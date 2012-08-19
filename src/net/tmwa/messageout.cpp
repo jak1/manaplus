@@ -43,6 +43,7 @@ MessageOut::MessageOut(short id):
     Net::MessageOut(id)
 {
     mNetwork = TmwAthena::Network::instance();
+    mNetwork->fixSendBuffer();
     mData = mNetwork->mOutBuffer + mNetwork->mOutSize;
     writeInt16(id);
 }

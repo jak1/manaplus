@@ -85,7 +85,8 @@ short packet_lengths[] =
    -1,122,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
 };
 
-const unsigned int BUFFER_SIZE = 655360;
+const unsigned int BUFFER_SIZE = 1000000;
+const unsigned int BUFFER_LIMIT = 930000;
 
 namespace TmwAthena
 {
@@ -480,6 +481,17 @@ Uint16 Network::readWord(int pos)
 #else
     return (*reinterpret_cast<Uint16*>(mInBuffer + (pos)));
 #endif
+}
+
+void Network::fixSendBuffer()
+{
+    if (mOutSize > BUFFER_LIMIT)
+    {
+        if (mState != CONNECTED)
+            mOutSize = 0;
+        else
+            flush();
+    }
 }
 
 } // namespace TmwAthena
