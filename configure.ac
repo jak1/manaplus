@@ -1,11 +1,10 @@
 AC_PREREQ(2.60)
-AC_INIT([ManaPlus], [1.3.10.27], [akaras@inbox.ru], [manaplus])
+AC_INIT([ManaPlus], [1.3.11.10], [akaras@inbox.ru], [manaplus])
 AM_INIT_AUTOMAKE([1.9])
 AC_CONFIG_HEADERS([config.h:config.h.in])
 AC_LANG_CPLUSPLUS
 
 # Checks for android.
-# Enable mac build
 AC_ARG_ENABLE(androidbuild,
 [  --enable-androidbuild    Turn on android building],
 [case "${enableval}" in
@@ -15,6 +14,17 @@ AC_ARG_ENABLE(androidbuild,
  ;;
   *) AC_MSG_ERROR(bad value ${enableval} for --enable-androidbuild) ;;
 esac],[androidbuild_enabled=false])
+
+# Enable nacl build
+AC_ARG_ENABLE(naclbuild,
+[  --enable-naclbuild    Turn on nacl building],
+[case "${enableval}" in
+  yes) naclbuild_enabled=true
+ ;;
+  no)  naclbuild_enabled=false
+ ;;
+  *) AC_MSG_ERROR(bad value ${enableval} for --enable-naclbuild) ;;
+esac],[naclbuild_enabled=false])
 
 # Checks for programs.
 AC_PROG_CXX
@@ -28,8 +38,10 @@ AC_HEADER_TIME
 AC_FUNC_ERROR_AT_LINE
 
 if test "x$androidbuild_enabled" == "xfalse"; then
-    AC_FUNC_MALLOC
-    AC_FUNC_REALLOC
+    if test "x$naclbuild_enabled" == "xfalse"; then
+        AC_FUNC_MALLOC
+        AC_FUNC_REALLOC
+    fi
 fi
 
 AC_C_INLINE
@@ -78,12 +90,6 @@ if test "x$with_sdl2" == "xyes"; then
     AC_MSG_ERROR([ *** Unable to find SDL2_mixer library (http://www.libsdl.org/projects/SDL_mixer/)]))
 
 
-#    disabled for now
-#    AC_CHECK_LIB(SDL2_gfx, rotozoomSurfaceXY, ,
-#    AC_MSG_ERROR([ *** Unable to find SDL2_gfx library (http://www.ferzkopp.net/joomla/software-mainmenu-14/4-ferzkopps-linux-software/19-sdlgfx)]))
-#    AC_CHECK_HEADERS(SDL_rotozoom.h, ,)
-
-#   using embedded sdl2gfx
 
     AC_CHECK_LIB(SDL2_net, SDLNet_Init, ,
     AC_MSG_ERROR([ *** Unable to find SDL2_net library]))
@@ -95,31 +101,49 @@ else
         LIBS="$LIBS `$SDL_CONFIG --libs`"
         CPPFLAGS="$CPPFLAGS `$SDL_CONFIG --cflags`"
     fi
-    AC_CHECK_LIB([SDL], [SDL_Init], ,
-    AC_MSG_ERROR([ *** Unable to find SDL library (http://www.libsdl.org/)]))
 
-    AC_CHECK_LIB(SDL_image, IMG_LoadPNG_RW, ,
-    AC_MSG_ERROR([ *** Unable to find SDL_image library with PNG support
+    if test "x$naclbuild_enabled" == "xfalse"; then
+        AC_CHECK_LIB([SDL], [SDL_Init], ,
+        AC_MSG_ERROR([ *** Unable to find SDL library (http://www.libsdl.org/)]))
+
+
+        AC_CHECK_LIB(SDL_image, IMG_LoadPNG_RW, ,
+        AC_MSG_ERROR([ *** Unable to find SDL_image library with PNG support
     (http://www.libsdl.org/projects/SDL_image/)]))
 
-    AC_CHECK_LIB(SDL_ttf, TTF_Quit, ,
-    AC_MSG_ERROR([ *** Unable to find SDL_ttf library (http://www.libsdl.org/projects/SDL_ttf/)]))
+        AC_CHECK_LIB(SDL_ttf, TTF_Quit, ,
+        AC_MSG_ERROR([ *** Unable to find SDL_ttf library (http://www.libsdl.org/projects/SDL_ttf/)]))
 
-    AC_CHECK_LIB([SDL_mixer], [Mix_OpenAudio], ,
-    AC_MSG_ERROR([ *** Unable to find SDL_mixer library (http://www.libsdl.org/projects/SDL_mixer/)]))
+        AC_CHECK_LIB([SDL_mixer], [Mix_OpenAudio], ,
+        AC_MSG_ERROR([ *** Unable to find SDL_mixer library (http://www.libsdl.org/projects/SDL_mixer/)]))
 
 
-    AC_CHECK_LIB(SDL_gfx, rotozoomSurfaceXY, ,
-    AC_MSG_ERROR([ *** Unable to find SDL_gfx library (http://www.ferzkopp.net/joomla/software-mainmenu-14/4-ferzkopps-linux-software/19-sdlgfx)]))
-    AC_CHECK_HEADERS(SDL_rotozoom.h, ,)
+        AC_CHECK_LIB(SDL_gfx, rotozoomSurfaceXY, ,
+        AC_MSG_ERROR([ *** Unable to find SDL_gfx library (http://www.ferzkopp.net/joomla/software-mainmenu-14/4-ferzkopps-linux-software/19-sdlgfx)]))
+        AC_CHECK_HEADERS(SDL_rotozoom.h, ,)
 
-    AC_CHECK_LIB(SDL_net, SDLNet_Init, ,
-    AC_MSG_ERROR([ *** Unable to find SDL_net library]))
+        AC_CHECK_LIB(SDL_net, SDLNet_Init, ,
+        AC_MSG_ERROR([ *** Unable to find SDL_net library]))
+    fi
 
     with_sdl2=no
 fi
 
 AM_CONDITIONAL(USE_SDL2, test x$with_sdl2 = xyes)
+
+# Option to enable internal sdl-gfx for SDL2 (for now it enabled by default)
+AC_ARG_WITH(internalsdlgfx,[  --without-internalsdlgfx        don't use internal sdlgfx (for SDL2 only) ] )
+if test "x$with_internalsdlgfx" == "xno"; then
+    with_internalsdlgfx=no
+
+    AC_CHECK_LIB(SDL2_gfx, rotozoomSurfaceXY, ,
+    AC_MSG_ERROR([ *** Unable to find SDL2_gfx library (http://www.ferzkopp.net/joomla/software-mainmenu-14/4-ferzkopps-linux-software/19-sdlgfx)]))
+    AC_CHECK_HEADERS(SDL_rotozoom.h, ,)
+else
+    with_internalsdlgfx=yes
+    AC_DEFINE(USE_INTERNALSDLGFX, 1, [Defines if ManaPlus should use internal sdlgfx2])
+fi
+AM_CONDITIONAL(USE_INTERNALSDLGFX, test x$with_internalsdlgfx = xyes)
 
 # Search for *-config
 AC_PATH_PROG(PKG_CONFIG, pkg-config)
@@ -295,6 +319,17 @@ AC_ARG_ENABLE(eathena,
 esac],[with_eathena=false])
 
 AM_CONDITIONAL(ENABLE_EATHENA, test x$with_eathena = xtrue)
+
+# Enable checks
+AC_ARG_ENABLE(checks,
+[  --enable-checks    Turn on internal checks (can be slow)],
+[case "${enableval}" in
+  yes) with_checks=true ;;
+  no)  with_checks=false ;;
+  *) AC_MSG_ERROR(bad value ${enableval} for --enable-checks) ;;
+esac],[with_checks=false])
+
+AM_CONDITIONAL(ENABLE_CHECKS, test x$with_checks = xtrue)
 
 # Enable portable
 AC_ARG_ENABLE(portable,

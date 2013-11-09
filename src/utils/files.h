@@ -21,12 +21,18 @@
 #ifndef UTILS_FILES_H
 #define UTILS_FILES_H
 
-#ifdef ANDROID
 #include <string>
 
 namespace Files
 {
+#ifdef ANDROID
     void extractLocale();
+#endif
+
+#if defined(ANDROID) || defined(__native_client__)
+    typedef void (*CopyFileCallbackPtr) (int cnt);
+
+    void setCopyCallBack(CopyFileCallbackPtr callback);
 
     void copyPhysFsFile(const std::string &inFile, const std::string &outFile);
 
@@ -34,7 +40,9 @@ namespace Files
 
     void extractZip(const std::string &zipName, const std::string &inDir,
                     const std::string &outDir);
+#endif  // ANDROID __native_client__
+
+    int renameFile(const std::string &pFrom, const std::string &pTo);
 }  // namespace Files
 
-#endif  // ANDROID
 #endif  // UTILS_FILES_H

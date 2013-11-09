@@ -24,7 +24,6 @@
 #define NET_EA_NETWORK_H
 
 #include "net/serverinfo.h"
-
 #include "net/sdltcpnet.h"
 
 #include <SDL_thread.h>

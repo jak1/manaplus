@@ -23,7 +23,8 @@
 #include "net/tmwa/playerhandler.h"
 
 #include "configuration.h"
-#include "client.h"
+#include "game.h"
+#include "soundmanager.h"
 
 #include "net/net.h"
 
@@ -33,9 +34,12 @@
 
 #include "gui/windows/whoisonline.h"
 
+#include "gui/viewport.h"
+
 #include "debug.h"
 
 extern Net::PlayerHandler *playerHandler;
+extern int serverVersion;
 
 namespace TmwAthena
 {
@@ -56,6 +60,8 @@ PlayerHandler::PlayerHandler() :
         SMSG_PLAYER_STAT_UPDATE_6,
         SMSG_PLAYER_ARROW_MESSAGE,
         SMSG_ONLINE_LIST,
+        SMSG_MAP_MASK,
+        SMSG_MAP_MUSIC,
         0
     };
     handledMessages = _messages;
@@ -106,6 +112,14 @@ void PlayerHandler::handleMessage(Net::MessageIn &msg)
 
         case SMSG_ONLINE_LIST:
             processOnlineList(msg);
+            break;
+
+        case SMSG_MAP_MASK:
+            processMapMask(msg);
+            break;
+
+        case SMSG_MAP_MUSIC:
+            processMapMusic(msg);
             break;
 
         default:
@@ -293,6 +307,26 @@ void PlayerHandler::updateStatus(const uint8_t status) const
     MessageOut outMsg(CMSG_SET_STATUS);
     outMsg.writeInt8(status);
     outMsg.writeInt8(0);
+}
+
+void PlayerHandler::processMapMask(Net::MessageIn &msg) const
+{
+    const int mask = msg.readInt32();
+    msg.readInt32();  // unused
+    Map *const map = Game::instance()->getCurrentMap();
+    if (map)
+        map->setMask(mask);
+}
+
+void PlayerHandler::processMapMusic(Net::MessageIn &msg) const
+{
+    const int size = msg.readInt16() - 5;
+    const std::string music = msg.readString(size);
+    soundManager.playMusic(music);
+
+    Map *const map = viewport->getMap();
+    if (map)
+        map->setMusicFile(music);
 }
 
 }  // namespace TmwAthena

@@ -57,6 +57,7 @@ typedef TilePairVector::const_iterator TilePairVectorCIter;
 
 typedef std::vector<AmbientLayer*> AmbientLayerVector;
 typedef AmbientLayerVector::const_iterator AmbientLayerVectorCIter;
+typedef AmbientLayerVector::iterator AmbientLayerVectorIter;
 
 static const int mapTileSize = 32;
 
@@ -267,6 +268,8 @@ class Map final : public Properties, public ConfigListener
 
         const std::string getMusicFile() const A_WARN_UNUSED;
 
+        void setMusicFile(const std::string &file);
+
         const std::string getName() const A_WARN_UNUSED;
 
         /**
@@ -430,6 +433,8 @@ class Map final : public Properties, public ConfigListener
 
         uint8_t getHeightOffset(const int x, const int y) const;
 
+        void setMask(const int mask);
+
     protected:
         friend class Actor;
         friend class Minimap;
@@ -545,6 +550,7 @@ class Map final : public Properties, public ConfigListener
         int mDrawY;
         int mDrawScrollX;
         int mDrawScrollY;
+        int mMask;
         Resource *mAtlas;
         MapHeights *mHeights;
         bool mRedrawMap;

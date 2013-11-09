@@ -23,7 +23,6 @@
 #include "resources/resourcemanager.h"
 
 #include "animationdelayload.h"
-#include "client.h"
 #include "configuration.h"
 #include "logger.h"
 #include "navigationmanager.h"
@@ -39,9 +38,11 @@
 #include "resources/spritedef.h"
 
 #include "utils/mkdir.h"
+#include "utils/paths.h"
 #include "utils/physfscheckutils.h"
 #include "utils/physfsrwops.h"
 #include "utils/sdlcheckutils.h"
+#include "utils/timer.h"
 
 #include <SDL_image.h>
 #include <dirent.h>
@@ -427,8 +428,7 @@ std::string ResourceManager::getPath(const std::string &file) const
     else
     {
         // if not found in search path return the default path
-        path = std::string(client->getPackageDirectory()).append(
-            dirSeparator).append(file);
+        path = getPackageDir().append(dirSeparator).append(file);
     }
 
     return path;

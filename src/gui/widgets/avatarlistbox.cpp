@@ -71,6 +71,7 @@ AvatarListBox::AvatarListBox(const Widget2 *const widget,
 AvatarListBox::~AvatarListBox()
 {
     config.removeListeners(this);
+    CHECKLISTENERS
 
     instances--;
 
@@ -112,7 +113,7 @@ void AvatarListBox::draw(gcn::Graphics *gcnGraphics)
     // Draw the list elements
     graphics->setColorAll(mForegroundColor, mForegroundColor2);
     ImageCollection vertexes;
-    const bool useCaching = openGLMode != RENDER_SAFE_OPENGL;
+    const bool useCaching = isBatchDrawRenders(openGLMode);
 
     for (int i = 0, y = 0;
          i < model->getNumberOfElements();

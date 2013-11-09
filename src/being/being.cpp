@@ -68,6 +68,7 @@
 #include "gui/widgets/tabs/langtab.h"
 
 #include "utils/gettext.h"
+#include "utils/timer.h"
 
 #include "debug.h"
 
@@ -214,6 +215,7 @@ Being::Being(const int id, const Type type, const uint16_t subtype,
 Being::~Being()
 {
     config.removeListener("visiblenames", this);
+    CHECKLISTENERS
 
     delete [] mSpriteRemap;
     mSpriteRemap = nullptr;

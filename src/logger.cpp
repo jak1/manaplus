@@ -25,8 +25,6 @@
 #include <iostream>
 #include <sstream>
 
-#include "gui/widgets/tabs/chattab.h"
-
 #ifdef WIN32
 #include <windows.h>
 #elif defined __APPLE__
@@ -62,10 +60,11 @@
         << static_cast<int>((tv.tv_usec / 10000) % 100) \
         << "] ";
 
+Logger *logger = nullptr;          // Log object
+
 Logger::Logger() :
     mLogFile(),
     mLogToStandardOut(true),
-    mChatWindow(nullptr),
     mDebugLog(false)
 {
 }
@@ -95,6 +94,7 @@ void Logger::log(const std::string &str)
     log("%s", str.c_str());
 }
 
+#ifdef ENABLEDEBUGLOG
 void Logger::dlog(const std::string &str)
 {
     if (!mDebugLog)
@@ -114,10 +114,8 @@ void Logger::dlog(const std::string &str)
 
     if (mLogToStandardOut)
         std::cout << timeStr.str() << str << std::endl;
-
-    if (mChatWindow && debugChatTab)
-        debugChatTab->chatLog(str, BY_LOGGER);
 }
+#endif
 
 void Logger::log1(const char *const buf)
 {
@@ -135,9 +133,6 @@ void Logger::log1(const char *const buf)
 
     if (mLogToStandardOut)
         std::cout << timeStr.str() << buf << std::endl;
-
-    if (mChatWindow && debugChatTab)
-        debugChatTab->chatLog(buf, BY_LOGGER);
 }
 
 void Logger::log(const char *const log_text, ...)
@@ -169,9 +164,6 @@ void Logger::log(const char *const log_text, ...)
 
     if (mLogToStandardOut)
         std::cout << timeStr.str() << buf << std::endl;
-
-    if (mChatWindow && debugChatTab)
-        debugChatTab->chatLog(buf, BY_LOGGER);
 
     // Delete temporary buffer
     delete [] buf;

@@ -30,7 +30,12 @@
 #include <guichan/actionlistener.hpp>
 
 #include <SDL.h>
+
+#ifdef USE_SDL2
+#include <SDL2_framerate.h>
+#else
 #include <SDL_framerate.h>
+#endif
 
 #include <string>
 
@@ -46,17 +51,6 @@ class Skin;
 class Window;
 class QuitDialog;
 
-/**
- * Set the milliseconds value of a tick time.
- */
-static const int MILLISECONDS_IN_A_TICK = 10;
-
-static const uint16_t DEFAULT_PORT = 6901;
-
-extern volatile int fps;
-extern volatile int lps;
-extern volatile int tick_time;
-extern volatile int cur_time;
 extern bool isSafeMode;
 extern int serverVersion;
 extern unsigned int tmwServerVersion;
@@ -72,13 +66,6 @@ class ErrorListener : public gcn::ActionListener
 extern std::string errorMessage;
 extern ErrorListener errorListener;
 extern LoginData loginData;
-
-/**
- * Returns elapsed time. (Warning: supposes the delay is always < 100 seconds)
- */
-int get_elapsed_time(const int startTime) A_WARN_UNUSED;
-
-int get_elapsed_time1(const int startTime) A_WARN_UNUSED;
 
 /**
  * All client states.
@@ -233,9 +220,6 @@ public:
     State getState() const A_WARN_UNUSED
     { return mState; }
 
-    const std::string &getPackageDirectory() const A_WARN_UNUSED
-    { return mPackageDir; }
-
     const std::string &getConfigDirectory() const A_WARN_UNUSED
     { return mConfigDir; }
 
@@ -342,6 +326,22 @@ public:
                             const bool modal);
 
 private:
+    void createWindows();
+
+    void initLang();
+
+    void initSoundManager();
+
+    void initConfigListeners();
+
+    void initGraphics();
+
+    void initTitle();
+
+    void extractDataDir();
+
+    void mountDataDir();
+
     void initRootDir();
 
     void initHomeDir();
@@ -378,7 +378,7 @@ private:
 
     static Client *mInstance;
 
-    static void bindTextDomain(const char *const name, const char *const path);
+    static void bindTextDomain(const char *const path);
 
     static void setEnv(const char *const name, const char *const value);
 
@@ -390,7 +390,6 @@ private:
 
     Options mOptions;
 
-    std::string mPackageDir;
     std::string mConfigDir;
     std::string mServerConfigDir;
     std::string mLocalDataDir;
@@ -423,9 +422,6 @@ private:
     State mOldState;
 
     SDL_Surface *mIcon;
-
-    SDL_TimerID mLogicCounterId;
-    SDL_TimerID mSecondsCounterId;
 
     std::string mCaption;
     FPSmanager mFpsManager;

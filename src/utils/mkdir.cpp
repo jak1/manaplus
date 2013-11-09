@@ -112,6 +112,7 @@ int mkdir_r(const char *const pathname)
     return 0;
 }
 #else
+
 /// Create a directory, making leading components first if necessary
 int mkdir_r(const char *const pathname)
 {

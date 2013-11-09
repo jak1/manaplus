@@ -105,6 +105,7 @@
 #include "utils/physfstools.h"
 #include "utils/process.h"
 #include "utils/sdlcheckutils.h"
+#include "utils/timer.h"
 
 #include <sstream>
 #include <string>
@@ -314,9 +315,6 @@ static void createGuiWindows()
         gmChatTab = new GmTab(chatWindow);
     }
 
-    if (config.getBoolValue("logToChat"))
-        logger->setChatWindow(chatWindow);
-
     if (!isSafeMode && chatWindow)
         chatWindow->loadState();
 
@@ -338,7 +336,6 @@ static void destroyGuiWindows()
 {
     Net::getGeneralHandler()->gameEnded();
 
-    logger->setChatWindow(nullptr);
     if (whoIsOnline)
         whoIsOnline->setAllowUpdate(false);
 
@@ -851,6 +848,12 @@ void Game::handleMove()
                  (joystick && joystick->isRight()))
         {
             direction |= Being::RIGHT;
+            setValidSpeed();
+            player_node->cancelFollow();
+        }
+        else if (inputManager.isActionActive(Input::KEY_MOVE_FORWARD))
+        {
+            direction = player_node->getDirection();
             setValidSpeed();
             player_node->cancelFollow();
         }

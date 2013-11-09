@@ -420,6 +420,7 @@ SET(SRCS
     net/npchandler.h
     net/net.cpp
     net/net.h
+    net/netconsts.h
     net/partyhandler.h
     net/playerhandler.h
     net/sdltcpnet.cpp
@@ -553,6 +554,8 @@ SET(SRCS
     utils/stringutils.cpp
     utils/stringutils.h
     utils/stringvector.h
+    utils/timer.cpp
+    utils/timer.h
     utils/mutex.h
     utils/mkdir.cpp
     utils/mkdir.h

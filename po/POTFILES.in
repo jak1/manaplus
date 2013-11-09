@@ -7,6 +7,7 @@ src/client.cpp
 src/commandhandler.cpp
 src/commands.cpp
 src/commands.h
+src/dyetool/dyemain.cpp
 src/game.cpp
 src/gui/popups/beingpopup.cpp
 src/gui/popups/itempopup.cpp
@@ -114,3 +115,4 @@ src/resources/db/monsterdb.cpp
 src/resources/mapreader.cpp
 src/utils/gettext.h
 src/utils/stringutils.h
+src/utils/xml.cpp

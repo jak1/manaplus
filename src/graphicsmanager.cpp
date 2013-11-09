@@ -364,6 +364,14 @@ void GraphicsManager::setVideoMode()
 
     int width = res[0];
     int height = res[1];
+#elif defined __native_client__
+#ifdef USE_SDL2
+    // not implimented
+#else
+    const SDL_VideoInfo* info = SDL_GetVideoInfo();
+    int width = info->current_w;
+    int height = info->current_h;
+#endif
 #else
     int width = config.getIntValue("screenwidth");
     int height = config.getIntValue("screenheight");
@@ -445,9 +453,11 @@ void GraphicsManager::updateExtensions()
     {   // get extensions in old way
         char const *extensions = reinterpret_cast<char const *>(
             glGetString(GL_EXTENSIONS));
-        logger->log1(extensions);
-
-        splitToStringSet(mExtensions, extensions, ' ');
+        if (extensions)
+        {
+            logger->log1(extensions);
+            splitToStringSet(mExtensions, extensions, ' ');
+        }
     }
 }
 

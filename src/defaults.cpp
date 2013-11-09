@@ -21,7 +21,6 @@
 
 #include "defaults.h"
 
-#include "client.h"
 #include "graphicsmanager.h"
 
 #include "being/being.h"
@@ -29,6 +28,12 @@
 #include "input/keydata.h"
 
 #include "render/graphics.h"
+
+#include "net/netconsts.h"
+
+#ifndef USE_SDL2
+#include <SDL_keyboard.h>
+#endif
 
 #include "debug.h"
 
@@ -129,7 +134,11 @@ DefaultsData* getConfigDefaults()
     AddDEF("fpslimit", 60);
     AddDEF("theme", "");
     AddDEF("showChatColorsList", true);
+#ifdef __native_client__
+    AddDEF("customcursor", false);
+#else
     AddDEF("customcursor", true);
+#endif
     AddDEF("showDidYouKnow", true);
 #endif
     AddDEF("showEmotesButton", true);
@@ -182,7 +191,6 @@ DefaultsData* getConfigDefaults()
     AddDEF("npcFont", "fonts/dejavusans.ttf");
     AddDEF("showBackground", true);
     AddDEF("enableTradeTab", true);
-    AddDEF("logToChat", false);
     AddDEF("cyclePlayers", true);
     AddDEF("cycleMonsters", true);
     AddDEF("cycleNPC", true);
@@ -492,6 +500,7 @@ DefaultsData* getFeaturesDefaults()
 {
     DefaultsData *const configData = new DefaultsData;
     AddDEF("languageTab", false);
+    AddDEF("allowFollow", true);
     return configData;
 }
 

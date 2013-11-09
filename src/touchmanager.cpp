@@ -67,6 +67,7 @@ TouchManager::~TouchManager()
     clear();
     delete mVertexes;
     mVertexes = nullptr;
+    CHECKLISTENERS
 }
 
 void TouchManager::shutdown()
@@ -185,7 +186,7 @@ void TouchManager::clear()
 
 void TouchManager::draw()
 {
-    if (openGLMode != RENDER_SAFE_OPENGL)
+    if (isBatchDrawRenders(openGLMode))
     {
         if (mRedraw)
         {

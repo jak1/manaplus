@@ -341,6 +341,7 @@ namespace Input
         KEY_SHOW_KEYBOARD,
         KEY_SHOW_WINDOWS,
         KEY_CHAT_MOD,
+        KEY_MOVE_FORWARD,
         KEY_TOTAL
     };
 }  // namespace Input

@@ -45,8 +45,8 @@
  * different interfaces, which have different implementations for each server.
  */
 
-#define SMALL_VERSION "1.3.10.27"
-#define CHECK_VERSION "01.03.10.27"
+#define SMALL_VERSION "1.3.11.10"
+#define CHECK_VERSION "01.03.11.10"
 
 #ifdef HAVE_CONFIG_H
 #include "../config.h"
@@ -76,6 +76,8 @@
     || defined WIN64 || defined _WIN64 || defined __WIN64__ \
     || defined __MINGW32__ || defined _MSC_VER
 #define PACKAGE_OS "Windows"
+#elif defined __native_client__
+#define PACKAGE_OS "nacl"
 #else
 #define PACKAGE_OS "Other"
 #endif

@@ -26,8 +26,6 @@
 
 #include "utils/gettext.h"
 
-#include <guichan/font.hpp>
-
 #include "debug.h"
 
 EditDialog::EditDialog(const std::string &title, const std::string &msg,
@@ -47,17 +45,16 @@ void EditDialog::postInit()
     // TRANSLATORS: edit dialog label
     Button *const okButton = new Button(this, _("OK"), mEventOk, this);
 
-    const int numRows = 1;
-    const int fontHeight = getFont()->getHeight();
-    const int height = numRows * fontHeight;
     const int pad = getPadding();
-
-    setContentSize(mDefaultWidth, height + fontHeight + okButton->getHeight());
+    const int pad2 = pad * 2;
     mTextField->setPosition(pad, pad);
-    mTextField->setWidth(mDefaultWidth - 2 * pad);
-
+    mTextField->setWidth(mDefaultWidth - pad2);
+    const int buttonPadding = getOption("buttonPadding", 8)
+        + mTextField->getHeight();
+    setContentSize(mDefaultWidth, okButton->getHeight()
+        + buttonPadding + pad2);
     okButton->setPosition((mDefaultWidth - okButton->getWidth()) / 2,
-        height + getOption("buttonPadding", 8));
+        buttonPadding + pad);
 
     add(mTextField);
     add(okButton);

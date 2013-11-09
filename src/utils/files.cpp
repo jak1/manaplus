@@ -18,18 +18,18 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifdef ANDROID
 #include "utils/files.h"
 
-#include "logger.h"
-
+#if defined(ANDROID) || defined(__native_client__)
 #include "resources/resourcemanager.h"
+#include "utils/physfstools.h"
+#endif
 
 #include "utils/mkdir.h"
-#include "utils/physfstools.h"
 
 #include "localconsts.h"
 
+#ifdef ANDROID
 void Files::extractLocale()
 {
     // in future need also remove all locales in local dir
@@ -60,6 +60,20 @@ void Files::extractLocale()
     resman->removeFromSearchPath(fileName2);
     remove(fileName2.c_str());
 }
+#endif // ANDROID
+
+#if defined(ANDROID) || defined(__native_client__)
+
+namespace
+{
+    int mFilesCount = 0;
+    Files::CopyFileCallbackPtr mCallbackPtr = nullptr;
+}  // namespace
+
+void Files::setCopyCallBack(Files::CopyFileCallbackPtr callback)
+{
+    mCallbackPtr = callback;
+}
 
 void Files::copyPhysFsFile(const std::string &inFile,
                            const std::string &outFile)
@@ -70,6 +84,13 @@ void Files::copyPhysFsFile(const std::string &inFile,
     fwrite(buf, 1, size, file);
     fclose(file);
     free(buf);
+#ifdef ANDROID
+    if (mCallbackPtr)
+    {
+        mCallbackPtr(mFilesCount);
+        mFilesCount ++;
+    }
+#endif
 }
 
 void Files::copyPhysFsDir(const std::string &inDir, const std::string &outDir)
@@ -98,4 +119,40 @@ void Files::extractZip(const std::string &zipName, const std::string &inDir,
     remove(zipName.c_str());
 }
 
-#endif  // ANDROID
+#endif  // ANDROID __native_client__
+
+int Files::renameFile(const std::string &srcName, const std::string &dstName)
+{
+    FILE *srcFile = fopen(srcName.c_str(), "rb");
+    if (srcFile == nullptr)
+        return -1;
+    FILE *dstFile = fopen(dstName.c_str(), "w+b");
+    if (dstFile == nullptr)
+    {
+        fclose(srcFile);
+        return -1;
+    }
+
+    const int chunkSize = 500000;
+    char *buf = new char[chunkSize];
+    size_t sz = 0;
+    while ((sz = fread(buf, 1, chunkSize, srcFile)))
+    {
+        if (fwrite(buf, 1, sz, dstFile) != sz)
+        {
+            delete [] buf;
+            fclose(srcFile);
+            fclose(dstFile);
+            ::remove(dstName.c_str());
+            return -1;
+        }
+    }
+
+    delete [] buf;
+    fclose(srcFile);
+    fclose(dstFile);
+    if (!::remove(srcName.c_str()))
+        return 0;
+
+    return -1;
+}

@@ -1,6 +1,6 @@
 AUTOMAKE_OPTIONS = subdir-objects
 
-bin_PROGRAMS = manaplus
+bin_PROGRAMS = manaplus dyecmd
 
 manaplus_CXXFLAGS = -DPKG_DATADIR=\""$(pkgdatadir)/"\"      \
 		-DLOCALEDIR=\""$(localedir)"\"           \
@@ -25,16 +25,137 @@ else
 manaplus_SOURCES =
 endif
 
+if USE_INTERNALGUICHAN
+dyecmd_CXXFLAGS = -I$(srcdir)/guichan/include -DUSE_INTERNALGUICHAN
+dyecmd_SOURCES = guichan/actionevent.cpp \
+	      guichan/cliprectangle.cpp \
+	      guichan/color.cpp \
+	      guichan/event.cpp \
+	      guichan/exception.cpp \
+	      guichan/font.cpp \
+	      guichan/graphics.cpp \
+	      guichan/rectangle.cpp \
+	      guichan/widget.cpp \
+	      guichan/include/guichan/actionevent.hpp \
+	      guichan/include/guichan/cliprectangle.hpp \
+	      guichan/include/guichan/color.hpp \
+	      guichan/include/guichan/event.hpp \
+	      guichan/include/guichan/exception.hpp \
+	      guichan/include/guichan/font.hpp \
+	      guichan/include/guichan/graphics.hpp \
+	      guichan/include/guichan/rectangle.hpp \
+	      guichan/include/guichan/widget.hpp
+else
+dyecmd_CXXFLAGS =
+dyecmd_SOURCES =
+endif
+
+dyecmd_SOURCES += dyetool/dyemain.cpp \
+	      animatedsprite.cpp \
+	      animatedsprite.h \
+	      animationdelayload.cpp \
+	      animationdelayload.h \
+	      configuration.cpp \
+	      configuration.h \
+	      graphicsmanager.cpp \
+	      graphicsmanager.h \
+	      graphicsvertexes.cpp \
+	      graphicsvertexes.h \
+	      logger.cpp \
+	      logger.h \
+	      navigationmanager.cpp \
+	      navigationmanager.h \
+	      walklayer.cpp \
+	      walklayer.h \
+	      render/graphics.cpp \
+	      render/graphics.h \
+	      render/renderers.cpp \
+	      render/renderers.h \
+	      render/sdl2softwaregraphics.cpp \
+	      render/sdl2softwaregraphics.h \
+	      render/sdl2graphics.cpp \
+	      render/sdl2graphics.h \
+	      render/sdlgraphics.cpp \
+	      render/sdlgraphics.h \
+	      resources/action.cpp \
+	      resources/action.h \
+	      resources/animation.cpp \
+	      resources/animation.h \
+	      resources/db/palettedb.cpp \
+	      resources/db/palettedb.h \
+	      resources/dye.cpp \
+	      resources/dye.h \
+	      resources/image.cpp \
+	      resources/image.h \
+	      resources/imagehelper.cpp \
+	      resources/imagehelper.h \
+	      resources/imageset.cpp \
+	      resources/imageset.h \
+	      resources/imagewriter.cpp \
+	      resources/imagewriter.h \
+	      resources/resource.cpp \
+	      resources/resource.h \
+	      resources/resourcemanager.cpp \
+	      resources/resourcemanager.h \
+	      resources/sdl2softwareimagehelper.cpp \
+	      resources/sdl2softwareimagehelper.h \
+	      resources/sdl2imagehelper.cpp \
+	      resources/sdl2imagehelper.h \
+	      resources/sdlimagehelper.cpp \
+	      resources/sdlimagehelper.h \
+	      resources/sdlmusic.cpp \
+	      resources/sdlmusic.h \
+	      resources/soundeffect.cpp \
+	      resources/soundeffect.h \
+	      resources/subimage.cpp \
+	      resources/subimage.h \
+	      resources/surfaceimagehelper.cpp \
+	      resources/surfaceimagehelper.h \
+	      resources/spritedef.cpp \
+	      resources/spritedef.h \
+	      utils/mkdir.cpp \
+	      utils/mkdir.h \
+	      utils/paths.cpp \
+	      utils/paths.h \
+	      utils/physfsrwops.cpp \
+	      utils/physfsrwops.h \
+	      utils/physfstools.cpp \
+	      utils/physfstools.h \
+	      utils/sdl2helper.cpp \
+	      utils/sdl2helper.h \
+	      utils/sdlhelper.cpp \
+	      utils/sdlhelper.h \
+	      utils/stringutils.cpp \
+	      utils/stringutils.h \
+	      utils/timer.cpp \
+	      utils/timer.h \
+	      utils/xml.cpp \
+	      utils/xml.h \
+	      utils/translation/podict.cpp \
+	      utils/translation/podict.h
+
 if USE_MUMBLE
 manaplus_CXXFLAGS += -DUSE_MUMBLE
 endif
 
+if ENABLE_CHECKS
+manaplus_CXXFLAGS += -DENABLE_CHECKS
+endif
+
 if USE_SDL2
+if USE_INTERNALSDLGFX
+dyecmd_CXXFLAGS += -I$(srcdir)/sdl2gfx -DUSE_SDL2
+dyecmd_SOURCES += sdl2gfx/SDL2_framerate.c \
+	      sdl2gfx/SDL2_framerate.h \
+	      sdl2gfx/SDL2_rotozoom.c \
+	      sdl2gfx/SDL2_rotozoom.h
+
 manaplus_CXXFLAGS += -I$(srcdir)/sdl2gfx -DUSE_SDL2
-manaplus_SOURCES += sdl2gfx/SDL_framerate.c \
-	      sdl2gfx/SDL_framerate.h \
-	      sdl2gfx/SDL_rotozoom.c \
-	      sdl2gfx/SDL_rotozoom.h
+manaplus_SOURCES += sdl2gfx/SDL2_framerate.c \
+	      sdl2gfx/SDL2_framerate.h \
+	      sdl2gfx/SDL2_rotozoom.c \
+	      sdl2gfx/SDL2_rotozoom.h
+endif
 endif
 
 if USE_INTERNALGUICHAN
@@ -430,6 +551,7 @@ manaplus_SOURCES += gui/widgets/avatarlistbox.cpp \
 	      net/messageout.h \
 	      net/net.cpp \
 	      net/net.h \
+	      net/netconsts.h \
 	      net/npchandler.h \
 	      net/partyhandler.h \
 	      net/playerhandler.h \
@@ -473,8 +595,8 @@ manaplus_SOURCES += gui/widgets/avatarlistbox.cpp \
 	      resources/image.h \
 	      resources/imagehelper.cpp \
 	      resources/imagehelper.h \
-	      resources/imageset.h \
 	      resources/imageset.cpp \
+	      resources/imageset.h \
 	      resources/imagewriter.cpp \
 	      resources/imagewriter.h \
 	      resources/db/itemdb.cpp \
@@ -568,6 +690,8 @@ manaplus_SOURCES += gui/widgets/avatarlistbox.cpp \
 	      utils/stringutils.cpp \
 	      utils/stringutils.h \
 	      utils/stringvector.h \
+	      utils/timer.cpp \
+	      utils/timer.h \
 	      utils/mutex.h \
 	      utils/xml.cpp \
 	      utils/xml.h \
@@ -914,6 +1038,7 @@ manaplus_SOURCES += \
 	      animatedsprite_unittest.cc \
 	      gui/sdlfont_unittest.cc \
 	      gui/widgets/browserbox_unittest.cc \
+	      utils/files_unittest.cc \
 	      utils/stringutils_unittest.cc \
 	      resources/dye_unittest.cc
 endif

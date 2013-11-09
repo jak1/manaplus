@@ -55,20 +55,16 @@ install_manifest.txt
 *.gcno
 .dirstamp
 po/stamp-po
-src/tmw
-src/tmw-ea
-src/mana
-src/mana-ea
 src/manaplus
+src/dyecmd
 
 # files created during Windows build
 .objs
 *.dll
 *.exe
-tmw.depend
-tmw.layout
-mana.depend
-mana.layout
+manaplis.depend
+manaplis.layout
+stdout.txt
 
 # files copied in on Windows
 include/*

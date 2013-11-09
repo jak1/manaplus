@@ -45,6 +45,7 @@
 #include "utils/dtor.h"
 #include "utils/mkdir.h"
 #include "utils/physfstools.h"
+#include "utils/timer.h"
 
 #include <climits>
 #include <queue>
@@ -172,6 +173,7 @@ Map::Map(const int width, const int height,
     mDrawY(-1),
     mDrawScrollX(-1),
     mDrawScrollY(-1),
+    mMask(1),
     mAtlas(nullptr),
     mHeights(nullptr),
     mRedrawMap(true),
@@ -198,6 +200,7 @@ Map::Map(const int width, const int height,
 Map::~Map()
 {
     config.removeListeners(this);
+    CHECKLISTENERS
 
     // delete metadata, layers, tilesets and overlays
     delete [] mMetaTiles;
@@ -280,11 +283,15 @@ void Map::initializeAmbientLayers()
         Image *const img = resman->getImage(getProperty(name + "image"));
         if (img)
         {
+            int mask = atoi(getProperty(name + "mask").c_str());
+            if (!mask)
+                mask = 1;
             mForegrounds.push_back(new AmbientLayer(img,
                 getFloatProperty(name + "parallax"),
                 getFloatProperty(name + "scrollX"),
                 getFloatProperty(name + "scrollY"),
-                getBoolProperty(name + "keepratio")));
+                getBoolProperty(name + "keepratio"),
+                mask));
 
             // The AmbientLayer takes control over the image.
             img->decRef();
@@ -300,11 +307,15 @@ void Map::initializeAmbientLayers()
 
         if (img)
         {
+            int mask = atoi(getProperty(name + "mask").c_str());
+            if (!mask)
+                mask = 1;
             mBackgrounds.push_back(new AmbientLayer(img,
                 getFloatProperty(name + "parallax"),
                 getFloatProperty(name + "scrollX"),
                 getFloatProperty(name + "scrollY"),
-                getBoolProperty(name + "keepratio")));
+                getBoolProperty(name + "keepratio"),
+                mask));
 
             // The AmbientLayer takes control over the image.
             img->decRef();
@@ -430,6 +441,9 @@ void Map::draw(Graphics *const graphics, int scrollX, int scrollY)
              layeri != layeri_end && !overFringe; ++ layeri)
         {
             MapLayer *const layer = *layeri;
+            if (!(layer->mMask & mMask))
+                continue;
+
             if (layer->isFringeLayer())
             {
                 layer->setSpecialLayer(mSpecialLayer);
@@ -597,11 +611,21 @@ void Map::updateAmbientLayers(const float scrollX, const float scrollY)
     const float dy = scrollY - mLastAScrollY;
     const int timePassed = get_elapsed_time(lastTick);
 
-    FOR_EACH (AmbientLayerVectorCIter, i, mBackgrounds)
-        (*i)->update(timePassed, dx, dy);
+    // need check mask to update or not to update
 
-    FOR_EACH (AmbientLayerVectorCIter, i, mForegrounds)
-        (*i)->update(timePassed, dx, dy);
+    FOR_EACH (AmbientLayerVectorIter, i, mBackgrounds)
+    {
+        AmbientLayer *const layer = *i;
+        if (layer && (layer->mMask & mMask))
+            layer->update(timePassed, dx, dy);
+    }
+
+    FOR_EACH (AmbientLayerVectorIter, i, mForegrounds)
+    {
+        AmbientLayer *const layer = *i;
+        if (layer && (layer->mMask & mMask))
+            layer->update(timePassed, dx, dy);
+    }
 
     mLastAScrollX = scrollX;
     mLastAScrollY = scrollY;
@@ -637,8 +661,10 @@ void Map::drawAmbientLayers(Graphics *const graphics, const LayerType type,
     // Draw overlays
     FOR_EACHP (AmbientLayerVectorCIter, i, layers)
     {
-        if (*i)
-            (*i)->draw(graphics, graphics->mWidth, graphics->mHeight);
+        const AmbientLayer *const layer = *i;
+        // need check mask to draw or not to draw
+        if (layer && (layer->mMask & mMask))
+            (layer)->draw(graphics, graphics->mWidth, graphics->mHeight);
 
         // Detail 1: only one overlay, higher: all overlays
         if (detail == 1)
@@ -1599,4 +1625,16 @@ uint8_t Map::getHeightOffset(const int x, const int y) const
     if (!mHeights)
         return 0;
     return mHeights->getHeight(x, y);
+}
+
+void Map::setMask(const int mask)
+{
+    if (mask != mMask)
+        mRedrawMap = true;
+    mMask = mask;
+}
+
+void Map::setMusicFile(const std::string &file)
+{
+    setProperty("music", file);
 }

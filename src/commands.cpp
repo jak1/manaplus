@@ -77,6 +77,7 @@
 
 #include "utils/gettext.h"
 #include "utils/process.h"
+#include "utils/timer.h"
 
 #include "debug.h"
 
@@ -740,6 +741,9 @@ impHandler1(pseudoAway)
 impHandler(follow)
 {
     if (!player_node)
+        return;
+
+    if (!features.getBoolValue("allowFollow"))
         return;
 
     if (!args.empty())

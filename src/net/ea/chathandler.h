@@ -49,17 +49,20 @@ class ChatHandler : public Net::ChatHandler
                                       const bool channels) const;
 
         virtual void processChat(Net::MessageIn &msg, const bool normalChat,
-                                 const bool channels) const;
+                                 const bool channels);
 
         virtual void processMVP(Net::MessageIn &msg) const;
 
         virtual void processIgnoreAllResponse(Net::MessageIn &msg) const;
+
+        void clear() override final;
 
     protected:
         typedef std::queue<std::string> WhisperQueue;
         WhisperQueue mSentWhispers;
         bool mShowAllLang;
         bool mShowMotd;
+        bool mSkipping;
 };
 
 }  // namespace Ea
