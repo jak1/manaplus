@@ -24,14 +24,13 @@
 
 #include "client.h"
 
-#ifdef ANDROID
+#if defined ANDROID || defined USE_SDL2
 #include "input/inputmanager.h"
 #endif
 
 #include "input/keydata.h"
 #include "input/keyevent.h"
 
-#include "gui/sdlinput.h"
 #include "gui/viewport.h"
 
 #include "gui/popups/popupmenu.h"
@@ -277,45 +276,21 @@ void TextField::keyPressed(gcn::KeyEvent &keyEvent)
     {
         case 2:  // Ctrl+b
         {
-            while (mCaretPosition > 0)
-            {
-                --mCaretPosition;
-                if ((mText[mCaretPosition] & 192) != 128)
-                    break;
-            }
+            moveCaretBack();
             consumed = true;
             break;
         }
 
         case 6:  // Ctrl+f
         {
-            const unsigned sz = static_cast<unsigned>(mText.size());
-            while (mCaretPosition < sz)
-            {
-                ++mCaretPosition;
-                if (mCaretPosition == sz ||
-                    (mText[mCaretPosition] & 192) != 128)
-                {
-                    break;
-                }
-            }
+            moveCaretForward();
             consumed = true;
             break;
         }
 
         case 4:  // Ctrl+d
         {
-            unsigned sz = static_cast<unsigned>(mText.size());
-            while (mCaretPosition < sz)
-            {
-                --sz;
-                mText.erase(mCaretPosition, 1);
-                if (mCaretPosition == sz ||
-                    (mText[mCaretPosition] & 192) != 128)
-                {
-                    break;
-                }
-            }
+            caretDelete();
             consumed = true;
             break;
         }
@@ -336,15 +311,11 @@ void TextField::keyPressed(gcn::KeyEvent &keyEvent)
             break;
 
         case 21:  // Ctrl+u
-            if (mCaretPosition > 0)
-            {
-                mText = mText.substr(mCaretPosition);
-                mCaretPosition = 0;
-            }
+            caretDeleteToStart();
             consumed = true;
             break;
 
-        case 3:
+        case 3:  // Ctrl+c
             handleCopy();
             consumed = true;
             break;
@@ -359,15 +330,7 @@ void TextField::keyPressed(gcn::KeyEvent &keyEvent)
             break;
 
         case 23:  // Ctrl+w
-            while (mCaretPosition > 0)
-            {
-                deleteCharLeft(mText, &mCaretPosition);
-                if (mCaretPosition > 0 && isWordSeparator(
-                    mText[mCaretPosition - 1]))
-                {
-                    break;
-                }
-            }
+            caretDeleteWord();
             consumed = true;
             break;
 
@@ -469,8 +432,119 @@ void TextField::keyPressed(gcn::KeyEvent &keyEvent)
         distributeActionEvent();
 
     if (consumed)
+    {
         keyEvent.consume();
+    }
+#ifdef USE_SDL2
+    else
+    {
+        if (inputManager.isActionActive(static_cast<int>(Input::KEY_GUI_CTRL)))
+        {
+            switch (action)
+            {
+                case Input::KEY_GUI_B:
+                {
+                    moveCaretBack();
+                    consumed = true;
+                    break;
+                }
+                case Input::KEY_GUI_C:
+                {
+                    handleCopy();
+                    consumed = true;
+                    break;
+                }
+                case Input::KEY_GUI_D:
+                {
+                    caretDelete();
+                    consumed = true;
+                    break;
+                }
+                case Input::KEY_GUI_E:
+                {
+                    mCaretPosition = static_cast<int>(mText.size());
+                    consumed = true;
+                    break;
+                }
+                case Input::KEY_GUI_F:
+                {
+                    moveCaretBack();
+                    consumed = true;
+                    break;
+                }
+                case Input::KEY_GUI_H:
+                {
+                    deleteCharLeft(mText, &mCaretPosition);
+                    consumed = true;
+                    break;
+                }
+                case Input::KEY_GUI_U:
+                {
+                    caretDeleteToStart();
+                    consumed = true;
+                    break;
+                }
+                case Input::KEY_GUI_K:
+                {
+                    mText = mText.substr(0, mCaretPosition);
+                    consumed = true;
+                    break;
+                }
+                case Input::KEY_GUI_V:
+                {
+                    handlePaste();
+                    consumed = true;
+                    break;
+                }
+                case Input::KEY_GUI_W:
+                {
+                    caretDeleteWord();
+                    consumed = true;
+                    break;
+                }
+
+                default:
+                    break;
+            }
+        }
+    }
+    if (consumed)
+        keyEvent.consume();
+#endif
     fixScroll();
+}
+
+void TextField::moveCaretBack()
+{
+    while (mCaretPosition > 0)
+    {
+        --mCaretPosition;
+        if ((mText[mCaretPosition] & 192) != 128)
+        break;
+    }
+}
+
+void TextField::moveCaretForward()
+{
+    const unsigned sz = static_cast<unsigned>(mText.size());
+    while (mCaretPosition < sz)
+    {
+        ++mCaretPosition;
+        if (mCaretPosition == sz || (mText[mCaretPosition] & 192) != 128)
+            break;
+    }
+}
+
+void TextField::caretDelete()
+{
+    unsigned sz = static_cast<unsigned>(mText.size());
+    while (mCaretPosition < sz)
+    {
+        --sz;
+        mText.erase(mCaretPosition, 1);
+        if (mCaretPosition == sz || (mText[mCaretPosition] & 192) != 128)
+            break;
+    }
 }
 
 void TextField::handlePaste()
@@ -482,6 +556,25 @@ void TextField::handlePaste()
     {
         setText(text);
         setCaretPosition(static_cast<unsigned>(caretPos));
+    }
+}
+
+void TextField::caretDeleteToStart()
+{
+    if (mCaretPosition > 0)
+    {
+        mText = mText.substr(mCaretPosition);
+        mCaretPosition = 0;
+    }
+}
+
+void TextField::caretDeleteWord()
+{
+    while (mCaretPosition > 0)
+    {
+        deleteCharLeft(mText, &mCaretPosition);
+        if (mCaretPosition > 0 && isWordSeparator(mText[mCaretPosition - 1]))
+            break;
     }
 }
 

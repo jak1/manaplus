@@ -413,11 +413,12 @@ void ItemDB::loadXmlFile(const std::string &fileName, int &tagNum)
         {
             if (xmlNameEqual(itemChild, "sprite"))
             {
-                std::string attackParticle = XML::getProperty(
-                    itemChild, "particle-effect", "");
-                itemInfo->setParticleEffect(attackParticle);
-
                 loadSpriteRef(itemInfo, itemChild);
+            }
+            else if (xmlNameEqual(itemChild, "particlefx"))
+            {
+                display.particles.push_back(reinterpret_cast<const char*>(
+                    itemChild->xmlChildrenNode->content));
             }
             else if (xmlNameEqual(itemChild, "sound"))
             {
