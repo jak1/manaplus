@@ -72,6 +72,7 @@ BrowserBox::BrowserBox(const Widget2 *const widget,
     mPadding(0),
     mNewLinePadding(15),
     mItemPadding(0),
+    mDataWidth(0),
     mHighlightColor(getThemeColor(Theme::HIGHLIGHT)),
     mHyperLinkColor(getThemeColor(Theme::HYPERLINK)),
     mOpaque(opaque),
@@ -403,6 +404,7 @@ void BrowserBox::clearRows()
     setHeight(0);
     mSelectedLink = -1;
     mUpdateTime = 0;
+    mDataWidth = 0;
     updateHeight();
 }
 
@@ -506,7 +508,7 @@ void BrowserBox::draw(gcn::Graphics *graphics)
         }
         else if (part.mImage)
         {
-            graphics2->drawImage(part.mImage, part.mX, part.mY);
+            DRAW_IMAGE(graphics2, part.mImage, part.mX, part.mY);
         }
     }
 
@@ -751,7 +753,11 @@ int BrowserBox::calcHeight()
 
                     start += 3;
                     if (start == row.size())
+                    {
+                        if (x > mDataWidth)
+                            mDataWidth = x;
                         break;
+                    }
                 }
             }
             const size_t len = (end == std::string::npos) ? end : end - start;
@@ -832,6 +838,8 @@ int BrowserBox::calcHeight()
                 break;
 
             x += width;
+            if (x > mDataWidth)
+                mDataWidth = x;
         }
         y += fontHeight;
     }
@@ -887,6 +895,13 @@ std::string BrowserBox::getTextAtPos(const int x, const int y) const
     }
 
     return str;
+}
+
+void BrowserBox::setForegroundColorAll(const gcn::Color &color1,
+                                       const gcn::Color &color2)
+{
+    mForegroundColor = color1;
+    mForegroundColor2 = color2;
 }
 
 LinePart::~LinePart()

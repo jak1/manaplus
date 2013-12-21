@@ -31,6 +31,8 @@
 #include "input/keydata.h"
 #include "input/keyevent.h"
 
+#include "gui/sdlinput.h"
+
 #include "gui/viewport.h"
 
 #include "gui/popups/popupmenu.h"
@@ -51,10 +53,11 @@ int TextField::instances = 0;
 float TextField::mAlpha = 1.0;
 ImageRect TextField::skin;
 
-TextField::TextField(const Widget2 *const widget,
-                     const std::string &text, const bool loseFocusOnTab,
-                     gcn::ActionListener *const listener,
-                     const std::string &eventId,
+TextField::TextField(const Widget2 *restrict const widget,
+                     const std::string &restrict text,
+                     const bool loseFocusOnTab,
+                     gcn::ActionListener *restrict const listener,
+                     const std::string &restrict eventId,
                      const bool sendAlwaysEvents):
     gcn::TextField(text),
     gcn::FocusListener(),

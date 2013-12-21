@@ -47,6 +47,15 @@ struct SDL_Window;
 static const int defaultScreenWidth = 800;
 static const int defaultScreenHeight = 600;
 
+#define DRAW_IMAGE(graphics, image, x, y) \
+    { \
+        if (image) \
+        { \
+            (graphics)->drawImage2(image, 0, 0, x, y, \
+                (image)->mBounds.w, (image)->mBounds.h, false); \
+        } \
+    }
+
 /**
  * 9 images defining a rectangle. 4 corners, 4 sides and a middle area. The
  * topology is as follows:
@@ -225,22 +234,23 @@ class Graphics : public gcn::Graphics
                                       const int x, const int y,
                                       const int w, const int h) const = 0;
 
-        virtual void calcTile(ImageVertexes *const vert,
-                              const Image *const image,
-                              int x, int y) const = 0;
+        virtual void calcTileVertexes(ImageVertexes *const vert,
+                                      const Image *const image,
+                                      int x, int y) const = 0;
 
         virtual void calcTileSDL(ImageVertexes *const vert A_UNUSED,
                                  int x A_UNUSED, int y A_UNUSED) const
         {
         }
 
-        virtual void drawTile(const ImageVertexes *const vert) = 0;
+        virtual void drawTileVertexes(const ImageVertexes *const vert) = 0;
 
-        virtual void drawTile(const ImageCollection *const vertCol) = 0;
+        virtual void drawTileCollection(const ImageCollection
+                                        *const vertCol) = 0;
 
-        virtual void calcTile(ImageCollection *const vertCol,
-                              const Image *const image,
-                              int x, int y) = 0;
+        virtual void calcTileCollection(ImageCollection *const vertCol,
+                                        const Image *const image,
+                                        int x, int y) = 0;
 
         virtual bool calcWindow(ImageCollection *const vertCol,
                                 const int x, const int y,
@@ -370,14 +380,6 @@ class Graphics : public gcn::Graphics
         virtual void setRendererFlags(const uint32_t flags A_UNUSED)
         { }
 #endif
-        int mWidth;
-        int mHeight;
-
-    protected:
-        /**
-         * Constructor.
-         */
-        Graphics();
 
         /**
          * Blits an image onto the screen.
@@ -391,6 +393,14 @@ class Graphics : public gcn::Graphics
                                 const int width, const int height,
                                 const bool useColor) = 0;
 
+        int mWidth;
+        int mHeight;
+
+    protected:
+        /**
+         * Constructor.
+         */
+        Graphics();
 
         void setMainFlags(const int w, const int h, const int bpp,
                           const bool fs, const bool hwaccel,

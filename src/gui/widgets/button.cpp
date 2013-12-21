@@ -79,7 +79,8 @@ Button::Button(const Widget2 *const widget) :
 }
 
 Button::Button(const Widget2 *const widget,
-               const std::string &caption, const std::string &actionEventId,
+               const std::string &restrict caption,
+               const std::string &restrict actionEventId,
                gcn::ActionListener *const listener) :
     gcn::Button(caption),
     Widget2(widget),
@@ -116,9 +117,10 @@ Button::Button(const Widget2 *const widget,
 }
 
 Button::Button(const Widget2 *const widget,
-               const std::string &caption, const std::string &imageName,
+               const std::string &restrict caption,
+               const std::string &restrict imageName,
                const int imageWidth, const int imageHeight,
-               const std::string &actionEventId,
+               const std::string &restrict actionEventId,
                gcn::ActionListener *const listener) :
     gcn::Button(caption),
     Widget2(widget),
@@ -155,9 +157,10 @@ Button::Button(const Widget2 *const widget,
         addActionListener(listener);
 }
 
-Button::Button(const Widget2 *const widget, const std::string &imageName,
+Button::Button(const Widget2 *const widget,
+               const std::string &restrict imageName,
                const int imageWidth, const int imageHeight,
-               const std::string &actionEventId,
+               const std::string &restrict actionEventId,
                gcn::ActionListener *const listener) :
     gcn::Button(),
     Widget2(widget),
@@ -195,9 +198,9 @@ Button::Button(const Widget2 *const widget, const std::string &imageName,
 }
 
 Button::Button(const Widget2 *const widget,
-               const std::string &caption,
-               const std::string &imageName,
-               const std::string &actionEventId,
+               const std::string &restrict caption,
+               const std::string &restrict imageName,
+               const std::string &restrict actionEventId,
                gcn::ActionListener *const listener) :
     gcn::Button(caption),
     Widget2(widget),
@@ -485,26 +488,32 @@ void Button::draw(gcn::Graphics *graphics)
             {
                 if (isPressed())
                 {
-                    g2->calcTile(mVertexes2, mImages[mode],
+                    g2->calcTileCollection(mVertexes2, mImages[mode],
                         imageX + 1, imageY + 1);
                 }
                 else
                 {
-                    g2->calcTile(mVertexes2, mImages[mode], imageX, imageY);
+                    g2->calcTileCollection(mVertexes2,
+                        mImages[mode], imageX, imageY);
                 }
             }
         }
-        g2->drawTile(mVertexes2);
+        g2->drawTileCollection(mVertexes2);
     }
     else
     {
         g2->drawImageRect(0, 0, width, height, skin->getBorder());
+
         if (mImages)
         {
             if (isPressed())
-                g2->drawImage(mImages[mode], imageX + 1, imageY + 1);
+            {
+                DRAW_IMAGE(g2, mImages[mode], imageX + 1, imageY + 1);
+            }
             else
-                g2->drawImage(mImages[mode], imageX, imageY);
+            {
+                DRAW_IMAGE(g2, mImages[mode], imageX, imageY);
+            }
         }
     }
 

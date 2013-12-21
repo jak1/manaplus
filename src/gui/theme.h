@@ -75,10 +75,10 @@ struct ThemeInfo final
 class Skin final
 {
     public:
-        Skin(ImageRect *skin, const ImageRect *images,
+        Skin(ImageRect *restrict skin, const ImageRect *restrict images,
              const std::string &filePath, const std::string &name = "",
              const int padding = 3, const int titlePadding = 4,
-             std::map<std::string, int> *const options = nullptr);
+             std::map<std::string, int> *restrict const options = nullptr);
 
         A_DELETE_COPY(Skin)
 
@@ -224,6 +224,7 @@ class Theme final : public Palette, public ConfigListener
             OUTLINE,
             BORDER,
             PROGRESS_BAR,
+            PROGRESS_BAR_OUTLINE,
             BUTTON,
             BUTTON_OUTLINE,
             BUTTON_DISABLED,
@@ -392,19 +393,47 @@ class Theme final : public Palette, public ConfigListener
             BROWN_OUTLINE,
             STATUSBAR_ON,
             STATUSBAR_OFF,
+            TABLE_BACKGROUND,
+            SLOTS_BAR,
+            SLOTS_BAR_OUTLINE,
+            HP_BAR,
+            HP_BAR_OUTLINE,
+            MP_BAR,
+            MP_BAR_OUTLINE,
+            NO_MP_BAR,
+            NO_MP_BAR_OUTLINE,
+            XP_BAR,
+            XP_BAR_OUTLINE,
+            WEIGHT_BAR,
+            WEIGHT_BAR_OUTLINE,
+            MONEY_BAR,
+            MONEY_BAR_OUTLINE,
+            ARROWS_BAR,
+            ARROWS_BAR_OUTLINE,
+            STATUS_BAR,
+            STATUS_BAR_OUTLINE,
+            JOB_BAR,
+            JOB_BAR_OUTLINE,
+            OLDCHAT,
+            OLDCHAT_OUTLINE,
+            AWAYCHAT,
+            AWAYCHAT_OUTLINE,
             THEME_COLORS_END
         };
 
         enum ProgressPalette
         {
-            PROG_DEFAULT = 0,
-            PROG_HP,
+            PROG_HP = 0,
             PROG_MP,
             PROG_NO_MP,
             PROG_EXP,
             PROG_INVY_SLOTS,
             PROG_WEIGHT,
             PROG_JOB,
+            PROG_UPDATE,
+            PROG_MONEY,
+            PROG_ARROWS,
+            PROG_STATUS,
             THEME_PROG_END
         };
 
@@ -438,7 +467,7 @@ class Theme final : public Palette, public ConfigListener
          */
         Skin *load(const std::string &filename, const std::string &filename2,
                    const bool full = true, const std::string
-                   &defaultPath = getThemePath()) A_WARN_UNUSED;
+                   &restrict defaultPath = getThemePath()) A_WARN_UNUSED;
 
         Skin *loadSkinRect(ImageRect &image, const std::string &name,
                            const std::string &name2, const int start = 0,

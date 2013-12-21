@@ -84,7 +84,7 @@ void EmotePage::draw(gcn::Graphics *graphics)
                 const Image *const image = *it;
                 if (image)
                 {
-                    g->calcTile(mVertexes, image, x, y);
+                    g->calcTileCollection(mVertexes, image, x, y);
                     x += emoteWidth;
                     if (x + emoteWidth > width)
                     {
@@ -94,7 +94,7 @@ void EmotePage::draw(gcn::Graphics *graphics)
                 }
             }
         }
-        g->drawTile(mVertexes);
+        g->drawTileCollection(mVertexes);
     }
     else
     {
@@ -103,7 +103,7 @@ void EmotePage::draw(gcn::Graphics *graphics)
             const Image *const image = *it;
             if (image)
             {
-                g->drawImage(image, x, y);
+                DRAW_IMAGE(g, image, x, y);
                 x += emoteWidth;
                 if (x + emoteWidth > width)
                 {

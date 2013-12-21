@@ -105,15 +105,18 @@ class NormalOpenGLGraphics final : public Graphics
                               const int x, const int y,
                               const int w, const int h) const override final;
 
-        void calcTile(ImageVertexes *const vert, const Image *const image,
-                      int x, int y) const override final;
+        void calcTileVertexes(ImageVertexes *const vert,
+                              const Image *const image,
+                              int x, int y) const override final;
 
-        void calcTile(ImageCollection *const vertCol,
-                      const Image *const image, int x, int y) override final;
+        void calcTileCollection(ImageCollection *const vertCol,
+                                const Image *const image,
+                                int x, int y) override final;
 
-        void drawTile(const ImageCollection *const vertCol) override final;
+        void drawTileCollection(const ImageCollection *const vertCol)
+                                override final;
 
-        void drawTile(const ImageVertexes *const vert) override final;
+        void drawTileVertexes(const ImageVertexes *const vert) override final;
 
         bool calcWindow(ImageCollection *const vertCol,
                         const int x, const int y,
@@ -191,6 +194,12 @@ class NormalOpenGLGraphics final : public Graphics
 
         void updateTextureFormat();
 
+        bool drawImage2(const Image *const image,
+                        int srcX, int srcY,
+                        int dstX, int dstY,
+                        const int width, const int height,
+                        const bool useColor) override final;
+
 #ifdef DEBUG_DRAW_CALLS
         unsigned int getDrawCalls() const
         { return mLastDrawCalls; }
@@ -208,12 +217,6 @@ class NormalOpenGLGraphics final : public Graphics
         static GLuint mLastImage;
 
     protected:
-        bool drawImage2(const Image *const image,
-                        int srcX, int srcY,
-                        int dstX, int dstY,
-                        const int width, const int height,
-                        const bool useColor) override final;
-
         void setTexturingAndBlending(const bool enable);
 
         void debugBindTexture(const Image *const image);

@@ -378,6 +378,12 @@ class Being : public ActorSprite, public ConfigListener
                        const bool isWeapon = false,
                        const bool isTempSprite = false);
 
+        void updateSprite(const unsigned int slot, const int id,
+                          std::string color = "",
+                          const unsigned char colorId = 1,
+                          const bool isWeapon = false,
+                          const bool isTempSprite = false);
+
         void setSpriteID(const unsigned int slot, const int id);
 
         void setSpriteColor(const unsigned int slot,
@@ -677,10 +683,10 @@ class Being : public ActorSprite, public ConfigListener
 
         void talkTo() const;
 
-        bool draw(Graphics *const graphics,
+        void draw(Graphics *const graphics,
                   const int offsetX, const int offsetY) const override final;
 
-        bool drawSpriteAt(Graphics *const graphics,
+        void drawSpriteAt(Graphics *const graphics,
                           const int x, const int y) const;
 
         void setMoveTime()
@@ -797,8 +803,9 @@ class Being : public ActorSprite, public ConfigListener
         static std::string loadComment(const std::string &name,
                                        const int type) A_WARN_UNUSED;
 
-        static void saveComment(const std::string &name,
-                                const std::string &comment, const int type);
+        static void saveComment(const std::string &restrict name,
+                                const std::string &restrict comment,
+                                const int type);
 
         bool isAdvanced() const A_WARN_UNUSED
         { return mAdvanced; }
@@ -1016,6 +1023,7 @@ class Being : public ActorSprite, public ConfigListener
         std::string mIp;
         int *mSpriteRemap;
         int *mSpriteHide;
+        int *mSpriteDraw;
         std::string mComment;
         Being *mPet;
         Being *mOwner;

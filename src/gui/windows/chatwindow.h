@@ -220,7 +220,8 @@ class ChatWindow final : public Window,
 
         void doPresent() const;
 
-        void addWhisper(const std::string &nick, const std::string &mes,
+        void addWhisper(const std::string &restrict nick,
+                        const std::string &restrict mes,
                         const Own own = BY_OTHER);
 
         WhisperTab *addWhisperTab(const std::string &nick,
@@ -340,6 +341,7 @@ class ChatWindow final : public Window,
 
         void loadCommandsFile(const std::string &name);
 
+        void updateTabsMargin();
 
         typedef std::map<const std::string, WhisperTab*> TabMap;
         /** Manage whisper tabs */

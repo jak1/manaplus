@@ -29,7 +29,7 @@
 #include "gui/widgets/popup.h"
 
 class Label;
-class TextBox;
+class BrowserBox;
 
 class SpeechBubble final : public Popup
 {
@@ -59,8 +59,9 @@ class SpeechBubble final : public Popup
 
     private:
         std::string mText;
+        int mSpacing;
         Label *mCaption;
-        TextBox *mSpeechBox;
+        BrowserBox *mSpeechBox;
 };
 
 #endif  // GUI_POPUPS_SPEECHBUBBLE_H

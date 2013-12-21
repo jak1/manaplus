@@ -98,18 +98,18 @@ void ShortcutContainer::drawBackground(Graphics *g)
                 mVertexes->clear();
                 for (unsigned i = 0; i < mMaxItems; i ++)
                 {
-                    g->calcTile(mVertexes, mBackgroundImg,
+                    g->calcTileCollection(mVertexes, mBackgroundImg,
                         (i % mGridWidth) * mBoxWidth,
                         (i / mGridWidth) * mBoxHeight);
                 }
             }
-            g->drawTile(mVertexes);
+            g->drawTileCollection(mVertexes);
         }
         else
         {
             for (unsigned i = 0; i < mMaxItems; i ++)
             {
-                g->drawImage(mBackgroundImg, (i % mGridWidth) * mBoxWidth,
+                DRAW_IMAGE(g, mBackgroundImg, (i % mGridWidth) * mBoxWidth,
                     (i / mGridWidth) * mBoxHeight);
             }
         }

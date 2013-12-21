@@ -1,5 +1,5 @@
 AC_PREREQ(2.60)
-AC_INIT([ManaPlus], [1.3.11.24], [akaras@inbox.ru], [manaplus])
+AC_INIT([ManaPlus], [1.3.12.22], [akaras@inbox.ru], [manaplus])
 AM_INIT_AUTOMAKE([1.9])
 AC_CONFIG_HEADERS([config.h:config.h.in])
 AC_LANG_CPLUSPLUS
@@ -411,6 +411,7 @@ data/themes/blacknblack/Makefile
 data/themes/blackwood/Makefile
 data/themes/classic/Makefile
 data/themes/enchilado/Makefile
+data/themes/golden-delicious/Makefile
 data/themes/jewelry/Makefile
 data/themes/mana/Makefile
 data/themes/pink/Makefile

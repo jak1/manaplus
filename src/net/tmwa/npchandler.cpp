@@ -57,6 +57,7 @@ NpcHandler::NpcHandler() :
         SMSG_NPC_INT_INPUT,
         SMSG_NPC_STR_INPUT,
         SMSG_NPC_COMMAND,
+        SMSG_NPC_CHANGETITLE,
         0
     };
     handledMessages = _messages;
@@ -66,8 +67,10 @@ NpcHandler::NpcHandler() :
 void NpcHandler::handleMessage(Net::MessageIn &msg)
 {
     BLOCK_START("NpcHandler::handleMessage")
+
     const int npcId = getNpc(msg, msg.getId() == SMSG_NPC_CHOICE
-        || msg.getId() == SMSG_NPC_MESSAGE);
+        || msg.getId() == SMSG_NPC_MESSAGE
+        || msg.getId() == SMSG_NPC_CHANGETITLE);
 
     if (msg.getId() != SMSG_NPC_STR_INPUT)
         mRequestLang = false;
@@ -103,6 +106,10 @@ void NpcHandler::handleMessage(Net::MessageIn &msg)
 
         case SMSG_NPC_COMMAND:
             processNpcCommand(msg, npcId);
+            break;
+
+        case SMSG_NPC_CHANGETITLE:
+            processChangeTitle(msg, npcId);
             break;
 
         default:
@@ -322,10 +329,14 @@ void NpcHandler::processNpcCommand(Net::MessageIn &msg, const int npcId)
                 mDialog->clearRows();
             break;
         case 10:  // send selected item id
+        {
+            int invSize = msg.readInt32();
+            if (!invSize)
+                invSize = 1;
             if (mDialog)
-                mDialog->itemRequest();
+                mDialog->itemRequest(invSize);
             break;
-
+        }
         default:
             logger->log("unknown npc command: %d", cmd);
             break;
@@ -337,6 +348,14 @@ void NpcHandler::processLangReuqest(Net::MessageIn &msg A_UNUSED,
 {
     mRequestLang = false;
     stringInput(npcId, getLangSimple());
+}
+
+void NpcHandler::processChangeTitle(Net::MessageIn &msg,
+                                    const int npcId A_UNUSED) const
+{
+    const std::string str = msg.readString();
+    if (mDialog)
+        mDialog->setCaption(str);
 }
 
 }  // namespace TmwAthena

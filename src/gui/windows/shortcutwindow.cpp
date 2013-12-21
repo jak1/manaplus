@@ -51,9 +51,9 @@ class ShortcutTab final : public Tab
         ShortcutContainer* mContent;
 };
 
-ShortcutWindow::ShortcutWindow(const std::string &title,
-                               ShortcutContainer *const content,
-                               const std::string &skinFile,
+ShortcutWindow::ShortcutWindow(const std::string &restrict title,
+                               ShortcutContainer *restrict const content,
+                               const std::string &restrict skinFile,
                                int width, int height) :
     Window("Window", false, nullptr, skinFile),
     mItems(content),
@@ -77,19 +77,22 @@ ShortcutWindow::ShortcutWindow(const std::string &title,
         setupWindow->registerWindowForReset(this);
 
     const int border = SCROLL_PADDING * 2 + getPadding() * 2;
-    setMinWidth(mItems->getBoxWidth() + border);
-    setMinHeight(mItems->getBoxHeight() + border);
-    setMaxWidth(mItems->getBoxWidth() * mItems->getMaxItems() + border);
-    setMaxHeight(mItems->getBoxHeight() * mItems->getMaxItems() + border);
+    const int bw = mItems->getBoxWidth();
+    const int bh = mItems->getBoxHeight();
+    const int maxItems = mItems->getMaxItems();
+    setMinWidth(32);
+    setMinHeight(32);
+    setMaxWidth(bw * maxItems + border);
+    setMaxHeight(bh * maxItems + border);
 
     if (width == 0)
-        width = mItems->getBoxWidth() + border;
+        width = bw + border;
     if (height == 0)
-        height = (mItems->getBoxHeight() * mItems->getMaxItems()) + border;
+        height = bh * maxItems + border;
 
     setDefaultSize(width, height, ImageRect::LOWER_RIGHT);
 
-    mBoxesWidth += mItems->getBoxWidth() + border;
+    mBoxesWidth += bw + border;
 
     mScrollArea->setPosition(SCROLL_PADDING, SCROLL_PADDING);
     mScrollArea->setHorizontalScrollPolicy(gcn::ScrollArea::SHOW_NEVER);
@@ -104,8 +107,8 @@ ShortcutWindow::ShortcutWindow(const std::string &title,
     enableVisibleSound(true);
 }
 
-ShortcutWindow::ShortcutWindow(const std::string &title,
-                               const std::string &skinFile,
+ShortcutWindow::ShortcutWindow(const std::string &restrict title,
+                               const std::string &restrict skinFile,
                                const int width, const int height) :
     Window("Window", false, nullptr, skinFile),
     mItems(nullptr),
@@ -127,13 +130,11 @@ ShortcutWindow::ShortcutWindow(const std::string &title,
     if (setupWindow)
         setupWindow->registerWindowForReset(this);
 
-    const int border = SCROLL_PADDING * 2 + getPadding() * 2;
-
     if (width && height)
         setDefaultSize(width, height, ImageRect::LOWER_RIGHT);
 
-    setMinWidth(32 + border);
-    setMinHeight(32 + border);
+    setMinWidth(32);
+    setMinHeight(32);
 
     place(0, 0, mTabs, 5, 5);
 

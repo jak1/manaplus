@@ -36,7 +36,7 @@ struct SDL_Surface;
 /**
  * A central point of control for graphics.
  */
-class SurfaceGraphics : public Graphics
+class SurfaceGraphics final : public Graphics
 {
     public:
         enum BlitMode
@@ -49,7 +49,7 @@ class SurfaceGraphics : public Graphics
 
         A_DELETE_COPY(SurfaceGraphics)
 
-        virtual ~SurfaceGraphics();
+        ~SurfaceGraphics();
 
         void setTarget(SDL_Surface *const target)
         { mTarget = target; }
@@ -113,25 +113,27 @@ class SurfaceGraphics : public Graphics
                               const int h A_UNUSED) const override final
         { }
 
-        void calcTile(ImageVertexes *const vert A_UNUSED,
-                      const Image *const image A_UNUSED,
-                      int x A_UNUSED, int y A_UNUSED) const override final
+        void calcTileVertexes(ImageVertexes *const vert A_UNUSED,
+                              const Image *const image A_UNUSED,
+                              int x A_UNUSED,
+                              int y A_UNUSED) const override final
         { }
 
         void calcTileSDL(ImageVertexes *const vert A_UNUSED,
                          int x A_UNUSED, int y A_UNUSED) const override final
         { }
 
-        void calcTile(ImageCollection *const vertCol A_UNUSED,
-                      const Image *const image A_UNUSED,
-                      int x A_UNUSED, int y A_UNUSED) override final
+        void calcTileCollection(ImageCollection *const vertCol A_UNUSED,
+                                const Image *const image A_UNUSED,
+                                int x A_UNUSED, int y A_UNUSED) override final
         { }
 
-        void drawTile(const ImageVertexes *const vert A_UNUSED) override final
+        void drawTileVertexes(const ImageVertexes *const
+                              vert A_UNUSED) override final
         { }
 
-        void drawTile(const ImageCollection *const vertCol A_UNUSED)
-                      override final
+        void drawTileCollection(const ImageCollection *const vertCol A_UNUSED)
+                                override final
         { }
 
         void updateScreen()
@@ -180,13 +182,13 @@ class SurfaceGraphics : public Graphics
                           const bool noFrame A_UNUSED) override final
         { return false; }
 
-    protected:
         bool drawImage2(const Image *const image,
                         int srcX, int srcY,
                         int dstX, int dstY,
                         const int width, const int height,
                         const bool useColor) override final;
 
+    protected:
         BlitMode mBlitMode;
         SDL_Surface *mTarget;
 };

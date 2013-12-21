@@ -179,7 +179,6 @@ ItemContainer::ItemContainer(const Widget2 *const widget,
     mGridColumns(1),
     mGridRows(1),
     mSelectedIndex(-1),
-    mHighlightedIndex(-1),
     mLastUsedSlot(-1),
     mTag(0),
     mSortType(0),
@@ -192,7 +191,6 @@ ItemContainer::ItemContainer(const Widget2 *const widget,
     mPaddingItemY(mSkin ? mSkin->getOption("paddingItemY", 0) : 0),
     mSelectionStatus(SEL_NONE),
     mForceQuantity(forceQuantity),
-    mSwapItems(false),
     mDescItems(false)
 {
     mItemPopup->postInit();
@@ -280,16 +278,16 @@ void ItemContainer::draw(gcn::Graphics *graphics)
                 if (mShowMatrix[itemIndex] == mSelectedIndex)
                 {
                     if (mSelImg)
-                        g->drawImage(mSelImg, itemX, itemY);
+                        DRAW_IMAGE(g, mSelImg, itemX, itemY);
                 }
                 image->setAlpha(1.0F);  // ensure the image if fully drawn...
-                g->drawImage(image, itemX + mPaddingItemX,
+                DRAW_IMAGE(g, image, itemX + mPaddingItemX,
                     itemY + mPaddingItemY);
                 if (mProtectedImg && PlayerInfo::isItemProtected(
                     item->getId()))
                 {
-                    g->drawImage(mProtectedImg, itemX + mPaddingItemX,
-                        itemY + mPaddingItemY);
+                    DRAW_IMAGE(g, mProtectedImg,
+                        itemX + mPaddingItemX, itemY + mPaddingItemY);
                 }
             }
         }

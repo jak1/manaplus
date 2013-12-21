@@ -132,12 +132,12 @@ void AvatarListBox::draw(gcn::Graphics *gcnGraphics)
             {
                 if (useCaching)
                 {
-                    graphics->calcTile(&vertexes, icon,
+                    graphics->calcTileCollection(&vertexes, icon,
                         mImagePadding, y + mPadding);
                 }
                 else
                 {
-                    graphics->drawImage(icon, mImagePadding, y + mPadding);
+                    DRAW_IMAGE(graphics, icon, mImagePadding, y + mPadding);
                 }
             }
         }
@@ -305,7 +305,7 @@ void AvatarListBox::draw(gcn::Graphics *gcnGraphics)
     }
 
     if (useCaching)
-        graphics->drawTile(&vertexes);
+        graphics->drawTileCollection(&vertexes);
 
     if (parent)
         setWidth(parent->getWidth() - 10);

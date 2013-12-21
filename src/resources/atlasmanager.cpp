@@ -131,9 +131,9 @@ void AtlasManager::loadImages(const StringVect &files,
     }
 }
 
-void AtlasManager::simpleSort(const std::string &name,
-                              std::vector<TextureAtlas*> &atlases,
-                              std::vector<Image*> &images, int size)
+void AtlasManager::simpleSort(const std::string &restrict name,
+                              std::vector<TextureAtlas*> &restrict atlases,
+                              std::vector<Image*> &restrict images, int size)
 {
     int x = 0;
     int y = 0;
@@ -250,7 +250,7 @@ SDL_Surface *AtlasManager::createSDLAtlas(TextureAtlas *const atlas)
 #else
                 SDL_SetAlpha(image->mSDLSurface, 0, SDL_ALPHA_OPAQUE);
 #endif
-                graphics->drawImage(image, item->x, item->y);
+                DRAW_IMAGE(graphics, image, item->x, item->y);
             }
         }
     }

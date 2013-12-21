@@ -40,7 +40,8 @@ float GuiTable::mAlpha = 1.0;
 class GuiTableActionListener final : public gcn::ActionListener
 {
 public:
-    GuiTableActionListener(GuiTable *_table, gcn::Widget *_widget,
+    GuiTableActionListener(GuiTable *restrict _table,
+                           gcn::Widget *restrict _widget,
                            int _row, int _column);
 
     A_DELETE_COPY(GuiTableActionListener)
@@ -57,9 +58,9 @@ protected:
 };
 
 
-GuiTableActionListener::GuiTableActionListener(GuiTable *table,
-                                               gcn::Widget *widget, int row,
-                                               int column) :
+GuiTableActionListener::GuiTableActionListener(GuiTable *restrict table,
+                                               gcn::Widget *restrict widget,
+                                               int row, int column) :
     gcn::ActionListener(),
     mTable(table),
     mRow(row),
@@ -100,11 +101,12 @@ GuiTable::GuiTable(const Widget2 *const widget,
     mTopWidget(nullptr),
     mActionListeners(),
     mHighlightColor(getThemeColor(Theme::HIGHLIGHT)),
-    mSelectedRow(0),
-    mSelectedColumn(0),
+    mSelectedRow(-1),
+    mSelectedColumn(-1),
     mLinewiseMode(false),
     mWrappingEnabled(false),
-    mOpaque(opacity)
+    mOpaque(opacity),
+    mSelectable(true)
 {
     mBackgroundColor = getThemeColor(Theme::BACKGROUND);
 
@@ -157,11 +159,14 @@ void GuiTable::recomputeDimensions()
     const int columns_nr = mModel->getColumns();
     int width = 0;
 
-    if (mSelectedRow >= rows_nr)
-        mSelectedRow = rows_nr - 1;
+    if (mSelectable)
+    {
+        if (mSelectedRow >= rows_nr)
+            mSelectedRow = rows_nr - 1;
 
-    if (mSelectedColumn >= columns_nr)
-        mSelectedColumn = columns_nr - 1;
+        if (mSelectedColumn >= columns_nr)
+            mSelectedColumn = columns_nr - 1;
+    }
 
     for (int i = 0; i < columns_nr; i++)
         width += getColumnWidth(i);
@@ -204,7 +209,7 @@ int GuiTable::getColumnWidth(const int i) const
 
 void GuiTable::setSelectedRow(const int selected)
 {
-    if (!mModel)
+    if (!mModel || !mSelectable)
     {
         mSelectedRow = -1;
     }
@@ -310,7 +315,9 @@ void GuiTable::draw(gcn::Graphics* graphics)
 
     // First, determine how many rows we need to draw,
     // and where we should start.
-    const int rHeight = getRowHeight();
+    int rHeight = getRowHeight();
+    if (!rHeight)
+        rHeight = 1;
     int first_row = -(y / rHeight);
 
     if (first_row < 0)
@@ -352,7 +359,7 @@ void GuiTable::draw(gcn::Graphics* graphics)
 
                 widget->setDimension(bounds);
 
-                if (mSelectedRow > 0)
+                if (mSelectedRow > -1)
                 {
                     mHighlightColor.a = static_cast<int>(mAlpha * 255.0F);
                     graphics->setColor(mHighlightColor);
@@ -457,7 +464,7 @@ void GuiTable::keyPressed(gcn::KeyEvent& keyEvent)
 // -- MouseListener notifications
 void GuiTable::mousePressed(gcn::MouseEvent& mouseEvent)
 {
-    if (!mModel)
+    if (!mModel || !mSelectable)
         return;
 
     if (mouseEvent.getButton() == gcn::MouseEvent::LEFT)

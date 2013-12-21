@@ -39,6 +39,7 @@
 #define final
 #define override
 #define constexpr
+#define noexcept
 #define A_DELETE(func)
 #define A_DELETE_COPY(func)
 #else
@@ -49,6 +50,7 @@
 #define final
 #define override
 #define constexpr
+#define noexcept
 // #define A_DELETE
 // #define A_DELETE_COPY
 #endif
@@ -64,11 +66,13 @@
 #define A_UNUSED  __attribute__ ((unused))
 #define A_WARN_UNUSED __attribute__ ((warn_unused_result))
 #define DEPRECATED __attribute__ ((deprecated))
+#define restrict __restrict__
 #else
 #define A_UNUSED
 #define A_WARN_UNUSED
 #define gnu_printf printf
 #define DEPRECATED
+#define restrict
 #endif
 #ifdef __clang__
 #define gnu_printf printf

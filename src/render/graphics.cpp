@@ -494,10 +494,10 @@ void Graphics::drawImageRect(const int x, const int y,
     // Draw the corners
     if (drawMain)
     {
-        drawImage(topLeft, x, y);
-        drawImage(topRight, x + w - topRight->getWidth(), y);
-        drawImage(bottomLeft, x, h - bottomLeft->getHeight() + y);
-        drawImage(bottomRight,
+        DRAW_IMAGE(this, topLeft, x, y);
+        DRAW_IMAGE(this, topRight, x + w - topRight->getWidth(), y);
+        DRAW_IMAGE(this, bottomLeft, x, h - bottomLeft->getHeight() + y);
+        DRAW_IMAGE(this, bottomRight,
             x + w - bottomRight->getWidth(),
             y + h - bottomRight->getHeight());
     }
@@ -569,14 +569,14 @@ bool Graphics::calcImageRect(ImageVertexes *const vert,
         calcImagePattern(vert, right, x + w - rw, y + th, rw, h - th - bh);
     }
 
-    calcTile(vert, topLeft, x, y);
+    calcTileVertexes(vert, topLeft, x, y);
     if (topRight)
-        calcTile(vert, topRight, x + w - topRight->getWidth(), y);
+        calcTileVertexes(vert, topRight, x + w - topRight->getWidth(), y);
     if (bottomLeft)
-        calcTile(vert, bottomLeft, x, y + h - bottomLeft->getHeight());
+        calcTileVertexes(vert, bottomLeft, x, y + h - bottomLeft->getHeight());
     if (bottomRight)
     {
-        calcTile(vert, bottomRight, x + w - bottomRight->getWidth(),
+        calcTileVertexes(vert, bottomRight, x + w - bottomRight->getWidth(),
             y + h - bottomRight->getHeight());
     }
 

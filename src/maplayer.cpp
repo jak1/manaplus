@@ -139,7 +139,7 @@ void MapLayer::draw(Graphics *const graphics,
 
                     if (!c)
                     {
-                        graphics->drawImage(img, px, py);
+                        DRAW_IMAGE(graphics, img, px, py);
                     }
                     else
                     {
@@ -167,7 +167,7 @@ void MapLayer::drawSDL(Graphics *const graphics)
         const MepRowImages::const_iterator iit_end = images->end();
         while (iit != iit_end)
         {
-            graphics->drawTile(*iit);
+            graphics->drawTileVertexes(*iit);
             ++ iit;
         }
         ++ rit;
@@ -311,7 +311,7 @@ void MapLayer::updateOGL(Graphics *const graphics, int startX, int startY,
                     lastImage = img;
 //                    if (imgVert->image->mGLImage != lastImage->mGLImage)
 //                        logger->log("wrong image draw");
-                    graphics->calcTile(imgVert, lastImage, px, py);
+                    graphics->calcTileVertexes(imgVert, lastImage, px, py);
                 }
             }
         }
@@ -332,7 +332,7 @@ void MapLayer::drawOGL(Graphics *const graphics)
         const MepRowImages::const_iterator iit_end = images->end();
         while (iit != iit_end)
         {
-            graphics->drawTile(*iit);
+            graphics->drawTileVertexes(*iit);
             ++ iit;
 //            k ++;
         }
@@ -455,7 +455,7 @@ void MapLayer::drawFringe(Graphics *const graphics, int startX, int startY,
 
                         if (!c)
                         {
-                            graphics->drawImage(img, px, py);
+                            DRAW_IMAGE(graphics, img, px, py);
                         }
                         else
                         {
@@ -796,7 +796,7 @@ void MapItem::draw(Graphics *const graphics, const int x, const int y,
 {
     BLOCK_START("MapItem::draw")
     if (mImage)
-        graphics->drawImage(mImage, x, y);
+        DRAW_IMAGE(graphics, mImage, x, y);
 
     switch (mType)
     {

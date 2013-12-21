@@ -131,6 +131,8 @@ InventoryWindow::InventoryWindow(Inventory *const inventory):
     mCompactMode(false)
 {
     mTextPopup->postInit();
+    mSlotsBar->setColor(Theme::getThemeColor(Theme::SLOTS_BAR),
+        Theme::getThemeColor(Theme::SLOTS_BAR_OUTLINE));
 
     if (inventory)
     {
@@ -224,6 +226,8 @@ InventoryWindow::InventoryWindow(Inventory *const inventory):
         // TRANSLATORS: inventory button
         mEquipmentButton = new Button(this, _("Equipment"), "equipment", this);
         mWeightBar = new ProgressBar(this, 0.0F, 100, 0, Theme::PROG_WEIGHT);
+        mWeightBar->setColor(Theme::getThemeColor(Theme::WEIGHT_BAR),
+            Theme::getThemeColor(Theme::WEIGHT_BAR_OUTLINE));
 
         place(0, 0, mWeightBar, 4);
         mSlotsBarCell = &place(4, 0, mSlotsBar, 5);

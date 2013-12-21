@@ -60,10 +60,10 @@ static void initDefaultThemePath()
         defaultThemePath = "themes/";
 }
 
-Skin::Skin(ImageRect *skin, const ImageRect *images,
+Skin::Skin(ImageRect *restrict skin, const ImageRect *restrict images,
            const std::string &filePath, const std::string &name,
            const int padding, const int titlePadding,
-           std::map<std::string, int> *const options):
+           std::map<std::string, int> *restrict const options):
     instances(1),
     mFilePath(filePath),
     mName(name),
@@ -198,6 +198,8 @@ Theme::Theme() :
     mColors[LOGGER].ch = 'L';
     mColors[HYPERLINK].ch = '<';
     mColors[SELFNICK].ch = 's';
+    mColors[OLDCHAT].ch = 'o';
+    mColors[AWAYCHAT].ch = 'a';
     mCharColors['H'] = HIGHLIGHT;
     mCharColors['C'] = CHAT;
     mCharColors['G'] = GM;
@@ -212,6 +214,8 @@ Theme::Theme() :
     mCharColors['L'] = LOGGER;
     mCharColors['<'] = HYPERLINK;
     mCharColors['s'] = SELFNICK;
+    mCharColors['o'] = OLDCHAT;
+    mCharColors['a'] = AWAYCHAT;
 
     // here need use outlined colors
     mCharColors['H' | 0x80] = HIGHLIGHT_OUTLINE;
@@ -228,6 +232,8 @@ Theme::Theme() :
     mCharColors['L' | 0x80] = LOGGER_OUTLINE;
     mCharColors['<' | 0x80] = HYPERLINK_OUTLINE;
     mCharColors['s' | 0x80] = SELFNICK_OUTLINE;
+    mCharColors['o' | 0x80] = OLDCHAT_OUTLINE;
+    mCharColors['a' | 0x80] = AWAYCHAT_OUTLINE;
 }
 
 Theme::~Theme()
@@ -270,7 +276,7 @@ gcn::Color Theme::getProgressColor(const int type, const float progress)
 }
 
 Skin *Theme::load(const std::string &filename, const std::string &filename2,
-                  const bool full, const std::string &defaultPath)
+                  const bool full, const std::string &restrict defaultPath)
 {
     // Check if this skin was already loaded
 
@@ -768,7 +774,7 @@ ImageSet *Theme::getImageSetFromTheme(const std::string &path,
 
 static int readColorType(const std::string &type)
 {
-    static const std::string colors[] =
+    static const std::string colors[Theme::THEME_COLORS_END] =
     {
         "BROWSERBOX",
         "BROWSERBOX_OUTLINE",
@@ -781,6 +787,7 @@ static int readColorType(const std::string &type)
         "OUTLINE",
         "BORDER",
         "PROGRESS_BAR",
+        "PROGRESS_BAR_OUTLINE",
         "BUTTON",
         "BUTTON_OUTLINE",
         "BUTTON_DISABLED",
@@ -948,7 +955,32 @@ static int readColorType(const std::string &type)
         "BROWN",
         "BROWN_OUTLINE",
         "STATUSBAR_ON",
-        "STATUSBAR_OFF"
+        "STATUSBAR_OFF",
+        "TABLE_BACKGROUND",
+        "SLOTS_BAR",
+        "SLOTS_BAR_OUTLINE",
+        "HP_BAR",
+        "HP_BAR_OUTLINE",
+        "MP_BAR",
+        "MP_BAR_OUTLINE",
+        "NO_MP_BAR",
+        "NO_MP_BAR_OUTLINE",
+        "XP_BAR",
+        "XP_BAR_OUTLINE",
+        "WEIGHT_BAR",
+        "WEIGHT_BAR_OUTLINE",
+        "MONEY_BAR",
+        "MONEY_BAR_OUTLINE",
+        "ARROWS_BAR",
+        "ARROWS_BAR_OUTLINE",
+        "STATUS_BAR",
+        "STATUS_BAR_OUTLINE",
+        "JOB_BAR",
+        "JOB_BAR_OUTLINE",
+        "OLDCHAT",
+        "OLDCHAT_OUTLINE",
+        "AWAYCHAT",
+        "AWAYCHAT_OUTLINE"
     };
 
     if (type.empty())
@@ -1028,16 +1060,19 @@ static Palette::GradientType readColorGradient(const std::string &grad)
 
 static int readProgressType(const std::string &type)
 {
-    static const std::string colors[] =
+    static const std::string colors[Theme::THEME_PROG_END] =
     {
-        "DEFAULT",
         "HP",
         "MP",
         "NO_MP",
         "EXP",
         "INVY_SLOTS",
         "WEIGHT",
-        "JOB"
+        "JOB",
+        "UPDATE",
+        "MONEY",
+        "ARROWS",
+        "STATUS"
     };
 
     if (type.empty())

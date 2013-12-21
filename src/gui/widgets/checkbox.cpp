@@ -38,16 +38,17 @@ Skin *CheckBox::mSkin = nullptr;
 float CheckBox::mAlpha = 1.0;
 
 CheckBox::CheckBox(const Widget2 *const widget,
-                   const std::string &caption, const bool selected,
+                   const std::string &restrict caption, const bool selected,
                    gcn::ActionListener *const listener,
-                   const std::string &eventId) :
+                   const std::string &restrict eventId) :
     gcn::CheckBox(caption, selected),
     Widget2(widget),
     mPadding(0),
     mImagePadding(0),
     mImageSize(9),
     mSpacing(2),
-    mHasMouse(false)
+    mHasMouse(false),
+    mDrawBox(true)
 {
     mForegroundColor2 = getThemeColor(Theme::CHECKBOX_OUTLINE);
     if (instances == 0)
@@ -74,6 +75,7 @@ CheckBox::CheckBox(const Widget2 *const widget,
         mImagePadding = mSkin->getOption("imagePadding");
         mImageSize = mSkin->getOption("imageSize");
         mSpacing = mSkin->getOption("spacing");
+        mDrawBox = mSkin->getOption("drawBox", 1);
     }
     adjustSize();
 }
@@ -129,7 +131,7 @@ void CheckBox::updateAlpha()
 
 void CheckBox::drawBox(gcn::Graphics *const graphics)
 {
-    if (!mSkin)
+    if (!mSkin || !mDrawBox)
         return;
 
     const ImageRect &rect = mSkin->getBorder();
@@ -165,7 +167,7 @@ void CheckBox::drawBox(gcn::Graphics *const graphics)
 
     if (box)
     {
-        static_cast<Graphics*>(graphics)->drawImage(
+        DRAW_IMAGE(static_cast<Graphics*>(graphics),
             box, mImagePadding, (getHeight() - mImageSize) / 2);
     }
 }

@@ -203,14 +203,14 @@ void TouchManager::draw()
                     const Image *const icon = item->icon;
                     if (icon)
                     {
-                        mainGraphics->calcTile(mVertexes, icon,
+                        mainGraphics->calcTileCollection(mVertexes, icon,
                             item->x + (item->width - icon->mBounds.w) / 2,
                             item->y + (item->height - icon->mBounds.h) / 2);
                     }
                 }
             }
         }
-        mainGraphics->drawTile(mVertexes);
+        mainGraphics->drawTileCollection(mVertexes);
     }
     else
     {
@@ -225,7 +225,7 @@ void TouchManager::draw()
                 const Image *const icon = item->icon;
                 if (icon)
                 {
-                    mainGraphics->drawImage(icon,
+                    DRAW_IMAGE(mainGraphics, icon,
                         item->x + (item->width - icon->mBounds.w) / 2,
                         item->y + (item->height - icon->mBounds.h) / 2);
                 }

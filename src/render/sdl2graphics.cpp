@@ -326,9 +326,9 @@ void SDLGraphics::calcImagePattern(ImageCollection* const vertCol,
     calcImagePattern(vert, image, x, y, w, h);
 }
 
-void SDLGraphics::calcTile(ImageVertexes *const vert,
-                           const Image *const image,
-                           int x, int y) const
+void SDLGraphics::calcTileVertexes(ImageVertexes *const vert,
+                                   const Image *const image,
+                                   int x, int y) const
 {
     vert->image = image;
     calcTileSDL(vert, x, y);
@@ -366,9 +366,9 @@ void SDLGraphics::calcTileSDL(ImageVertexes *const vert, int x, int y) const
     vert->sdl.push_back(rect);
 }
 
-void SDLGraphics::calcTile(ImageCollection *const vertCol,
-                           const Image *const image,
-                           int x, int y)
+void SDLGraphics::calcTileCollection(ImageCollection *const vertCol,
+                                     const Image *const image,
+                                     int x, int y)
 {
     if (vertCol->currentImage != image)
     {
@@ -385,7 +385,8 @@ void SDLGraphics::calcTile(ImageCollection *const vertCol,
     }
 }
 
-void SDLGraphics::drawTile(const ImageCollection *const vertCol)
+void SDLGraphics::drawTileCollection(const ImageCollection
+                                     *const vertCol)
 {
     const ImageVertexesVector &draws = vertCol->draws;
     const ImageCollectionCIter it_end = draws.end();
@@ -405,7 +406,7 @@ void SDLGraphics::drawTile(const ImageCollection *const vertCol)
     }
 }
 
-void SDLGraphics::drawTile(const ImageVertexes *const vert)
+void SDLGraphics::drawTileVertexes(const ImageVertexes *const vert)
 {
     // vert and img must be != 0
     const Image *const img = vert->image;

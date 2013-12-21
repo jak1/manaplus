@@ -291,6 +291,7 @@ ChatWindow::ChatWindow():
     mChatInput->addKeyListener(this);
     mCurHist = mHistory.end();
     mColorPicker->setVisible(config.getBoolValue("showChatColorsList"));
+    updateTabsMargin();
 
     fillCommands();
     if (player_node && player_node->isGM())
@@ -362,6 +363,18 @@ void ChatWindow::loadGMCommands()
     mGMLoaded = true;
 }
 
+void ChatWindow::updateTabsMargin()
+{
+    if (mColorPicker->isVisible())
+    {
+        mChatTabs->setRightMargin(mColorPicker->getWidth() + 16 + 8);
+    }
+    else
+    {
+        mChatTabs->setRightMargin(8);
+    }
+}
+
 void ChatWindow::adjustTabSize()
 {
     const gcn::Rectangle area = getChildrenArea();
@@ -381,6 +394,7 @@ void ChatWindow::adjustTabSize()
         mChatTabs->setHeight(height);
     else
         mChatTabs->setHeight(height + inputHeight);
+    updateTabsMargin();
 
     if (showEmotes)
     {
@@ -1075,8 +1089,8 @@ void ChatWindow::setVisible(bool visible)
     mTmpVisible = false;
 }
 
-void ChatWindow::addWhisper(const std::string &nick,
-                            const std::string &mes, const Own own)
+void ChatWindow::addWhisper(const std::string &restrict nick,
+                            const std::string &restrict mes, const Own own)
 {
     if (mes.empty() || !player_node)
         return;
@@ -1714,7 +1728,7 @@ void ChatWindow::addToAwayLog(const std::string &line)
         mAwayLog.pop_front();
 
     if (findI(line, mHighlights) != std::string::npos)
-        mAwayLog.push_back("##9away:" + line);
+        mAwayLog.push_back("##aaway:" + line);
 }
 
 void ChatWindow::displayAwayLog() const

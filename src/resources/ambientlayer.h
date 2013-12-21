@@ -43,9 +43,10 @@ class AmbientLayer final
          * @param keepRatio  rescale the image to keep
          * the same ratio than in 800x600 resolution mode.
          */
-        AmbientLayer(Image *const img, const float parallax,
+        AmbientLayer(Image *const img,
+                     const float parallax, const float parallaxY,
                      const float speedX, const float speedY,
-                     const bool keepRatio, int mask);
+                     const bool keepRatio, const int mask);
 
         A_DELETE_COPY(AmbientLayer)
 
@@ -57,7 +58,8 @@ class AmbientLayer final
 
     private:
         Image *mImage;
-        float mParallax;
+        float mParallaxX;
+        float mParallaxY;
         float mPosX;             /**< Current layer X position. */
         float mPosY;             /**< Current layer Y position. */
         float mSpeedX;           /**< Scrolling speed in X direction. */

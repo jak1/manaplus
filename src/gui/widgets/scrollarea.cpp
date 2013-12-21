@@ -286,7 +286,8 @@ void ScrollArea::draw(gcn::Graphics *graphics)
                     calcHMarker(graphics);
                 }
             }
-            static_cast<Graphics *const>(graphics)->drawTile(mVertexes);
+            static_cast<Graphics *const>(graphics)->drawTileCollection(
+                mVertexes);
         }
         else
         {
@@ -378,7 +379,7 @@ void ScrollArea::drawFrame(gcn::Graphics *graphics)
                 static_cast<Graphics*>(graphics)->calcWindow(
                     mVertexes2, 0, 0, w, h, background);
             }
-            static_cast<Graphics*>(graphics)->drawTile(mVertexes2);
+            static_cast<Graphics*>(graphics)->drawTileCollection(mVertexes2);
         }
         else
         {
@@ -428,8 +429,8 @@ void ScrollArea::drawButton(gcn::Graphics *const graphics,
 
     if (buttons[dir][state])
     {
-        static_cast<Graphics*>(graphics)->
-            drawImage(buttons[dir][state], dim.x, dim.y);
+        DRAW_IMAGE(static_cast<Graphics*>(graphics),
+            buttons[dir][state], dim.x, dim.y);
     }
 }
 
@@ -466,7 +467,7 @@ void ScrollArea::calcButton(gcn::Graphics *const graphics,
 
     if (buttons[dir][state])
     {
-        static_cast<Graphics*>(graphics)->calcTile(
+        static_cast<Graphics*>(graphics)->calcTileCollection(
             mVertexes, buttons[dir][state], dim.x, dim.y);
     }
 }

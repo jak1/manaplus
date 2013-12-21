@@ -148,6 +148,7 @@ Being::Being(const int id, const Type type, const uint16_t subtype,
     mIp(),
     mSpriteRemap(new int[20]),
     mSpriteHide(new int[20]),
+    mSpriteDraw(new int[20]),
     mComment(),
     mPet(nullptr),
     mOwner(nullptr),
@@ -191,6 +192,7 @@ Being::Being(const int id, const Type type, const uint16_t subtype,
     {
         mSpriteRemap[f] = f;
         mSpriteHide[f] = 0;
+        mSpriteDraw[f] = 0;
     }
 
     setMap(map);
@@ -223,6 +225,8 @@ Being::~Being()
     mSpriteRemap = nullptr;
     delete [] mSpriteHide;
     mSpriteHide = nullptr;
+    delete [] mSpriteDraw;
+    mSpriteDraw = nullptr;
 
     delete mSpeechBubble;
     mSpeechBubble = nullptr;
@@ -495,6 +499,12 @@ void Being::setSpeech(const std::string &text, const std::string &channel,
                          gcn::Graphics::CENTER,
                          &userPalette->getColor(UserPalette::PARTICLE),
                          true);
+    }
+    else
+    {
+        const bool isShowName = (speech == NAME_IN_BUBBLE);
+        mSpeechBubble->setCaption(isShowName ? mName : "");
+        mSpeechBubble->setText(mSpeech, isShowName);
     }
 }
 
@@ -1627,14 +1637,9 @@ void Being::drawSpeech(const int offsetX, const int offsetY)
     else if (mSpeechTime > 0 && (speech == NAME_IN_BUBBLE ||
              speech == NO_NAME_IN_BUBBLE))
     {
-        const bool isShowName = (speech == NAME_IN_BUBBLE);
-
         delete mText;
         mText = nullptr;
 
-        mSpeechBubble->setCaption(isShowName ? mName : "");
-
-        mSpeechBubble->setText(mSpeech, isShowName);
         mSpeechBubble->setPosition(px - (mSpeechBubble->getWidth() / 2),
             py - getHeight() - (mSpeechBubble->getHeight()));
         mSpeechBubble->setVisible(true);
@@ -1902,6 +1907,21 @@ void Being::updateColors()
     }
 }
 
+void Being::updateSprite(const unsigned int slot, const int id,
+                         std::string color, const unsigned char colorId,
+                         const bool isWeapon, const bool isTempSprite)
+{
+    if (slot >= Net::getCharServerHandler()->maxSprite())
+        return;
+
+    if (slot >= mSpriteIDs.size())
+        mSpriteIDs.resize(slot + 1, 0);
+
+    if (slot && mSpriteIDs[slot] == id)
+        return;
+    setSprite(slot, id, color, colorId, isWeapon, isTempSprite);
+}
+
 void Being::setSprite(const unsigned int slot, const int id,
                       std::string color, const unsigned char colorId,
                       const bool isWeapon, const bool isTempSprite)
@@ -1921,14 +1941,15 @@ void Being::setSprite(const unsigned int slot, const int id,
     if (slot >= mSpriteColorsIds.size())
         mSpriteColorsIds.resize(slot + 1, 1);
 
-    // here probably need more complex condition
-    if (slot && mSpriteIDs[slot] == id)
-        return;
+    // disabled for now, because it may broke replace/reorder sprites logic
+//    if (slot && mSpriteIDs[slot] == id)
+//        return;
 
     // id = 0 means unequip
     if (id == 0)
     {
         removeSprite(slot);
+        mSpriteDraw[slot] = 0;
 
         if (isWeapon)
             mEquippedWeapon = nullptr;
@@ -1972,6 +1993,7 @@ void Being::setSprite(const unsigned int slot, const int id,
             equipmentSprite->setSpriteDirection(getSpriteDirection());
 
         CompoundSprite::setSprite(slot, equipmentSprite);
+        mSpriteDraw[slot] = id;
 
         addItemParticles(id, info.getDisplay());
 
@@ -2227,14 +2249,16 @@ void Being::talkTo() const
     Net::getNpcHandler()->talk(mId);
 }
 
-bool Being::draw(Graphics *const graphics,
+void Being::draw(Graphics *const graphics,
                  const int offsetX, const int offsetY) const
 {
-    bool res = true;
     if (!mErased)
-        res = ActorSprite::draw(graphics, offsetX, offsetY);
-
-    return res;
+    {
+        const int px = getActorX() + offsetX;
+        const int py = getActorY() + offsetY;
+        ActorSprite::draw1(graphics, px, py);
+        drawSpriteAt(graphics, px, py);
+    }
 }
 
 void Being::drawSprites(Graphics *const graphics,
@@ -2272,16 +2296,13 @@ void Being::drawSpritesSDL(Graphics *const graphics,
     }
 }
 
-bool Being::drawSpriteAt(Graphics *const graphics,
+void Being::drawSpriteAt(Graphics *const graphics,
                          const int x, const int y) const
 {
-    bool res = true;
-
-    if (!mErased)
-        res = ActorSprite::drawSpriteAt(graphics, x, y);
+    CompoundSprite::draw(graphics, x, y);
 
     if (!userPalette)
-        return res;
+        return;
 
     if (mHighlightMapPortals && mMap && mSubType == 45 && !mMap->getHasWarps())
     {
@@ -2342,7 +2363,6 @@ bool Being::drawSpriteAt(Graphics *const graphics,
                   y + mapTileSize - 6 + mInfo->getHpBarOffsetY(),
                   2 * 50, 4);
     }
-    return res;
 }
 
 void Being::drawHpBar(Graphics *const graphics, const int maxHP, const int hp,
@@ -2459,6 +2479,7 @@ void Being::recalcSpritesOrder()
 
     std::vector<int>::iterator it;
     int oldHide[20];
+    bool updatedSprite[20];
     int dir = mSpriteDirection;
     if (dir < 0 || dir >= 9)
         dir = 0;
@@ -2472,9 +2493,11 @@ void Being::recalcSpritesOrder()
     {
         oldHide[slot] = mSpriteHide[slot];
         mSpriteHide[slot] = 0;
+        updatedSprite[slot] = false;
     }
 
     const size_t spriteIdSize = mSpriteIDs.size();
+
     for (unsigned slot = 0; slot < sz; slot ++)
     {
         slotRemap.push_back(slot);
@@ -2505,7 +2528,7 @@ void Being::recalcSpritesOrder()
                         {
                             mSpriteHide[remSprite] = 1;
                         }
-                        else
+                        else if (mSpriteHide[remSprite] != 1)
                         {
                             std::map<int, int>::const_iterator repIt
                                 = itemReplacer.find(mSpriteIDs[remSprite]);
@@ -2534,6 +2557,7 @@ void Being::recalcSpritesOrder()
                                             .getDyeColorsString(mHairColor),
                                             1, false, true);
                                     }
+                                    updatedSprite[remSprite] = true;
                                 }
                             }
                         }
@@ -2563,6 +2587,7 @@ void Being::recalcSpritesOrder()
                                                 mHairColor),
                                                 1, false, true);
                                         }
+                                        updatedSprite[slot2] = true;
                                     }
                                 }
                             }
@@ -2694,15 +2719,27 @@ void Being::recalcSpritesOrder()
     for (unsigned slot = 0; slot < sz; slot ++)
     {
         mSpriteRemap[slot] = slotRemap[slot];
-        if (oldHide[slot] != 0 && oldHide[slot] != 1 && mSpriteHide[slot] == 0)
+        if (mSpriteHide[slot] == 0)
+        {
+            if (oldHide[slot] != 0 && oldHide[slot] != 1)
+            {
+                const int id = mSpriteIDs[slot];
+                if (!id)
+                    continue;
+
+                updatedSprite[slot] = true;
+                setSprite(slot, id, mSpriteColors[slot], 1, false, true);
+            }
+        }
+    }
+    for (unsigned slot = 0; slot < spriteIdSize; slot ++)
+    {
+        if (mSpriteHide[slot] == 0)
         {
             const int id = mSpriteIDs[slot];
-            if (!id)
-                continue;
-
-            setSprite(slot, id, mSpriteColors[slot], 1, false, true);
+            if (updatedSprite[slot] == false && mSpriteDraw[slot] != id)
+                setSprite(slot, id, mSpriteColors[slot], 1, false, true);
         }
-//        logger->log("slot %d = %d", slot, mSpriteRemap[slot]);
     }
 }
 
@@ -2807,20 +2844,20 @@ std::string Being::loadComment(const std::string &name, const int type)
 
     str.append(stringToHexPath(name)).append("/comment.txt");
     logger->log("load from: %s", str.c_str());
-    StringVect lines;
 
     const ResourceManager *const resman = ResourceManager::getInstance();
     if (resman->existsLocal(str))
     {
-        lines = resman->loadTextFileLocal(str);
+        StringVect lines;
+        resman->loadTextFileLocal(str, lines);
         if (lines.size() >= 2)
             return lines[1];
     }
     return "";
 }
 
-void Being::saveComment(const std::string &name,
-                        const std::string &comment, const int type)
+void Being::saveComment(const std::string &restrict name,
+                        const std::string &restrict comment, const int type)
 {
     std::string dir;
     switch (type)

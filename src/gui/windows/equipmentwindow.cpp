@@ -181,16 +181,17 @@ void EquipmentWindow::draw(gcn::Graphics *graphics)
                     continue;
                 if (i == mSelected)
                 {
-                    g->calcTile(mVertexes, mSlotHighlightedBackground,
-                        box->x, box->y);
+                    g->calcTileCollection(mVertexes,
+                        mSlotHighlightedBackground, box->x, box->y);
                 }
                 else
                 {
-                    g->calcTile(mVertexes, mSlotBackground, box->x, box->y);
+                    g->calcTileCollection(mVertexes, mSlotBackground,
+                        box->x, box->y);
                 }
             }
         }
-        g->drawTile(mVertexes);
+        g->drawTileCollection(mVertexes);
     }
     else
     {
@@ -201,9 +202,13 @@ void EquipmentWindow::draw(gcn::Graphics *graphics)
             if (!box)
                 continue;
             if (i == mSelected)
-                g->drawImage(mSlotHighlightedBackground, box->x, box->y);
+            {
+                DRAW_IMAGE(g, mSlotHighlightedBackground, box->x, box->y);
+            }
             else
-                g->drawImage(mSlotBackground, box->x, box->y);
+            {
+                DRAW_IMAGE(g, mSlotBackground, box->x, box->y);
+            }
         }
     }
 
@@ -229,7 +234,7 @@ void EquipmentWindow::draw(gcn::Graphics *graphics)
             {
                 image->setAlpha(1.0F);  // Ensure the image is drawn
                                         // with maximum opacity
-                g->drawImage(image, box->x + mItemPadding,
+                DRAW_IMAGE(g, image, box->x + mItemPadding,
                     box->y + mItemPadding);
                 if (i == EQUIP_PROJECTILE_SLOT)
                 {
@@ -243,7 +248,7 @@ void EquipmentWindow::draw(gcn::Graphics *graphics)
         }
         else if (box->image)
         {
-            g->drawImage(box->image, box->x + mItemPadding,
+            DRAW_IMAGE(g, box->image, box->x + mItemPadding,
                 box->y + mItemPadding);
         }
     }

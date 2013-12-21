@@ -142,6 +142,7 @@ Window::Window(const std::string &caption, const bool modal,
             mTitleBarHeight += getOption("titlebarHeightRelative");
             setPalette(getOption("palette"));
             childPalette = getOption("childPalette");
+            mShowTitle = getOptionBool("showTitle", true);
         }
     }
 
@@ -238,7 +239,10 @@ void Window::draw(gcn::Graphics *graphics)
                 const Image *const button = mSkin->getCloseImage(
                     mResizeHandles == CLOSE);
                 if (button)
-                    g->calcTile(mVertexes, button, mCloseRect.x, mCloseRect.y);
+                {
+                    g->calcTileCollection(mVertexes, button,
+                        mCloseRect.x, mCloseRect.y);
+                }
             }
             // Draw Sticky Button
             if (mStickyButton)
@@ -246,19 +250,22 @@ void Window::draw(gcn::Graphics *graphics)
                 const Image *const button = mSkin->getStickyImage(mSticky);
                 if (button)
                 {
-                    g->calcTile(mVertexes, button,
+                    g->calcTileCollection(mVertexes, button,
                         mStickyRect.x, mStickyRect.y);
                 }
             }
 
             if (mGrip)
-                g->calcTile(mVertexes, mGrip, mGripRect.x, mGripRect.y);
+            {
+                g->calcTileCollection(mVertexes, mGrip,
+                    mGripRect.x, mGripRect.y);
+            }
         }
         else
         {
             mLastRedraw = false;
         }
-        g->drawTile(mVertexes);
+        g->drawTileCollection(mVertexes);
     }
     else
     {
@@ -271,18 +278,18 @@ void Window::draw(gcn::Graphics *graphics)
             const Image *const button = mSkin->getCloseImage(
                 mResizeHandles == CLOSE);
             if (button)
-                g->drawImage(button, mCloseRect.x, mCloseRect.y);
+                DRAW_IMAGE(g, button, mCloseRect.x, mCloseRect.y);
         }
         // Draw Sticky Button
         if (mStickyButton)
         {
             const Image *const button = mSkin->getStickyImage(mSticky);
             if (button)
-                g->drawImage(button, mStickyRect.x, mStickyRect.y);
+                DRAW_IMAGE(g, button, mStickyRect.x, mStickyRect.y);
         }
 
         if (mGrip)
-            g->drawImage(mGrip, mGripRect.x, mGripRect.y);
+            DRAW_IMAGE(g, mGrip, mGripRect.x, mGripRect.y);
     }
 
     // Draw title
@@ -1219,11 +1226,11 @@ int Window::getOption(const std::string &name, const int def) const
     return def;
 }
 
-bool Window::getOptionBool(const std::string &name) const
+bool Window::getOptionBool(const std::string &name, const bool def) const
 {
     if (mSkin)
-        return mSkin->getOption(name) != 0;
-    return 0;
+        return mSkin->getOption(name, def) != 0;
+    return def;
 }
 
 #ifdef USE_PROFILER

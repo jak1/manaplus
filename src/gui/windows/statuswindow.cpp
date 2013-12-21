@@ -87,8 +87,9 @@ class AttrDisplay : public Container
 
     protected:
         AttrDisplay(const Widget2 *const widget,
-                    const int id, const std::string &name,
-                    const std::string &shortName);
+                    const int id,
+                    const std::string &restrict name,
+                    const std::string &restrict shortName);
 
         const int mId;
         const std::string mName;
@@ -103,8 +104,8 @@ class DerDisplay final : public AttrDisplay
 {
     public:
         DerDisplay(const Widget2 *const widget,
-                   const int id, const std::string &name,
-                   const std::string &shortName);
+                   const int id, const std::string &restrict name,
+                   const std::string &restrict shortName);
 
         A_DELETE_COPY(DerDisplay)
 
@@ -116,8 +117,8 @@ class ChangeDisplay final : public AttrDisplay, gcn::ActionListener
 {
     public:
         ChangeDisplay(const Widget2 *const widget,
-                      const int id, const std::string &name,
-                      const std::string &shortName);
+                      const int id, const std::string &restrict name,
+                      const std::string &restrict shortName);
 
         A_DELETE_COPY(ChangeDisplay)
 
@@ -191,12 +192,16 @@ StatusWindow::StatusWindow() :
 
     mHpBar = new ProgressBar(this, static_cast<float>(PlayerInfo::getAttribute(
         PlayerInfo::HP)) / static_cast<float>(max), 80, 0, Theme::PROG_HP);
+    mHpBar->setColor(Theme::getThemeColor(Theme::HP_BAR),
+        Theme::getThemeColor(Theme::HP_BAR_OUTLINE));
 
     max = PlayerInfo::getAttribute(PlayerInfo::EXP_NEEDED);
     mXpBar = new ProgressBar(this, max ?
             static_cast<float>(PlayerInfo::getAttribute(PlayerInfo::EXP))
             / static_cast<float>(max):
             static_cast<float>(0), 80, 0, Theme::PROG_EXP);
+    mXpBar->setColor(Theme::getThemeColor(Theme::XP_BAR),
+        Theme::getThemeColor(Theme::XP_BAR_OUTLINE));
 
     const bool magicBar = Net::getGameHandler()->canUseMagicBar();
     const int job = Net::getPlayerHandler()->getJobLocation()
@@ -207,11 +212,21 @@ StatusWindow::StatusWindow() :
         max = PlayerInfo::getAttribute(PlayerInfo::MAX_MP);
         // TRANSLATORS: status window label
         mMpLabel = new Label(this, _("MP:"));
+        const bool useMagic = Net::getPlayerHandler()->canUseMagic();
         mMpBar = new ProgressBar(this, max ? static_cast<float>(
             PlayerInfo::getAttribute(PlayerInfo::MAX_MP))
             / static_cast<float>(max) : static_cast<float>(0),
-            80, 0, Net::getPlayerHandler()->canUseMagic() ?
-            Theme::PROG_MP : Theme::PROG_NO_MP);
+            80, 0, useMagic ? Theme::PROG_MP : Theme::PROG_NO_MP);
+        if (useMagic)
+        {
+            mMpBar->setColor(Theme::getThemeColor(Theme::MP_BAR),
+                Theme::getThemeColor(Theme::MP_BAR_OUTLINE));
+        }
+        else
+        {
+            mMpBar->setColor(Theme::getThemeColor(Theme::NO_MP_BAR),
+                Theme::getThemeColor(Theme::NO_MP_BAR_OUTLINE));
+        }
     }
     else
     {
@@ -241,6 +256,8 @@ StatusWindow::StatusWindow() :
         // TRANSLATORS: status window label
         mJobLabel = new Label(this, _("Job:"));
         mJobBar = new ProgressBar(this, 0.0F, 80, 0, Theme::PROG_JOB);
+        mJobBar->setColor(Theme::getThemeColor(Theme::JOB_BAR),
+            Theme::getThemeColor(Theme::JOB_BAR_OUTLINE));
 
         place(3, 0, mJobLvlLabel, 3);
         place(5, 2, mJobLabel).setPadding(3);
@@ -455,10 +472,9 @@ void StatusWindow::setPointsNeeded(const int id, const int needed)
     }
 }
 
-void StatusWindow::addAttribute(const int id, const std::string &name,
-                                const std::string &shortName,
-                                const bool modifiable,
-                                const std::string &description A_UNUSED)
+void StatusWindow::addAttribute(const int id, const std::string &restrict name,
+                                const std::string &restrict shortName,
+                                const bool modifiable)
 {
     AttrDisplay *disp;
 
@@ -521,9 +537,17 @@ void StatusWindow::updateMPBar(ProgressBar *const bar, const bool showMax)
         prog = static_cast<float>(mp) / static_cast<float>(maxMp);
 
     if (Net::getPlayerHandler()->canUseMagic())
+    {
+        bar->setColor(Theme::getThemeColor(Theme::MP_BAR),
+            Theme::getThemeColor(Theme::MP_BAR_OUTLINE));
         bar->setProgressPalette(Theme::PROG_MP);
+    }
     else
+    {
+        bar->setColor(Theme::getThemeColor(Theme::NO_MP_BAR),
+            Theme::getThemeColor(Theme::NO_MP_BAR_OUTLINE));
         bar->setProgressPalette(Theme::PROG_NO_MP);
+    }
 
     bar->setProgress(prog);
 }
@@ -713,9 +737,9 @@ void StatusWindow::updateStatusBar(ProgressBar *const bar,
 
     bar->setProgress(50);
     if (player_node->getDisableGameModifiers())
-        bar->setColor(Theme::getThemeColor(Theme::STATUSBAR_ON));
+        bar->setBackgroundColor(Theme::getThemeColor(Theme::STATUSBAR_ON));
     else
-        bar->setColor(Theme::getThemeColor(Theme::STATUSBAR_OFF));
+        bar->setBackgroundColor(Theme::getThemeColor(Theme::STATUSBAR_OFF));
 }
 
 void StatusWindow::action(const gcn::ActionEvent &event)
@@ -744,8 +768,8 @@ void StatusWindow::action(const gcn::ActionEvent &event)
 }
 
 AttrDisplay::AttrDisplay(const Widget2 *const widget,
-                         const int id, const std::string &name,
-                         const std::string &shortName) :
+                         const int id, const std::string &restrict name,
+                         const std::string &restrict shortName) :
     Container(widget),
     mId(id),
     mName(name),
@@ -778,8 +802,8 @@ std::string AttrDisplay::update()
 }
 
 DerDisplay::DerDisplay(const Widget2 *const widget,
-                       const int id, const std::string &name,
-                       const std::string &shortName) :
+                       const int id, const std::string &restrict name,
+                       const std::string &restrict shortName) :
     AttrDisplay(widget, id, name, shortName)
 {
     ContainerPlacer place = mLayout->getPlacer(0, 0);
@@ -789,8 +813,8 @@ DerDisplay::DerDisplay(const Widget2 *const widget,
 }
 
 ChangeDisplay::ChangeDisplay(const Widget2 *const widget,
-                             const int id, const std::string &name,
-                             const std::string &shortName) :
+                             const int id, const std::string &restrict name,
+                             const std::string &restrict shortName) :
     AttrDisplay(widget, id, name, shortName),
     gcn::ActionListener(),
     mNeeded(1),

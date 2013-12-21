@@ -38,7 +38,8 @@ Skin *RadioButton::mSkin = nullptr;
 float RadioButton::mAlpha = 1.0;
 
 RadioButton::RadioButton(const Widget2 *const widget,
-                         const std::string &caption, const std::string &group,
+                         const std::string &restrict caption,
+                         const std::string &restrict group,
                          const bool marked):
     gcn::RadioButton(caption, group, marked),
     Widget2(widget),
@@ -148,7 +149,7 @@ void RadioButton::drawBox(gcn::Graphics* graphics)
 
     if (box)
     {
-        static_cast<Graphics*>(graphics)->drawImage(
+        DRAW_IMAGE(static_cast<Graphics*>(graphics),
             box, mImagePadding, (getHeight() - mImageSize) / 2);
     }
 }

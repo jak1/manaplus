@@ -25,6 +25,7 @@
 
 #include "gui/sdlfont.h"
 
+#include "gui/widgets/browserbox.h"
 #include "gui/widgets/label.h"
 #include "gui/widgets/textbox.h"
 
@@ -35,15 +36,16 @@
 SpeechBubble::SpeechBubble() :
     Popup("Speech", "speechbubble.xml"),
     mText(),
+    mSpacing(mSkin ? mSkin->getOption("spacing") : 2),
     mCaption(new Label(this)),
-    mSpeechBox(new TextBox(this))
+    mSpeechBox(new BrowserBox(this, BrowserBox::AUTO_SIZE, true,
+        "speechbrowserbox.xml"))
 {
     setContentSize(140, 46);
-    setMinWidth(29);
-    setMinHeight(29);
+    setMinWidth(8);
+    setMinHeight(8);
 
     mCaption->setFont(boldFont);
-    mSpeechBox->setEditable(false);
     mSpeechBox->setOpaque(false);
     mSpeechBox->setForegroundColorAll(getThemeColor(Theme::BUBBLE_TEXT),
         getThemeColor(Theme::BUBBLE_TEXT_OUTLINE));
@@ -66,34 +68,24 @@ void SpeechBubble::setCaption(const std::string &name,
 
 void SpeechBubble::setText(const std::string &text, const bool showName)
 {
-    if (text == mText && (mCaption->getWidth() <= mSpeechBox->getMinWidth()))
+    if (text == mText && (mCaption->getWidth() <= mSpeechBox->getWidth()))
         return;
 
     mSpeechBox->setForegroundColorAll(getThemeColor(Theme::BUBBLE_TEXT),
         getThemeColor(Theme::BUBBLE_TEXT_OUTLINE));
 
-    const int pad = mPadding;
-    const int pad2 = 2 * pad;
-    int width = mCaption->getWidth() + pad2;
-    mSpeechBox->setTextWrapped(text, 130 > width ? 130 : width);
-    const int speechWidth = mSpeechBox->getMinWidth() + pad2;
+    int width = mCaption->getWidth();
+    mSpeechBox->clearRows();
+    mSpeechBox->addRow(text);
+    mSpeechBox->setWidth(mSpeechBox->getDataWidth());
 
-    const int fontHeight = getFont()->getHeight();
-    const int nameHeight = showName ? mCaption->getHeight() + pad / 2 : 0;
-    const int numRows = mSpeechBox->getNumberOfRows();
-    const int height = (numRows * fontHeight) + nameHeight + pad;
+    const int speechWidth = mSpeechBox->getWidth();
+    const int nameHeight = showName ? mCaption->getHeight() + mSpacing : 0;
 
     if (width < speechWidth)
         width = speechWidth;
 
-    width += pad2;
-
-    setContentSize(width, height);
-
-    const gcn::Rectangle &rect = mDimension;
-    const int xPos = ((rect.width - width) / 2);
-    const int yPos = ((rect.height - height) / 2) + nameHeight;
-
-    mCaption->setPosition(xPos, pad);
-    mSpeechBox->setPosition(xPos, yPos);
+    setContentSize(width, getFont()->getHeight() + nameHeight);
+    mCaption->setPosition(0, 0);
+    mSpeechBox->setPosition(0, nameHeight);
 }

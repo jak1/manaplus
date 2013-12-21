@@ -17,8 +17,10 @@ gui_DATA =				\
 	circle-on.xml		\
 	colors.xml			\
 	complete_icon.xml		\
+	connection.xml		\
 	dbutton.xml		\
 	dbutton_image.xml		\
+	desktop.xml		\
 	dpad.xml		\
 	dpad_image.xml		\
 	dropdown.xml		\
@@ -67,6 +69,7 @@ gui_DATA =				\
 	shop.xml			\
 	slider.xml			\
 	slider_highlighted.xml		\
+	speechbrowserbox.xml		\
 	speechbubble.xml		\
 	tab.xml				\
 	tab_highlighted.xml		\
