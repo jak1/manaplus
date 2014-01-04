@@ -2,7 +2,7 @@
  *  The ManaPlus Client
  *  Copyright (C) 2004-2009  The Mana World Development Team
  *  Copyright (C) 2009-2010  The Mana Developers
- *  Copyright (C) 2011-2013  The ManaPlus Developers
+ *  Copyright (C) 2011-2014  The ManaPlus Developers
  *
  *  This file is part of The ManaPlus Client.
  *
@@ -38,6 +38,32 @@
 
 #include "debug.h"
 
+#define vertFill2D(tVar, vVar, x1, y1, x2, y2, dstX, dstY, w, h) \
+    tVar[vp + 0] = x1; \
+    tVar[vp + 1] = y1; \
+    tVar[vp + 2] = x2; \
+    tVar[vp + 3] = y1; \
+    tVar[vp + 4] = x2; \
+    tVar[vp + 5] = y2; \
+    tVar[vp + 6] = x1; \
+    tVar[vp + 7] = y1; \
+    tVar[vp + 8] = x1; \
+    tVar[vp + 9] = y2; \
+    tVar[vp + 10] = x2; \
+    tVar[vp + 11] = y2; \
+    vVar[vp + 0] = dstX; \
+    vVar[vp + 1] = dstY; \
+    vVar[vp + 2] = dstX + w; \
+    vVar[vp + 3] = dstY; \
+    vVar[vp + 4] = dstX + w; \
+    vVar[vp + 5] = dstY + h; \
+    vVar[vp + 6] = dstX; \
+    vVar[vp + 7] = dstY; \
+    vVar[vp + 8] = dstX; \
+    vVar[vp + 9] = dstY + h; \
+    vVar[vp + 10] = dstX + w; \
+    vVar[vp + 11] = dstY + h;
+
 GLuint MobileOpenGLGraphics::mLastImage = 0;
 #ifdef DEBUG_DRAW_CALLS
 unsigned int MobileOpenGLGraphics::mDrawCalls = 0;
@@ -46,12 +72,15 @@ unsigned int MobileOpenGLGraphics::mLastDrawCalls = 0;
 
 MobileOpenGLGraphics::MobileOpenGLGraphics():
     mFloatTexArray(nullptr),
-    mIntTexArray(nullptr),
-    mIntVertArray(nullptr),
     mShortVertArray(nullptr),
+    mFloatTexArrayCached(nullptr),
+    mShortVertArrayCached(nullptr),
+    mAlphaCached(1.0F),
+    mVpCached(0),
     mTexture(false),
     mIsByteColor(false),
     mByteColor(),
+    mImageCached(0),
     mFloatColor(1.0F),
     mMaxVertices(500),
     mColorAlpha(false),
@@ -68,9 +97,9 @@ MobileOpenGLGraphics::MobileOpenGLGraphics():
 MobileOpenGLGraphics::~MobileOpenGLGraphics()
 {
     delete [] mFloatTexArray;
-    delete [] mIntTexArray;
-    delete [] mIntVertArray;
     delete [] mShortVertArray;
+    delete [] mFloatTexArrayCached;
+    delete [] mShortVertArrayCached;
 }
 
 void MobileOpenGLGraphics::initArrays()
@@ -85,9 +114,9 @@ void MobileOpenGLGraphics::initArrays()
     const int sz = mMaxVertices * 4 + 30;
     vertexBufSize = mMaxVertices;
     mFloatTexArray = new GLfloat[sz];
-    mIntTexArray = new GLint[sz];
-    mIntVertArray = new GLint[sz];
     mShortVertArray = new GLshort[sz];
+    mFloatTexArrayCached = new GLfloat[sz];
+    mShortVertArrayCached = new GLshort[sz];
 }
 
 bool MobileOpenGLGraphics::setVideoMode(const int w, const int h,
@@ -187,115 +216,206 @@ static inline void drawRescaledQuad(const Image *const image,
     }
 }
 
-
 bool MobileOpenGLGraphics::drawImage2(const Image *const image,
-                                      int srcX, int srcY,
-                                      int dstX, int dstY,
-                                      const int width, const int height,
-                                      const bool useColor)
+                                      int dstX, int dstY)
+{
+    return drawImageInline(image, dstX, dstY);
+}
+
+bool MobileOpenGLGraphics::drawImageInline(const Image *const image,
+                                           int dstX, int dstY)
 {
     FUNC_BLOCK("Graphics::drawImage2", 1)
     if (!image)
         return false;
 
-    const SDL_Rect &imageRect = image->mBounds;
-
-    if (!useColor)
-        setColorAlpha(image->mAlpha);
-
+    setColorAlpha(image->mAlpha);
 #ifdef DEBUG_BIND_TEXTURE
     debugBindTexture(image);
 #endif
     bindTexture(OpenGLImageHelper::mTextureType, image->mGLImage);
-
     setTexturingAndBlending(true);
 
-    drawQuad(image, srcX + imageRect.x, srcY + imageRect.y,
-        dstX, dstY, width, height);
+    const SDL_Rect &imageRect = image->mBounds;
+    drawQuad(image, imageRect.x, imageRect.y,
+        dstX, dstY, imageRect.w, imageRect.h);
 
     return true;
 }
 
-bool MobileOpenGLGraphics::drawRescaledImage(const Image *const image,
-                                             int srcX, int srcY,
-                                             int dstX, int dstY,
-                                             const int width, const int height,
-                                             const int desiredWidth,
-                                             const int desiredHeight,
-                                             const bool useColor)
+void MobileOpenGLGraphics::drawImageCached(const Image *const image,
+                                           int x, int y)
 {
-    return drawRescaledImage(image, srcX, srcY,
-                             dstX, dstY,
-                             width, height,
-                             desiredWidth, desiredHeight,
-                             useColor, true);
+    if (!image)
+        return;
+
+    if (image->mGLImage != mImageCached)
+    {
+        completeCache();
+        mImageCached = image->mGLImage;
+        mAlphaCached = image->mAlpha;
+    }
+
+    const SDL_Rect &imageRect = image->mBounds;
+    const int srcX = imageRect.x;
+    const int srcY = imageRect.y;
+    const int w = imageRect.w;
+    const int h = imageRect.h;
+
+    if (w == 0 || h == 0)
+        return;
+
+    const float tw = static_cast<float>(image->mTexWidth);
+    const float th = static_cast<float>(image->mTexHeight);
+
+    const unsigned int vLimit = mMaxVertices * 4;
+
+    unsigned int vp = mVpCached;
+
+    // Draw a set of textured rectangles
+//    if (OpenGLImageHelper::mTextureType == GL_TEXTURE_2D)
+    {
+        float texX1 = static_cast<float>(srcX) / tw;
+        float texY1 = static_cast<float>(srcY) / th;
+        float texX2 = static_cast<float>(srcX + w) / tw;
+        float texY2 = static_cast<float>(srcY + h) / th;
+
+        vertFill2D(mFloatTexArrayCached, mShortVertArrayCached,
+            texX1, texY1, texX2, texY2,
+            x, y, w, h);
+
+        vp += 12;
+        if (vp >= vLimit)
+        {
+            completeCache();
+            vp = 0;
+        }
+        else
+        {
+            mVpCached = vp;
+        }
+    }
+}
+
+void MobileOpenGLGraphics::drawPatternCached(const Image *const image,
+                                             const int x, const int y,
+                                             const int w, const int h)
+{
+    if (!image)
+        return;
+
+    if (image->mGLImage != mImageCached)
+    {
+        completeCache();
+        mImageCached = image->mGLImage;
+    }
+
+    const SDL_Rect &imageRect = image->mBounds;
+    const int srcX = imageRect.x;
+    const int srcY = imageRect.y;
+    const int iw = imageRect.w;
+    const int ih = imageRect.h;
+
+    if (iw == 0 || ih == 0)
+        return;
+
+    const float tw = static_cast<float>(image->mTexWidth);
+    const float th = static_cast<float>(image->mTexHeight);
+
+    unsigned int vp = mVpCached;
+    const unsigned int vLimit = mMaxVertices * 4;
+    // Draw a set of textured rectangles
+//    if (OpenGLImageHelper::mTextureType == GL_TEXTURE_2D)
+//    {
+        const float texX1 = static_cast<float>(srcX) / tw;
+        const float texY1 = static_cast<float>(srcY) / th;
+
+        for (int py = 0; py < h; py += ih)
+        {
+            const int height = (py + ih >= h) ? h - py : ih;
+            const float texY2 = static_cast<float>(srcY + height) / th;
+            const int dstY = y + py;
+            for (int px = 0; px < w; px += iw)
+            {
+                const int width = (px + iw >= w) ? w - px : iw;
+                const int dstX = x + px;
+
+                const float texX2 = static_cast<float>(srcX + width) / tw;
+
+                vertFill2D(mFloatTexArrayCached, mShortVertArrayCached,
+                    texX1, texY1, texX2, texY2,
+                    dstX, dstY, width, height);
+
+                vp += 12;
+                if (vp >= vLimit)
+                {
+                    completeCache();
+                    vp = 0;
+                }
+            }
+        }
+//    }
+    mVpCached = vp;
+}
+
+void MobileOpenGLGraphics::completeCache()
+{
+    if (!mImageCached)
+        return;
+
+    setColorAlpha(mAlphaCached);
+#ifdef DEBUG_BIND_TEXTURE
+//    debugBindTexture(image);
+#endif
+    bindTexture(OpenGLImageHelper::mTextureType, mImageCached);
+    setTexturingAndBlending(true);
+
+    drawTriangleArrayfsCached(mVpCached);
+    mImageCached = 0;
+    mVpCached = 0;
 }
 
 bool MobileOpenGLGraphics::drawRescaledImage(const Image *const image,
-                                             int srcX, int srcY,
                                              int dstX, int dstY,
-                                             const int width, const int height,
                                              const int desiredWidth,
-                                             const int desiredHeight,
-                                             const bool useColor,
-                                             bool smooth)
+                                             const int desiredHeight)
 {
     FUNC_BLOCK("Graphics::drawRescaledImage", 1)
     if (!image)
         return false;
 
-    // Just draw the image normally when no resizing is necessary,
-    if (width == desiredWidth && height == desiredHeight)
-    {
-        return drawImage2(image, srcX, srcY, dstX, dstY,
-                          width, height, useColor);
-    }
-
-    // When the desired image is smaller than the current one,
-    // disable smooth effect.
-    if (width > desiredWidth && height > desiredHeight)
-        smooth = false;
-
     const SDL_Rect &imageRect = image->mBounds;
-    srcX += imageRect.x;
-    srcY += imageRect.y;
 
-    if (!useColor)
-        setColorAlpha(image->mAlpha);
+    // Just draw the image normally when no resizing is necessary,
+    if (imageRect.w == desiredWidth && imageRect.h == desiredHeight)
+        return drawImageInline(image, dstX, dstY);
 
+    setColorAlpha(image->mAlpha);
 #ifdef DEBUG_BIND_TEXTURE
     debugBindTexture(image);
 #endif
     bindTexture(OpenGLImageHelper::mTextureType, image->mGLImage);
-
     setTexturingAndBlending(true);
 
     // Draw a textured quad.
-    drawRescaledQuad(image, srcX, srcY, dstX, dstY, width, height,
-                     desiredWidth, desiredHeight);
-
-    if (smooth)  // A basic smooth effect...
-    {
-        setColorAlpha(0.2F);
-        drawRescaledQuad(image, srcX, srcY, dstX - 1, dstY - 1, width, height,
-                         desiredWidth + 1, desiredHeight + 1);
-        drawRescaledQuad(image, srcX, srcY, dstX + 1, dstY + 1, width, height,
-                         desiredWidth - 1, desiredHeight - 1);
-
-        drawRescaledQuad(image, srcX, srcY, dstX + 1, dstY, width, height,
-                         desiredWidth - 1, desiredHeight);
-        drawRescaledQuad(image, srcX, srcY, dstX, dstY + 1, width, height,
-                         desiredWidth, desiredHeight - 1);
-    }
+    drawRescaledQuad(image, imageRect.x, imageRect.y, dstX, dstY,
+        imageRect.w, imageRect.h, desiredWidth, desiredHeight);
 
     return true;
 }
 
-void MobileOpenGLGraphics::drawImagePattern(const Image *const image,
-                                            const int x, const int y,
-                                            const int w, const int h)
+void MobileOpenGLGraphics::drawPattern(const Image *const image,
+                                       const int x, const int y,
+                                       const int w, const int h)
 {
-    FUNC_BLOCK("Graphics::drawImagePattern", 1)
+    drawPatternInline(image, x, y, w, h);
+}
+
+void MobileOpenGLGraphics::drawPatternInline(const Image *const image,
+                                             const int x, const int y,
+                                             const int w, const int h)
+{
+    FUNC_BLOCK("Graphics::drawPattern", 1)
     if (!image)
         return;
 
@@ -340,41 +460,9 @@ void MobileOpenGLGraphics::drawImagePattern(const Image *const image,
 
                 const float texX2 = static_cast<float>(srcX + width) / tw;
 
-                mFloatTexArray[vp + 0] = texX1;     // 1
-                mFloatTexArray[vp + 1] = texY1;
-
-                mFloatTexArray[vp + 2] = texX2;     // 2
-                mFloatTexArray[vp + 3] = texY1;
-
-                mFloatTexArray[vp + 4] = texX2;     // 3
-                mFloatTexArray[vp + 5] = texY2;
-
-                mFloatTexArray[vp + 6] = texX1;     // 1
-                mFloatTexArray[vp + 7] = texY1;
-
-                mFloatTexArray[vp + 8] = texX1;     // 4
-                mFloatTexArray[vp + 9] = texY2;
-
-                mFloatTexArray[vp + 10] = texX2;    // 3
-                mFloatTexArray[vp + 11] = texY2;
-
-                mShortVertArray[vp + 0] = static_cast<GLshort>(dstX);
-                mShortVertArray[vp + 1] = static_cast<GLshort>(dstY);
-
-                mShortVertArray[vp + 2] = static_cast<GLshort>(dstX + width);
-                mShortVertArray[vp + 3] = static_cast<GLshort>(dstY);
-
-                mShortVertArray[vp + 4] = static_cast<GLshort>(dstX + width);
-                mShortVertArray[vp + 5] = static_cast<GLshort>(dstY + height);
-
-                mShortVertArray[vp + 6] = static_cast<GLshort>(dstX);
-                mShortVertArray[vp + 7] = static_cast<GLshort>(dstY);
-
-                mShortVertArray[vp + 8] = static_cast<GLshort>(dstX);
-                mShortVertArray[vp + 9] = static_cast<GLshort>(dstY + height);
-
-                mShortVertArray[vp + 10] = static_cast<GLshort>(dstX + width);
-                mShortVertArray[vp + 11] = static_cast<GLshort>(dstY + height);
+                vertFill2D(mFloatTexArray, mShortVertArray,
+                    texX1, texY1, texX2, texY2,
+                    dstX, dstY, width, height);
 
                 vp += 12;
                 if (vp >= vLimit)
@@ -389,11 +477,11 @@ void MobileOpenGLGraphics::drawImagePattern(const Image *const image,
 //    }
 }
 
-void MobileOpenGLGraphics::drawRescaledImagePattern(const Image *const image,
-                                                    const int x, const int y,
-                                                    const int w, const int h,
-                                                    const int scaledWidth,
-                                                    const int scaledHeight)
+void MobileOpenGLGraphics::drawRescaledPattern(const Image *const image,
+                                               const int x, const int y,
+                                               const int w, const int h,
+                                               const int scaledWidth,
+                                               const int scaledHeight)
 {
     if (!image)
         return;
@@ -450,41 +538,9 @@ void MobileOpenGLGraphics::drawRescaledImagePattern(const Image *const image,
                     / scaledWidth;
                 const float texX2 = texX1 + tFractionW * visibleFractionW;
 
-                mFloatTexArray[vp + 0] = texX1;
-                mFloatTexArray[vp + 1] = texY1;
-
-                mFloatTexArray[vp + 2] = texX2;
-                mFloatTexArray[vp + 3] = texY1;
-
-                mFloatTexArray[vp + 4] = texX2;
-                mFloatTexArray[vp + 5] = texY2;
-
-                mFloatTexArray[vp + 6] = texX1;
-                mFloatTexArray[vp + 7] = texY1;
-
-                mFloatTexArray[vp + 8] = texX1;
-                mFloatTexArray[vp + 9] = texY2;
-
-                mFloatTexArray[vp + 10] = texX2;
-                mFloatTexArray[vp + 11] = texY2;
-
-                mShortVertArray[vp + 0] = static_cast<GLshort>(dstX);
-                mShortVertArray[vp + 1] = static_cast<GLshort>(dstY);
-
-                mShortVertArray[vp + 2] = static_cast<GLshort>(dstX + width);
-                mShortVertArray[vp + 3] = static_cast<GLshort>(dstY);
-
-                mShortVertArray[vp + 4] = static_cast<GLshort>(dstX + width);
-                mShortVertArray[vp + 5] = static_cast<GLshort>(dstY + height);
-
-                mShortVertArray[vp + 6] = static_cast<GLshort>(dstX);
-                mShortVertArray[vp + 7] = static_cast<GLshort>(dstY);
-
-                mShortVertArray[vp + 8] = static_cast<GLshort>(dstX);
-                mShortVertArray[vp + 9] = static_cast<GLshort>(dstY + height);
-
-                mShortVertArray[vp + 10] = static_cast<GLshort>(dstX + width);
-                mShortVertArray[vp + 11] = static_cast<GLshort>(dstY + height);
+                vertFill2D(mFloatTexArray, mShortVertArray,
+                    texX1, texY1, texX2, texY2,
+                    dstX, dstY, width, height);
 
                 vp += 12;
                 if (vp >= vLimit)
@@ -528,10 +584,18 @@ inline void MobileOpenGLGraphics::drawVertexes(const
     }
 }
 
-void MobileOpenGLGraphics::calcImagePattern(ImageVertexes *const vert,
-                                            const Image *const image,
-                                            const int x, const int y,
-                                            const int w, const int h) const
+void MobileOpenGLGraphics::calcPattern(ImageVertexes *const vert,
+                                       const Image *const image,
+                                       const int x, const int y,
+                                       const int w, const int h) const
+{
+    calcPatternInline(vert, image, x, y, w, h);
+}
+
+void MobileOpenGLGraphics::calcPatternInline(ImageVertexes *const vert,
+                                             const Image *const image,
+                                             const int x, const int y,
+                                             const int w, const int h) const
 {
     if (!image || !vert)
         return;
@@ -573,41 +637,9 @@ void MobileOpenGLGraphics::calcImagePattern(ImageVertexes *const vert,
                 const int dstX = x + px;
                 const float texX2 = static_cast<float>(srcX + width) / tw;
 
-                floatTexArray[vp + 0] = texX1;
-                floatTexArray[vp + 1] = texY1;
-
-                floatTexArray[vp + 2] = texX2;
-                floatTexArray[vp + 3] = texY1;
-
-                floatTexArray[vp + 4] = texX2;
-                floatTexArray[vp + 5] = texY2;
-
-                floatTexArray[vp + 6] = texX1;
-                floatTexArray[vp + 7] = texY1;
-
-                floatTexArray[vp + 8] = texX1;
-                floatTexArray[vp + 9] = texY2;
-
-                floatTexArray[vp + 10] = texX2;
-                floatTexArray[vp + 11] = texY2;
-
-                shortVertArray[vp + 0] = dstX;
-                shortVertArray[vp + 1] = dstY;
-
-                shortVertArray[vp + 2] = dstX + width;
-                shortVertArray[vp + 3] = dstY;
-
-                shortVertArray[vp + 4] = dstX + width;
-                shortVertArray[vp + 5] = dstY + height;
-
-                shortVertArray[vp + 6] = dstX;
-                shortVertArray[vp + 7] = dstY;
-
-                shortVertArray[vp + 8] = dstX;
-                shortVertArray[vp + 9] = dstY + height;
-
-                shortVertArray[vp + 10] = dstX + width;
-                shortVertArray[vp + 11] = dstY + height;
+                vertFill2D(floatTexArray, shortVertArray,
+                    texX1, texY1, texX2, texY2,
+                    dstX, dstY, width, height);
 
                 vp += 12;
                 if (vp >= vLimit)
@@ -634,11 +666,11 @@ void MobileOpenGLGraphics::calcTileCollection(ImageCollection *const vertCol,
         vertCol->currentVert = vert;
         vert->image = image;
         vertCol->draws.push_back(vert);
-        calcTileVertexes(vert, image, x, y);
+        calcTileVertexesInline(vert, image, x, y);
     }
     else
     {
-        calcTileVertexes(vertCol->currentVert, image, x, y);
+        calcTileVertexesInline(vertCol->currentVert, image, x, y);
     }
 }
 
@@ -662,10 +694,10 @@ void MobileOpenGLGraphics::drawTileCollection(const ImageCollection
     }
 }
 
-void MobileOpenGLGraphics::calcImagePattern(ImageCollection* const vertCol,
-                                            const Image *const image,
-                                            const int x, const int y,
-                                            const int w, const int h) const
+void MobileOpenGLGraphics::calcPattern(ImageCollection* const vertCol,
+                                       const Image *const image,
+                                       const int x, const int y,
+                                       const int w, const int h) const
 {
     ImageVertexes *vert = nullptr;
     if (vertCol->currentGLImage != image->mGLImage)
@@ -681,12 +713,19 @@ void MobileOpenGLGraphics::calcImagePattern(ImageCollection* const vertCol,
         vert = vertCol->currentVert;
     }
 
-    calcImagePattern(vert, image, x, y, w, h);
+    calcPatternInline(vert, image, x, y, w, h);
 }
 
 void MobileOpenGLGraphics::calcTileVertexes(ImageVertexes *const vert,
                                             const Image *const image,
                                             int dstX, int dstY) const
+{
+    calcTileVertexesInline(vert, image, dstX, dstY);
+}
+
+void MobileOpenGLGraphics::calcTileVertexesInline(ImageVertexes *const vert,
+                                                  const Image *const image,
+                                                  int dstX, int dstY) const
 {
     if (!vert || !image)
         return;
@@ -721,41 +760,9 @@ void MobileOpenGLGraphics::calcTileVertexes(ImageVertexes *const vert,
         GLfloat *const floatTexArray = ogl.continueFloatTexArray();
         GLshort *const shortVertArray = ogl.continueShortVertArray();
 
-        floatTexArray[vp + 0] = texX1;
-        floatTexArray[vp + 1] = texY1;
-
-        floatTexArray[vp + 2] = texX2;
-        floatTexArray[vp + 3] = texY1;
-
-        floatTexArray[vp + 4] = texX2;
-        floatTexArray[vp + 5] = texY2;
-
-        floatTexArray[vp + 6] = texX1;
-        floatTexArray[vp + 7] = texY1;
-
-        floatTexArray[vp + 8] = texX1;
-        floatTexArray[vp + 9] = texY2;
-
-        floatTexArray[vp + 10] = texX2;
-        floatTexArray[vp + 11] = texY2;
-
-        shortVertArray[vp + 0] = dstX;
-        shortVertArray[vp + 1] = dstY;
-
-        shortVertArray[vp + 2] = dstX + w;
-        shortVertArray[vp + 3] = dstY;
-
-        shortVertArray[vp + 4] = dstX + w;
-        shortVertArray[vp + 5] = dstY + h;
-
-        shortVertArray[vp + 6] = dstX;
-        shortVertArray[vp + 7] = dstY;
-
-        shortVertArray[vp + 8] = dstX;
-        shortVertArray[vp + 9] = dstY + h;
-
-        shortVertArray[vp + 10] = dstX + w;
-        shortVertArray[vp + 11] = dstY + h;
+        vertFill2D(floatTexArray, shortVertArray,
+            texX1, texY1, texX2, texY2,
+            dstX, dstY, w, h);
 
         vp += 12;
         if (vp >= vLimit)
@@ -784,7 +791,7 @@ void MobileOpenGLGraphics::drawTileVertexes(const ImageVertexes *const vert)
     drawVertexes(vert->ogl);
 }
 
-bool MobileOpenGLGraphics::calcWindow(ImageCollection *const vertCol,
+void MobileOpenGLGraphics::calcWindow(ImageCollection *const vertCol,
                                       const int x, const int y,
                                       const int w, const int h,
                                       const ImageRect &imgRect)
@@ -803,11 +810,7 @@ bool MobileOpenGLGraphics::calcWindow(ImageCollection *const vertCol,
     {
         vert = vertCol->currentVert;
     }
-
-    return calcImageRect(vert, x, y, w, h,
-        imgRect.grid[0], imgRect.grid[2], imgRect.grid[6], imgRect.grid[8],
-        imgRect.grid[1], imgRect.grid[5], imgRect.grid[7], imgRect.grid[3],
-        imgRect.grid[4]);
+    calcImageRect(vert, x, y, w, h, imgRect);
 }
 
 void MobileOpenGLGraphics::updateScreen()
@@ -1202,6 +1205,17 @@ inline void MobileOpenGLGraphics::drawTriangleArrayfs(const int size)
     glDrawArrays(GL_TRIANGLES, 0, size / 2);
 }
 
+inline void MobileOpenGLGraphics::drawTriangleArrayfsCached(const int size)
+{
+    glVertexPointer(2, GL_SHORT, 0, mShortVertArrayCached);
+    glTexCoordPointer(2, GL_FLOAT, 0, mFloatTexArrayCached);
+
+#ifdef DEBUG_DRAW_CALLS
+    mDrawCalls ++;
+#endif
+    glDrawArrays(GL_TRIANGLES, 0, size / 2);
+}
+
 inline void MobileOpenGLGraphics::drawTriangleArrayfs(const GLshort *const
                                                       shortVertArray,
                                                       const GLfloat *const
@@ -1268,6 +1282,21 @@ void MobileOpenGLGraphics::restoreColor()
                static_cast<GLubyte>(mColor.a));
     mIsByteColor = true;
     mByteColor = mColor;
+}
+
+void MobileOpenGLGraphics::drawImageRect(const int x, const int y,
+                                         const int w, const int h,
+                                         const ImageRect &imgRect)
+{
+    #include "render/graphics_drawImageRect.hpp"
+}
+
+void MobileOpenGLGraphics::calcImageRect(ImageVertexes *const vert,
+                                         const int x, const int y,
+                                         const int w, const int h,
+                                         const ImageRect &imgRect)
+{
+    #include "render/graphics_calcImageRect.hpp"
 }
 
 #ifdef DEBUG_BIND_TEXTURE

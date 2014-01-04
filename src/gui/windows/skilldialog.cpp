@@ -2,7 +2,7 @@
  *  The ManaPlus Client
  *  Copyright (C) 2004-2009  The Mana World Development Team
  *  Copyright (C) 2009-2010  The Mana Developers
- *  Copyright (C) 2011-2013  The ManaPlus Developers
+ *  Copyright (C) 2011-2014  The ManaPlus Developers
  *
  *  This file is part of The ManaPlus Client.
  *
@@ -134,7 +134,7 @@ class SkillListBox final : public ListBox
                     const SkillData *const data = e->data;
                     const int yPad = y + mPadding;
                     const std::string &description = data->description;
-                    DRAW_IMAGE(graphics, data->icon, mPadding, yPad);
+                    graphics->drawImage2(data->icon, mPadding, yPad);
                     font->drawString(graphics, data->name, mTextPadding, yPad);
                     if (!description.empty())
                     {

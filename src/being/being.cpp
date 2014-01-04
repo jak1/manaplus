@@ -2,7 +2,7 @@
  *  The ManaPlus Client
  *  Copyright (C) 2004-2009  The Mana World Development Team
  *  Copyright (C) 2009-2010  The Mana Developers
- *  Copyright (C) 2011-2013  The ManaPlus Developers
+ *  Copyright (C) 2011-2014  The ManaPlus Developers
  *
  *  This file is part of The ManaPlus Client.
  *
@@ -51,6 +51,7 @@
 #include "net/gamehandler.h"
 #include "net/net.h"
 #include "net/npchandler.h"
+#include "net/pethandler.h"
 #include "net/playerhandler.h"
 
 #include "resources/iteminfo.h"
@@ -243,7 +244,12 @@ Being::~Being()
     if (mOwner)
         mOwner->setPet(nullptr);
     if (mPet)
+    {
         mPet->setOwner(nullptr);
+        actorManager->erase(mPet);
+        delete mPet;
+        mPet = nullptr;
+    }
 
     removeAllItemsParticles();
 }
@@ -290,8 +296,19 @@ void Being::setSubtype(const uint16_t subtype, const uint8_t look)
         mInfo = PETDB::get(mId);
         if (mInfo)
         {
+            setName(mInfo->getName());
             setupSpriteDisplay(mInfo->getDisplay(), false);
             mYDiff = mInfo->getSortOffsetY();
+            const int speed = mInfo->getWalkSpeed();
+            if (!speed)
+            {
+                setWalkSpeed(Net::getPlayerHandler()
+                    ->getDefaultWalkSpeed());
+            }
+            else
+            {
+                setWalkSpeed(Vector(speed, speed, 0));
+            }
         }
     }
     else if (mType == PLAYER)
@@ -1592,6 +1609,9 @@ void Being::logic()
             actorManager->destroy(this);
     }
 
+    if (mPet)
+        mPet->petLogic();
+
     const SoundInfo *const sound = mNextSound.sound;
     if (sound)
     {
@@ -1606,6 +1626,149 @@ void Being::logic()
     }
 
     BLOCK_END("Being::logic")
+}
+
+void Being::petLogic()
+{
+    if (!mOwner || !mMap || !mInfo)
+        return;
+
+    const int time = tick_time;
+    const int thinkTime = mInfo->getThinkTime();
+    if (abs(mMoveTime - time) < thinkTime)
+        return;
+
+    mMoveTime = time;
+
+    const int dstX0 = mOwner->getTileX();
+    const int dstY0 = mOwner->getTileY();
+    int dstX = dstX0;
+    int dstY = dstY0;
+    const int followDist = mInfo->getStartFollowDist();
+    const int warpDist = mInfo->getWarpDist();
+    const int dist = mInfo->getFollowDist();
+    const int divX = abs(dstX - mX);
+    const int divY = abs(dstY - mY);
+
+    if (divX >= warpDist || divY >= warpDist)
+    {
+        setAction(Being::STAND, 0);
+        fixPetSpawnPos(dstX, dstY);
+        setTileCoords(dstX, dstY);
+        Net::getPetHandler()->spawn(mOwner, dstX, dstY);
+    }
+    else if (divX > followDist || divY > followDist)
+    {
+        if (!dist)
+        {
+            fixPetSpawnPos(dstX, dstY);
+        }
+        else
+        {
+            if (divX > followDist)
+            {
+                if (dstX > mX + dist)
+                    dstX -= dist;
+                else if (dstX + dist <= mX)
+                    dstX += dist;
+            }
+            else
+            {
+                dstX = mX;
+            }
+            if (divY > followDist)
+            {
+                if (dstY > mY + dist)
+                    dstY -= dist;
+                else if (dstX + dist <= mX)
+                    dstY += dist;
+            }
+            else
+            {
+                dstY = mY;
+            }
+        }
+
+        const int walkMask = getWalkMask();
+        if (!mMap->getWalk(dstX, dstY, walkMask))
+        {
+            if (dstX != dstX0)
+            {
+                dstX = dstX0;
+                if (!mMap->getWalk(dstX, dstY, walkMask))
+                    dstY = dstY0;
+            }
+            else if (dstY != dstY0)
+            {
+                dstY = dstY0;
+                if (!mMap->getWalk(dstX, dstY, walkMask))
+                    dstX = dstX0;
+            }
+        }
+        if (mX != dstX || mY != dstY)
+        {
+            setPath(mMap->findPath(mX, mY, dstX, dstY, walkMask));
+            Net::getPetHandler()->move(mOwner, mX, mY, dstX, dstY);
+            return;
+        }
+    }
+    if (mAction == STAND)
+    {
+        int directionType = 0;
+        switch (mOwner->getCurrentAction())
+        {
+            case STAND:
+            case MOVE:
+            case ATTACK:
+            case HURT:
+            case SPAWN:
+            default:
+                directionType = mInfo->getDirectionType();
+                break;
+            case SIT:
+                directionType = mInfo->getSitDirectionType();
+                break;
+            case DEAD:
+                directionType = mInfo->getDeadDirectionType();
+                break;
+        }
+
+        int newDir = 0;
+        switch (directionType)
+        {
+            case 0:
+            default:
+                return;
+
+            case 1:
+                newDir = mOwner->getDirection();
+                break;
+
+            case 2:
+                if (dstX > dstX0)
+                    newDir |= LEFT;
+                else if (dstX < dstX0)
+                    newDir |= RIGHT;
+                if (dstY > dstY0)
+                    newDir |= UP;
+                else if (dstY < dstY0)
+                    newDir |= DOWN;
+                break;
+
+            case 3:
+                if (dstX > dstX0)
+                    newDir |= RIGHT;
+                else if (dstX < dstX0)
+                    newDir |= LEFT;
+                if (dstY > dstY0)
+                    newDir |= DOWN;
+                else if (dstY < dstY0)
+                    newDir |= UP;
+                break;
+        }
+        if (newDir && newDir != getDirection())
+            setDirection(newDir);
+    }
 }
 
 void Being::drawEmotion(Graphics *const graphics, const int offsetX,
@@ -1643,6 +1806,7 @@ void Being::drawSpeech(const int offsetX, const int offsetY)
         mSpeechBubble->setPosition(px - (mSpeechBubble->getWidth() / 2),
             py - getHeight() - (mSpeechBubble->getHeight()));
         mSpeechBubble->setVisible(true);
+        mSpeechBubble->requestMoveToBackground();
     }
     else if (mSpeechTime > 0 && speech == TEXT_OVERHEAD)
     {
@@ -2843,7 +3007,6 @@ std::string Being::loadComment(const std::string &name, const int type)
     }
 
     str.append(stringToHexPath(name)).append("/comment.txt");
-    logger->log("load from: %s", str.c_str());
 
     const ResourceManager *const resman = ResourceManager::getInstance();
     if (resman->existsLocal(str))
@@ -3041,7 +3204,7 @@ void Being::addEffect(const std::string &name)
 
 void Being::addPet(const int id)
 {
-    if (!actorManager)
+    if (!actorManager || !config.getBoolValue("usepets"))
         return;
 
     removePet();
@@ -3049,10 +3212,14 @@ void Being::addPet(const int id)
         id, ActorSprite::PET, 0);
     if (being)
     {
-        being->setTileCoords(getTileX(), getTileY());
         being->setOwner(this);
         mPetId = id;
         mPet = being;
+        int dstX = mX;
+        int dstY = mY;
+        being->fixPetSpawnPos(dstX, dstY);
+        being->setTileCoords(dstX, dstY);
+        Net::getPetHandler()->spawn(this, dstX, dstY);
     }
 }
 
@@ -3065,7 +3232,8 @@ void Being::removePet()
     if (mPet)
     {
         mPet->setOwner(nullptr);
-        actorManager->destroy(mPet);
+        actorManager->erase(mPet);
+        delete mPet;
         mPet = nullptr;
     }
 }
@@ -3084,6 +3252,72 @@ void Being::updatePets()
         {
             addPet(pet);
             return;
+        }
+    }
+}
+
+void Being::fixPetSpawnPos(int &dstX, int &dstY) const
+{
+    if (!mInfo || !mOwner)
+        return;
+
+    int offsetX1;
+    int offsetY1;
+    switch (mOwner->getCurrentAction())
+    {
+        case SIT:
+            offsetX1 = mInfo->getSitOffsetX();
+            offsetY1 = mInfo->getSitOffsetY();
+            break;
+
+        case MOVE:
+            offsetX1 = mInfo->getMoveOffsetX();
+            offsetY1 = mInfo->getMoveOffsetY();
+            break;
+
+        case DEAD:
+            offsetX1 = mInfo->getDeadOffsetX();
+            offsetY1 = mInfo->getDeadOffsetY();
+            break;
+
+        case ATTACK:
+        case SPAWN:
+        case HURT:
+        case STAND:
+        default:
+            offsetX1 = mInfo->getTargetOffsetX();
+            offsetY1 = mInfo->getTargetOffsetY();
+            break;
+    }
+
+    int offsetX = offsetX1;
+    int offsetY = offsetY1;
+    switch (mOwner->getDirection())
+    {
+        case LEFT:
+            offsetX = -offsetY1;
+            offsetY = offsetX1;
+            break;
+        case RIGHT:
+            offsetX = offsetY1;
+            offsetY = -offsetX1;
+            break;
+        case UP:
+            offsetY = -offsetY;
+            offsetX = -offsetX;
+            break;
+        default:
+        case DOWN:
+            break;
+    }
+    dstX += offsetX;
+    dstY += offsetY;
+    if (mMap)
+    {
+        if (!mMap->getWalk(dstX, dstY, getWalkMask()))
+        {
+            dstX = mOwner->getTileX();
+            dstY = mOwner->getTileY();
         }
     }
 }

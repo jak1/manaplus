@@ -2,7 +2,7 @@
  *  The ManaPlus Client
  *  Copyright (C) 2004-2009  The Mana World Development Team
  *  Copyright (C) 2009-2010  The Mana Developers
- *  Copyright (C) 2011-2013  The ManaPlus Developers
+ *  Copyright (C) 2011-2014  The ManaPlus Developers
  *
  *  This file is part of The ManaPlus Client.
  *
@@ -157,7 +157,7 @@ void ShopListBox::draw(gcn::Graphics *gcnGraphics)
             if (icon)
             {
                 icon->setAlpha(1.0F);
-                DRAW_IMAGE(graphics, icon, mPadding, y + mPadding);
+                graphics->drawImage2(icon, mPadding, y + mPadding);
             }
         }
         if (mSelected == i)

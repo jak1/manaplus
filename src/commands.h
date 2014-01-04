@@ -2,7 +2,7 @@
  *  The ManaPlus Client
  *  Copyright (C) 2008-2009  The Mana World Development Team
  *  Copyright (C) 2009-2010  The Mana Developers
- *  Copyright (C) 2011-2013  The ManaPlus Developers
+ *  Copyright (C) 2011-2014  The ManaPlus Developers
  *
  *  This file is part of The ManaPlus Client.
  *
@@ -81,6 +81,7 @@ namespace Commands
     decHandler(ignoreAll);
     decHandler(outfit);
     decHandler(emote);
+    decHandler(emotePet);
     decHandler(away);
     decHandler(pseudoAway);
     decHandler(follow);
@@ -127,6 +128,7 @@ namespace Commands
     decHandler(testParticle);
     decHandler(createItems);
     decHandler(talkRaw);
+    decHandler(talkPet);
 
     void replaceVars(std::string &str);
 }  // namespace Commands
@@ -169,6 +171,7 @@ enum
     COMMAND_ATKHUMAN,
     COMMAND_OUTFIT,
     COMMAND_EMOTE,
+    COMMAND_EMOTEPET,
     COMMAND_AWAY,
     COMMAND_PSEUDOAWAY,
     COMMAND_FOLLOW,
@@ -221,6 +224,7 @@ enum
     COMMAND_TEST_PARTICLE,
     COMMAND_CREATEITEMS,
     COMMAND_TALKRAW,
+    COMMAND_TALKPET,
     COMMAND_HACK,
     END_COMMANDS
 };
@@ -263,6 +267,7 @@ static const CommandInfo commands[] =
     {"atkhuman", &Commands::attackHuman, -1, true},
     {"outfit", &Commands::outfit, -1, true},
     {"emote", &Commands::emote, -1, true},
+    {"emotepet", &Commands::emotePet, -1, true},
     {"away", &Commands::away, -1, true},
     {"pseudoaway", &Commands::pseudoAway, -1, true},
     {"follow", &Commands::follow, -1, true},
@@ -315,6 +320,7 @@ static const CommandInfo commands[] =
     {"testparticle", &Commands::testParticle, -1, true},
     {"createitems", &Commands::createItems, -1, false},
     {"talkraw", &Commands::talkRaw, -1, true},
+    {"talkpet", &Commands::talkPet, -1, true},
     {"hack", &Commands::hack, -1, true}
 };
 

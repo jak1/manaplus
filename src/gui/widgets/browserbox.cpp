@@ -2,7 +2,7 @@
  *  The ManaPlus Client
  *  Copyright (C) 2004-2009  The Mana World Development Team
  *  Copyright (C) 2009-2010  The Mana Developers
- *  Copyright (C) 2011-2013  The ManaPlus Developers
+ *  Copyright (C) 2011-2014  The ManaPlus Developers
  *  Copyright (C) 2009  Aethyra Development Team
  *
  *  This file is part of The ManaPlus Client.
@@ -508,7 +508,7 @@ void BrowserBox::draw(gcn::Graphics *graphics)
         }
         else if (part.mImage)
         {
-            DRAW_IMAGE(graphics2, part.mImage, part.mX, part.mY);
+            graphics2->drawImage2(part.mImage, part.mX, part.mY);
         }
     }
 

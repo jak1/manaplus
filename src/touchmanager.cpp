@@ -1,6 +1,6 @@
 /*
  *  The ManaPlus Client
- *  Copyright (C) 2012-2013  The ManaPlus Developers
+ *  Copyright (C) 2012-2014  The ManaPlus Developers
  *
  *  This file is part of The ManaPlus Client.
  *
@@ -225,7 +225,7 @@ void TouchManager::draw()
                 const Image *const icon = item->icon;
                 if (icon)
                 {
-                    DRAW_IMAGE(mainGraphics, icon,
+                    mainGraphics->drawImage2(icon,
                         item->x + (item->width - icon->mBounds.w) / 2,
                         item->y + (item->height - icon->mBounds.h) / 2);
                 }

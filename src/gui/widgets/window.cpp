@@ -2,7 +2,7 @@
  *  The ManaPlus Client
  *  Copyright (C) 2004-2009  The Mana World Development Team
  *  Copyright (C) 2009-2010  The Mana Developers
- *  Copyright (C) 2011-2013  The ManaPlus Developers
+ *  Copyright (C) 2011-2014  The ManaPlus Developers
  *
  *  This file is part of The ManaPlus Client.
  *
@@ -278,18 +278,18 @@ void Window::draw(gcn::Graphics *graphics)
             const Image *const button = mSkin->getCloseImage(
                 mResizeHandles == CLOSE);
             if (button)
-                DRAW_IMAGE(g, button, mCloseRect.x, mCloseRect.y);
+                g->drawImage2(button, mCloseRect.x, mCloseRect.y);
         }
         // Draw Sticky Button
         if (mStickyButton)
         {
             const Image *const button = mSkin->getStickyImage(mSticky);
             if (button)
-                DRAW_IMAGE(g, button, mStickyRect.x, mStickyRect.y);
+                g->drawImage2(button, mStickyRect.x, mStickyRect.y);
         }
 
         if (mGrip)
-            DRAW_IMAGE(g, mGrip, mGripRect.x, mGripRect.y);
+            g->drawImage2(mGrip, mGripRect.x, mGripRect.y);
     }
 
     // Draw title

@@ -2,7 +2,7 @@
  *  The ManaPlus Client
  *  Copyright (C) 2008-2009  The Mana World Development Team
  *  Copyright (C) 2009-2010  The Mana Developers
- *  Copyright (C) 2011-2013  The ManaPlus Developers
+ *  Copyright (C) 2011-2014  The ManaPlus Developers
  *
  *  This file is part of The ManaPlus Client.
  *
@@ -22,13 +22,14 @@
 
 #include "resources/db/petdb.h"
 
+#include "configuration.h"
 #include "logger.h"
 
 #include "resources/beingcommon.h"
 #include "resources/beinginfo.h"
 
+#include "utils/gettext.h"
 #include "utils/dtor.h"
-#include "configuration.h"
 
 #include "debug.h"
 
@@ -74,13 +75,54 @@ void PETDB::load()
 
         BeingInfo *const currentInfo = new BeingInfo;
 
+        currentInfo->setName(XML::langProperty(petNode,
+            // TRANSLATORS: unknown info name
+            "name", _("pet")));
+
         currentInfo->setTargetSelection(XML::getBoolProperty(petNode,
-            "targetSelection", false));
+            "targetSelection", true));
 
         BeingCommon::readBasicAttributes(currentInfo, petNode, "talk");
 
         currentInfo->setDeadSortOffsetY(XML::getProperty(petNode,
             "deadSortOffsetY", 31));
+
+        currentInfo->setStartFollowDist(XML::getProperty(petNode,
+            "startFollowDistance", 3));
+        currentInfo->setFollowDist(XML::getProperty(petNode,
+            "followDistance", 0));
+        currentInfo->setWarpDist(XML::getProperty(petNode,
+            "warpDistance", 11));
+
+        currentInfo->setWalkSpeed(XML::getProperty(petNode,
+            "walkSpeed", 0));
+
+        currentInfo->setTargetOffsetX(XML::getProperty(petNode,
+            "offsetX", 0));
+        currentInfo->setTargetOffsetY(XML::getProperty(petNode,
+            "offsetY", 1));
+        currentInfo->setSitOffsetX(XML::getProperty(petNode,
+            "sitOffsetX", 0));
+        currentInfo->setSitOffsetY(XML::getProperty(petNode,
+            "sitOffsetY", 1));
+        currentInfo->setMoveOffsetX(XML::getProperty(petNode,
+            "moveOffsetX", 0));
+        currentInfo->setMoveOffsetY(XML::getProperty(petNode,
+            "moveOffsetY", 1));
+        currentInfo->setDeadOffsetX(XML::getProperty(petNode,
+            "deadOffsetX", 0));
+        currentInfo->setDeadOffsetY(XML::getProperty(petNode,
+            "deadOffsetY", 1));
+
+        currentInfo->setThinkTime(XML::getProperty(petNode,
+            "thinkTime", 500) / 10);
+
+        currentInfo->setDirectionType(XML::getProperty(petNode,
+            "directionType", 1));
+        currentInfo->setSitDirectionType(XML::getProperty(petNode,
+            "sitDirectionType", 1));
+        currentInfo->setDeadDirectionType(XML::getProperty(petNode,
+            "deadDirectionType", 1));
 
         SpriteDisplay display;
         for_each_xml_child_node(spriteNode, petNode)

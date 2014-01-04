@@ -3,7 +3,7 @@
  *  Copyright (C) 2004-2009  The Mana World Development Team
  *  Copyright (C) 2009-2010  The Mana Developers
  *  Copyright (C) 2009  Aethyra Development Team
- *  Copyright (C) 2011-2013  The ManaPlus Developers
+ *  Copyright (C) 2011-2014  The ManaPlus Developers
  *
  *  This file is part of The ManaPlus Client.
  *
@@ -398,15 +398,15 @@ SDLFont::~SDLFont()
 TTF_Font *SDLFont::openFont(const char *const name, const int size)
 {
 // disabled for now because some systems like gentoo cant use it
-//#ifdef USE_SDL2
+// #ifdef USE_SDL2
 //    SDL_RWops *const rw = MPHYSFSRWOPS_openRead(name);
 //    if (!rw)
 //        return nullptr;
 //    return TTF_OpenFontIndexRW(rw, 1, size, 0);
-//#else
+// #else
     return TTF_OpenFontIndex(ResourceManager::getInstance()->getPath(
         name).c_str(), size, 0);
-//#endif
+// #endif
 }
 
 void SDLFont::loadFont(std::string filename,
@@ -482,7 +482,7 @@ void SDLFont::drawString(gcn::Graphics *const graphics,
         if (image)
         {
             image->setAlpha(alpha);
-            DRAW_IMAGE(g, image, x, y);
+            g->drawImage2(image, x, y);
         }
     }
     else
@@ -504,7 +504,7 @@ void SDLFont::drawString(gcn::Graphics *const graphics,
 
         const Image *const image = chunk2->img;
         if (image)
-            DRAW_IMAGE(g, image, x, y);
+            g->drawImage2(image, x, y);
     }
     BLOCK_END("SDLFont::drawString")
 }

@@ -2,7 +2,7 @@
  *  The ManaPlus Client
  *  Copyright (C) 2004-2009  The Mana World Development Team
  *  Copyright (C) 2009-2010  The Mana Developers
- *  Copyright (C) 2011-2013  The ManaPlus Developers
+ *  Copyright (C) 2011-2014  The ManaPlus Developers
  *
  *  This file is part of The ManaPlus Client.
  *
@@ -70,47 +70,43 @@ class SurfaceGraphics final : public Graphics
         { }
 
         bool drawRescaledImage(const Image *const image A_UNUSED,
-                               int srcX A_UNUSED, int srcY A_UNUSED,
                                int dstX A_UNUSED, int dstY A_UNUSED,
-                               const int width A_UNUSED,
-                               const int height A_UNUSED,
                                const int desiredWidth A_UNUSED,
-                               const int desiredHeight A_UNUSED,
-                               const bool useColor A_UNUSED = false)
+                               const int desiredHeight A_UNUSED)
                                override final
         { return false; }
 
-        void drawImagePattern(const Image *const image A_UNUSED,
-                              const int x A_UNUSED,
-                              const int y A_UNUSED,
-                              const int w A_UNUSED,
-                              const int h A_UNUSED) override final
+        void drawPattern(const Image *const image A_UNUSED,
+                         const int x A_UNUSED,
+                         const int y A_UNUSED,
+                         const int w A_UNUSED,
+                         const int h A_UNUSED) override final
         { }
 
-        void drawRescaledImagePattern(const Image *const image A_UNUSED,
-                                      const int x A_UNUSED,
-                                      const int y A_UNUSED,
-                                      const int w A_UNUSED,
-                                      const int h A_UNUSED,
-                                      const int scaledWidth A_UNUSED,
-                                      const int scaledHeight A_UNUSED)
-                                      override final
+        void drawRescaledPattern(const Image *const image A_UNUSED,
+                                 const int x A_UNUSED,
+                                 const int y A_UNUSED,
+                                 const int w A_UNUSED,
+                                 const int h A_UNUSED,
+                                 const int scaledWidth A_UNUSED,
+                                 const int scaledHeight A_UNUSED)
+                                 override final
         { }
 
-        void calcImagePattern(ImageVertexes *const vert A_UNUSED,
-                              const Image *const image A_UNUSED,
-                              const int x A_UNUSED,
-                              const int y A_UNUSED,
-                              const int w A_UNUSED,
-                              const int h A_UNUSED) const override final
+        void calcPattern(ImageVertexes *const vert A_UNUSED,
+                         const Image *const image A_UNUSED,
+                         const int x A_UNUSED,
+                         const int y A_UNUSED,
+                         const int w A_UNUSED,
+                         const int h A_UNUSED) const override final
         { }
 
-        void calcImagePattern(ImageCollection *const vert A_UNUSED,
-                              const Image *const image A_UNUSED,
-                              const int x A_UNUSED,
-                              const int y A_UNUSED,
-                              const int w A_UNUSED,
-                              const int h A_UNUSED) const override final
+        void calcPattern(ImageCollection *const vert A_UNUSED,
+                         const Image *const image A_UNUSED,
+                         const int x A_UNUSED,
+                         const int y A_UNUSED,
+                         const int w A_UNUSED,
+                         const int h A_UNUSED) const override final
         { }
 
         void calcTileVertexes(ImageVertexes *const vert A_UNUSED,
@@ -150,11 +146,11 @@ class SurfaceGraphics final : public Graphics
                      const int height A_UNUSED) override final
         { return false; }
 
-        bool calcWindow(ImageCollection *const vertCol A_UNUSED,
+        void calcWindow(ImageCollection *const vertCol A_UNUSED,
                         const int x A_UNUSED, const int y A_UNUSED,
                         const int w A_UNUSED, const int h A_UNUSED,
                         const ImageRect &imgRect A_UNUSED) override final
-        { return false; }
+        { }
 
         void setBlitMode(const BlitMode mode)
         { mBlitMode = mode; }
@@ -183,10 +179,28 @@ class SurfaceGraphics final : public Graphics
         { return false; }
 
         bool drawImage2(const Image *const image,
-                        int srcX, int srcY,
-                        int dstX, int dstY,
-                        const int width, const int height,
-                        const bool useColor) override final;
+                        int dstX, int dstY) override final;
+
+        void drawImageCached(const Image *const image,
+                             int x, int y) override final;
+
+        void drawPatternCached(const Image *const image A_UNUSED,
+                               const int x A_UNUSED,
+                               const int y A_UNUSED,
+                               const int w A_UNUSED,
+                               const int h A_UNUSED) override final
+        { }
+
+        void completeCache() override final;
+
+        /**
+         * Draws a rectangle using images. 4 corner images, 4 side images and 1
+         * image for the inside.
+         */
+        void drawImageRect(const int x A_UNUSED, const int y A_UNUSED,
+                           const int w A_UNUSED, const int h A_UNUSED,
+                           const ImageRect &imgRect A_UNUSED)
+        { }
 
     protected:
         BlitMode mBlitMode;

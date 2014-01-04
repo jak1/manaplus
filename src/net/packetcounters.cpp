@@ -2,7 +2,7 @@
  *  The ManaPlus Client
  *  Copyright (C) 2004-2009  The Mana World Development Team
  *  Copyright (C) 2009-2010  The Mana Developers
- *  Copyright (C) 2011-2013  The ManaPlus Developers
+ *  Copyright (C) 2011-2014  The ManaPlus Developers
  *
  *  This file is part of The ManaPlus Client.
  *
@@ -104,7 +104,9 @@ int PacketCounters::getOutPackets()
 }
 
 
-void PacketCounters::updateCounter(int &currentSec, int &calc, int &counter)
+void PacketCounters::updateCounter(int &restrict currentSec,
+                                   int &restrict calc,
+                                   int &restrict counter)
 {
     const int idx = cur_time % 60;
     if (currentSec != idx)

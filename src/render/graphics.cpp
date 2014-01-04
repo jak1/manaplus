@@ -2,7 +2,7 @@
  *  The ManaPlus Client
  *  Copyright (C) 2004-2009  The Mana World Development Team
  *  Copyright (C) 2009-2010  The Mana Developers
- *  Copyright (C) 2011-2013  The ManaPlus Developers
+ *  Copyright (C) 2011-2014  The ManaPlus Developers
  *
  *  This file is part of The ManaPlus Client.
  *
@@ -28,7 +28,6 @@
 #include "graphicsmanager.h"
 #include "logger.h"
 
-#include "resources/image.h"
 #include "resources/imagehelper.h"
 #include "resources/openglimagehelper.h"
 
@@ -440,79 +439,6 @@ int Graphics::getHeight() const
     return mHeight;
 }
 
-bool Graphics::drawImage(const Image *image, int x, int y)
-{
-    if (image)
-    {
-        return drawImage2(image, 0, 0, x, y,
-            image->mBounds.w, image->mBounds.h, false);
-    }
-    else
-    {
-        return false;
-    }
-}
-
-void Graphics::drawImageRect(const int x, const int y,
-                             const int w, const int h,
-                             const Image *const topLeft,
-                             const Image *const topRight,
-                             const Image *const bottomLeft,
-                             const Image *const bottomRight,
-                             const Image *const top,
-                             const Image *const right,
-                             const Image *const bottom,
-                             const Image *const left,
-                             const Image *const center)
-{
-    BLOCK_START("Graphics::drawImageRect")
-    const bool drawMain = center && topLeft && topRight
-        && bottomLeft && bottomRight;
-
-    // Draw the center area
-    if (center && drawMain)
-    {
-        const int tlw = topLeft->getWidth();
-        const int tlh = topLeft->getHeight();
-        drawImagePattern(center, tlw + x, tlh + y,
-            w - tlw - topRight->getWidth(),
-            h - tlh - bottomLeft->getHeight());
-    }
-
-    // Draw the sides
-    if (top && left && bottom && right)
-    {
-        const int lw = left->getWidth();
-        const int rw = right->getWidth();
-        const int th = top->getHeight();
-        const int bh = bottom->getHeight();
-        drawImagePattern(top, x + lw, y, w - lw - rw, th);
-        drawImagePattern(bottom, x + lw, h - bh + y, w - lw - rw, bh);
-        drawImagePattern(left, x, y + th, lw, h - th - bh);
-        drawImagePattern(right, x + w - rw, th + y, rw, h - th - bh);
-    }
-    // Draw the corners
-    if (drawMain)
-    {
-        DRAW_IMAGE(this, topLeft, x, y);
-        DRAW_IMAGE(this, topRight, x + w - topRight->getWidth(), y);
-        DRAW_IMAGE(this, bottomLeft, x, h - bottomLeft->getHeight() + y);
-        DRAW_IMAGE(this, bottomRight,
-            x + w - bottomRight->getWidth(),
-            y + h - bottomRight->getHeight());
-    }
-    BLOCK_END("Graphics::drawImageRect")
-}
-
-void Graphics::drawImageRect(int x, int y, int w, int h,
-                             const ImageRect &imgRect)
-{
-    drawImageRect(x, y, w, h,
-            imgRect.grid[0], imgRect.grid[2], imgRect.grid[6], imgRect.grid[8],
-            imgRect.grid[1], imgRect.grid[5], imgRect.grid[7], imgRect.grid[3],
-            imgRect.grid[4]);
-}
-
 bool Graphics::drawNet(const int x1, const int y1, const int x2, const int y2,
                        const int width, const int height)
 {
@@ -523,66 +449,6 @@ bool Graphics::drawNet(const int x1, const int y1, const int x2, const int y2,
         drawLine(x, y1, x, y2);
 
     return true;
-}
-
-bool Graphics::calcImageRect(ImageVertexes *const vert,
-                             const int x, const int y,
-                             const int w, const int h,
-                             const Image *const topLeft,
-                             const Image *const topRight,
-                             const Image *const bottomLeft,
-                             const Image *const bottomRight,
-                             const Image *const top,
-                             const Image *const right,
-                             const Image *const bottom,
-                             const Image *const left,
-                             const Image *const center)
-{
-    if (!vert)
-        return false;
-
-    BLOCK_START("Graphics::calcImageRect")
-    const bool drawMain = center && topLeft && topRight
-        && bottomLeft && bottomRight;
-
-//    pushClipArea(gcn::Rectangle(x, y, w, h));
-
-    // Draw the center area
-    if (center && drawMain)
-    {
-        const int tlw = topLeft->getWidth();
-        const int tlh = topLeft->getHeight();
-        calcImagePattern(vert, center, tlw + x, tlh + y,
-            w - tlw - topRight->getWidth(),
-            h - tlh - bottomLeft->getHeight());
-    }
-    // Draw the sides
-    if (top && left && bottom && right)
-    {
-        const int lw = left->getWidth();
-        const int rw = right->getWidth();
-        const int th = top->getHeight();
-        const int bh = bottom->getHeight();
-        calcImagePattern(vert, top, x + lw, y, w - lw - rw, th);
-        calcImagePattern(vert, bottom, x + lw, y + h - bh, w - lw - rw, bh);
-        calcImagePattern(vert, left, x, y + th, lw, h - th - bh);
-        calcImagePattern(vert, right, x + w - rw, y + th, rw, h - th - bh);
-    }
-
-    calcTileVertexes(vert, topLeft, x, y);
-    if (topRight)
-        calcTileVertexes(vert, topRight, x + w - topRight->getWidth(), y);
-    if (bottomLeft)
-        calcTileVertexes(vert, bottomLeft, x, y + h - bottomLeft->getHeight());
-    if (bottomRight)
-    {
-        calcTileVertexes(vert, bottomRight, x + w - bottomRight->getWidth(),
-            y + h - bottomRight->getHeight());
-    }
-
-//    popClipArea();
-    BLOCK_END("Graphics::calcImageRect")
-    return 0;
 }
 
 void Graphics::setWindowSize(const int width A_UNUSED,

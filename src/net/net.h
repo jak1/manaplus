@@ -2,7 +2,7 @@
  *  The ManaPlus Client
  *  Copyright (C) 2009  The Mana World Development Team
  *  Copyright (C) 2009-2010  The Mana Developers
- *  Copyright (C) 2011-2013  The ManaPlus Developers
+ *  Copyright (C) 2011-2014  The ManaPlus Developers
  *
  *  This file is part of The ManaPlus Client.
  *
@@ -47,6 +47,7 @@ class InventoryHandler;
 class LoginHandler;
 class NpcHandler;
 class PartyHandler;
+class PetHandler;
 class PlayerHandler;
 class SkillHandler;
 class TradeHandler;
@@ -63,6 +64,7 @@ InventoryHandler *getInventoryHandler() A_WARN_UNUSED;
 LoginHandler *getLoginHandler() A_WARN_UNUSED;
 NpcHandler *getNpcHandler() A_WARN_UNUSED;
 PartyHandler *getPartyHandler() A_WARN_UNUSED;
+PetHandler *getPetHandler() A_WARN_UNUSED;
 PlayerHandler *getPlayerHandler() A_WARN_UNUSED;
 SkillHandler *getSkillHandler() A_WARN_UNUSED;
 TradeHandler *getTradeHandler() A_WARN_UNUSED;

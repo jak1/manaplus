@@ -2,7 +2,7 @@
  *  The ManaPlus Client
  *  Copyright (C) 2004-2009  The Mana World Development Team
  *  Copyright (C) 2009-2010  The Mana Developers
- *  Copyright (C) 2011-2013  The ManaPlus Developers
+ *  Copyright (C) 2011-2014  The ManaPlus Developers
  *
  *  This file is part of The ManaPlus Client.
  *
@@ -212,10 +212,10 @@ class BeingInfo final
         void setAvatarId(const uint16_t id)
         { mAvatarId = id; }
 
-        int getWidth() const
+        int getWidth() const A_WARN_UNUSED
         { return mWidth; }
 
-        int getHeight() const
+        int getHeight() const A_WARN_UNUSED
         { return mHeight; }
 
         void setWidth(const int n)
@@ -224,9 +224,93 @@ class BeingInfo final
         void setHeight(const int n)
         { mHeight = n; }
 
+        void setStartFollowDist(const int n)
+        { mStartFollowDist = n; }
+
+        int getStartFollowDist() const A_WARN_UNUSED
+        { return mStartFollowDist; }
+
+        void setFollowDist(const int n)
+        { mFollowDist = n; }
+
+        int getFollowDist() const A_WARN_UNUSED
+        { return mFollowDist; }
+
+        void setWalkSpeed(const int n)
+        { mWalkSpeed = n; }
+
+        int getWalkSpeed() const A_WARN_UNUSED
+        { return mWalkSpeed; }
+
+        void setWarpDist(const int n)
+        { mWarpDist = n; }
+
+        int getWarpDist() const A_WARN_UNUSED
+        { return mWarpDist; }
+
+        void setSitOffsetX(const int n)
+        { mSitOffsetX = n; }
+
+        int getSitOffsetX() const A_WARN_UNUSED
+        { return mSitOffsetX; }
+
+        void setSitOffsetY(const int n)
+        { mSitOffsetY = n; }
+
+        int getSitOffsetY() const A_WARN_UNUSED
+        { return mSitOffsetY; }
+
+        void setMoveOffsetX(const int n)
+        { mMoveOffsetX = n; }
+
+        int getMoveOffsetX() const A_WARN_UNUSED
+        { return mMoveOffsetX; }
+
+        void setMoveOffsetY(const int n)
+        { mMoveOffsetY = n; }
+
+        int getMoveOffsetY() const A_WARN_UNUSED
+        { return mMoveOffsetY; }
+
+        void setDeadOffsetX(const int n)
+        { mDeadOffsetX = n; }
+
+        int getDeadOffsetX() const A_WARN_UNUSED
+        { return mDeadOffsetX; }
+
+        void setDeadOffsetY(const int n)
+        { mDeadOffsetY = n; }
+
+        int getDeadOffsetY() const A_WARN_UNUSED
+        { return mDeadOffsetY; }
+
+        void setThinkTime(const int n)
+        { mThinkTime = n; }
+
+        int getThinkTime() const A_WARN_UNUSED
+        { return mThinkTime; }
+
+        void setDirectionType(const int n)
+        { mDirectionType = n; }
+
+        int getDirectionType() const A_WARN_UNUSED
+        { return mDirectionType; }
+
+        void setSitDirectionType(const int n)
+        { mSitDirectionType = n; }
+
+        int getSitDirectionType() const A_WARN_UNUSED
+        { return mSitDirectionType; }
+
+        void setDeadDirectionType(const int n)
+        { mDeadDirectionType = n; }
+
+        int getDeadDirectionType() const A_WARN_UNUSED
+        { return mDeadDirectionType; }
+
         void setColorsList(const std::string &name);
 
-        std::string getColor(const int idx) const;
+        std::string getColor(const int idx) const A_WARN_UNUSED;
 
         static void init();
 
@@ -254,6 +338,20 @@ class BeingInfo final
         uint16_t mAvatarId;
         int mWidth;
         int mHeight;
+        int mStartFollowDist;
+        int mFollowDist;
+        int mWarpDist;
+        int mWalkSpeed;
+        int mSitOffsetX;
+        int mSitOffsetY;
+        int mMoveOffsetX;
+        int mMoveOffsetY;
+        int mDeadOffsetX;
+        int mDeadOffsetY;
+        int mThinkTime;
+        int mDirectionType;
+        int mSitDirectionType;
+        int mDeadDirectionType;
         bool mStaticMaxHP;
         bool mTargetSelection;
 };

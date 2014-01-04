@@ -2,7 +2,7 @@
  *  The ManaPlus Client
  *  Copyright (C) 2004-2009  The Mana World Development Team
  *  Copyright (C) 2009-2010  The Mana Developers
- *  Copyright (C) 2011-2013  The ManaPlus Developers
+ *  Copyright (C) 2011-2014  The ManaPlus Developers
  *
  *  This file is part of The ManaPlus Client.
  *
@@ -37,6 +37,43 @@
 
 #include "debug.h"
 
+#define vertFill2D(tVar, vVar, x1, y1, x2, y2, dstX, dstY, w, h) \
+    tVar[vp + 0] = x1; \
+    tVar[vp + 1] = y1; \
+    tVar[vp + 2] = x2; \
+    tVar[vp + 3] = y1; \
+    tVar[vp + 4] = x2; \
+    tVar[vp + 5] = y2; \
+    tVar[vp + 6] = x1; \
+    tVar[vp + 7] = y2; \
+    vVar[vp + 0] = dstX; \
+    vVar[vp + 1] = dstY; \
+    vVar[vp + 2] = dstX + w; \
+    vVar[vp + 3] = dstY; \
+    vVar[vp + 4] = dstX + w; \
+    vVar[vp + 5] = dstY + h; \
+    vVar[vp + 6] = dstX; \
+    vVar[vp + 7] = dstY + h;
+
+
+#define vertFillNv(tVar, vVar, srcX, srcY, dstX, dstY, w, h) \
+    tVar[vp + 0] = srcX; \
+    tVar[vp + 1] = srcY; \
+    tVar[vp + 2] = srcX + w; \
+    tVar[vp + 3] = srcY; \
+    tVar[vp + 4] = srcX + w; \
+    tVar[vp + 5] = srcY + h; \
+    tVar[vp + 6] = srcX; \
+    tVar[vp + 7] = srcY + h; \
+    vVar[vp + 0] = dstX; \
+    vVar[vp + 1] = dstY; \
+    vVar[vp + 2] = dstX + w; \
+    vVar[vp + 3] = dstY; \
+    vVar[vp + 4] = dstX + w; \
+    vVar[vp + 5] = dstY + h; \
+    vVar[vp + 6] = dstX; \
+    vVar[vp + 7] = dstY + h;
+
 GLuint NormalOpenGLGraphics::mLastImage = 0;
 #ifdef DEBUG_DRAW_CALLS
 unsigned int NormalOpenGLGraphics::mDrawCalls = 0;
@@ -51,9 +88,15 @@ NormalOpenGLGraphics::NormalOpenGLGraphics():
     mFloatTexArray(nullptr),
     mIntTexArray(nullptr),
     mIntVertArray(nullptr),
+    mFloatTexArrayCached(nullptr),
+    mIntTexArrayCached(nullptr),
+    mIntVertArrayCached(nullptr),
+    mAlphaCached(1.0F),
+    mVpCached(0),
     mTexture(false),
     mIsByteColor(false),
     mByteColor(),
+    mImageCached(0),
     mFloatColor(1.0F),
     mMaxVertices(500),
     mColorAlpha(false),
@@ -72,6 +115,9 @@ NormalOpenGLGraphics::~NormalOpenGLGraphics()
     delete [] mFloatTexArray;
     delete [] mIntTexArray;
     delete [] mIntVertArray;
+    delete [] mFloatTexArrayCached;
+    delete [] mIntTexArrayCached;
+    delete [] mIntVertArrayCached;
 }
 
 void NormalOpenGLGraphics::initArrays()
@@ -88,6 +134,9 @@ void NormalOpenGLGraphics::initArrays()
     mFloatTexArray = new GLfloat[sz];
     mIntTexArray = new GLint[sz];
     mIntVertArray = new GLint[sz];
+    mFloatTexArrayCached = new GLfloat[sz];
+    mIntTexArrayCached = new GLint[sz];
+    mIntVertArrayCached = new GLint[sz];
 }
 
 bool NormalOpenGLGraphics::setVideoMode(const int w, const int h,
@@ -234,115 +283,253 @@ static inline void drawRescaledQuad(const Image *const image,
     }
 }
 
-
 bool NormalOpenGLGraphics::drawImage2(const Image *const image,
-                                      int srcX, int srcY,
-                                      int dstX, int dstY,
-                                      const int width, const int height,
-                                      const bool useColor)
+                                      int dstX, int dstY)
+{
+    return drawImageInline(image, dstX, dstY);
+}
+
+bool NormalOpenGLGraphics::drawImageInline(const Image *const image,
+                                           int dstX, int dstY)
 {
     FUNC_BLOCK("Graphics::drawImage2", 1)
     if (!image)
         return false;
 
-    const SDL_Rect &imageRect = image->mBounds;
 
-    if (!useColor)
-        setColorAlpha(image->mAlpha);
-
+    setColorAlpha(image->mAlpha);
 #ifdef DEBUG_BIND_TEXTURE
     debugBindTexture(image);
 #endif
     bindTexture(OpenGLImageHelper::mTextureType, image->mGLImage);
-
     setTexturingAndBlending(true);
 
-    drawQuad(image, srcX + imageRect.x, srcY + imageRect.y,
-        dstX, dstY, width, height);
+    const SDL_Rect &imageRect = image->mBounds;
+    drawQuad(image, imageRect.x, imageRect.y,
+        dstX, dstY, imageRect.w, imageRect.h);
 
     return true;
 }
 
-bool NormalOpenGLGraphics::drawRescaledImage(const Image *const image,
-                                             int srcX, int srcY,
-                                             int dstX, int dstY,
-                                             const int width, const int height,
-                                             const int desiredWidth,
-                                             const int desiredHeight,
-                                             const bool useColor)
+void NormalOpenGLGraphics::drawImageCached(const Image *const image,
+                                           int x, int y)
 {
-    return drawRescaledImage(image, srcX, srcY,
-                             dstX, dstY,
-                             width, height,
-                             desiredWidth, desiredHeight,
-                             useColor, true);
+    if (!image)
+        return;
+
+    if (image->mGLImage != mImageCached)
+    {
+        completeCache();
+        mImageCached = image->mGLImage;
+        mAlphaCached = image->mAlpha;
+    }
+
+    const SDL_Rect &imageRect = image->mBounds;
+    const int w = imageRect.w;
+    const int h = imageRect.h;
+
+    if (w == 0 || h == 0)
+        return;
+
+    const int srcX = imageRect.x;
+    const int srcY = imageRect.y;
+
+    const float tw = static_cast<float>(image->mTexWidth);
+    const float th = static_cast<float>(image->mTexHeight);
+
+    const unsigned int vLimit = mMaxVertices * 4;
+
+    unsigned int vp = mVpCached;
+
+    // Draw a set of textured rectangles
+    if (OpenGLImageHelper::mTextureType == GL_TEXTURE_2D)
+    {
+        const float texX1 = static_cast<float>(srcX) / tw;
+        const float texY1 = static_cast<float>(srcY) / th;
+
+        const float texX2 = static_cast<float>(srcX + w) / tw;
+        const float texY2 = static_cast<float>(srcY + h) / th;
+
+        vertFill2D(mFloatTexArrayCached, mIntVertArrayCached,
+            texX1, texY1, texX2, texY2,
+            x, y, w, h);
+
+        vp += 8;
+        if (vp >= vLimit)
+        {
+            completeCache();
+            vp = 0;
+        }
+        else
+        {
+            mVpCached = vp;
+        }
+    }
+    else
+    {
+        vertFillNv(mIntTexArrayCached, mIntVertArrayCached,
+            srcX, srcY, x, y, w, h);
+
+        vp += 8;
+        if (vp >= vLimit)
+        {
+            completeCache();
+            vp = 0;
+        }
+        else
+        {
+            mVpCached = vp;
+        }
+    }
+}
+
+void NormalOpenGLGraphics::drawPatternCached(const Image *const image,
+                                             const int x, const int y,
+                                             const int w, const int h)
+{
+    FUNC_BLOCK("Graphics::drawPatternCached", 1)
+    if (!image)
+        return;
+
+    if (image->mGLImage != mImageCached)
+    {
+        completeCache();
+        mImageCached = image->mGLImage;
+    }
+
+    const SDL_Rect &imageRect = image->mBounds;
+    const int srcX = imageRect.x;
+    const int srcY = imageRect.y;
+    const int iw = imageRect.w;
+    const int ih = imageRect.h;
+
+    if (iw == 0 || ih == 0)
+        return;
+
+    const float tw = static_cast<float>(image->mTexWidth);
+    const float th = static_cast<float>(image->mTexHeight);
+
+    unsigned int vp = mVpCached;
+    const unsigned int vLimit = mMaxVertices * 4;
+    // Draw a set of textured rectangles
+    if (OpenGLImageHelper::mTextureType == GL_TEXTURE_2D)
+    {
+        const float texX1 = static_cast<float>(srcX) / tw;
+        const float texY1 = static_cast<float>(srcY) / th;
+
+        for (int py = 0; py < h; py += ih)
+        {
+            const int height = (py + ih >= h) ? h - py : ih;
+            const int dstY = y + py;
+            const float texY2 = static_cast<float>(srcY + height) / th;
+            for (int px = 0; px < w; px += iw)
+            {
+                const int width = (px + iw >= w) ? w - px : iw;
+                const int dstX = x + px;
+
+                const float texX2 = static_cast<float>(srcX + width) / tw;
+
+                vertFill2D(mFloatTexArrayCached, mIntVertArrayCached,
+                    texX1, texY1, texX2, texY2,
+                    dstX, dstY, width, height);
+
+                vp += 8;
+                if (vp >= vLimit)
+                {
+                    completeCache();
+                    vp = 0;
+                }
+            }
+        }
+    }
+    else
+    {
+        for (int py = 0; py < h; py += ih)
+        {
+            const int height = (py + ih >= h) ? h - py : ih;
+            const int dstY = y + py;
+            for (int px = 0; px < w; px += iw)
+            {
+                const int width = (px + iw >= w) ? w - px : iw;
+                const int dstX = x + px;
+
+                vertFillNv(mIntTexArrayCached, mIntVertArrayCached,
+                    srcX, srcY, dstX, dstY, width, height);
+
+                vp += 8;
+                if (vp >= vLimit)
+                {
+                    completeCache();
+                    vp = 0;
+                }
+            }
+        }
+    }
+    mVpCached = vp;
+}
+
+void NormalOpenGLGraphics::completeCache()
+{
+    if (!mImageCached)
+        return;
+
+    setColorAlpha(mAlphaCached);
+#ifdef DEBUG_BIND_TEXTURE
+//    debugBindTexture(image);
+#endif
+    bindTexture(OpenGLImageHelper::mTextureType, mImageCached);
+    setTexturingAndBlending(true);
+
+    if (OpenGLImageHelper::mTextureType == GL_TEXTURE_2D)
+        drawQuadArrayfiCached(mVpCached);
+    else
+        drawQuadArrayiiCached(mVpCached);
+
+    mImageCached = 0;
+    mVpCached = 0;
 }
 
 bool NormalOpenGLGraphics::drawRescaledImage(const Image *const image,
-                                             int srcX, int srcY,
                                              int dstX, int dstY,
-                                             const int width, const int height,
                                              const int desiredWidth,
-                                             const int desiredHeight,
-                                             const bool useColor,
-                                             bool smooth)
+                                             const int desiredHeight)
 {
     FUNC_BLOCK("Graphics::drawRescaledImage", 1)
     if (!image)
         return false;
 
-    // Just draw the image normally when no resizing is necessary,
-    if (width == desiredWidth && height == desiredHeight)
-    {
-        return drawImage2(image, srcX, srcY, dstX, dstY,
-                          width, height, useColor);
-    }
-
-    // When the desired image is smaller than the current one,
-    // disable smooth effect.
-    if (width > desiredWidth && height > desiredHeight)
-        smooth = false;
-
     const SDL_Rect &imageRect = image->mBounds;
-    srcX += imageRect.x;
-    srcY += imageRect.y;
 
-    if (!useColor)
-        setColorAlpha(image->mAlpha);
+    // Just draw the image normally when no resizing is necessary,
+    if (imageRect.w == desiredWidth && imageRect.h == desiredHeight)
+        return drawImageInline(image, dstX, dstY);
 
+    setColorAlpha(image->mAlpha);
 #ifdef DEBUG_BIND_TEXTURE
     debugBindTexture(image);
 #endif
     bindTexture(OpenGLImageHelper::mTextureType, image->mGLImage);
-
     setTexturingAndBlending(true);
 
     // Draw a textured quad.
-    drawRescaledQuad(image, srcX, srcY, dstX, dstY, width, height,
-                     desiredWidth, desiredHeight);
-
-    if (smooth)  // A basic smooth effect...
-    {
-        setColorAlpha(0.2F);
-        drawRescaledQuad(image, srcX, srcY, dstX - 1, dstY - 1, width, height,
-                         desiredWidth + 1, desiredHeight + 1);
-        drawRescaledQuad(image, srcX, srcY, dstX + 1, dstY + 1, width, height,
-                         desiredWidth - 1, desiredHeight - 1);
-
-        drawRescaledQuad(image, srcX, srcY, dstX + 1, dstY, width, height,
-                         desiredWidth - 1, desiredHeight);
-        drawRescaledQuad(image, srcX, srcY, dstX, dstY + 1, width, height,
-                         desiredWidth, desiredHeight - 1);
-    }
+    drawRescaledQuad(image, imageRect.x, imageRect.y, dstX, dstY,
+        imageRect.w, imageRect.h, desiredWidth, desiredHeight);
 
     return true;
 }
 
-void NormalOpenGLGraphics::drawImagePattern(const Image *const image,
-                                            const int x, const int y,
-                                            const int w, const int h)
+void NormalOpenGLGraphics::drawPattern(const Image *const image,
+                                       const int x, const int y,
+                                       const int w, const int h)
 {
-    FUNC_BLOCK("Graphics::drawImagePattern", 1)
+    drawPatternInline(image, x, y, w, h);
+}
+
+void NormalOpenGLGraphics::drawPatternInline(const Image *const image,
+                                             const int x, const int y,
+                                             const int w, const int h)
+{
+    FUNC_BLOCK("Graphics::drawPattern", 1)
     if (!image)
         return;
 
@@ -384,32 +571,11 @@ void NormalOpenGLGraphics::drawImagePattern(const Image *const image,
             {
                 const int width = (px + iw >= w) ? w - px : iw;
                 const int dstX = x + px;
-
                 const float texX2 = static_cast<float>(srcX + width) / tw;
 
-                mFloatTexArray[vp + 0] = texX1;
-                mFloatTexArray[vp + 1] = texY1;
-
-                mFloatTexArray[vp + 2] = texX2;
-                mFloatTexArray[vp + 3] = texY1;
-
-                mFloatTexArray[vp + 4] = texX2;
-                mFloatTexArray[vp + 5] = texY2;
-
-                mFloatTexArray[vp + 6] = texX1;
-                mFloatTexArray[vp + 7] = texY2;
-
-                mIntVertArray[vp + 0] = dstX;
-                mIntVertArray[vp + 1] = dstY;
-
-                mIntVertArray[vp + 2] = dstX + width;
-                mIntVertArray[vp + 3] = dstY;
-
-                mIntVertArray[vp + 4] = dstX + width;
-                mIntVertArray[vp + 5] = dstY + height;
-
-                mIntVertArray[vp + 6] = dstX;
-                mIntVertArray[vp + 7] = dstY + height;
+                vertFill2D(mFloatTexArray, mIntVertArray,
+                    texX1, texY1, texX2, texY2,
+                    dstX, dstY, width, height);
 
                 vp += 8;
                 if (vp >= vLimit)
@@ -433,29 +599,8 @@ void NormalOpenGLGraphics::drawImagePattern(const Image *const image,
                 const int width = (px + iw >= w) ? w - px : iw;
                 const int dstX = x + px;
 
-                mIntTexArray[vp + 0] = srcX;
-                mIntTexArray[vp + 1] = srcY;
-
-                mIntTexArray[vp + 2] = srcX + width;
-                mIntTexArray[vp + 3] = srcY;
-
-                mIntTexArray[vp + 4] = srcX + width;
-                mIntTexArray[vp + 5] = srcY + height;
-
-                mIntTexArray[vp + 6] = srcX;
-                mIntTexArray[vp + 7] = srcY + height;
-
-                mIntVertArray[vp + 0] = dstX;
-                mIntVertArray[vp + 1] = dstY;
-
-                mIntVertArray[vp + 2] = dstX + width;
-                mIntVertArray[vp + 3] = dstY;
-
-                mIntVertArray[vp + 4] = dstX + width;
-                mIntVertArray[vp + 5] = dstY + height;
-
-                mIntVertArray[vp + 6] = dstX;
-                mIntVertArray[vp + 7] = dstY + height;
+                vertFillNv(mIntTexArray, mIntVertArray,
+                    srcX, srcY, dstX, dstY, width, height);
 
                 vp += 8;
                 if (vp >= vLimit)
@@ -470,11 +615,11 @@ void NormalOpenGLGraphics::drawImagePattern(const Image *const image,
     }
 }
 
-void NormalOpenGLGraphics::drawRescaledImagePattern(const Image *const image,
-                                                    const int x, const int y,
-                                                    const int w, const int h,
-                                                    const int scaledWidth,
-                                                    const int scaledHeight)
+void NormalOpenGLGraphics::drawRescaledPattern(const Image *const image,
+                                               const int x, const int y,
+                                               const int w, const int h,
+                                               const int scaledWidth,
+                                               const int scaledHeight)
 {
     if (!image)
         return;
@@ -532,29 +677,9 @@ void NormalOpenGLGraphics::drawRescaledImagePattern(const Image *const image,
                     / scaledWidth;
                 const float texX2 = texX1 + tFractionW * visibleFractionW;
 
-                mFloatTexArray[vp + 0] = texX1;
-                mFloatTexArray[vp + 1] = texY1;
-
-                mFloatTexArray[vp + 2] = texX2;
-                mFloatTexArray[vp + 3] = texY1;
-
-                mFloatTexArray[vp + 4] = texX2;
-                mFloatTexArray[vp + 5] = texY2;
-
-                mFloatTexArray[vp + 6] = texX1;
-                mFloatTexArray[vp + 7] = texY2;
-
-                mIntVertArray[vp + 0] = dstX;
-                mIntVertArray[vp + 1] = dstY;
-
-                mIntVertArray[vp + 2] = dstX + width;
-                mIntVertArray[vp + 3] = dstY;
-
-                mIntVertArray[vp + 4] = dstX + width;
-                mIntVertArray[vp + 5] = dstY + height;
-
-                mIntVertArray[vp + 6] = dstX;
-                mIntVertArray[vp + 7] = dstY + height;
+                vertFill2D(mFloatTexArray, mIntVertArray,
+                    texX1, texY1, texX2, texY2,
+                    dstX, dstY, width, height);
 
                 vp += 8;
                 if (vp >= vLimit)
@@ -665,10 +790,18 @@ inline void NormalOpenGLGraphics::drawVertexes(const
     }
 }
 
-void NormalOpenGLGraphics::calcImagePattern(ImageVertexes* const vert,
-                                            const Image *const image,
-                                            const int x, const int y,
-                                            const int w, const int h) const
+void NormalOpenGLGraphics::calcPattern(ImageVertexes* const vert,
+                                       const Image *const image,
+                                       const int x, const int y,
+                                       const int w, const int h) const
+{
+    calcPatternInline(vert, image, x, y, w, h);
+}
+
+void NormalOpenGLGraphics::calcPatternInline(ImageVertexes* const vert,
+                                             const Image *const image,
+                                             const int x, const int y,
+                                             const int w, const int h) const
 {
     if (!image || !vert)
         return;
@@ -710,29 +843,9 @@ void NormalOpenGLGraphics::calcImagePattern(ImageVertexes* const vert,
                 const int dstX = x + px;
                 const float texX2 = static_cast<float>(srcX + width) / tw;
 
-                floatTexArray[vp + 0] = texX1;
-                floatTexArray[vp + 1] = texY1;
-
-                floatTexArray[vp + 2] = texX2;
-                floatTexArray[vp + 3] = texY1;
-
-                floatTexArray[vp + 4] = texX2;
-                floatTexArray[vp + 5] = texY2;
-
-                floatTexArray[vp + 6] = texX1;
-                floatTexArray[vp + 7] = texY2;
-
-                intVertArray[vp + 0] = dstX;
-                intVertArray[vp + 1] = dstY;
-
-                intVertArray[vp + 2] = dstX + width;
-                intVertArray[vp + 3] = dstY;
-
-                intVertArray[vp + 4] = dstX + width;
-                intVertArray[vp + 5] = dstY + height;
-
-                intVertArray[vp + 6] = dstX;
-                intVertArray[vp + 7] = dstY + height;
+                vertFill2D(floatTexArray, intVertArray,
+                    texX1, texY1, texX2, texY2,
+                    dstX, dstY, width, height);
 
                 vp += 8;
                 if (vp >= vLimit)
@@ -759,29 +872,8 @@ void NormalOpenGLGraphics::calcImagePattern(ImageVertexes* const vert,
                 const int width = (px + iw >= w) ? w - px : iw;
                 const int dstX = x + px;
 
-                intTexArray[vp + 0] = srcX;
-                intTexArray[vp + 1] = srcY;
-
-                intTexArray[vp + 2] = srcX + width;
-                intTexArray[vp + 3] = srcY;
-
-                intTexArray[vp + 4] = srcX + width;
-                intTexArray[vp + 5] = srcY + height;
-
-                intTexArray[vp + 6] = srcX;
-                intTexArray[vp + 7] = srcY + height;
-
-                intVertArray[vp + 0] = dstX;
-                intVertArray[vp + 1] = dstY;
-
-                intVertArray[vp + 2] = dstX + width;
-                intVertArray[vp + 3] = dstY;
-
-                intVertArray[vp + 4] = dstX + width;
-                intVertArray[vp + 5] = dstY + height;
-
-                intVertArray[vp + 6] = dstX;
-                intVertArray[vp + 7] = dstY + height;
+                vertFillNv(intTexArray, intVertArray,
+                    srcX, srcY, dstX, dstY, width, height);
 
                 vp += 8;
                 if (vp >= vLimit)
@@ -808,11 +900,11 @@ void NormalOpenGLGraphics::calcTileCollection(ImageCollection *const vertCol,
         vertCol->currentVert = vert;
         vert->image = image;
         vertCol->draws.push_back(vert);
-        calcTileVertexes(vert, image, x, y);
+        calcTileVertexesInline(vert, image, x, y);
     }
     else
     {
-        calcTileVertexes(vertCol->currentVert, image, x, y);
+        calcTileVertexesInline(vertCol->currentVert, image, x, y);
     }
 }
 
@@ -836,10 +928,10 @@ void NormalOpenGLGraphics::drawTileCollection(const ImageCollection
     }
 }
 
-void NormalOpenGLGraphics::calcImagePattern(ImageCollection* const vertCol,
-                                            const Image *const image,
-                                            const int x, const int y,
-                                            const int w, const int h) const
+void NormalOpenGLGraphics::calcPattern(ImageCollection* const vertCol,
+                                       const Image *const image,
+                                       const int x, const int y,
+                                       const int w, const int h) const
 {
     ImageVertexes *vert = nullptr;
     if (vertCol->currentGLImage != image->mGLImage)
@@ -855,12 +947,19 @@ void NormalOpenGLGraphics::calcImagePattern(ImageCollection* const vertCol,
         vert = vertCol->currentVert;
     }
 
-    calcImagePattern(vert, image, x, y, w, h);
+    calcPatternInline(vert, image, x, y, w, h);
 }
 
 void NormalOpenGLGraphics::calcTileVertexes(ImageVertexes *const vert,
                                             const Image *const image,
                                             int dstX, int dstY) const
+{
+    calcTileVertexesInline(vert, image, dstX, dstY);
+}
+
+void NormalOpenGLGraphics::calcTileVertexesInline(ImageVertexes *const vert,
+                                                  const Image *const image,
+                                                  int dstX, int dstY) const
 {
     if (!vert || !image)
         return;
@@ -897,29 +996,9 @@ void NormalOpenGLGraphics::calcTileVertexes(ImageVertexes *const vert,
         GLfloat *const floatTexArray = ogl.continueFloatTexArray();
         GLint *const intVertArray = ogl.continueIntVertArray();
 
-        floatTexArray[vp + 0] = texX1;
-        floatTexArray[vp + 1] = texY1;
-
-        floatTexArray[vp + 2] = texX2;
-        floatTexArray[vp + 3] = texY1;
-
-        floatTexArray[vp + 4] = texX2;
-        floatTexArray[vp + 5] = texY2;
-
-        floatTexArray[vp + 6] = texX1;
-        floatTexArray[vp + 7] = texY2;
-
-        intVertArray[vp + 0] = dstX;
-        intVertArray[vp + 1] = dstY;
-
-        intVertArray[vp + 2] = dstX + w;
-        intVertArray[vp + 3] = dstY;
-
-        intVertArray[vp + 4] = dstX + w;
-        intVertArray[vp + 5] = dstY + h;
-
-        intVertArray[vp + 6] = dstX;
-        intVertArray[vp + 7] = dstY + h;
+        vertFill2D(floatTexArray, intVertArray,
+            texX1, texY1, texX2, texY2,
+            dstX, dstY, w, h);
 
         vp += 8;
         if (vp >= vLimit)
@@ -935,29 +1014,8 @@ void NormalOpenGLGraphics::calcTileVertexes(ImageVertexes *const vert,
         GLint *const intTexArray = ogl.continueIntTexArray();
         GLint *const intVertArray = ogl.continueIntVertArray();
 
-        intTexArray[vp + 0] = srcX;
-        intTexArray[vp + 1] = srcY;
-
-        intTexArray[vp + 2] = srcX + w;
-        intTexArray[vp + 3] = srcY;
-
-        intTexArray[vp + 4] = srcX + w;
-        intTexArray[vp + 5] = srcY + h;
-
-        intTexArray[vp + 6] = srcX;
-        intTexArray[vp + 7] = srcY + h;
-
-        intVertArray[vp + 0] = dstX;
-        intVertArray[vp + 1] = dstY;
-
-        intVertArray[vp + 2] = dstX + w;
-        intVertArray[vp + 3] = dstY;
-
-        intVertArray[vp + 4] = dstX + w;
-        intVertArray[vp + 5] = dstY + h;
-
-        intVertArray[vp + 6] = dstX;
-        intVertArray[vp + 7] = dstY + h;
+        vertFillNv(intTexArray, intVertArray,
+            srcX, srcY, dstX, dstY, w, h);
 
         vp += 8;
         if (vp >= vLimit)
@@ -986,7 +1044,7 @@ void NormalOpenGLGraphics::drawTileVertexes(const ImageVertexes *const vert)
     drawVertexes(vert->ogl);
 }
 
-bool NormalOpenGLGraphics::calcWindow(ImageCollection *const vertCol,
+void NormalOpenGLGraphics::calcWindow(ImageCollection *const vertCol,
                                       const int x, const int y,
                                       const int w, const int h,
                                       const ImageRect &imgRect)
@@ -994,7 +1052,7 @@ bool NormalOpenGLGraphics::calcWindow(ImageCollection *const vertCol,
     ImageVertexes *vert = nullptr;
     Image *const image = imgRect.grid[4];
     if (!image)
-        return false;
+        return;
     if (vertCol->currentGLImage != image->mGLImage)
     {
         vert = new ImageVertexes();
@@ -1007,12 +1065,7 @@ bool NormalOpenGLGraphics::calcWindow(ImageCollection *const vertCol,
     {
         vert = vertCol->currentVert;
     }
-
-    const Image *const *const grid = &imgRect.grid[0];
-    return calcImageRect(vert, x, y, w, h,
-        grid[0], grid[2], grid[6], grid[8],
-        grid[1], grid[5], grid[7], grid[3],
-        grid[4]);
+    calcImageRect(vert, x, y, w, h, imgRect);
 }
 
 void NormalOpenGLGraphics::updateScreen()
@@ -1391,6 +1444,17 @@ inline void NormalOpenGLGraphics::drawQuadArrayfi(const int size)
     glDrawArrays(GL_QUADS, 0, size / 2);
 }
 
+inline void NormalOpenGLGraphics::drawQuadArrayfiCached(const int size)
+{
+    glVertexPointer(2, GL_INT, 0, mIntVertArrayCached);
+    glTexCoordPointer(2, GL_FLOAT, 0, mFloatTexArrayCached);
+
+#ifdef DEBUG_DRAW_CALLS
+    mDrawCalls ++;
+#endif
+    glDrawArrays(GL_QUADS, 0, size / 2);
+}
+
 inline void NormalOpenGLGraphics::drawQuadArrayfi(const GLint *const
                                                   intVertArray,
                                                   const GLfloat *const
@@ -1410,6 +1474,17 @@ inline void NormalOpenGLGraphics::drawQuadArrayii(const int size)
 {
     glVertexPointer(2, GL_INT, 0, mIntVertArray);
     glTexCoordPointer(2, GL_INT, 0, mIntTexArray);
+
+#ifdef DEBUG_DRAW_CALLS
+    mDrawCalls ++;
+#endif
+    glDrawArrays(GL_QUADS, 0, size / 2);
+}
+
+inline void NormalOpenGLGraphics::drawQuadArrayiiCached(const int size)
+{
+    glVertexPointer(2, GL_INT, 0, mIntVertArrayCached);
+    glTexCoordPointer(2, GL_INT, 0, mIntTexArrayCached);
 
 #ifdef DEBUG_DRAW_CALLS
     mDrawCalls ++;
@@ -1493,6 +1568,21 @@ void NormalOpenGLGraphics::restoreColor()
                static_cast<GLubyte>(mColor.a));
     mIsByteColor = true;
     mByteColor = mColor;
+}
+
+void NormalOpenGLGraphics::drawImageRect(const int x, const int y,
+                                         const int w, const int h,
+                                         const ImageRect &imgRect)
+{
+    #include "render/graphics_drawImageRect.hpp"
+}
+
+void NormalOpenGLGraphics::calcImageRect(ImageVertexes *const vert,
+                                         const int x, const int y,
+                                         const int w, const int h,
+                                         const ImageRect &imgRect)
+{
+    #include "render/graphics_calcImageRect.hpp"
 }
 
 #ifdef DEBUG_BIND_TEXTURE

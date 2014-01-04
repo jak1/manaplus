@@ -2,7 +2,7 @@
  *  The ManaPlus Client
  *  Copyright (C) 2004-2009  The Mana World Development Team
  *  Copyright (C) 2009-2010  The Mana Developers
- *  Copyright (C) 2011-2013  The ManaPlus Developers
+ *  Copyright (C) 2011-2014  The ManaPlus Developers
  *
  *  This file is part of The ManaPlus Client.
  *
@@ -412,6 +412,8 @@ class Being : public ActorSprite, public ConfigListener
          */
         virtual void logic() override;
 
+        void petLogic();
+
         /**
          * Draws the speech text above the being.
          */
@@ -476,7 +478,7 @@ class Being : public ActorSprite, public ConfigListener
          * in pixels per second for eAthena,
          * in tiles per second for Manaserv.
          */
-        void setWalkSpeed(const Vector &speed)
+        void setWalkSpeed(Vector speed)
         { mWalkSpeed = speed; mSpeed = speed.x; }
 
         /**
@@ -878,6 +880,8 @@ class Being : public ActorSprite, public ConfigListener
         void removePet();
 
         void updatePets();
+
+        void fixPetSpawnPos(int &dstX, int &dstY) const;
 
         Being *getPet()
         { return mPet; }

@@ -2,7 +2,7 @@
  *  The ManaPlus Client
  *  Copyright (C) 2008-2009  The Mana World Development Team
  *  Copyright (C) 2009-2010  The Mana Developers
- *  Copyright (C) 2011-2013  The ManaPlus Developers
+ *  Copyright (C) 2011-2014  The ManaPlus Developers
  *
  *  This file is part of The ManaPlus Client.
  *
@@ -73,7 +73,7 @@ void Icon::draw(gcn::Graphics *g)
     if (mImage)
     {
         Graphics *const graphics = static_cast<Graphics*>(g);
-        DRAW_IMAGE(graphics, mImage,
+        graphics->drawImage2(mImage,
             (mDimension.width - mImage->mBounds.w) / 2,
             (mDimension.height - mImage->mBounds.h) / 2);
     }

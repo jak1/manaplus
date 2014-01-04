@@ -2,7 +2,7 @@
  *  The ManaPlus Client
  *  Copyright (C) 2004-2009  The Mana World Development Team
  *  Copyright (C) 2009-2010  The Mana Developers
- *  Copyright (C) 2011-2013  The ManaPlus Developers
+ *  Copyright (C) 2011-2014  The ManaPlus Developers
  *
  *  This file is part of The ManaPlus Client.
  *
@@ -233,7 +233,7 @@ class ChatWindow final : public Window,
 
         void ignoreAllWhispers();
 
-        void resortChatLog(std::string line, Own own,
+        bool resortChatLog(std::string line, Own own,
                            const std::string &channel,
                            const bool ignoreRecord,
                            const bool tryRemoveColors);
@@ -291,6 +291,12 @@ class ChatWindow final : public Window,
         void addGlobalMessage(const std::string &line);
 
         void postInit() override final;
+
+        static void localPetSay(const std::string &nick,
+                                const std::string &text);
+
+        static void localPetEmote(const std::string &nick,
+                                  const uint8_t emoteId);
 
 #ifdef USE_PROFILER
         void logicChildren();

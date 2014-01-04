@@ -1,6 +1,6 @@
 /*
  *  The ManaPlus Client
- *  Copyright (C) 2012-2013  The ManaPlus Developers
+ *  Copyright (C) 2012-2014  The ManaPlus Developers
  *
  *  This file is part of The ManaPlus Client.
  *
@@ -250,7 +250,7 @@ SDL_Surface *AtlasManager::createSDLAtlas(TextureAtlas *const atlas)
 #else
                 SDL_SetAlpha(image->mSDLSurface, 0, SDL_ALPHA_OPAQUE);
 #endif
-                DRAW_IMAGE(graphics, image, item->x, item->y);
+                graphics->drawImage2(image, item->x, item->y);
             }
         }
     }

@@ -2,7 +2,7 @@
  *  The ManaPlus Client
  *  Copyright (C) 2009  The Mana World Development Team
  *  Copyright (C) 2009-2010  The Mana Developers
- *  Copyright (C) 2011-2013  The ManaPlus Developers
+ *  Copyright (C) 2011-2014  The ManaPlus Developers
  *
  *  This file is part of The ManaPlus Client.
  *
@@ -122,8 +122,8 @@ class ChatTab : public Tab
          * @returns true  if the command was handled
          *          false if the command was not handled
          */
-        virtual bool handleCommand(const std::string &type A_UNUSED,
-                                   const std::string &args A_UNUSED)
+        virtual bool handleCommand(const std::string &restrict type A_UNUSED,
+                                   const std::string &restrict args A_UNUSED)
         { return false; }
 
         /**

@@ -2,7 +2,7 @@
  *  The ManaPlus Client
  *  Copyright (C) 2004-2009  The Mana World Development Team
  *  Copyright (C) 2009-2010  The Mana Developers
- *  Copyright (C) 2011-2013  The ManaPlus Developers
+ *  Copyright (C) 2011-2014  The ManaPlus Developers
  *
  *  This file is part of The ManaPlus Client.
  *
@@ -56,6 +56,26 @@ void WindowContainer::adjustAfterResize(const int oldScreenWidth,
         if (Window *const window = dynamic_cast<Window*>(*i))
             window->adjustPositionAfterResize(oldScreenWidth, oldScreenHeight);
     }
+}
+
+void WindowContainer::moveWidgetAfter(gcn::Widget *const after,
+                                      gcn::Widget *const widget)
+{
+    const WidgetListIterator widgetIter = std::find(
+        mWidgets.begin(), mWidgets.end(), widget);
+
+    if (widgetIter == mWidgets.end())
+        return;
+
+    WidgetListIterator afterIter = std::find(
+        mWidgets.begin(), mWidgets.end(), after);
+
+    if (afterIter == mWidgets.end())
+        return;
+
+    ++ afterIter;
+    mWidgets.erase(widgetIter);
+    mWidgets.insert(afterIter, widget);
 }
 
 #ifdef USE_PROFILER

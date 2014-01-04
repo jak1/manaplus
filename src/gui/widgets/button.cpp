@@ -2,7 +2,7 @@
  *  The ManaPlus Client
  *  Copyright (C) 2004-2009  The Mana World Development Team
  *  Copyright (C) 2009-2010  The Mana Developers
- *  Copyright (C) 2011-2013  The ManaPlus Developers
+ *  Copyright (C) 2011-2014  The ManaPlus Developers
  *
  *  This file is part of The ManaPlus Client.
  *
@@ -508,11 +508,11 @@ void Button::draw(gcn::Graphics *graphics)
         {
             if (isPressed())
             {
-                DRAW_IMAGE(g2, mImages[mode], imageX + 1, imageY + 1);
+                g2->drawImage2(mImages[mode], imageX + 1, imageY + 1);
             }
             else
             {
-                DRAW_IMAGE(g2, mImages[mode], imageX, imageY);
+                g2->drawImage2(mImages[mode], imageX, imageY);
             }
         }
     }

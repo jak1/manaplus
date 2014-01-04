@@ -1,7 +1,7 @@
 /*
  *  The ManaPlus Client
  *  Copyright (C) 2009-2010  The Mana Developers
- *  Copyright (C) 2011-2013  The ManaPlus Developers
+ *  Copyright (C) 2011-2014  The ManaPlus Developers
  *
  *  This file is part of The ManaPlus Client.
  *
@@ -119,13 +119,13 @@ void AmbientLayer::draw(Graphics *const graphics, const int x,
 
     if (imageHelper->useOpenGL() == RENDER_SOFTWARE || !mKeepRatio)
     {
-        graphics->drawImagePattern(mImage, static_cast<int>(-mPosX),
-                static_cast<int>(-mPosY), x + static_cast<int>(mPosX),
-                y + static_cast<int>(mPosY));
+        graphics->drawPattern(mImage, static_cast<int>(-mPosX),
+            static_cast<int>(-mPosY), x + static_cast<int>(mPosX),
+            y + static_cast<int>(mPosY));
     }
     else
     {
-        graphics->drawRescaledImagePattern(mImage, static_cast<int>(-mPosX),
+        graphics->drawRescaledPattern(mImage, static_cast<int>(-mPosX),
                 static_cast<int>(-mPosY), x + static_cast<int>(mPosX),
                 y + static_cast<int>(mPosY),
                 static_cast<int>(mImage->mBounds.w)

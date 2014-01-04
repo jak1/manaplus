@@ -3,7 +3,7 @@
  *  Copyright (C) 2008  The Legend of Mazzeroth Development Team
  *  Copyright (C) 2008-2009  The Mana World Development Team
  *  Copyright (C) 2009-2010  The Mana Developers
- *  Copyright (C) 2011-2013  The ManaPlus Developers
+ *  Copyright (C) 2011-2014  The ManaPlus Developers
  *
  *  This file is part of The ManaPlus Client.
  *
@@ -24,6 +24,7 @@
 #include "gui/popups/speechbubble.h"
 
 #include "gui/sdlfont.h"
+#include "gui/viewport.h"
 
 #include "gui/widgets/browserbox.h"
 #include "gui/widgets/label.h"
@@ -88,4 +89,9 @@ void SpeechBubble::setText(const std::string &text, const bool showName)
     setContentSize(width, getFont()->getHeight() + nameHeight);
     mCaption->setPosition(0, 0);
     mSpeechBox->setPosition(0, nameHeight);
+}
+
+void SpeechBubble::requestMoveToBackground()
+{
+    windowContainer->moveWidgetAfter(viewport, this);
 }

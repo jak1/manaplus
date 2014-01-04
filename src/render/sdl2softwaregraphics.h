@@ -2,7 +2,7 @@
  *  The ManaPlus Client
  *  Copyright (C) 2004-2009  The Mana World Development Team
  *  Copyright (C) 2009-2010  The Mana Developers
- *  Copyright (C) 2011-2013  The ManaPlus Developers
+ *  Copyright (C) 2011-2014  The ManaPlus Developers
  *
  *  This file is part of The ManaPlus Client.
  *
@@ -63,32 +63,33 @@ class SDL2SoftwareGraphics final : public Graphics
         void popClipArea();
 
         bool drawRescaledImage(const Image *const image,
-                               int srcX, int srcY,
                                int dstX, int dstY,
-                               const int width, const int height,
                                const int desiredWidth,
-                               const int desiredHeight,
-                               const bool useColor = false) override final;
+                               const int desiredHeight) override final;
 
-        void drawImagePattern(const Image *const image,
-                              const int x, const int y,
-                              const int w, const int h) override final;
+        void drawPattern(const Image *const image,
+                         const int x, const int y,
+                         const int w, const int h) override final;
 
-        void drawRescaledImagePattern(const Image *const image,
+        void inline drawPatternInline(const Image *const image,
                                       const int x, const int y,
-                                      const int w, const int h,
-                                      const int scaledWidth,
-                                      const int scaledHeight) override final;
+                                      const int w, const int h);
 
-        void calcImagePattern(ImageVertexes *const vert,
-                              const Image *const image,
-                              const int x, const int y,
-                              const int w, const int h) const override final;
+        void drawRescaledPattern(const Image *const image,
+                                 const int x, const int y,
+                                 const int w, const int h,
+                                 const int scaledWidth,
+                                 const int scaledHeight) override final;
 
-        void calcImagePattern(ImageCollection *const vert,
-                              const Image *const image,
-                              const int x, const int y,
-                              const int w, const int h) const override final;
+        void calcPattern(ImageVertexes *const vert,
+                         const Image *const image,
+                         const int x, const int y,
+                         const int w, const int h) const override final;
+
+        void calcPattern(ImageCollection *const vert,
+                         const Image *const image,
+                         const int x, const int y,
+                         const int w, const int h) const override final;
 
         void calcTileVertexes(ImageVertexes *const vert,
                               const Image *const image,
@@ -114,7 +115,7 @@ class SDL2SoftwareGraphics final : public Graphics
                      const int x2, const int y2,
                      const int width, const int height) override final;
 
-        bool calcWindow(ImageCollection *const vertCol,
+        void calcWindow(ImageCollection *const vertCol,
                         const int x, const int y,
                         const int w, const int h,
                         const ImageRect &imgRect) override final;
@@ -140,10 +141,23 @@ class SDL2SoftwareGraphics final : public Graphics
         bool resizeScreen(const int width, const int height) override final;
 
         bool drawImage2(const Image *const image,
-                        int srcX, int srcY,
-                        int dstX, int dstY,
-                        const int width, const int height,
-                        const bool useColor) override final;
+                        int dstX, int dstY) override final;
+
+        void drawImageCached(const Image *const image,
+                             int x, int y) override final;
+
+        void drawPatternCached(const Image *const image,
+                               const int x, const int y,
+                               const int w, const int h) override final;
+
+        void completeCache() override final;
+
+        /**
+         * Draws a rectangle using images. 4 corner images, 4 side images and 1
+         * image for the inside.
+         */
+        void drawImageRect(int x, int y, int w, int h,
+                           const ImageRect &imgRect);
 
     protected:
         int SDL_FakeUpperBlit(const SDL_Surface *const src,
@@ -159,6 +173,24 @@ class SDL2SoftwareGraphics final : public Graphics
         SDL_Surface *mSurface;
         uint32_t mOldPixel;
         int mOldAlpha;
+
+    private:
+        void inline calcImageRect(ImageVertexes *const vert,
+                                  const int x, const int y,
+                                  const int w, const int h,
+                                  const ImageRect &imgRect);
+
+        void inline calcPatternInline(ImageVertexes *const vert,
+                                      const Image *const image,
+                                      const int x, const int y,
+                                      const int w, const int h) const;
+
+        void inline calcTileVertexesInline(ImageVertexes *const vert,
+                                           const Image *const image,
+                                           int x, int y) const;
+
+        bool inline drawImageInline(const Image *const image,
+                                    int dstX, int dstY);
 };
 
 #endif  // USE_SDL2

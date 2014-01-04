@@ -2,7 +2,7 @@
  *  The ManaPlus Client
  *  Copyright (C) 2004-2009  The Mana World Development Team
  *  Copyright (C) 2009-2010  The Mana Developers
- *  Copyright (C) 2011-2013  The ManaPlus Developers
+ *  Copyright (C) 2011-2014  The ManaPlus Developers
  *
  *  This file is part of The ManaPlus Client.
  *
@@ -62,10 +62,19 @@ void ChatHandler::clear()
     mSkipping = true;
 }
 
-void ChatHandler::me(const std::string &text, const std::string &channel) const
+void ChatHandler::me(const std::string &restrict text,
+                     const std::string &restrict channel) const
 {
     // here need string duplication
     std::string action = strprintf("*%s*", text.c_str());
+    talk(action, channel);
+}
+
+void ChatHandler::talkPet(const std::string &restrict text,
+                          const std::string &restrict channel) const
+{
+    // here need string duplication
+    std::string action = strprintf("\302\202\303 %s", text.c_str());
     talk(action, channel);
 }
 
@@ -310,17 +319,18 @@ void ChatHandler::processBeingChat(Net::MessageIn &msg,
 
     trim(chatMsg);
 
+    bool allow(true);
     // We use getIgnorePlayer instead of ignoringPlayer here
     // because ignorePlayer' side effects are triggered
     // right below for Being::IGNORE_SPEECH_FLOAT.
     if (player_relations.checkPermissionSilently(sender_name,
         PlayerRelation::SPEECH_LOG) && chatWindow)
     {
-        chatWindow->resortChatLog(removeColors(sender_name)
+        allow = chatWindow->resortChatLog(removeColors(sender_name)
             .append(" : ").append(chatMsg), BY_OTHER, channel, false, true);
     }
 
-    if (player_relations.hasPermission(sender_name,
+    if (allow && player_relations.hasPermission(sender_name,
         PlayerRelation::SPEECH_FLOAT))
     {
         being->setSpeech(chatMsg, channel);
@@ -352,9 +362,10 @@ void ChatHandler::processChat(Net::MessageIn &msg, const bool normalChat,
 
     if (normalChat)
     {
+        bool allow(true);
         if (chatWindow)
         {
-            chatWindow->resortChatLog(chatMsg, BY_PLAYER,
+            allow = chatWindow->resortChatLog(chatMsg, BY_PLAYER,
                 channel, false, true);
         }
 
@@ -386,7 +397,7 @@ void ChatHandler::processChat(Net::MessageIn &msg, const bool normalChat,
 
         if (player_node)
         {
-            if (chatWindow || mShowMotd)
+            if ((chatWindow || mShowMotd) && allow)
                 player_node->setSpeech(chatMsg, channel);
         }
     }

@@ -1,7 +1,7 @@
 /*
  *  The ManaPlus Client
  *  Copyright (C) 2010  The Mana Developers
- *  Copyright (C) 2011-2013  The ManaPlus Developers
+ *  Copyright (C) 2011-2014  The ManaPlus Developers
  *
  *  This file is part of The ManaPlus Client.
  *
@@ -137,7 +137,7 @@ void AvatarListBox::draw(gcn::Graphics *gcnGraphics)
                 }
                 else
                 {
-                    DRAW_IMAGE(graphics, icon, mImagePadding, y + mPadding);
+                    graphics->drawImage2(icon, mImagePadding, y + mPadding);
                 }
             }
         }

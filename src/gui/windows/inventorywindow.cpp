@@ -2,7 +2,7 @@
  *  The ManaPlus Client
  *  Copyright (C) 2004-2009  The Mana World Development Team
  *  Copyright (C) 2009-2010  The Mana Developers
- *  Copyright (C) 2011-2013  The ManaPlus Developers
+ *  Copyright (C) 2011-2014  The ManaPlus Developers
  *
  *  This file is part of The ManaPlus Client.
  *
@@ -117,7 +117,8 @@ InventoryWindow::InventoryWindow(Inventory *const inventory):
     mRetrieveButton(nullptr),
     mInvCloseButton(nullptr),
     mWeightBar(nullptr),
-    mSlotsBar(new ProgressBar(this, 0.0F, 100, 0, Theme::PROG_INVY_SLOTS)),
+    mSlotsBar(new ProgressBar(this, 0.0F, 100, 0, Theme::PROG_INVY_SLOTS,
+              "slotsprogressbar.xml", "slotsprogressbar_fill.xml")),
     mFilter(nullptr),
     mSortModel(new SortListModelInv),
     mSortDropDown(new DropDown(this, mSortModel, false, false, this, "sort")),
@@ -225,7 +226,8 @@ InventoryWindow::InventoryWindow(Inventory *const inventory):
         mShopButton = new Button(this, _("Shop"), "shop", this);
         // TRANSLATORS: inventory button
         mEquipmentButton = new Button(this, _("Equipment"), "equipment", this);
-        mWeightBar = new ProgressBar(this, 0.0F, 100, 0, Theme::PROG_WEIGHT);
+        mWeightBar = new ProgressBar(this, 0.0F, 100, 0, Theme::PROG_WEIGHT,
+            "weightprogressbar.xml", "weightprogressbar_fill.xml");
         mWeightBar->setColor(Theme::getThemeColor(Theme::WEIGHT_BAR),
             Theme::getThemeColor(Theme::WEIGHT_BAR_OUTLINE));
 

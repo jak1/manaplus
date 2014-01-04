@@ -2,7 +2,7 @@
  *  The ManaPlus Client
  *  Copyright (C) 2004-2009  The Mana World Development Team
  *  Copyright (C) 2009-2010  The Mana Developers
- *  Copyright (C) 2011-2013  The ManaPlus Developers
+ *  Copyright (C) 2011-2014  The ManaPlus Developers
  *
  *  This file is part of The ManaPlus Client.
  *
@@ -60,6 +60,20 @@ BeingInfo::BeingInfo() :
     mAvatarId(0),
     mWidth(0),
     mHeight(0),
+    mStartFollowDist(3),
+    mFollowDist(1),
+    mWarpDist(11),
+    mWalkSpeed(0),
+    mSitOffsetX(0),
+    mSitOffsetY(0),
+    mMoveOffsetX(0),
+    mMoveOffsetY(0),
+    mDeadOffsetX(0),
+    mDeadOffsetY(0),
+    mThinkTime(50),
+    mDirectionType(1),
+    mSitDirectionType(1),
+    mDeadDirectionType(1),
     mStaticMaxHP(false),
     mTargetSelection(true)
 {

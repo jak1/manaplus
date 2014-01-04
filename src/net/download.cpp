@@ -1,7 +1,7 @@
 /*
  *  The ManaPlus Client
  *  Copyright (C) 2009-2010  The Mana Developers
- *  Copyright (C) 2011-2013  The ManaPlus Developers
+ *  Copyright (C) 2011-2014  The ManaPlus Developers
  *
  *  This file is part of The ManaPlus Client.
  *
@@ -26,6 +26,7 @@
 #include "logger.h"
 #include "main.h"
 
+#include "utils/files.h"
 #include "utils/sdlhelper.h"
 
 #include <curl/curl.h>
@@ -364,12 +365,7 @@ int Download::downloadThread(void *ptr)
                 if (!d->mOptions.cancel)
                 {
                     ::remove(d->mFileName.c_str());
-#if defined __native_client__
-                    Files::renameFile(
-#else
-                    ::rename(
-#endif
-                    outFilename.c_str(), d->mFileName.c_str());
+                    Files::renameFile(outFilename, d->mFileName);
 
                     // Check if we can open it and no errors were encountered
                     // during renaming

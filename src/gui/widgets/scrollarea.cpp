@@ -2,7 +2,7 @@
  *  The ManaPlus Client
  *  Copyright (C) 2004-2009  The Mana World Development Team
  *  Copyright (C) 2009-2010  The Mana Developers
- *  Copyright (C) 2011-2013  The ManaPlus Developers
+ *  Copyright (C) 2011-2014  The ManaPlus Developers
  *
  *  This file is part of The ManaPlus Client.
  *
@@ -429,7 +429,7 @@ void ScrollArea::drawButton(gcn::Graphics *const graphics,
 
     if (buttons[dir][state])
     {
-        DRAW_IMAGE(static_cast<Graphics*>(graphics),
+        static_cast<Graphics*>(graphics)->drawImage2(
             buttons[dir][state], dim.x, dim.y);
     }
 }
@@ -479,17 +479,17 @@ void ScrollArea::drawVBar(gcn::Graphics *const graphics)
 
     if (vBackground.grid[4])
     {
-        g->drawImagePattern(vBackground.grid[4],
+        g->drawPattern(vBackground.grid[4],
             dim.x, dim.y, dim.width, dim.height);
     }
     if (vBackground.grid[1])
     {
-        g->drawImagePattern(vBackground.grid[1],
+        g->drawPattern(vBackground.grid[1],
             dim.x, dim.y, dim.width, vBackground.grid[1]->getHeight());
     }
     if (vBackground.grid[7])
     {
-        g->drawImagePattern(vBackground.grid[7],
+        g->drawPattern(vBackground.grid[7],
             dim.x, dim.height - vBackground.grid[7]->getHeight() + dim.y,
             dim.width, vBackground.grid[7]->getHeight());
     }
@@ -502,17 +502,17 @@ void ScrollArea::calcVBar(gcn::Graphics *const graphics)
 
     if (vBackground.grid[4])
     {
-        g->calcImagePattern(mVertexes, vBackground.grid[4],
+        g->calcPattern(mVertexes, vBackground.grid[4],
             dim.x, dim.y, dim.width, dim.height);
     }
     if (vBackground.grid[1])
     {
-        g->calcImagePattern(mVertexes, vBackground.grid[1],
+        g->calcPattern(mVertexes, vBackground.grid[1],
             dim.x, dim.y, dim.width, vBackground.grid[1]->getHeight());
     }
     if (vBackground.grid[7])
     {
-        g->calcImagePattern(mVertexes, vBackground.grid[7],
+        g->calcPattern(mVertexes, vBackground.grid[7],
             dim.x, dim.height - vBackground.grid[7]->getHeight() + dim.y,
             dim.width, vBackground.grid[7]->getHeight());
     }
@@ -525,19 +525,19 @@ void ScrollArea::drawHBar(gcn::Graphics *const graphics)
 
     if (hBackground.grid[4])
     {
-        g->drawImagePattern(hBackground.grid[4],
+        g->drawPattern(hBackground.grid[4],
             dim.x, dim.y, dim.width, dim.height);
     }
 
     if (hBackground.grid[3])
     {
-        g->drawImagePattern(hBackground.grid[3],
+        g->drawPattern(hBackground.grid[3],
             dim.x, dim.y, hBackground.grid[3]->getWidth(), dim.height);
     }
 
     if (hBackground.grid[5])
     {
-        g->drawImagePattern(hBackground.grid[5],
+        g->drawPattern(hBackground.grid[5],
             dim.x + dim.width - hBackground.grid[5]->getWidth(), dim.y,
             hBackground.grid[5]->getWidth(), dim.height);
     }
@@ -550,19 +550,19 @@ void ScrollArea::calcHBar(gcn::Graphics *const graphics)
 
     if (hBackground.grid[4])
     {
-        g->calcImagePattern(mVertexes, hBackground.grid[4],
+        g->calcPattern(mVertexes, hBackground.grid[4],
             dim.x, dim.y, dim.width, dim.height);
     }
 
     if (hBackground.grid[3])
     {
-        g->calcImagePattern(mVertexes, hBackground.grid[3],
+        g->calcPattern(mVertexes, hBackground.grid[3],
             dim.x, dim.y, hBackground.grid[3]->getWidth(), dim.height);
     }
 
     if (hBackground.grid[5])
     {
-        g->calcImagePattern(mVertexes, hBackground.grid[5],
+        g->calcPattern(mVertexes, hBackground.grid[5],
             dim.x + dim.width - hBackground.grid[5]->getWidth(), dim.y,
             hBackground.grid[5]->getWidth(), dim.height);
     }

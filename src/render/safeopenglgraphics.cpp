@@ -2,7 +2,7 @@
  *  The ManaPlus Client
  *  Copyright (C) 2004-2009  The Mana World Development Team
  *  Copyright (C) 2009-2010  The Mana Developers
- *  Copyright (C) 2011-2013  The ManaPlus Developers
+ *  Copyright (C) 2011-2014  The ManaPlus Developers
  *
  *  This file is part of The ManaPlus Client.
  *
@@ -138,112 +138,56 @@ static inline void drawRescaledQuad(const Image *const image,
     }
 }
 
-
 bool SafeOpenGLGraphics::drawImage2(const Image *const image,
-                                    int srcX, int srcY,
-                                    int dstX, int dstY,
-                                    const int width, const int height,
-                                    const bool useColor)
+                                    int dstX, int dstY)
+{
+    return drawImageInline(image, dstX, dstY);
+}
+
+bool SafeOpenGLGraphics::drawImageInline(const Image *const image,
+                                         int dstX, int dstY)
 {
     FUNC_BLOCK("Graphics::drawImage2", 1)
     if (!image)
         return false;
 
-    if (!useColor)
-        setColorAlpha(image->mAlpha);
-
+    setColorAlpha(image->mAlpha);
     bindTexture(OpenGLImageHelper::mTextureType, image->mGLImage);
-
     setTexturingAndBlending(true);
 
+    const SDL_Rect &bounds = image->mBounds;
     // Draw a textured quad.
     glBegin(GL_QUADS);
-    drawQuad(image, srcX + image->mBounds.x, srcY + image->mBounds.y,
-        dstX, dstY, width, height);
+    drawQuad(image, bounds.x, bounds.y,
+        dstX, dstY, bounds.w, bounds.h);
     glEnd();
 
     return true;
 }
 
-bool SafeOpenGLGraphics::drawRescaledImage(const Image *const image, int srcX,
-                                           int srcY, int dstX, int dstY,
-                                           const int width, const int height,
-                                           const int desiredWidth,
-                                           const int desiredHeight,
-                                           const bool useColor)
+void SafeOpenGLGraphics::drawImageCached(const Image *const image,
+                                         int x, int y)
 {
-    return drawRescaledImage(image, srcX, srcY,
-                             dstX, dstY,
-                             width, height,
-                             desiredWidth, desiredHeight,
-                             useColor, true);
-}
-
-bool SafeOpenGLGraphics::drawRescaledImage(const Image *const image, int srcX,
-                                           int srcY, int dstX, int dstY,
-                                           const int width, const int height,
-                                           const int desiredWidth,
-                                           const int desiredHeight,
-                                           const bool useColor,
-                                           bool smooth)
-{
-    FUNC_BLOCK("Graphics::drawRescaledImage", 1)
+    FUNC_BLOCK("Graphics::drawImageCached", 1)
     if (!image)
-        return false;
+        return;
 
-    // Just draw the image normally when no resizing is necessary,
-    if (width == desiredWidth && height == desiredHeight)
-    {
-        return drawImage2(image, srcX, srcY, dstX, dstY,
-                          width, height, useColor);
-    }
-
-    // When the desired image is smaller than the current one,
-    // disable smooth effect.
-    if (width > desiredWidth && height > desiredHeight)
-        smooth = false;
-
-    srcX += image->mBounds.x;
-    srcY += image->mBounds.y;
-
-    if (!useColor)
-        setColorAlpha(image->mAlpha);
-
+    setColorAlpha(image->mAlpha);
     bindTexture(OpenGLImageHelper::mTextureType, image->mGLImage);
-
     setTexturingAndBlending(true);
 
+    const SDL_Rect &bounds = image->mBounds;
     // Draw a textured quad.
     glBegin(GL_QUADS);
-    drawRescaledQuad(image, srcX, srcY, dstX, dstY, width, height,
-                     desiredWidth, desiredHeight);
-
-    if (smooth)  // A basic smooth effect...
-    {
-        setColorAlpha(0.2F);
-        drawRescaledQuad(image, srcX, srcY, dstX - 1, dstY - 1, width, height,
-                        desiredWidth + 1, desiredHeight + 1);
-        drawRescaledQuad(image, srcX, srcY, dstX + 1, dstY + 1, width, height,
-                        desiredWidth - 1, desiredHeight - 1);
-
-        drawRescaledQuad(image, srcX, srcY, dstX + 1, dstY, width, height,
-                        desiredWidth - 1, desiredHeight);
-        drawRescaledQuad(image, srcX, srcY, dstX, dstY + 1, width, height,
-                        desiredWidth, desiredHeight - 1);
-    }
-
+    drawQuad(image, bounds.x, bounds.y, x, y, bounds.w, bounds.h);
     glEnd();
-
-    return true;
 }
 
-/* Optimising the functions that Graphics::drawImagePattern would call,
- * so that glBegin...glEnd are outside the main loop. */
-void SafeOpenGLGraphics::drawImagePattern(const Image *const image,
-                                          const int x, const int y,
-                                          const int w, const int h)
+void SafeOpenGLGraphics::drawPatternCached(const Image *const image,
+                                           const int x, const int y,
+                                           const int w, const int h)
 {
-    FUNC_BLOCK("Graphics::drawImagePattern", 1)
+    FUNC_BLOCK("Graphics::drawPatternCached", 1)
     if (!image)
         return;
 
@@ -278,11 +222,89 @@ void SafeOpenGLGraphics::drawImagePattern(const Image *const image,
     glEnd();
 }
 
-void SafeOpenGLGraphics::drawRescaledImagePattern(const Image *const image,
-                                                  const int x, const int y,
-                                                  const int w, const int h,
-                                                  const int scaledWidth,
-                                                  const int scaledHeight)
+void SafeOpenGLGraphics::completeCache()
+{
+}
+
+bool SafeOpenGLGraphics::drawRescaledImage(const Image *const image,
+                                           int dstX, int dstY,
+                                           const int desiredWidth,
+                                           const int desiredHeight)
+{
+    FUNC_BLOCK("Graphics::drawRescaledImage", 1)
+    if (!image)
+        return false;
+
+    const SDL_Rect &imageRect = image->mBounds;
+
+    // Just draw the image normally when no resizing is necessary,
+    if (imageRect.w == desiredWidth && imageRect.h == desiredHeight)
+        return drawImageInline(image, dstX, dstY);
+
+    setColorAlpha(image->mAlpha);
+    bindTexture(OpenGLImageHelper::mTextureType, image->mGLImage);
+    setTexturingAndBlending(true);
+
+    // Draw a textured quad.
+    glBegin(GL_QUADS);
+    drawRescaledQuad(image, imageRect.x, imageRect.y, dstX, dstY,
+        imageRect.w, imageRect.h, desiredWidth, desiredHeight);
+    glEnd();
+
+    return true;
+}
+
+void SafeOpenGLGraphics::drawPattern(const Image *const image,
+                                     const int x, const int y,
+                                     const int w, const int h)
+{
+    drawPatternInline(image, x, y, w, h);
+}
+
+void SafeOpenGLGraphics::drawPatternInline(const Image *const image,
+                                           const int x, const int y,
+                                           const int w, const int h)
+{
+    FUNC_BLOCK("Graphics::drawPattern", 1)
+    if (!image)
+        return;
+
+    const SDL_Rect &imageRect = image->mBounds;
+    const int iw = imageRect.w;
+    const int ih = imageRect.h;
+    if (iw == 0 || ih == 0)
+        return;
+
+    const int srcX = imageRect.x;
+    const int srcY = imageRect.y;
+
+    setColorAlpha(image->mAlpha);
+    bindTexture(OpenGLImageHelper::mTextureType, image->mGLImage);
+    setTexturingAndBlending(true);
+
+    // Draw a set of textured rectangles
+    glBegin(GL_QUADS);
+
+    for (int py = 0; py < h; py += ih)
+    {
+        const int height = (py + ih >= h) ? h - py : ih;
+        const int dstY = y + py;
+        for (int px = 0; px < w; px += iw)
+        {
+            int width = (px + iw >= w) ? w - px : iw;
+            int dstX = x + px;
+            drawQuad(image, srcX, srcY, dstX, dstY, width, height);
+        }
+    }
+
+    glEnd();
+}
+
+void SafeOpenGLGraphics::drawRescaledPattern(const Image *const image,
+                                             const int x, const int y,
+                                             const int w, const int h,
+                                             const int scaledWidth,
+                                             const int scaledHeight)
 {
     if (!image)
         return;
@@ -339,21 +361,39 @@ void SafeOpenGLGraphics::calcTileVertexes(ImageVertexes *const vert A_UNUSED,
 {
 }
 
-void SafeOpenGLGraphics::calcImagePattern(ImageVertexes *const vert A_UNUSED,
-                                          const Image *const image A_UNUSED,
-                                          const int x A_UNUSED,
-                                          const int y A_UNUSED,
-                                          const int w A_UNUSED,
-                                          const int h A_UNUSED) const
+void SafeOpenGLGraphics::calcTileVertexesInline(ImageVertexes *const
+                                                vert A_UNUSED,
+                                                const Image *const
+                                                image A_UNUSED,
+                                                int x A_UNUSED,
+                                                int y A_UNUSED) const
 {
 }
 
-void SafeOpenGLGraphics::calcImagePattern(ImageCollection *const vert A_UNUSED,
-                                          const Image *const image A_UNUSED,
-                                          const int x A_UNUSED,
-                                          const int y A_UNUSED,
-                                          const int w A_UNUSED,
-                                          const int h A_UNUSED) const
+void SafeOpenGLGraphics::calcPattern(ImageVertexes *const vert A_UNUSED,
+                                     const Image *const image A_UNUSED,
+                                     const int x A_UNUSED,
+                                     const int y A_UNUSED,
+                                     const int w A_UNUSED,
+                                     const int h A_UNUSED) const
+{
+}
+
+void SafeOpenGLGraphics::calcPatternInline(ImageVertexes *const vert A_UNUSED,
+                                           const Image *const image A_UNUSED,
+                                           const int x A_UNUSED,
+                                           const int y A_UNUSED,
+                                           const int w A_UNUSED,
+                                           const int h A_UNUSED) const
+{
+}
+
+void SafeOpenGLGraphics::calcPattern(ImageCollection *const vert A_UNUSED,
+                                     const Image *const image A_UNUSED,
+                                     const int x A_UNUSED,
+                                     const int y A_UNUSED,
+                                     const int w A_UNUSED,
+                                     const int h A_UNUSED) const
 {
 }
 
@@ -380,12 +420,11 @@ void SafeOpenGLGraphics::updateScreen()
     BLOCK_END("Graphics::updateScreen")
 }
 
-bool SafeOpenGLGraphics::calcWindow(ImageCollection *const vertCol A_UNUSED,
+void SafeOpenGLGraphics::calcWindow(ImageCollection *const vertCol A_UNUSED,
                                     const int x A_UNUSED, const int y A_UNUSED,
                                     const int w A_UNUSED, const int h A_UNUSED,
                                     const ImageRect &imgRect A_UNUSED)
 {
-    return false;
 }
 
 void SafeOpenGLGraphics::_beginDraw()
@@ -527,6 +566,34 @@ void SafeOpenGLGraphics::drawPoint(int x, int y)
     glEnd();
 }
 
+bool SafeOpenGLGraphics::drawNet(const int x1, const int y1,
+                                 const int x2, const int y2,
+                                 const int width, const int height)
+{
+    setTexturingAndBlending(false);
+    restoreColor();
+
+    glBegin(GL_LINES);
+    for (int y = y1; y < y2; y += height)
+    {
+        glVertex2f(static_cast<float>(x1) + 0.5F,
+            static_cast<float>(y) + 0.5F);
+        glVertex2f(static_cast<float>(x2) + 0.5F,
+            static_cast<float>(y) + 0.5F);
+    }
+
+    for (int x = x1; x < x2; x += width)
+    {
+        glVertex2f(static_cast<float>(x) + 0.5F,
+            static_cast<float>(y1) + 0.5F);
+        glVertex2f(static_cast<float>(x) + 0.5F,
+            static_cast<float>(y2) + 0.5F);
+    }
+    glEnd();
+
+    return true;
+}
+
 void SafeOpenGLGraphics::drawLine(int x1, int y1, int x2, int y2)
 {
     setTexturingAndBlending(false);
@@ -534,10 +601,6 @@ void SafeOpenGLGraphics::drawLine(int x1, int y1, int x2, int y2)
 
     glBegin(GL_LINES);
     glVertex2f(static_cast<float>(x1) + 0.5F, static_cast<float>(y1) + 0.5F);
-    glVertex2f(static_cast<float>(x2) + 0.5F, static_cast<float>(y2) + 0.5F);
-    glEnd();
-
-    glBegin(GL_POINTS);
     glVertex2f(static_cast<float>(x2) + 0.5F, static_cast<float>(y2) + 0.5F);
     glEnd();
 }
@@ -642,6 +705,21 @@ void SafeOpenGLGraphics::restoreColor()
                static_cast<GLubyte>(mColor.a));
     mIsByteColor = true;
     mByteColor = mColor;
+}
+
+void SafeOpenGLGraphics::drawImageRect(const int x, const int y,
+                                       const int w, const int h,
+                                       const ImageRect &imgRect)
+{
+    #include "render/graphics_drawImageRect.hpp"
+}
+
+void SafeOpenGLGraphics::calcImageRect(ImageVertexes *const vert,
+                                       const int x, const int y,
+                                       const int w, const int h,
+                                       const ImageRect &imgRect)
+{
+    #include "render/graphics_calcImageRect.hpp"
 }
 
 #endif  // USE_OPENGL

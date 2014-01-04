@@ -2,7 +2,7 @@
  *  The ManaPlus Client
  *  Copyright (C) 2009  The Mana World Development Team
  *  Copyright (C) 2009-2010  Andrei Karas
- *  Copyright (C) 2011-2013  The ManaPlus developers
+ *  Copyright (C) 2011-2014  The ManaPlus Developers
  *
  *  This file is part of The ManaPlus Client.
  *
@@ -135,7 +135,7 @@ void SpellShortcutContainer::draw(gcn::Graphics *graphics)
                 if (image)
                 {
                     image->setAlpha(1.0F);
-                    DRAW_IMAGE(g, image, itemX, itemY);
+                    g->drawImage2(image, itemX, itemY);
                 }
             }
 

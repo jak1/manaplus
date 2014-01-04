@@ -1,7 +1,7 @@
 /*
  *  The ManaPlus Client
  *  Copyright (C) 2010  The Mana Developers
- *  Copyright (C) 2011-2013  The ManaPlus Developers
+ *  Copyright (C) 2011-2014  The ManaPlus Developers
  *
  *  This file is part of The ManaPlus Client.
  *
@@ -48,6 +48,7 @@ BeingPopup::BeingPopup() :
     mBeingName->setPosition(0, 0);
 
     const int fontHeight = mBeingName->getHeight();
+    setMinHeight(fontHeight);
 
     // Being's party
     mBeingParty->setPosition(0, fontHeight);

@@ -1,6 +1,6 @@
 /*
  *  The ManaPlus Client
- *  Copyright (C) 2012-2013  The ManaPlus Developers
+ *  Copyright (C) 2012-2014  The ManaPlus Developers
  *
  *  This file is part of The ManaPlus Client.
  *
@@ -89,9 +89,23 @@ void ExtendedListBox::draw(gcn::Graphics *graphics)
         if (insideWidth < strWidth)
         {
             const int strSize = str.size();
+            int divPos = strSize / 2;
+            if (divPos > 0 && static_cast<unsigned char>(
+                str[divPos - 1]) >= 0xc0)
+            {
+                divPos --;
+            }
+            for (int d = divPos; d > 10; d --)
+            {
+                if (str[d] == 32)
+                {
+                    divPos = d + 1;
+                    break;
+                }
+            }
             list.push_back(ExtendedListBoxItem(row,
-                str.substr(0, strSize / 2), useImage, y));
-            str = str.substr(strSize / 2);
+                str.substr(0, divPos), useImage, y));
+            str = str.substr(divPos);
             y += height;
             useImage = false;
         }
@@ -132,7 +146,7 @@ void ExtendedListBox::draw(gcn::Graphics *graphics)
             const Image *const image = model->getImageAt(row1);
             if (image)
             {
-                DRAW_IMAGE(g, image, mImagePadding, item.y + (height
+                g->drawImage2(image, mImagePadding, item.y + (height
                     - image->getHeight()) / 2 + mPadding);
             }
         }
@@ -166,7 +180,7 @@ void ExtendedListBox::draw(gcn::Graphics *graphics)
             const Image *const image = model->getImageAt(row1);
             if (image)
             {
-                DRAW_IMAGE(g, image, mImagePadding, item.y + (height
+                g->drawImage2(image, mImagePadding, item.y + (height
                     - image->getHeight()) / 2 + mPadding);
             }
         }

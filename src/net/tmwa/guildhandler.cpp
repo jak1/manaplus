@@ -1,7 +1,7 @@
 /*
  *  The ManaPlus Client
  *  Copyright (C) 2009-2010  The Mana Developers
- *  Copyright (C) 2011-2013  The ManaPlus Developers
+ *  Copyright (C) 2011-2014  The ManaPlus Developers
  *
  *  This file is part of The ManaPlus Client.
  *
@@ -255,8 +255,8 @@ void GuildHandler::leave(const int guildId) const
     msg.writeString("", 40);                  // Message
 }
 
-void GuildHandler::kick(const GuildMember *const member,
-                        const std::string &reason) const
+void GuildHandler::kick(const GuildMember *restrict const member,
+                        const std::string &restrict reason) const
 {
     if (!member || !member->getGuild())
         return;
@@ -319,8 +319,9 @@ void GuildHandler::changeMemberPostion(const GuildMember *const member,
     msg.writeInt32(level);                // pos
 }
 
-void GuildHandler::changeNotice(const int guildId, const std::string &msg1,
-                                const std::string &msg2) const
+void GuildHandler::changeNotice(const int guildId,
+                                const std::string &restrict msg1,
+                                const std::string &restrict msg2) const
 {
     MessageOut msg(CMSG_GUILD_CHANGE_NOTICE);
     msg.writeInt32(guildId);

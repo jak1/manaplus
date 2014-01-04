@@ -2,7 +2,7 @@
  *  The ManaPlus Client
  *  Copyright (C) 2004-2009  The Mana World Development Team
  *  Copyright (C) 2009-2010  The Mana Developers
- *  Copyright (C) 2011-2013  The ManaPlus Developers
+ *  Copyright (C) 2011-2014  The ManaPlus Developers
  *
  *  This file is part of The ManaPlus Client.
  *
@@ -468,7 +468,7 @@ void Gui::draw()
         {
             const int posX = mouseX - (image->mBounds.w / 2);
             const int posY = mouseY - (image->mBounds.h / 2);
-            DRAW_IMAGE(g2, image, posX, posY);
+            g2->drawImage2(image, posX, posY);
         }
         if (mGuiFont)
         {
@@ -486,7 +486,7 @@ void Gui::draw()
         if (mouseCursor)
         {
             mouseCursor->setAlpha(mMouseCursorAlpha);
-            DRAW_IMAGE(g2, mouseCursor, mouseX - 15, mouseY - 17);
+            g2->drawImage2(mouseCursor, mouseX - 15, mouseY - 17);
         }
     }
 

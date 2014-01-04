@@ -2,7 +2,7 @@
  *  The ManaPlus Client
  *  Copyright (C) 2004-2009  The Mana World Development Team
  *  Copyright (C) 2009-2010  The Mana Developers
- *  Copyright (C) 2011-2013  The ManaPlus Developers
+ *  Copyright (C) 2011-2014  The ManaPlus Developers
  *
  *  This file is part of The ManaPlus Client.
  *
@@ -1452,7 +1452,7 @@ std::string ChatWindow::autoCompleteHistory(const std::string &partName) const
     return autoComplete(nameList, partName);
 }
 
-void ChatWindow::resortChatLog(std::string line, Own own,
+bool ChatWindow::resortChatLog(std::string line, Own own,
                                const std::string &channel,
                                const bool ignoreRecord,
                                const bool tryRemoveColors)
@@ -1470,7 +1470,7 @@ void ChatWindow::resortChatLog(std::string line, Own own,
         {
             tradeChatTab->chatLog(prefix + line, own,
                 ignoreRecord, tryRemoveColors);
-            return;
+            return false;
         }
 
         size_t idx2 = line.find(": ");
@@ -1479,13 +1479,35 @@ void ChatWindow::resortChatLog(std::string line, Own own,
             const size_t idx = line.find(": \302\202");
             if (idx == idx2)
             {
-                // ignore special message formats.
                 if (line.find(": \302\202\302") != std::string::npos)
-                    return;
+                {
+                    if (line.find(": \302\202\302e") != std::string::npos)
+                    {
+                        const std::string nick = line.substr(0, idx2 - 1);
+                        line = line.substr(idx2 + 6);
+                        localPetEmote(nick, atoi(line.c_str()));
+                    }
+                    // ignore other special message formats.
+                    return false;
+                }
+
+                // pet talk message detected
+                if (line.find(": \302\202\303 ") != std::string::npos)
+                {
+                    if (actorManager && idx2 > 1)
+                    {
+                        const std::string nick = line.substr(0, idx2 - 1);
+                        line = line.substr(idx2 + 6);
+                        localPetSay(nick, line);
+                    }
+
+                    return false;
+                }
+
                 line = line.erase(idx + 2, 2);
                 tradeChatTab->chatLog(prefix + line, own, ignoreRecord,
                     tryRemoveColors);
-                return;
+                return false;
             }
         }
 
@@ -1502,7 +1524,7 @@ void ChatWindow::resortChatLog(std::string line, Own own,
                     {
                         tradeChatTab->chatLog(prefix + line, own,
                             ignoreRecord, tryRemoveColors);
-                        return;
+                        return false;
                     }
                 }
             }
@@ -1533,6 +1555,7 @@ void ChatWindow::resortChatLog(std::string line, Own own,
     {
         localChatTab->chatLog(line, own, ignoreRecord, tryRemoveColors);
     }
+    return true;
 }
 
 void ChatWindow::battleChatLog(const std::string &line, Own own,
@@ -1545,6 +1568,43 @@ void ChatWindow::battleChatLog(const std::string &line, Own own,
         battleChatTab->chatLog(line, own, ignoreRecord, tryRemoveColors);
     else if (debugChatTab)
         debugChatTab->chatLog(line, own, ignoreRecord, tryRemoveColors);
+}
+
+void ChatWindow::localPetSay(const std::string &nick, const std::string &text)
+{
+    Being *const being = actorManager->findBeingByName(
+        nick, ActorSprite::PLAYER);
+    Being *pet = nullptr;
+    if (being)
+    {
+        pet = being->getPet();
+        if (pet)
+            pet->setSpeech(text, GENERAL_CHANNEL);
+    }
+
+    if (!localChatTab)
+        return;
+    if (pet)
+    {
+        // TRANSLATORS: owners pet name. For example: 4144's pet
+        localChatTab->chatLog(strprintf(_("%s's pet"), nick.c_str()), text);
+    }
+    else
+    {
+        localChatTab->chatLog(nick, text);
+    }
+}
+
+void ChatWindow::localPetEmote(const std::string &nick, const uint8_t emoteId)
+{
+    Being *const being = actorManager->findBeingByName(
+        nick, ActorSprite::PLAYER);
+    if (being)
+    {
+        Being *const pet = being->getPet();
+        if (pet)
+            pet->setEmote(emoteId, 0);
+    }
 }
 
 void ChatWindow::initTradeFilter()

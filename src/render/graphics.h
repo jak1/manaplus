@@ -2,7 +2,7 @@
  *  The ManaPlus Client
  *  Copyright (C) 2004-2009  The Mana World Development Team
  *  Copyright (C) 2009-2010  The Mana Developers
- *  Copyright (C) 2011-2013  The ManaPlus Developers
+ *  Copyright (C) 2011-2014  The ManaPlus Developers
  *
  *  This file is part of The ManaPlus Client.
  *
@@ -46,15 +46,6 @@ struct SDL_Window;
 
 static const int defaultScreenWidth = 800;
 static const int defaultScreenHeight = 600;
-
-#define DRAW_IMAGE(graphics, image, x, y) \
-    { \
-        if (image) \
-        { \
-            (graphics)->drawImage2(image, 0, 0, x, y, \
-                (image)->mBounds.w, (image)->mBounds.h, false); \
-        } \
-    }
 
 /**
  * 9 images defining a rectangle. 4 corners, 4 sides and a middle area. The
@@ -150,89 +141,48 @@ class Graphics : public gcn::Graphics
          */
         virtual bool resizeScreen(const int width, const int height);
 
-        /**
-         * Blits an image onto the screen.
-         *
-         * @return <code>true</code> if the image was blitted properly
-         *         <code>false</code> otherwise.
-         */
-        bool drawImage(const Image *image, int x, int y);
-
         //  override unused abstract function
         void drawImage(const gcn::Image* image A_UNUSED,
                        int srcX A_UNUSED, int srcY A_UNUSED,
                        int dstX A_UNUSED, int dstY A_UNUSED,
-                       int width A_UNUSED, int height A_UNUSED) override
+                       int width A_UNUSED, int height A_UNUSED) override final
         {
         }
 
         /**
          * Draws a resclaled version of the image
          */
-        virtual bool drawRescaledImage(const Image *const image, int srcX,
-                                       int srcY, int dstX, int dstY,
-                                       const int width, const int height,
+        virtual bool drawRescaledImage(const Image *const image,
+                                       int dstX, int dstY,
                                        const int desiredWidth,
-                                       const int desiredHeight,
-                                       const bool useColor = false) = 0;
+                                       const int desiredHeight) = 0;
 
-        virtual void drawImagePattern(const Image *const image,
-                                      const int x, const int y,
-                                      const int w, const int h) = 0;
+        virtual void drawPattern(const Image *const image,
+                                 const int x, const int y,
+                                 const int w, const int h) = 0;
 
         /**
          * Draw a pattern based on a rescaled version of the given image...
          */
-        virtual void drawRescaledImagePattern(const Image *const image,
-                                              const int x, const int y,
-                                              const int w, const int h,
-                                              const int scaledWidth,
-                                              const int scaledHeight) = 0;
+        virtual void drawRescaledPattern(const Image *const image,
+                                         const int x, const int y,
+                                         const int w, const int h,
+                                         const int scaledWidth,
+                                         const int scaledHeight) = 0;
 
-        /**
-         * Draws a rectangle using images. 4 corner images, 4 side images and 1
-         * image for the inside.
-         */
-        void drawImageRect(const int x, const int y, const int w, const int h,
-                           const Image *const topLeft,
-                           const Image *const topRight,
-                           const Image *const bottomLeft,
-                           const Image *const bottomRight,
-                           const Image *const top,
-                           const Image *const right,
-                           const Image *const bottom,
-                           const Image *const left,
-                           const Image *const center);
+        virtual void drawImageRect(const int x, const int y,
+                                   const int w, const int h,
+                                   const ImageRect &imgRect) = 0;
 
-        /**
-         * Draws a rectangle using images. 4 corner images, 4 side images and 1
-         * image for the inside.
-         */
-        void drawImageRect(int x, int y, int w, int h,
-                           const ImageRect &imgRect);
+        virtual void calcPattern(ImageVertexes *const vert,
+                                 const Image *const image,
+                                 const int x, const int y,
+                                 const int w, const int h) const = 0;
 
-        bool calcImageRect(ImageVertexes *const vert,
-                           const int x, const int y,
-                           const int w, const int h,
-                           const Image *const topLeft,
-                           const Image *const topRight,
-                           const Image *const bottomLeft,
-                           const Image *const bottomRight,
-                           const Image *const top,
-                           const Image *const right,
-                           const Image *const bottom,
-                           const Image *const left,
-                           const Image *const center);
-
-        virtual void calcImagePattern(ImageVertexes *const vert,
-                                      const Image *const image,
-                                      const int x, const int y,
-                                      const int w, const int h) const = 0;
-
-        virtual void calcImagePattern(ImageCollection *const vert,
-                                      const Image *const image,
-                                      const int x, const int y,
-                                      const int w, const int h) const = 0;
+        virtual void calcPattern(ImageCollection *const vert,
+                                 const Image *const image,
+                                 const int x, const int y,
+                                 const int w, const int h) const = 0;
 
         virtual void calcTileVertexes(ImageVertexes *const vert,
                                       const Image *const image,
@@ -252,18 +202,10 @@ class Graphics : public gcn::Graphics
                                         const Image *const image,
                                         int x, int y) = 0;
 
-        virtual bool calcWindow(ImageCollection *const vertCol,
+        virtual void calcWindow(ImageCollection *const vertCol,
                                 const int x, const int y,
                                 const int w, const int h,
                                 const ImageRect &imgRect) = 0;
-
-        /**
-         * Draws a rectangle using images. 4 corner images, 4 side images and 1
-         * image for the inside.
-         */
-        inline void drawImageRect(const gcn::Rectangle &area,
-                                  const ImageRect &imgRect)
-        { drawImageRect(area.x, area.y, area.width, area.height, imgRect); }
 
         virtual void fillRectangle(const gcn::Rectangle& rectangle)
                                    override = 0;
@@ -388,10 +330,16 @@ class Graphics : public gcn::Graphics
          *         <code>false</code> otherwise.
          */
         virtual bool drawImage2(const Image *const image,
-                                int srcX, int srcY,
-                                int dstX, int dstY,
-                                const int width, const int height,
-                                const bool useColor) = 0;
+                                int dstX, int dstY) = 0;
+
+        virtual void drawImageCached(const Image *const image,
+                                     int srcX, int srcY) = 0;
+
+        virtual void drawPatternCached(const Image *const image,
+                                       const int x, const int y,
+                                       const int w, const int h) = 0;
+
+        virtual void completeCache() = 0;
 
         int mWidth;
         int mHeight;

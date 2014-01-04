@@ -2,7 +2,7 @@
  *  The ManaPlus Client
  *  Copyright (C) 2008-2009  The Mana World Development Team
  *  Copyright (C) 2009-2010  The Mana Developers
- *  Copyright (C) 2011-2013  The ManaPlus Developers
+ *  Copyright (C) 2011-2014  The ManaPlus Developers
  *
  *  This file is part of The ManaPlus Client.
  *
@@ -242,7 +242,7 @@ void Tab::draw(gcn::Graphics *graphics)
             if (skin1)
             {
                 const int padding = skin1->getPadding();
-                DRAW_IMAGE(g, mImage, padding, padding);
+                g->drawImage2(mImage, padding, padding);
             }
         }
     }

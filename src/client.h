@@ -2,7 +2,7 @@
  *  The ManaPlus Client
  *  Copyright (C) 2004-2009  The Mana World Development Team
  *  Copyright (C) 2009-2010  The Mana Developers
- *  Copyright (C) 2011-2013  The ManaPlus Developers
+ *  Copyright (C) 2011-2014  The ManaPlus Developers
  *
  *  This file is part of The ManaPlus Client.
  *
@@ -365,6 +365,8 @@ private:
     void accountLogin(LoginData *const data) const;
 
     void storeSafeParameters() const;
+
+    void backupConfig() const;
 
     void gameClear();
 

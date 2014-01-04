@@ -2,7 +2,7 @@
  *  The ManaPlus Client
  *  Copyright (C) 2008-2009  The Mana World Development Team
  *  Copyright (C) 2009-2010  The Mana Developers
- *  Copyright (C) 2011-2013  The ManaPlus Developers
+ *  Copyright (C) 2011-2014  The ManaPlus Developers
  *
  *  This file is part of The ManaPlus Client.
  *
@@ -62,6 +62,7 @@
 #include "net/guildhandler.h"
 #include "net/net.h"
 #include "net/partyhandler.h"
+#include "net/pethandler.h"
 #include "net/tradehandler.h"
 
 #ifdef DEBUG_DUMP_LEAKS1
@@ -723,6 +724,11 @@ impHandler1(emote)
         player_node->emote(static_cast<uint8_t>(atoi(args.c_str())));
 }
 
+impHandler1(emotePet)
+{
+    Net::getPetHandler()->emote(static_cast<uint8_t>(atoi(args.c_str())));
+}
+
 impHandler1(away)
 {
     if (player_node)
@@ -1250,6 +1256,15 @@ impHandler0(createItems)
 impHandler1(talkRaw)
 {
     Net::getChatHandler()->talkRaw(args);
+}
+
+impHandler1(talkPet)
+{
+    // in future probably need add channel detection
+    if (player_node->getPet())
+        Net::getChatHandler()->talkPet(args, GENERAL_CHANNEL);
+    else
+        Net::getChatHandler()->talk(args, GENERAL_CHANNEL);
 }
 
 impHandler0(testsdlfont)

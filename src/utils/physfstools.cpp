@@ -1,6 +1,6 @@
 /*
  *  The ManaPlus Client
- *  Copyright (C) 2013  The ManaPlus Developers
+ *  Copyright (C) 2013-2014  The ManaPlus Developers
  *
  *  This file is part of The ManaPlus Client.
  *
@@ -33,13 +33,17 @@ const char *dirSeparator = nullptr;
 
 namespace PhysFs
 {
+#if defined(__native_client__)
     void init(const char *const name)
     {
-#if defined(__native_client__)
         if (!PHYSFS_init("/fakebinary"))
 #elif defined(ANDROID)
+    void init(const char *const name A_UNUSED)
+    {
         if (!PHYSFS_init((getRealPath(".").append("/fakebinary")).c_str()))
 #else
+    void init(const char *const name)
+    {
         if (!PHYSFS_init(name))
 #endif
         {

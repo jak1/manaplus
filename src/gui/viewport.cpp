@@ -2,7 +2,7 @@
  *  The ManaPlus Client
  *  Copyright (C) 2004-2009  The Mana World Development Team
  *  Copyright (C) 2009-2010  The Mana Developers
- *  Copyright (C) 2011-2013  The ManaPlus Developers
+ *  Copyright (C) 2011-2014  The ManaPlus Developers
  *
  *  This file is part of The ManaPlus Client.
  *
@@ -849,7 +849,8 @@ void Viewport::mouseMoved(gcn::MouseEvent &event A_UNUSED)
 
     mHoverBeing = actorManager->findBeingByPixel(x, y, true);
     if (mHoverBeing && (mHoverBeing->getType() == Being::PLAYER
-        || mHoverBeing->getType() == Being::NPC))
+        || mHoverBeing->getType() == Being::NPC
+        || mHoverBeing->getType() == Being::PET))
     {
         mTextPopup->setVisible(false);
         if (mShowBeingPopup)

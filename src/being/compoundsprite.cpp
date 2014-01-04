@@ -1,7 +1,7 @@
 /*
  *  The ManaPlus Client
  *  Copyright (C) 2010  The Mana Developers
- *  Copyright (C) 2011-2013  The ManaPlus Developers
+ *  Copyright (C) 2011-2014  The ManaPlus Developers
  *
  *  This file is part of The ManaPlus Client.
  *
@@ -123,12 +123,12 @@ void CompoundSprite::draw(Graphics *const graphics,
 
     if (mAlpha == 1.0F && mImage)
     {
-        DRAW_IMAGE(graphics, mImage, posX + mOffsetX, posY + mOffsetY);
+        graphics->drawImage2(mImage, posX + mOffsetX, posY + mOffsetY);
     }
     else if (mAlpha && mAlphaImage)
     {
         mAlphaImage->setAlpha(mAlpha);
-        DRAW_IMAGE(graphics, mAlphaImage,
+        graphics->drawImage2(mAlphaImage,
             posX + mOffsetX, posY + mOffsetY);
     }
     else

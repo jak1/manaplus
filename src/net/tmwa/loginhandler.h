@@ -2,7 +2,7 @@
  *  The ManaPlus Client
  *  Copyright (C) 2004-2009  The Mana World Development Team
  *  Copyright (C) 2009-2010  The Mana Developers
- *  Copyright (C) 2011-2013  The ManaPlus Developers
+ *  Copyright (C) 2011-2014  The ManaPlus Developers
  *
  *  This file is part of The ManaPlus Client.
  *
@@ -54,9 +54,9 @@ class LoginHandler final : public MessageHandler, public Ea::LoginHandler
         unsigned int getMaxPasswordLength() const override final A_WARN_UNUSED
         { return 24; }
 
-        void changePassword(const std::string &username,
-                            const std::string &oldPassword,
-                            const std::string &newPassword)
+        void changePassword(const std::string &restrict username,
+                            const std::string &restrict oldPassword,
+                            const std::string &restrict newPassword)
                             const override final;
 
         ServerInfo *getCharServer() const override final A_WARN_UNUSED;
@@ -68,9 +68,10 @@ class LoginHandler final : public MessageHandler, public Ea::LoginHandler
         void processUpdateHost2(Net::MessageIn &msg) const;
 
     private:
-        void sendLoginRegister(const std::string &username,
-                               const std::string &password,
-                               const std::string &email) const override final;
+        void sendLoginRegister(const std::string &restrict username,
+                               const std::string &restrict password,
+                               const std::string &restrict email)
+                               const override final;
 };
 
 }  // namespace TmwAthena

@@ -1,7 +1,7 @@
 /*
  *  The ManaPlus Client
  *  Copyright (C) 2009-2010  The Mana Developers
- *  Copyright (C) 2011-2013  The ManaPlus Developers
+ *  Copyright (C) 2011-2014  The ManaPlus Developers
  *
  *  This file is part of The ManaPlus Client.
  *
@@ -53,8 +53,8 @@ class GuildHandler final : public Ea::GuildHandler, public MessageHandler
 
         void leave(const int guildId) const override final;
 
-        void kick(const GuildMember *const member,
-                  const std::string &reason) const override final;
+        void kick(const GuildMember *restrict const member,
+                  const std::string &restrict reason) const override final;
 
         void chat(const int guildId,
                   const std::string &text) const override final;
@@ -66,8 +66,10 @@ class GuildHandler final : public Ea::GuildHandler, public MessageHandler
         void changeMemberPostion(const GuildMember *const member,
                                  const int level) const override final;
 
-        void changeNotice(const int guildId, const std::string &msg1,
-                          const std::string &msg2) const override final;
+        void changeNotice(const int guildId,
+                          const std::string &restrict msg1,
+                          const std::string &restrict msg2)
+                          const override final;
 };
 
     extern Ea::GuildTab *guildTab;

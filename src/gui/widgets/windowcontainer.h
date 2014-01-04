@@ -2,7 +2,7 @@
  *  The ManaPlus Client
  *  Copyright (C) 2004-2009  The Mana World Development Team
  *  Copyright (C) 2009-2010  The Mana Developers
- *  Copyright (C) 2011-2013  The ManaPlus Developers
+ *  Copyright (C) 2011-2014  The ManaPlus Developers
  *
  *  This file is part of The ManaPlus Client.
  *
@@ -52,6 +52,9 @@ class WindowContainer : public Container
          */
         void adjustAfterResize(const int oldScreenWidth,
                                const int oldScreenHeight);
+
+        void moveWidgetAfter(gcn::Widget *const before,
+                             gcn::Widget *const widget);
 
 #ifdef USE_PROFILER
         void draw(gcn::Graphics* graphics);

@@ -2,7 +2,7 @@
  *  The ManaPlus Client
  *  Copyright (C) 2009  The Mana World Development Team
  *  Copyright (C) 2009-2010  The Mana Developers
- *  Copyright (C) 2011-2013  The ManaPlus Developers
+ *  Copyright (C) 2011-2014  The ManaPlus Developers
  *
  *  This file is part of The ManaPlus Client.
  *
@@ -37,8 +37,8 @@ class GuildChatTab final : public ChatTab, public ConfigListener
 
         ~GuildChatTab();
 
-        bool handleCommand(const std::string &type,
-                           const std::string &args) override final;
+        bool handleCommand(const std::string &restrict type,
+                           const std::string &restrict args) override final;
 
         void showHelp() override;
 

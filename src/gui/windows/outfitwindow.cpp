@@ -2,7 +2,7 @@
  *  The ManaPlus Client
  *  Copyright (C) 2007-2009  The Mana World Development Team
  *  Copyright (C) 2009-2010  The Mana Developers
- *  Copyright (C) 2011-2013  The ManaPlus Developers
+ *  Copyright (C) 2011-2014  The ManaPlus Developers
  *
  *  This file is part of The ManaPlus Client.
  *
@@ -348,7 +348,7 @@ void OutfitWindow::draw(gcn::Graphics *graphics)
                 const Image *const image = item->getImage();
                 if (image)
                 {
-                    DRAW_IMAGE(g, image, itemX, itemY);
+                    g->drawImage2(image, itemX, itemY);
                     foundItem = true;
                 }
             }
@@ -359,7 +359,7 @@ void OutfitWindow::draw(gcn::Graphics *graphics)
                 mItemColors[mCurrentOutfit][i]);
             if (image)
             {
-                DRAW_IMAGE(g, image, itemX, itemY);
+                g->drawImage2(image, itemX, itemY);
                 image->decRef();
             }
         }

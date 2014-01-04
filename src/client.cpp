@@ -2,7 +2,7 @@
  *  The ManaPlus Client
  *  Copyright (C) 2004-2009  The Mana World Development Team
  *  Copyright (C) 2009-2010  The Mana Developers
- *  Copyright (C) 2011-2013  The ManaPlus Developers
+ *  Copyright (C) 2011-2014  The ManaPlus Developers
  *
  *  This file is part of The ManaPlus Client.
  *
@@ -110,6 +110,7 @@
 #include "utils/files.h"
 #include "utils/fuzzer.h"
 #include "utils/gettext.h"
+#include "utils/files.h"
 #include "utils/mkdir.h"
 #include "utils/paths.h"
 #include "utils/physfstools.h"
@@ -297,6 +298,7 @@ void Client::gameInit()
 #ifdef USE_FUZZER
     Fuzzer::init();
 #endif
+    backupConfig();
     initConfiguration();
     paths.setDefaultValues(getPathsDefaults());
     initFeatures();
@@ -353,6 +355,10 @@ void Client::gameInit()
 #endif
     SDL_EventState(SDL_SYSWMEVENT, SDL_IGNORE);
     SDL_EventState(SDL_USEREVENT, SDL_IGNORE);
+
+#ifdef WIN32
+    setIcon();
+#endif
 
     initGraphics();
     extractDataDir();
@@ -584,7 +590,9 @@ void Client::initTitle()
     }
 
     SDL::SetWindowTitle(mainGraphics->getWindow(), mCaption.c_str());
+#ifndef WIN32
     setIcon();
+#endif
 }
 
 #ifdef ANDROID
@@ -1292,11 +1300,11 @@ int Client::gameExec()
                 case STATE_LOGIN_ATTEMPT:
                     BLOCK_START("Client::gameExec STATE_LOGIN_ATTEMPT")
                     logger->log1("State: LOGIN ATTEMPT");
-                    accountLogin(&loginData);
                     mCurrentDialog = new ConnectionDialog(
                         // TRANSLATORS: connection dialog header
                         _("Logging in"), STATE_SWITCH_SERVER);
                     mCurrentDialog->postInit();
+                    accountLogin(&loginData);
                     BLOCK_END("Client::gameExec STATE_LOGIN_ATTEMPT")
                     break;
 
@@ -1457,12 +1465,12 @@ int Client::gameExec()
                 case STATE_GET_CHARACTERS:
                     BLOCK_START("Client::gameExec STATE_GET_CHARACTERS")
                     logger->log1("State: GET CHARACTERS");
-                    Net::getCharServerHandler()->requestCharacters();
                     mCurrentDialog = new ConnectionDialog(
                         // TRANSLATORS: connection dialog header
                         _("Requesting characters"),
                         STATE_SWITCH_SERVER);
                     mCurrentDialog->postInit();
+                    Net::getCharServerHandler()->requestCharacters();
                     BLOCK_END("Client::gameExec STATE_GET_CHARACTERS")
                     break;
 
@@ -1497,27 +1505,25 @@ int Client::gameExec()
                 case STATE_CONNECT_GAME:
                     BLOCK_START("Client::gameExec STATE_CONNECT_GAME")
                     logger->log1("State: CONNECT GAME");
-
-                    Net::getGameHandler()->connect();
                     mCurrentDialog = new ConnectionDialog(
                         // TRANSLATORS: connection dialog header
                         _("Connecting to the game server"),
                         Net::getNetworkType() != ServerInfo::MANASERV ?
                         STATE_CHOOSE_SERVER : STATE_SWITCH_CHARACTER);
                     mCurrentDialog->postInit();
+                    Net::getGameHandler()->connect();
                     BLOCK_END("Client::gameExec STATE_CONNECT_GAME")
                     break;
 
                 case STATE_CHANGE_MAP:
                     BLOCK_START("Client::gameExec STATE_CHANGE_MAP")
                     logger->log1("State: CHANGE_MAP");
-
-                    Net::getGameHandler()->connect();
                     mCurrentDialog = new ConnectionDialog(
                         // TRANSLATORS: connection dialog header
                         _("Changing game servers"),
                         STATE_SWITCH_CHARACTER);
                     mCurrentDialog->postInit();
+                    Net::getGameHandler()->connect();
                     BLOCK_END("Client::gameExec STATE_CHANGE_MAP")
                     break;
 
@@ -1596,11 +1602,11 @@ int Client::gameExec()
                 case STATE_REGISTER_PREP:
                     BLOCK_START("Client::gameExec STATE_REGISTER_PREP")
                     logger->log1("State: REGISTER_PREP");
-                    Net::getLoginHandler()->getRegistrationDetails();
                     mCurrentDialog = new ConnectionDialog(
                         // TRANSLATORS: connection dialog header
                         _("Requesting registration details"), STATE_LOGIN);
                     mCurrentDialog->postInit();
+                    Net::getLoginHandler()->getRegistrationDetails();
                     BLOCK_END("Client::gameExec STATE_REGISTER_PREP")
                     break;
 
@@ -1705,6 +1711,7 @@ int Client::gameExec()
                     Net::getGameHandler()->disconnect();
                     Net::getGameHandler()->clear();
                     mServerName.clear();
+                    serverConfig.write();
                     serverConfig.unload();
 
                     mState = STATE_CHOOSE_SERVER;
@@ -2142,6 +2149,22 @@ void Client::initConfiguration() const
         config.setDefaultValues(getConfigDefaults());
         logger->log("configPath: " + configPath);
     }
+}
+
+void Client::backupConfig() const
+{
+    const std::string confName = mConfigDir + "/config.xml.bak";
+    const int maxFileIndex = 5;
+    ::remove((confName + toString(maxFileIndex)).c_str());
+    for (int f = maxFileIndex; f > 1; f --)
+    {
+        const std::string fileName1 = confName + toString(f - 1);
+        const std::string fileName2 = confName + toString(f);
+        Files::renameFile(fileName1, fileName2);
+    }
+    const std::string fileName3 = mConfigDir + "/config.xml";
+    const std::string fileName4 = confName + toString(1);
+    Files::copyFile(fileName3, fileName4);
 }
 
 /**
@@ -2948,6 +2971,8 @@ void Client::setIcon()
     // Attempt to load icon from .ico file
     HICON icon = (HICON) LoadImage(nullptr, iconFile.c_str(),
         IMAGE_ICON, 64, 64, LR_LOADFROMFILE);
+    if (!icon)
+        logger->log("icon load error");
     // If it's failing, we load the default resource file.
     if (!icon)
         icon = LoadIcon(GetModuleHandle(nullptr), "A");

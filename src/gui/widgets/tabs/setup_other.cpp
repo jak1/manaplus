@@ -2,7 +2,7 @@
  *  The ManaPlus Client
  *  Copyright (C) 2009  The Mana World Development Team
  *  Copyright (C) 2009-2010  Andrei Karas
- *  Copyright (C) 2011-2013  The ManaPlus Developers
+ *  Copyright (C) 2011-2014  The ManaPlus Developers
  *
  *  This file is part of The ManaPlus Client.
  *
@@ -242,6 +242,10 @@ Setup_Other::Setup_Other(const Widget2 *const widget) :
     // TRANSLATORS: settings option
     new SetupItemCheckBox(_("Enable advert protocol"), "",
         "enableAdvert", this, "enableAdvertEvent");
+
+    // TRANSLATORS: settings option
+    new SetupItemCheckBox(_("Enabled pets support"),
+        "", "usepets", this, "usepetsEvent");
 
     new SetupItemCheckBox(_("Enable weight notifications"), "",
         "weightMsg", this, "weightMsgEvent");

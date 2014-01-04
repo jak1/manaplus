@@ -2,7 +2,7 @@
  *  The ManaPlus Client
  *  Copyright (C) 2004-2009  The Mana World Development Team
  *  Copyright (C) 2009-2010  The Mana Developers
- *  Copyright (C) 2011-2013  The ManaPlus Developers
+ *  Copyright (C) 2011-2014  The ManaPlus Developers
  *
  *  This file is part of The ManaPlus Client.
  *
@@ -81,12 +81,9 @@ SDLGraphics::~SDLGraphics()
 }
 
 bool SDLGraphics::drawRescaledImage(const Image *const image,
-                                    int srcX, int srcY,
                                     int dstX, int dstY,
-                                    const int width, const int height,
                                     const int desiredWidth,
-                                    const int desiredHeight,
-                                    const bool useColor A_UNUSED)
+                                    const int desiredHeight)
 {
     FUNC_BLOCK("Graphics::drawRescaledImage", 1)
     // Check that preconditions for blitting are met.
@@ -99,10 +96,10 @@ bool SDLGraphics::drawRescaledImage(const Image *const image,
     const SDL_Rect &bounds = image->mBounds;
     const SDL_Rect srcRect =
     {
-        static_cast<int32_t>(srcX + bounds.x),
-        static_cast<int32_t>(srcY + bounds.y),
-        static_cast<int32_t>(width),
-        static_cast<int32_t>(height)
+        static_cast<int32_t>(bounds.x),
+        static_cast<int32_t>(bounds.y),
+        static_cast<int32_t>(bounds.w),
+        static_cast<int32_t>(bounds.h)
     };
     const SDL_Rect dstRect =
     {
@@ -116,9 +113,14 @@ bool SDLGraphics::drawRescaledImage(const Image *const image,
         &srcRect, &dstRect) < 0);
 }
 
-bool SDLGraphics::drawImage2(const Image *const image, int srcX, int srcY,
-                             int dstX, int dstY, const int width,
-                             const int height, const bool useColor A_UNUSED)
+bool SDLGraphics::drawImage2(const Image *const image,
+                             int dstX, int dstY)
+{
+    return drawImageInline(image, dstX, dstY);
+}
+
+bool SDLGraphics::drawImageInline(const Image *const image,
+                                  int dstX, int dstY)
 {
     FUNC_BLOCK("Graphics::drawImage2", 1)
     // Check that preconditions for blitting are met.
@@ -132,28 +134,60 @@ bool SDLGraphics::drawImage2(const Image *const image, int srcX, int srcY,
     const SDL_Rect &bounds = image->mBounds;
     const SDL_Rect srcRect =
     {
-        static_cast<int32_t>(srcX + bounds.x),
-        static_cast<int32_t>(srcY + bounds.y),
-        static_cast<int32_t>(width),
-        static_cast<int32_t>(height)
+        static_cast<int32_t>(bounds.x),
+        static_cast<int32_t>(bounds.y),
+        static_cast<int32_t>(bounds.w),
+        static_cast<int32_t>(bounds.h)
     };
 
     const SDL_Rect dstRect =
     {
         static_cast<int32_t>(dstX + top.xOffset),
         static_cast<int32_t>(dstY + top.yOffset),
-        static_cast<int32_t>(width),
-        static_cast<int32_t>(height)
+        static_cast<int32_t>(bounds.w),
+        static_cast<int32_t>(bounds.h)
     };
 
     return !MSDL_RenderCopy(mRenderer, image->mTexture, &srcRect, &dstRect);
 }
 
-void SDLGraphics::drawImagePattern(const Image *const image,
-                                   const int x, const int y,
-                                   const int w, const int h)
+void SDLGraphics::drawImageCached(const Image *const image,
+                                  int x, int y)
 {
-    FUNC_BLOCK("Graphics::drawImagePattern", 1)
+    FUNC_BLOCK("Graphics::drawImageCached", 1)
+    // Check that preconditions for blitting are met.
+    if (!mWindow || !image || !image->mTexture)
+        return;
+
+    const gcn::ClipRectangle &top = mClipStack.top();
+    if (!top.width || !top.height)
+        return;
+
+    const SDL_Rect &bounds = image->mBounds;
+    const SDL_Rect srcRect =
+    {
+        static_cast<int32_t>(bounds.x),
+        static_cast<int32_t>(bounds.y),
+        static_cast<int32_t>(bounds.w),
+        static_cast<int32_t>(bounds.h)
+    };
+
+    const SDL_Rect dstRect =
+    {
+        static_cast<int32_t>(x + top.xOffset),
+        static_cast<int32_t>(y + top.yOffset),
+        static_cast<int32_t>(bounds.w),
+        static_cast<int32_t>(bounds.h)
+    };
+
+    MSDL_RenderCopy(mRenderer, image->mTexture, &srcRect, &dstRect);
+}
+
+void SDLGraphics::drawPatternCached(const Image *const image,
+                                    const int x, const int y,
+                                    const int w, const int h)
+{
+    FUNC_BLOCK("Graphics::drawPatternCached", 1)
     // Check that preconditions for blitting are met.
     if (!mWindow || !image)
         return;
@@ -196,11 +230,69 @@ void SDLGraphics::drawImagePattern(const Image *const image,
     }
 }
 
-void SDLGraphics::drawRescaledImagePattern(const Image *const image,
-                                           const int x, const int y,
-                                           const int w, const int h,
-                                           const int scaledWidth,
-                                           const int scaledHeight)
+void SDLGraphics::completeCache()
+{
+}
+
+void SDLGraphics::drawPattern(const Image *const image,
+                              const int x, const int y,
+                              const int w, const int h)
+{
+    drawPatternInline(image, x, y, w, h);
+}
+
+void SDLGraphics::drawPatternInline(const Image *const image,
+                                    const int x, const int y,
+                                    const int w, const int h)
+{
+    FUNC_BLOCK("Graphics::drawPattern", 1)
+    // Check that preconditions for blitting are met.
+    if (!mWindow || !image)
+        return;
+    if (!image->mTexture)
+        return;
+
+    const gcn::ClipRectangle &top = mClipStack.top();
+    if (!top.width || !top.height)
+        return;
+
+    const SDL_Rect &bounds = image->mBounds;
+    const int iw = bounds.w;
+    const int ih = bounds.h;
+    if (iw == 0 || ih == 0)
+        return;
+
+    const int xOffset = top.xOffset + x;
+    const int yOffset = top.yOffset + y;
+
+    SDL_Rect dstRect;
+    SDL_Rect srcRect;
+    srcRect.x = static_cast<int32_t>(bounds.x);
+    srcRect.y = static_cast<int32_t>(bounds.y);
+    for (int py = 0; py < h; py += ih)
+    {
+        const int dh = (py + ih >= h) ? h - py : ih;
+        dstRect.y = static_cast<int32_t>(py + yOffset);
+        srcRect.h = static_cast<int32_t>(dh);
+        dstRect.h = static_cast<int32_t>(dh);
+
+        for (int px = 0; px < w; px += iw)
+        {
+            const int dw = (px + iw >= w) ? w - px : iw;
+            dstRect.x = static_cast<int32_t>(px + xOffset);
+            srcRect.w = static_cast<int32_t>(dw);
+            dstRect.w = static_cast<int32_t>(dw);
+
+            MSDL_RenderCopy(mRenderer, image->mTexture, &srcRect, &dstRect);
+        }
+    }
+}
+
+void SDLGraphics::drawRescaledPattern(const Image *const image,
+                                      const int x, const int y,
+                                      const int w, const int h,
+                                      const int scaledWidth,
+                                      const int scaledHeight)
 {
     // Check that preconditions for blitting are met.
     if (!mWindow || !image)
@@ -254,10 +346,18 @@ void SDLGraphics::drawRescaledImagePattern(const Image *const image,
     delete tmpImage;
 }
 
-void SDLGraphics::calcImagePattern(ImageVertexes* const vert,
-                                   const Image *const image,
-                                   const int x, const int y,
-                                   const int w, const int h) const
+void SDLGraphics::calcPattern(ImageVertexes* const vert,
+                              const Image *const image,
+                              const int x, const int y,
+                              const int w, const int h) const
+{
+    calcPatternInline(vert, image, x, y, w, h);
+}
+
+void SDLGraphics::calcPatternInline(ImageVertexes* const vert,
+                                    const Image *const image,
+                                    const int x, const int y,
+                                    const int w, const int h) const
 {
     // Check that preconditions for blitting are met.
     if (!vert || !mWindow || !image || !image->mTexture)
@@ -304,10 +404,10 @@ void SDLGraphics::calcImagePattern(ImageVertexes* const vert,
     }
 }
 
-void SDLGraphics::calcImagePattern(ImageCollection* const vertCol,
-                                   const Image *const image,
-                                   const int x, const int y,
-                                   const int w, const int h) const
+void SDLGraphics::calcPattern(ImageCollection* const vertCol,
+                              const Image *const image,
+                              const int x, const int y,
+                              const int w, const int h) const
 {
     ImageVertexes *vert = nullptr;
     if (vertCol->currentImage != image)
@@ -323,12 +423,20 @@ void SDLGraphics::calcImagePattern(ImageCollection* const vertCol,
         vert = vertCol->currentVert;
     }
 
-    calcImagePattern(vert, image, x, y, w, h);
+    calcPatternInline(vert, image, x, y, w, h);
 }
 
 void SDLGraphics::calcTileVertexes(ImageVertexes *const vert,
                                    const Image *const image,
                                    int x, int y) const
+{
+    vert->image = image;
+    calcTileSDL(vert, x, y);
+}
+
+void SDLGraphics::calcTileVertexesInline(ImageVertexes *const vert,
+                                         const Image *const image,
+                                         int x, int y) const
 {
     vert->image = image;
     calcTileSDL(vert, x, y);
@@ -464,7 +572,7 @@ bool SDLGraphics::drawNet(const int x1, const int y1,
     return true;
 }
 
-bool SDLGraphics::calcWindow(ImageCollection *const vertCol,
+void SDLGraphics::calcWindow(ImageCollection *const vertCol,
                              const int x, const int y,
                              const int w, const int h,
                              const ImageRect &imgRect)
@@ -483,12 +591,7 @@ bool SDLGraphics::calcWindow(ImageCollection *const vertCol,
     {
         vert = vertCol->currentVert;
     }
-
-    const Image *const *const grid = &imgRect.grid[0];
-    return calcImageRect(vert, x, y, w, h,
-        grid[0], grid[2], grid[6], grid[8],
-        grid[1], grid[5], grid[7], grid[3],
-        grid[4]);
+    calcImageRect(vert, x, y, w, h, imgRect);
 }
 
 void SDLGraphics::fillRectangle(const gcn::Rectangle &rectangle)
@@ -638,6 +741,21 @@ bool SDLGraphics::setVideoMode(const int w, const int h, const int bpp,
     mRenderer = graphicsManager.createRenderer(mWindow, mRendererFlags);
     SDLImageHelper::setRenderer(mRenderer);
     return videoInfo();
+}
+
+void SDLGraphics::drawImageRect(const int x, const int y,
+                                const int w, const int h,
+                                const ImageRect &imgRect)
+{
+    #include "render/graphics_drawImageRect.hpp"
+}
+
+void SDLGraphics::calcImageRect(ImageVertexes *const vert,
+                                const int x, const int y,
+                                const int w, const int h,
+                                const ImageRect &imgRect)
+{
+    #include "render/graphics_calcImageRect.hpp"
 }
 
 #endif  // USE_SDL2

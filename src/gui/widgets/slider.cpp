@@ -2,7 +2,7 @@
  *  The ManaPlus Client
  *  Copyright (C) 2004-2009  The Mana World Development Team
  *  Copyright (C) 2009-2010  The Mana Developers
- *  Copyright (C) 2011-2013  The ManaPlus Developers
+ *  Copyright (C) 2011-2014  The ManaPlus Developers
  *
  *  This file is part of The ManaPlus Client.
  *
@@ -156,7 +156,7 @@ void Slider::draw(gcn::Graphics *graphics)
                 if (buttons[0].grid[HMID])
                 {
                     const Image *const hMid = buttons[0].grid[HMID];
-                    g->calcImagePattern(mVertexes, hMid, x, y,
+                    g->calcPattern(mVertexes, hMid, x, y,
                         w, hMid->getHeight());
                 }
 
@@ -184,7 +184,7 @@ void Slider::draw(gcn::Graphics *graphics)
                 if (buttons[1].grid[HMID])
                 {
                     const Image *const hMid = buttons[1].grid[HMID];
-                    g->calcImagePattern(mVertexes, hMid, x, y,
+                    g->calcPattern(mVertexes, hMid, x, y,
                         w, hMid->getHeight());
                 }
 
@@ -209,7 +209,7 @@ void Slider::draw(gcn::Graphics *graphics)
     {
         if (!mHasMouse)
         {
-            DRAW_IMAGE(g, buttons[0].grid[HSTART], x, y);
+            g->drawImage2(buttons[0].grid[HSTART], x, y);
             const int width = buttons[0].grid[HSTART]->getWidth();
             w -= width + buttons[0].grid[HEND]->getWidth();
             x += width;
@@ -217,22 +217,22 @@ void Slider::draw(gcn::Graphics *graphics)
             if (buttons[0].grid[HMID])
             {
                 const Image *const hMid = buttons[0].grid[HMID];
-                g->drawImagePattern(hMid, x, y, w, hMid->getHeight());
+                g->drawPattern(hMid, x, y, w, hMid->getHeight());
             }
 
             x += w;
-            DRAW_IMAGE(g, buttons[0].grid[HEND], x, y);
+            g->drawImage2(buttons[0].grid[HEND], x, y);
 
             const Image *const img = buttons[0].grid[HGRIP];
             if (img)
             {
-                DRAW_IMAGE(g, img, getMarkerPosition(),
+                g->drawImage2(img, getMarkerPosition(),
                     (mDimension.height - img->getHeight()) / 2);
             }
         }
         else
         {
-            DRAW_IMAGE(g, buttons[1].grid[HSTART], x, y);
+            g->drawImage2(buttons[1].grid[HSTART], x, y);
 
             const int width = buttons[1].grid[HSTART]->getWidth();
             w -= width;
@@ -243,17 +243,17 @@ void Slider::draw(gcn::Graphics *graphics)
             if (buttons[1].grid[HMID])
             {
                 const Image *const hMid = buttons[1].grid[HMID];
-                g->drawImagePattern(hMid, x, y, w, hMid->getHeight());
+                g->drawPattern(hMid, x, y, w, hMid->getHeight());
             }
 
             x += w;
             if (buttons[1].grid[HEND])
-                DRAW_IMAGE(g, buttons[1].grid[HEND], x, y);
+                g->drawImage2(buttons[1].grid[HEND], x, y);
 
             const Image *const img = buttons[1].grid[HGRIP];
             if (img)
             {
-                DRAW_IMAGE(g, img, getMarkerPosition(),
+                g->drawImage2(img, getMarkerPosition(),
                     (mDimension.height - img->getHeight()) / 2);
             }
         }

@@ -2,7 +2,7 @@
  *  The ManaPlus Client
  *  Copyright (C) 2009  The Mana World Development Team
  *  Copyright (C) 2009-2010  The Mana Developers
- *  Copyright (C) 2011-2013  The ManaPlus Developers
+ *  Copyright (C) 2011-2014  The ManaPlus Developers
  *
  *  This file is part of The ManaPlus Client.
  *
@@ -88,9 +88,10 @@ class LoginHandler
 
         virtual void changeEmail(const std::string &email) const = 0;
 
-        virtual void changePassword(const std::string &username,
-                                    const std::string &oldPassword,
-                                    const std::string &newPassword) const = 0;
+        virtual void changePassword(const std::string &restrict username,
+                                    const std::string &restrict oldPassword,
+                                    const std::string &restrict newPassword)
+                                    const = 0;
 
         virtual void chooseServer(unsigned int server) const = 0;
 

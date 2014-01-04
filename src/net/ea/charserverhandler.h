@@ -2,7 +2,7 @@
  *  The ManaPlus Client
  *  Copyright (C) 2004-2009  The Mana World Development Team
  *  Copyright (C) 2009-2010  The Mana Developers
- *  Copyright (C) 2011-2013  The ManaPlus Developers
+ *  Copyright (C) 2011-2014  The ManaPlus Developers
  *
  *  This file is part of The ManaPlus Client.
  *
@@ -72,13 +72,14 @@ class CharServerHandler : public Net::CharServerHandler
 
         virtual void processCharDeleteFailed(Net::MessageIn &msg);
 
-        virtual void processCharMapInfo(Net::MessageIn &msg,
-                                        Network *const network,
-                                        ServerInfo &mapServer);
+        virtual void processCharMapInfo(Net::MessageIn &restrict msg,
+                                        Network *restrict const network,
+                                        ServerInfo &restrict mapServer);
 
-        virtual void processChangeMapServer(Net::MessageIn &msg,
-                                            Network *const network,
-                                            ServerInfo &mapServer) const;
+        virtual void processChangeMapServer(Net::MessageIn &restrict msg,
+                                            Network *restrict const network,
+                                            ServerInfo &restrict mapServer)
+                                            const;
 
         virtual void clear() override final;
 

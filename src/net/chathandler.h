@@ -2,7 +2,7 @@
  *  The ManaPlus Client
  *  Copyright (C) 2009  The Mana World Development Team
  *  Copyright (C) 2009-2010  The Mana Developers
- *  Copyright (C) 2011-2013  The ManaPlus Developers
+ *  Copyright (C) 2011-2014  The ManaPlus Developers
  *
  *  This file is part of The ManaPlus Client.
  *
@@ -26,6 +26,8 @@
 #include <iosfwd>
 #include <string>
 
+#include "localconsts.h"
+
 namespace Net
 {
 class ChatHandler
@@ -34,16 +36,19 @@ class ChatHandler
         virtual ~ChatHandler()
         { }
 
-        virtual void talk(const std::string &text,
-                          const std::string &channel) const = 0;
+        virtual void talk(const std::string &restrict text,
+                          const std::string &restrict channel) const = 0;
+
+        virtual void talkPet(const std::string &restrict text,
+                             const std::string &restrict channel) const = 0;
 
         virtual void talkRaw(const std::string &text) const = 0;
 
-        virtual void me(const std::string &text,
-                        const std::string &channel) const = 0;
+        virtual void me(const std::string &restrict text,
+                        const std::string &restrict channel) const = 0;
 
-        virtual void privateMessage(const std::string &recipient,
-                                    const std::string &text) = 0;
+        virtual void privateMessage(const std::string &restrict recipient,
+                                    const std::string &restrict text) = 0;
 
         virtual void who() const = 0;
 

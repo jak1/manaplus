@@ -2,7 +2,7 @@
  *  The ManaPlus Client
  *  Copyright (C) 2009  The Mana World Development Team
  *  Copyright (C) 2009-2010  The Mana Developers
- *  Copyright (C) 2011-2013  The ManaPlus Developers
+ *  Copyright (C) 2011-2014  The ManaPlus Developers
  *
  *  This file is part of The ManaPlus Client.
  *
@@ -48,6 +48,7 @@ Net::GameHandler *gameHandler = nullptr;
 Net::GuildHandler *guildHandler = nullptr;
 Net::NpcHandler *npcHandler = nullptr;
 Net::PartyHandler *partyHandler = nullptr;
+Net::PetHandler *petHandler = nullptr;
 Net::PlayerHandler *playerHandler = nullptr;
 Net::SkillHandler *skillHandler = nullptr;
 Net::TradeHandler *tradeHandler = nullptr;
@@ -102,6 +103,11 @@ Net::NpcHandler *Net::getNpcHandler()
 Net::PartyHandler *Net::getPartyHandler()
 {
     return partyHandler;
+}
+
+Net::PetHandler *Net::getPetHandler()
+{
+    return petHandler;
 }
 
 Net::PlayerHandler *Net::getPlayerHandler()
