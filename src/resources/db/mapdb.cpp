@@ -24,6 +24,8 @@
 #include "configuration.h"
 #include "logger.h"
 
+#include "resources/beingcommon.h"
+
 #include "debug.h"
 
 namespace
@@ -36,8 +38,8 @@ namespace
 
 namespace MapDB
 {
-    void readMap(XmlNodePtr node);
-    void readAtlas(XmlNodePtr node);
+    void readMap(XmlNodePtrConst node);
+    void readAtlas(XmlNodePtrConst node);
 }
 
 void MapDB::load()
@@ -46,7 +48,9 @@ void MapDB::load()
         unload();
 
     loadRemap();
-    loadInfo();
+    loadInfo(paths.getStringValue("mapsFile"));
+    loadInfo(paths.getStringValue("mapsPatchFile"));
+    loadXmlDir("mapsPatchDir", loadInfo);
     mLoaded = true;
 }
 
@@ -55,7 +59,7 @@ void MapDB::loadRemap()
     XML::Document *const doc = new XML::Document(
         paths.getStringValue("mapsRemapFile"));
 
-    const XmlNodePtr root = doc->rootNode();
+    const XmlNodePtrConst root = doc->rootNode();
     if (!root)
     {
         delete doc;
@@ -81,7 +85,7 @@ void MapDB::loadRemap()
     delete doc;
 }
 
-void MapDB::readMap(XmlNodePtr node)
+void MapDB::readMap(XmlNodePtrConst node)
 {
     const std::string map = XML::getProperty(node, "name", "");
     if (map.empty())
@@ -99,7 +103,7 @@ void MapDB::readMap(XmlNodePtr node)
     }
 }
 
-void MapDB::readAtlas(XmlNodePtr node)
+void MapDB::readAtlas(XmlNodePtrConst node)
 {
     const std::string atlas = XML::getProperty(node, "name", "");
     if (atlas.empty())
@@ -125,10 +129,10 @@ void MapDB::readAtlas(XmlNodePtr node)
     }
 }
 
-void MapDB::loadInfo()
+void MapDB::loadInfo(const std::string &fileName)
 {
-    XML::Document *doc = new XML::Document(paths.getStringValue("mapsFile"));
-    const XmlNodePtr root = doc->rootNode();
+    XML::Document *doc = new XML::Document(fileName);
+    const XmlNodePtrConst root = doc->rootNode();
     if (!root)
     {
         delete doc;
@@ -138,9 +142,20 @@ void MapDB::loadInfo()
     for_each_xml_child_node(node, root)
     {
         if (xmlNameEqual(node, "map"))
+        {
             readMap(node);
+        }
         else if (xmlNameEqual(node, "atlas"))
+        {
             readAtlas(node);
+        }
+        else if (xmlNameEqual(node, "include"))
+        {
+            const std::string name = XML::getProperty(node, "name", "");
+            if (!name.empty())
+                loadInfo(name);
+            continue;
+        }
     }
     delete doc;
 }

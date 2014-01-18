@@ -25,6 +25,7 @@
 #include "configuration.h"
 #include "logger.h"
 
+#include "resources/beingcommon.h"
 #include "resources/iteminfo.h"
 
 #include "utils/dtor.h"
@@ -47,13 +48,16 @@ namespace
 extern int serverVersion;
 
 // Forward declarations
-static void loadSpriteRef(ItemInfo *const itemInfo, const XmlNodePtr node);
-static void loadSoundRef(ItemInfo *const itemInfo, const XmlNodePtr node);
+static void loadSpriteRef(ItemInfo *const itemInfo,
+                          const XmlNodePtr node);
+static void loadSoundRef(ItemInfo *const itemInfo,
+                         const XmlNodePtr node);
 static void loadFloorSprite(SpriteDisplay *const display,
-                            const XmlNodePtr node);
+                            const XmlNodePtrConst node);
 static void loadReplaceSprite(ItemInfo *const itemInfo,
                               const XmlNodePtr replaceNode);
-static void loadOrderSprite(ItemInfo *const itemInfo, const XmlNodePtr node,
+static void loadOrderSprite(ItemInfo *const itemInfo,
+                            const XmlNodePtr node,
                             const bool drawAfter);
 static int parseSpriteName(const std::string &name);
 static int parseDirectionName(const std::string &name);
@@ -210,12 +214,18 @@ void ItemDB::load()
     mUnknown->setSprite(errFile, GENDER_OTHER, 0);
     mUnknown->addTag(mTags["All"]);
     loadXmlFile(paths.getStringValue("itemsFile"), tagNum);
+    loadXmlFile(paths.getStringValue("itemsPatchFile"), tagNum);
+
+    StringVect list;
+    BeingCommon::getIncludeFiles(paths.getStringValue("itemsPatchDir"), list);
+    FOR_EACH (StringVectCIter, it, list)
+        loadXmlFile(*it, tagNum);
 }
 
 void ItemDB::loadXmlFile(const std::string &fileName, int &tagNum)
 {
     XML::Document doc(fileName);
-    const XmlNodePtr rootNode = doc.rootNode();
+    const XmlNodePtrConst rootNode = doc.rootNode();
 
     if (!rootNode || !xmlNameEqual(rootNode, "items"))
     {
@@ -237,6 +247,7 @@ void ItemDB::loadXmlFile(const std::string &fileName, int &tagNum)
             continue;
 
         const int id = XML::getProperty(node, "id", 0);
+        ItemInfo *itemInfo = nullptr;
 
         if (id == 0)
         {
@@ -247,7 +258,10 @@ void ItemDB::loadXmlFile(const std::string &fileName, int &tagNum)
         else if (mItemInfos.find(id) != mItemInfos.end())
         {
             logger->log("ItemDB: Redefinition of item ID %d", id);
+            itemInfo = mItemInfos[id];
         }
+        if (!itemInfo)
+            itemInfo = new ItemInfo;
 
         const std::string typeStr = XML::getProperty(node, "type", "other");
         const int weight = XML::getProperty(node, "weight", 0);
@@ -310,7 +324,6 @@ void ItemDB::loadXmlFile(const std::string &fileName, int &tagNum)
         else
             display.floor = image;
 
-        ItemInfo *const itemInfo = new ItemInfo;
         itemInfo->setId(id);
         // TRANSLATORS: item info name
         itemInfo->setName(name.empty() ? _("unnamed") : name);
@@ -485,18 +498,7 @@ void ItemDB::loadXmlFile(const std::string &fileName, int &tagNum)
         if (!name.empty())
         {
             temp = normalize(name);
-
-            const NamedItemInfos::const_iterator
-                itr = mNamedItemInfos.find(temp);
-            if (itr == mNamedItemInfos.end())
-            {
-                mNamedItemInfos[temp] = itemInfo;
-            }
-            else
-            {
-                logger->log("ItemDB: Duplicate name of item found item %d",
-                    id);
-            }
+            mNamedItemInfos[temp] = itemInfo;
         }
 
         if (!attackAction.empty())
@@ -758,7 +760,8 @@ void loadSoundRef(ItemInfo *const itemInfo, const XmlNodePtr node)
     }
 }
 
-void loadFloorSprite(SpriteDisplay *const display, const XmlNodePtr floorNode)
+void loadFloorSprite(SpriteDisplay *const display,
+                     const XmlNodePtrConst floorNode)
 {
     for_each_xml_child_node(spriteNode, floorNode)
     {
@@ -779,7 +782,8 @@ void loadFloorSprite(SpriteDisplay *const display, const XmlNodePtr floorNode)
     }
 }
 
-void loadReplaceSprite(ItemInfo *const itemInfo, const XmlNodePtr replaceNode)
+void loadReplaceSprite(ItemInfo *const itemInfo,
+                       const XmlNodePtr replaceNode)
 {
     const std::string removeSprite = XML::getProperty(
         replaceNode, "sprite", "");
@@ -910,7 +914,8 @@ void loadReplaceSprite(ItemInfo *const itemInfo, const XmlNodePtr replaceNode)
     }
 }
 
-void loadOrderSprite(ItemInfo *const itemInfo, const XmlNodePtr node,
+void loadOrderSprite(ItemInfo *const itemInfo,
+                     const XmlNodePtr node,
                      const bool drawAfter)
 {
     const int sprite = parseSpriteName(XML::getProperty(node, "name", ""));

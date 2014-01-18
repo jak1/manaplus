@@ -343,6 +343,8 @@ SET(SRCS
     gui/widgets/tabs/setup_colors.h
     gui/widgets/tabs/setup_joystick.cpp
     gui/widgets/tabs/setup_joystick.h
+    gui/widgets/tabs/setup_mods.cpp
+    gui/widgets/tabs/setup_mods.h
     gui/widgets/tabs/setup_other.cpp
     gui/widgets/tabs/setup_other.h
     gui/widgets/tabs/setup_theme.cpp
@@ -474,8 +476,12 @@ SET(SRCS
     resources/iteminfo.cpp
     resources/db/mapdb.cpp
     resources/db/mapdb.h
+    resources/db/moddb.cpp
+    resources/db/moddb.h
     resources/mapreader.cpp
     resources/mapreader.h
+    resources/modinfo.cpp
+    resources/modinfo.h
     resources/db/monsterdb.cpp
     resources/db/monsterdb.h
     resources/db/npcdb.cpp

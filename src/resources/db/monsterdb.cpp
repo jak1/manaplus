@@ -49,6 +49,9 @@ void MonsterDB::load()
 
     logger->log1("Initializing monster database...");
     loadXmlFile(paths.getStringValue("monstersFile"));
+    loadXmlFile(paths.getStringValue("monstersPatchFile"));
+    loadXmlDir("monstersPatchDir", loadXmlFile);
+
     mLoaded = true;
 }
 
@@ -87,7 +90,15 @@ void MonsterDB::loadXmlFile(const std::string &fileName)
         if (!xmlNameEqual(monsterNode, "monster"))
             continue;
 
-        BeingInfo *const currentInfo = new BeingInfo;
+        const int id = XML::getProperty(monsterNode, "id", 0);
+        BeingInfo *currentInfo = nullptr;
+        if (mMonsterInfos.find(id + offset) != mMonsterInfos.end())
+        {
+            logger->log("MonsterDB: Redefinition of monster ID %d", id);
+            currentInfo = mMonsterInfos[id + offset];
+        }
+        if (!currentInfo)
+            currentInfo = new BeingInfo;
 
         currentInfo->setWalkMask(Map::BLOCKMASK_WALL
             | Map::BLOCKMASK_CHARACTER | Map::BLOCKMASK_MONSTER);
@@ -197,7 +208,7 @@ void MonsterDB::loadXmlFile(const std::string &fileName)
             }
             else if (xmlNameEqual(spriteNode, "attack"))
             {
-                const int id = XML::getProperty(spriteNode, "id", 0);
+                const int attackId = XML::getProperty(spriteNode, "id", 0);
                 const int effectId = XML::getProperty(
                     spriteNode, "effect-id", paths.getIntValue("effectId"));
                 const int hitEffectId = XML::getProperty(spriteNode,
@@ -218,7 +229,7 @@ void MonsterDB::loadXmlFile(const std::string &fileName)
                 const std::string missileParticle = XML::getProperty(
                         spriteNode, "missile-particle", "");
 
-                currentInfo->addAttack(id, spriteAction, skySpriteAction,
+                currentInfo->addAttack(attackId, spriteAction, skySpriteAction,
                     waterSpriteAction, effectId, hitEffectId,
                     criticalHitEffectId, missEffectId, missileParticle);
             }
@@ -233,8 +244,7 @@ void MonsterDB::loadXmlFile(const std::string &fileName)
         }
         currentInfo->setDisplay(display);
 
-        mMonsterInfos[XML::getProperty(
-            monsterNode, "id", 0) + offset] = currentInfo;
+        mMonsterInfos[id + offset] = currentInfo;
     }
 }
 

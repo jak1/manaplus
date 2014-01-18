@@ -48,13 +48,16 @@ void NPCDB::load()
     logger->log1("Initializing NPC database...");
 
     loadXmlFile(paths.getStringValue("npcsFile"));
+    loadXmlFile(paths.getStringValue("npcsPatchFile"));
+    loadXmlDir("npcsPatchDir", loadXmlFile);
+
     mLoaded = true;
 }
 
 void NPCDB::loadXmlFile(const std::string &fileName)
 {
     XML::Document doc(fileName);
-    const XmlNodePtr rootNode = doc.rootNode();
+    const XmlNodePtrConst rootNode = doc.rootNode();
 
     if (!rootNode || !xmlNameEqual(rootNode, "npcs"))
     {
@@ -79,14 +82,20 @@ void NPCDB::loadXmlFile(const std::string &fileName)
             continue;
 
         const int id = XML::getProperty(npcNode, "id", 0);
+        BeingInfo *currentInfo = nullptr;
         if (id == 0)
         {
             logger->log("NPC Database: NPC with missing ID in %s!",
                 paths.getStringValue("npcsFile").c_str());
             continue;
         }
-
-        BeingInfo *const currentInfo = new BeingInfo;
+        else if (mNPCInfos.find(id) != mNPCInfos.end())
+        {
+            logger->log("NpcDB: Redefinition of npc ID %d", id);
+            currentInfo = mNPCInfos[id];
+        }
+        if (!currentInfo)
+            currentInfo = new BeingInfo;
 
         currentInfo->setTargetSelection(XML::getBoolProperty(npcNode,
             "targetSelection", true));

@@ -25,6 +25,8 @@
 
 #include "utils/translation/podict.h"
 
+#include "resources/beingcommon.h"
+
 #include "debug.h"
 
 namespace
@@ -38,9 +40,16 @@ void DeadDB::load()
     if (mLoaded)
         unload();
 
-    XML::Document *doc = new XML::Document(
-        paths.getStringValue("deadMessagesFile"));
-    const XmlNodePtr root = doc->rootNode();
+    loadXmlFile(paths.getStringValue("deadMessagesFile"));
+    loadXmlFile(paths.getStringValue("deadMessagesPatchFile"));
+    loadXmlDir("deadMessagesPatchDir", loadXmlFile);
+    mLoaded = true;
+}
+
+void DeadDB::loadXmlFile(const std::string &fileName)
+{
+    XML::Document *doc = new XML::Document(fileName);
+    const XmlNodePtrConst root = doc->rootNode();
 
     if (!root || !xmlNameEqual(root, "messages"))
     {
@@ -52,7 +61,14 @@ void DeadDB::load()
 
     for_each_xml_child_node(node, root)
     {
-        if (xmlNameEqual(node, "message"))
+        if (xmlNameEqual(node, "include"))
+        {
+            const std::string name = XML::getProperty(node, "name", "");
+            if (!name.empty())
+                loadXmlFile(name);
+            continue;
+        }
+        else if (xmlNameEqual(node, "message"))
         {
             const char *const data = reinterpret_cast<const char*>(
                 xmlNodeGetContent(node));
@@ -63,7 +79,6 @@ void DeadDB::load()
     }
 
     delete doc;
-    mLoaded = true;
 }
 
 void DeadDB::unload()

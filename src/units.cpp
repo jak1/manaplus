@@ -28,6 +28,8 @@
 #include "utils/stringutils.h"
 #include "utils/xml.h"
 
+#include "resources/beingcommon.h"
+
 #include <climits>
 #include <vector>
 
@@ -102,8 +104,15 @@ void Units::loadUnits()
         units[UNIT_CURRENCY] = ud;
     }
 
-    XML::Document doc(paths.getStringValue("unitsFile"));
-    const XmlNodePtr root = doc.rootNode();
+    loadXmlFile(paths.getStringValue("unitsFile"));
+    loadXmlFile(paths.getStringValue("unitsPatchFile"));
+    loadXmlDir("unitsPatchDir", loadXmlFile);
+}
+
+void Units::loadXmlFile(const std::string &fileName)
+{
+    XML::Document doc(fileName);
+    const XmlNodePtrConst root = doc.rootNode();
 
     if (!root || !xmlNameEqual(root, "units"))
     {
@@ -114,7 +123,14 @@ void Units::loadUnits()
 
     for_each_xml_child_node(node, root)
     {
-        if (xmlNameEqual(node, "unit"))
+        if (xmlNameEqual(node, "include"))
+        {
+            const std::string name = XML::getProperty(node, "name", "");
+            if (!name.empty())
+                loadXmlFile(name);
+            continue;
+        }
+        else if (xmlNameEqual(node, "unit"))
         {
             UnitDescription ud;
             int level = 1;

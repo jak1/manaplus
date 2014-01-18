@@ -62,9 +62,10 @@ namespace ColorDB
     /**
      * Loads the color data from <code>colors.xml</code>.
      */
-    void loadHair();
+    void loadHair(const std::string &fileName,
+                  std::map<int, ItemColor> &colors);
 
-    void loadColorLists();
+    void loadColorLists(const std::string &fileName);
 
     /**
      * Clear the color data

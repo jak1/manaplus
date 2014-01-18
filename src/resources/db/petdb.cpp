@@ -47,33 +47,52 @@ void PETDB::load()
         unload();
 
     logger->log1("Initializing PET database...");
+    loadXmlFile(paths.getStringValue("petsFile"));
+    loadXmlFile(paths.getStringValue("petsPatchFile"));
+    loadXmlDir("petsPatchDir", loadXmlFile);
+    mLoaded = true;
+}
 
-    XML::Document doc(paths.getStringValue("petsFile"));
-    const XmlNodePtr rootNode = doc.rootNode();
+void PETDB::loadXmlFile(const std::string &fileName)
+{
+    XML::Document doc(fileName);
+    const XmlNodePtrConst rootNode = doc.rootNode();
 
     if (!rootNode || !xmlNameEqual(rootNode, "pets"))
     {
         logger->log("PET Database: Error while loading %s!",
-            paths.getStringValue("petsFile").c_str());
-        mLoaded = true;
+            fileName.c_str());
         return;
     }
 
     // iterate <pet>s
     for_each_xml_child_node(petNode, rootNode)
     {
-        if (!xmlNameEqual(petNode, "pet"))
+        if (xmlNameEqual(petNode, "include"))
+        {
+            const std::string name = XML::getProperty(petNode, "name", "");
+            if (!name.empty())
+                loadXmlFile(name);
             continue;
+        }
+        else if (!xmlNameEqual(petNode, "pet"))
+        {
+            continue;
+        }
 
-        const int id = XML::getProperty(petNode, "id", 0);
-        if (id == 0)
+        const int id = XML::getProperty(petNode, "id", -1);
+        if (id == -1)
         {
             logger->log("PET Database: PET with missing ID in %s!",
                 paths.getStringValue("petsFile").c_str());
             continue;
         }
 
-        BeingInfo *const currentInfo = new BeingInfo;
+        BeingInfo *currentInfo = nullptr;
+        if (mPETInfos.find(id) != mPETInfos.end())
+            currentInfo = mPETInfos[id];
+        if (!currentInfo)
+            currentInfo = new BeingInfo;
 
         currentInfo->setName(XML::langProperty(petNode,
             // TRANSLATORS: unknown info name
@@ -151,8 +170,6 @@ void PETDB::load()
 
         mPETInfos[id] = currentInfo;
     }
-
-    mLoaded = true;
 }
 
 void PETDB::unload()

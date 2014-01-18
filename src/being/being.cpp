@@ -151,7 +151,7 @@ Being::Being(const int id, const Type type, const uint16_t subtype,
     mSpriteHide(new int[20]),
     mSpriteDraw(new int[20]),
     mComment(),
-    mPet(nullptr),
+    mPets(),
     mOwner(nullptr),
     mSpecialParticle(nullptr),
     mX(0),
@@ -176,8 +176,8 @@ Being::Being(const int id, const Type type, const uint16_t subtype,
     mCriticalHit(0),
     mPvpRank(0),
     mNumber(100),
-    mPetId(0),
     mLook(0),
+    mUsageCounter(1),
     mHairColor(0),
     mErased(false),
     mEnemy(false),
@@ -242,14 +242,18 @@ Being::~Being()
     mAnimationEffect = nullptr;
 
     if (mOwner)
-        mOwner->setPet(nullptr);
-    if (mPet)
+        mOwner->unassignPet(this);
+    FOR_EACH (std::vector<Being*>::iterator, it, mPets)
     {
-        mPet->setOwner(nullptr);
-        actorManager->erase(mPet);
-        delete mPet;
-        mPet = nullptr;
+        Being *pet = *it;
+        if (pet)
+        {
+            pet->setOwner(nullptr);
+            actorManager->erase(pet);
+            delete pet;
+        }
     }
+    mPets.clear();
 
     removeAllItemsParticles();
 }
@@ -913,7 +917,7 @@ const Guild *Being::getGuild(const std::string &guildName) const
 {
     FOR_EACH (GuildsMapCIter, itr, mGuilds)
     {
-        Guild *const guild = itr->second;
+        const Guild *const guild = itr->second;
         if (guild && guild->getName() == guildName)
             return guild;
     }
@@ -1609,8 +1613,12 @@ void Being::logic()
             actorManager->destroy(this);
     }
 
-    if (mPet)
-        mPet->petLogic();
+    FOR_EACH (std::vector<Being*>::iterator, it, mPets)
+    {
+        Being *const pet = *it;
+        if (pet)
+            pet->petLogic();
+    }
 
     const SoundInfo *const sound = mNextSound.sound;
     if (sound)
@@ -1655,9 +1663,9 @@ void Being::petLogic()
         setAction(Being::STAND, 0);
         fixPetSpawnPos(dstX, dstY);
         setTileCoords(dstX, dstY);
-        Net::getPetHandler()->spawn(mOwner, dstX, dstY);
+        Net::getPetHandler()->spawn(mOwner, mId, dstX, dstY);
     }
-    else if (divX > followDist || divY > followDist)
+    else if (!followDist || divX > followDist || divY > followDist)
     {
         if (!dist)
         {
@@ -1708,7 +1716,7 @@ void Being::petLogic()
         if (mX != dstX || mY != dstY)
         {
             setPath(mMap->findPath(mX, mY, dstX, dstY, walkMask));
-            Net::getPetHandler()->move(mOwner, mX, mY, dstX, dstY);
+            Net::getPetHandler()->move(mOwner, mId, mX, mY, dstX, dstY);
             return;
         }
     }
@@ -1806,7 +1814,9 @@ void Being::drawSpeech(const int offsetX, const int offsetY)
         mSpeechBubble->setPosition(px - (mSpeechBubble->getWidth() / 2),
             py - getHeight() - (mSpeechBubble->getHeight()));
         mSpeechBubble->setVisible(true);
+#ifdef USE_INTERNALGUICHAN
         mSpeechBubble->requestMoveToBackground();
+#endif
     }
     else if (mSpeechTime > 0 && speech == TEXT_OVERHEAD)
     {
@@ -2121,11 +2131,11 @@ void Being::setSprite(const unsigned int slot, const int id,
         if (id1)
         {
             const ItemInfo &info = ItemDB::get(id1);
-            if (mMap)
+            if (mMap && mType == PLAYER)
             {
                 const int pet = info.getPet();
                 if (pet)
-                    removePet();
+                    removePet(pet);
             }
             removeItemParticles(id1);
         }
@@ -3207,40 +3217,77 @@ void Being::addPet(const int id)
     if (!actorManager || !config.getBoolValue("usepets"))
         return;
 
-    removePet();
+    Being *const pet = findChildPet(id);
+    if (pet)
+    {
+        pet->incUsage();
+        return;
+    }
+
     Being *const being = actorManager->createBeing(
         id, ActorSprite::PET, 0);
     if (being)
     {
         being->setOwner(this);
-        mPetId = id;
-        mPet = being;
+        mPets.push_back(being);
         int dstX = mX;
         int dstY = mY;
         being->fixPetSpawnPos(dstX, dstY);
         being->setTileCoords(dstX, dstY);
-        Net::getPetHandler()->spawn(this, dstX, dstY);
+        Net::getPetHandler()->spawn(this, being->mId, dstX, dstY);
     }
 }
 
-void Being::removePet()
+Being *Being::findChildPet(const int id)
+{
+    FOR_EACH (std::vector<Being*>::iterator, it, mPets)
+    {
+        Being *const pet = *it;
+        if (pet && pet->mId == id)
+            return pet;
+    }
+    return nullptr;
+}
+
+void Being::removePet(const int id)
 {
     if (!actorManager)
         return;
 
-    mPetId = 0;
-    if (mPet)
+    FOR_EACH (std::vector<Being*>::iterator, it, mPets)
     {
-        mPet->setOwner(nullptr);
-        actorManager->erase(mPet);
-        delete mPet;
-        mPet = nullptr;
+        Being *const pet = *it;
+        if (pet && pet->mId == id)
+        {
+            if (!pet->decUsage())
+            {
+                pet->setOwner(nullptr);
+                actorManager->erase(pet);
+                mPets.erase(it);
+                delete pet;
+            }
+        }
     }
+}
+
+void Being::removeAllPets()
+{
+    FOR_EACH (std::vector<Being*>::iterator, it, mPets)
+    {
+        Being *const pet = *it;
+        if (pet)
+        {
+            pet->setOwner(nullptr);
+            actorManager->erase(pet);
+            delete pet;
+        }
+    }
+    mPets.clear();
 }
 
 void Being::updatePets()
 {
-    removePet();
+    removeAllPets();
     FOR_EACH (std::vector<int>::const_iterator, it, mSpriteIDs)
     {
         const int id = *it;
@@ -3249,8 +3296,17 @@ void Being::updatePets()
         const ItemInfo &info = ItemDB::get(id);
         const int pet = info.getPet();
         if (pet)
-        {
             addPet(pet);
+    }
+}
+
+void Being::unassignPet(const Being *const pet1)
+{
+    FOR_EACH (std::vector<Being*>::iterator, it, mPets)
+    {
+        if (*it == pet1)
+        {
+            mPets.erase(it);
             return;
         }
     }

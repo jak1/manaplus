@@ -30,28 +30,40 @@
 
 #include "particle/particle.h"
 
+#include "resources/beingcommon.h"
+
 #include "debug.h"
 
 EffectManager::EffectManager() :
     mEffects()
 {
-    XML::Document doc(paths.getStringValue("effectsFile"));
-    const XmlNodePtr root = doc.rootNode();
+    logger->log1("Effects are now loading");
+    loadXmlFile(paths.getStringValue("effectsFile"));
+    loadXmlFile(paths.getStringValue("effectsPatchFile"));
+    loadXmlDir("effectsPatchDir", loadXmlFile);
+}
+
+void EffectManager::loadXmlFile(const std::string &fileName)
+{
+    XML::Document doc(fileName);
+    const XmlNodePtrConst root = doc.rootNode();
 
     if (!root || !xmlNameEqual(root, "being-effects"))
     {
-        logger->log("Error loading being effects file: "
-            + paths.getStringValue("effectsFile"));
+        logger->log("Error loading being effects file: " + fileName);
         return;
-    }
-    else
-    {
-        logger->log1("Effects are now loading");
     }
 
     for_each_xml_child_node(node, root)
     {
-        if (xmlNameEqual(node, "effect"))
+        if (xmlNameEqual(node, "include"))
+        {
+            const std::string name = XML::getProperty(node, "name", "");
+            if (!name.empty())
+                loadXmlFile(name);
+            continue;
+        }
+        else if (xmlNameEqual(node, "effect"))
         {
             mEffects.push_back(EffectDescription(
                 XML::getProperty(node, "id", -1),

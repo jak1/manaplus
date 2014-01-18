@@ -20,11 +20,17 @@
 
 #include "resources/beingcommon.h"
 
+#include "utils/files.h"
+#include "utils/stringutils.h"
+
 #include "resources/beinginfo.h"
+
+#include <algorithm>
 
 #include "debug.h"
 
-void BeingCommon::readBasicAttributes(BeingInfo *const info, XmlNodePtr node,
+void BeingCommon::readBasicAttributes(BeingInfo *const info,
+                                      XmlNodePtrConst node,
                                       const std::string &hoverCursor)
 {
     info->setTargetCursorSize(XML::getProperty(node,
@@ -41,4 +47,18 @@ void BeingCommon::readBasicAttributes(BeingInfo *const info, XmlNodePtr node,
 
     info->setHpBarOffsetX(XML::getProperty(node, "hpBarOffsetX", 0));
     info->setHpBarOffsetY(XML::getProperty(node, "hpBarOffsetY", 0));
+}
+
+void BeingCommon::getIncludeFiles(const std::string &dir, StringVect &list)
+{
+    const std::string path = dir + "/";
+    StringVect tempList;
+    Files::getFilesWithDir(path, tempList);
+    FOR_EACH (StringVectCIter, it, tempList)
+    {
+        const std::string &str = *it;
+        if (findLast(str, ".xml"))
+            list.push_back(str);
+    }
+    std::sort(list.begin(), list.end());
 }

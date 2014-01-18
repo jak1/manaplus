@@ -33,6 +33,7 @@
 #include "resources/resourcemanager.h"
 
 #include "utils/dtor.h"
+#include "utils/files.h"
 #include "utils/physfstools.h"
 
 #include <algorithm>
@@ -649,37 +650,13 @@ bool Theme::tryThemePath(const std::string &themeName)
 
 void Theme::fillSkinsList(StringVect &list)
 {
-    char **skins = PhysFs::enumerateFiles(
-        branding.getStringValue("guiThemePath").c_str());
-
-    for (char **i = skins; *i; i++)
-    {
-        if (PhysFs::isDirectory((
-            branding.getStringValue("guiThemePath") + *i).c_str()))
-        {
-            list.push_back(*i);
-        }
-    }
-
-    PhysFs::freeList(skins);
+    Files::getDirs(branding.getStringValue("guiThemePath"), list);
 }
 
 void Theme::fillFontsList(StringVect &list)
 {
     PHYSFS_permitSymbolicLinks(1);
-    char **fonts = PhysFs::enumerateFiles(
-        branding.getStringValue("fontsPath").c_str());
-
-    for (char **i = fonts; *i; i++)
-    {
-        if (!PhysFs::isDirectory((
-            branding.getStringValue("fontsPath") + *i).c_str()))
-        {
-            list.push_back(*i);
-        }
-    }
-
-    PhysFs::freeList(fonts);
+    Files::getFiles(branding.getStringValue("fontsPath"), list);
     PHYSFS_permitSymbolicLinks(0);
 }
 
@@ -1095,7 +1072,7 @@ void Theme::loadColors(std::string file)
         file.append("/colors.xml");
 
     XML::Document doc(resolveThemePath(file));
-    const XmlNodePtr root = doc.rootNode();
+    const XmlNodePtrConst root = doc.rootNode();
 
     if (!root || !xmlNameEqual(root, "colors"))
     {
@@ -1283,7 +1260,7 @@ ThemeInfo *Theme::loadInfo(const std::string &themeName)
     }
     logger->log("loading: " + path);
     XML::Document doc(path);
-    const XmlNodePtr rootNode = doc.rootNode();
+    const XmlNodePtrConst rootNode = doc.rootNode();
 
     if (!rootNode || !xmlNameEqual(rootNode, "info"))
         return nullptr;
@@ -1308,8 +1285,12 @@ ThemeInfo *Theme::loadInfo(const std::string &themeName)
             readValue(helpFont);
         else if (xmlNameEqual(infoNode, "secureFont"))
             readValue(secureFont);
+        else if (xmlNameEqual(infoNode, "npcFont"))
+            readValue(npcFont);
         else if (xmlNameEqual(infoNode, "japanFont"))
             readValue(japanFont);
+        else if (xmlNameEqual(infoNode, "chinaFont"))
+            readValue(chinaFont);
         else if (xmlNameEqual(infoNode, "fontSize"))
             readIntValue(fontSize);
         else if (xmlNameEqual(infoNode, "npcfontSize"))

@@ -84,9 +84,17 @@ class Setup_Theme final : public SetupTab
         DropDown *mSecureFontDropDown;
         std::string mSecureFont;
 
+        Label *mNpcFontLabel;
+        DropDown *mNpcFontDropDown;
+        std::string mNpcFont;
+
         Label *mJapanFontLabel;
         DropDown *mJapanFontDropDown;
         std::string mJapanFont;
+
+        Label *mChinaFontLabel;
+        DropDown *mChinaFontDropDown;
+        std::string mChinaFont;
 
         FontSizeChoiceListModel *mFontSizeListModel;
         Label *mFontSizeLabel;

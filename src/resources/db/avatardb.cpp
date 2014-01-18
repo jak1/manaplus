@@ -24,6 +24,7 @@
 
 #include "logger.h"
 
+#include "resources/beingcommon.h"
 #include "resources/beinginfo.h"
 
 #include "utils/dtor.h"
@@ -43,24 +44,43 @@ void AvatarDB::load()
 {
     if (mLoaded)
         unload();
+    loadXmlFile(paths.getStringValue("avatarsFile"));
+    loadXmlFile(paths.getStringValue("avatarsPatchFile"));
+    loadXmlDir("avatarsPatchDir", loadXmlFile);
+}
 
-    XML::Document doc(paths.getStringValue("avatarsFile"));
-    const XmlNodePtr rootNode = doc.rootNode();
+void AvatarDB::loadXmlFile(const std::string &fileName)
+{
+    XML::Document doc(fileName);
+    const XmlNodePtrConst rootNode = doc.rootNode();
 
     if (!rootNode || !xmlNameEqual(rootNode, "avatars"))
     {
         logger->log("Avatars Database: Error while loading %s!",
-            paths.getStringValue("avatarsFile").c_str());
+            fileName.c_str());
         mLoaded = true;
         return;
     }
 
     for_each_xml_child_node(avatarNode, rootNode)
     {
+        if (xmlNameEqual(avatarNode, "include"))
+        {
+            const std::string name = XML::getProperty(avatarNode, "name", "");
+            if (!name.empty())
+                loadXmlFile(name);
+            continue;
+        }
+
         if (!xmlNameEqual(avatarNode, "avatar"))
             continue;
 
-        BeingInfo *const currentInfo = new BeingInfo;
+        const int id = XML::getProperty(avatarNode, "id", 0);
+        BeingInfo *currentInfo = nullptr;
+        if (mAvatarInfos.find(id) != mAvatarInfos.end())
+            currentInfo = mAvatarInfos[id];
+        if (!currentInfo)
+            currentInfo = new BeingInfo;
 
         currentInfo->setName(XML::langProperty(
             // TRANSLATORS: unknown info name
@@ -97,8 +117,7 @@ void AvatarDB::load()
             }
         }
         currentInfo->setDisplay(display);
-
-        mAvatarInfos[XML::getProperty(avatarNode, "id", 0)] = currentInfo;
+        mAvatarInfos[id] = currentInfo;
     }
 
     mLoaded = true;

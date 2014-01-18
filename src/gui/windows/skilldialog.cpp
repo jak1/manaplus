@@ -51,6 +51,8 @@
 #include "utils/dtor.h"
 #include "utils/gettext.h"
 
+#include "resources/beingcommon.h"
+
 #include <guichan/font.hpp>
 
 #include "debug.h"
@@ -62,14 +64,14 @@ class SkillListBox final : public ListBox
             ListBox(widget, model, "skilllistbox.xml"),
             mModel(model),
             mPopup(new TextPopup),
-            mHighlightColor(getThemeColor(Theme::HIGHLIGHT)),
             mTextColor(getThemeColor(Theme::TEXT)),
             mTextColor2(getThemeColor(Theme::TEXT_OUTLINE)),
             mTextPadding(mSkin ? mSkin->getOption("textPadding", 34) : 34),
             mSpacing(mSkin ? mSkin->getOption("spacing", 0) : 0),
-            mRowHeight(getFont()->getHeight() * 2 + mSpacing + 2 * mPadding),
             mSkillClicked(false)
         {
+            mRowHeight = getFont()->getHeight() * 2 + mSpacing + 2 * mPadding;
+            mHighlightColor = getThemeColor(Theme::HIGHLIGHT);
             mPopup->postInit();
 
             if (mRowHeight < 34)
@@ -231,12 +233,10 @@ class SkillListBox final : public ListBox
     private:
         SkillModel *mModel;
         TextPopup *mPopup;
-        gcn::Color mHighlightColor;
         gcn::Color mTextColor;
         gcn::Color mTextColor2;
         int mTextPadding;
         int mSpacing;
-        int mRowHeight;
         bool mSkillClicked;
 };
 
@@ -429,75 +429,41 @@ void SkillDialog::clearSkills()
 void SkillDialog::loadSkills()
 {
     clearSkills();
+    loadXmlFile(paths.getStringValue("skillsFile"));
+    if (mSkills.empty())
+        loadXmlFile(paths.getStringValue("skillsFile2"));
+    loadXmlFile(paths.getStringValue("skillsPatchFile"));
+    loadXmlDir("skillsPatchDir", loadXmlFile);
 
-    XML::Document doc(paths.getStringValue("skillsFile"));
-    XML::Document doc2(paths.getStringValue("skillsFile2"));
-    XmlNodePtr root = doc.rootNode();
+    update();
+}
+
+void SkillDialog::loadXmlFile(const std::string &fileName)
+{
+    XML::Document doc(fileName);
+    XmlNodePtrConst root = doc.rootNode();
 
     int setCount = 0;
-    std::string setName;
-    ScrollArea *scroll;
-    SkillListBox *listbox;
-    SkillTab *tab;
-
-    if (!root || !xmlNameEqual(root, "skills"))
-        root = doc2.rootNode();
 
     if (!root || !xmlNameEqual(root, "skills"))
     {
-        logger->log("Error loading skills");
-
-#ifdef MANASERV_SUPPORT
-        if (Net::getNetworkType() != ServerInfo::MANASERV)
-#endif
-        {
-            SkillModel *const model = new SkillModel();
-            if (!mDefaultModel)
-                mDefaultModel = model;
-
-            SkillInfo *const skill = new SkillInfo;
-            skill->id = 1;
-            // TRANSLATORS: skills dialog default skills tab
-            skill->data->name = _("basic");
-            skill->data->description.clear();
-            // TRANSLATORS: skills dialog default skill name
-            skill->data->dispName = _("basic, 1");
-            skill->data->shortName = "bas";
-            skill->data->setIcon("");
-            skill->modifiable = true;
-            skill->visible = true;
-            skill->model = model;
-            skill->update();
-
-            model->addSkill(skill);
-            mSkills[1] = skill;
-
-            model->updateVisibilities();
-
-            listbox = new SkillListBox(this, model);
-            listbox->postInit();
-            listbox->setActionEventId("sel");
-            listbox->addActionListener(this);
-            scroll = new ScrollArea(listbox, false);
-            scroll->setHorizontalScrollPolicy(ScrollArea::SHOW_NEVER);
-            scroll->setVerticalScrollPolicy(ScrollArea::SHOW_ALWAYS);
-
-            tab = new SkillTab(this, "Skills", listbox);
-            mDeleteTabs.push_back(tab);
-
-            mTabs->addTab(tab, scroll);
-
-            update();
-        }
+        logger->log("Error loading skills: " + fileName);
         return;
     }
 
     for_each_xml_child_node(set, root)
     {
-        if (xmlNameEqual(set, "set"))
+        if (xmlNameEqual(set, "include"))
+        {
+            const std::string name = XML::getProperty(set, "name", "");
+            if (!name.empty())
+                loadXmlFile(name);
+            continue;
+        }
+        else if (xmlNameEqual(set, "set"))
         {
             setCount++;
-            setName = XML::getProperty(set, "name",
+            const std::string setName = XML::getProperty(set, "name",
                 // TRANSLATORS: skills dialog default skill tab
                 strprintf(_("Skill Set %d"), setCount));
 
@@ -575,20 +541,19 @@ void SkillDialog::loadSkills()
             model->updateVisibilities();
 
             // possible leak listbox, scroll
-            listbox = new SkillListBox(this, model);
+            SkillListBox *const listbox = new SkillListBox(this, model);
             listbox->setActionEventId("sel");
             listbox->addActionListener(this);
-            scroll = new ScrollArea(listbox, false);
+            ScrollArea *const scroll = new ScrollArea(listbox, false);
             scroll->setHorizontalScrollPolicy(ScrollArea::SHOW_NEVER);
             scroll->setVerticalScrollPolicy(ScrollArea::SHOW_ALWAYS);
 
-            tab = new SkillTab(this, setName, listbox);
+            SkillTab *const tab = new SkillTab(this, setName, listbox);
             mDeleteTabs.push_back(tab);
 
             mTabs->addTab(tab, scroll);
         }
     }
-    update();
 }
 
 bool SkillDialog::updateSkill(const int id, const int range,

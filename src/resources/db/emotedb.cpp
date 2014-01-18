@@ -27,6 +27,8 @@
 
 #include "configuration.h"
 
+#include "resources/beingcommon.h"
+
 #include "debug.h"
 
 namespace
@@ -43,8 +45,6 @@ void EmoteDB::load()
     if (mLoaded)
         unload();
 
-    mLastEmote = 0;
-
     EmoteSprite *const unknownSprite = new EmoteSprite;
     unknownSprite->sprite = AnimatedSprite::load(
         paths.getStringValue("spriteErrorFile"));
@@ -53,21 +53,41 @@ void EmoteDB::load()
 
     logger->log1("Initializing emote database...");
 
-    XML::Document doc(paths.getStringValue("emotesFile"));
-    XmlNodePtr rootNode = doc.rootNode();
+    mLastEmote = 0;
+    loadXmlFile(paths.getStringValue("emotesFile"));
+    loadXmlFile(paths.getStringValue("emotesPatchFile"));
+    loadXmlDir("emotesPatchDir", loadXmlFile);
+    loadSpecialXmlFile("graphics/sprites/manaplus_emotes.xml");
+
+    mLoaded = true;
+}
+
+void EmoteDB::loadXmlFile(const std::string &fileName)
+{
+    XML::Document doc(fileName);
+    XmlNodePtrConst rootNode = doc.rootNode();
 
     if (!rootNode || !xmlNameEqual(rootNode, "emotes"))
     {
         logger->log("Emote Database: Error while loading %s!",
-            paths.getStringValue("emotesFile").c_str());
+            fileName.c_str());
         return;
     }
 
     // iterate <emote>s
     for_each_xml_child_node(emoteNode, rootNode)
     {
-        if (!xmlNameEqual(emoteNode, "emote"))
+        if (xmlNameEqual(emoteNode, "include"))
+        {
+            const std::string name = XML::getProperty(emoteNode, "name", "");
+            if (!name.empty())
+                loadXmlFile(name);
             continue;
+        }
+        else if (!xmlNameEqual(emoteNode, "emote"))
+        {
+            continue;
+        }
 
         const int id = XML::getProperty(emoteNode, "id", -1);
         // skip hight images
@@ -80,8 +100,11 @@ void EmoteDB::load()
                 paths.getStringValue("emotesFile").c_str());
             continue;
         }
-
-        EmoteInfo *const currentInfo = new EmoteInfo;
+        EmoteInfo *currentInfo = nullptr;
+        if (mEmoteInfos.find(id) != mEmoteInfos.end())
+            currentInfo = mEmoteInfos[id];
+        else
+            currentInfo = new EmoteInfo;
         currentInfo->time = XML::getProperty(emoteNode, "time", 500);
 
         for_each_xml_child_node(spriteNode, emoteNode)
@@ -111,9 +134,12 @@ void EmoteDB::load()
         if (id > mLastEmote)
             mLastEmote = id;
     }
+}
 
-    XML::Document doc2("graphics/sprites/manaplus_emotes.xml");
-    rootNode = doc2.rootNode();
+void EmoteDB::loadSpecialXmlFile(const std::string &fileName)
+{
+    XML::Document doc(fileName);
+    XmlNodePtrConst rootNode = doc.rootNode();
 
     if (!rootNode || !xmlNameEqual(rootNode, "emotes"))
     {
@@ -125,8 +151,17 @@ void EmoteDB::load()
     // iterate <emote>s
     for_each_xml_child_node(emoteNode, rootNode)
     {
-        if (!xmlNameEqual(emoteNode, "emote"))
+        if (xmlNameEqual(emoteNode, "include"))
+        {
+            const std::string name = XML::getProperty(emoteNode, "name", "");
+            if (!name.empty())
+                loadSpecialXmlFile(name);
             continue;
+        }
+        else if (!xmlNameEqual(emoteNode, "emote"))
+        {
+            continue;
+        }
 
         const int id = XML::getProperty(emoteNode, "id", -1);
         if (id == -1)
@@ -137,7 +172,11 @@ void EmoteDB::load()
         }
         const int altId = XML::getProperty(emoteNode, "altid", -1);
 
-        EmoteInfo *const currentInfo = new EmoteInfo;
+        EmoteInfo *currentInfo = nullptr;
+        if (mEmoteInfos.find(id) != mEmoteInfos.end())
+            currentInfo = mEmoteInfos[id];
+        if (!currentInfo)
+            currentInfo = new EmoteInfo;
         currentInfo->time = XML::getProperty(emoteNode, "time", 500);
 
         for_each_xml_child_node(spriteNode, emoteNode)
@@ -170,8 +209,6 @@ void EmoteDB::load()
         if (id > mLastEmote)
             mLastEmote = id;
     }
-
-    mLoaded = true;
 }
 
 void EmoteDB::unload()

@@ -23,14 +23,26 @@
 
 #include "utils/xml.h"
 
+#include "utils/stringvector.h"
+
 #include "localconsts.h"
 
 class BeingInfo;
 
+#define loadXmlDir(name, function) \
+    StringVect listVect; \
+    BeingCommon::getIncludeFiles(paths.getStringValue( \
+        name), listVect); \
+    FOR_EACH (StringVectCIter, itVect, listVect) \
+        function(*itVect);
+
 namespace BeingCommon
 {
-    void readBasicAttributes(BeingInfo *const info, XmlNodePtr node,
+    void readBasicAttributes(BeingInfo *const info,
+                             XmlNodePtrConst node,
                              const std::string &hoverCursor);
+
+    void getIncludeFiles(const std::string &dir, StringVect &list);
 }
 
 #endif  // RESOURCES_BEINGCOMMON_H

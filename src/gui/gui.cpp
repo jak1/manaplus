@@ -49,6 +49,7 @@
 #include "resources/resourcemanager.h"
 
 #include "utils/langs.h"
+#include "utils/timer.h"
 
 #include <guichan/exception.hpp>
 
@@ -107,6 +108,7 @@ Gui::Gui() :
     mFocusListeners(),
     mForegroundColor(Theme::getThemeColor(Theme::TEXT)),
     mForegroundColor2(Theme::getThemeColor(Theme::TEXT_OUTLINE)),
+    mTime(0),
     mCustomCursor(false),
     mDoubleClick(true)
 {
@@ -137,6 +139,8 @@ void Gui::postInit(Graphics *const graphics)
     const StringVect langs = getLang();
     const bool isJapan = (!langs.empty() && langs[0].size() > 3
         && langs[0].substr(0, 3) == "ja_");
+    const bool isChinese = (!langs.empty() && langs[0].size() > 3
+        && langs[0].substr(0, 3) == "zh_");
 
     // Set global font
     const int fontSize = config.getIntValue("fontSize");
@@ -147,7 +151,12 @@ void Gui::postInit(Graphics *const graphics)
         if (fontFile.empty())
             fontFile = branding.getStringValue("japanFont");
     }
-
+    else if (isChinese)
+    {
+        fontFile = config.getValue("chinaFont", "");
+        if (fontFile.empty())
+            fontFile = branding.getStringValue("chinaFont");
+    }
     if (fontFile.empty())
         fontFile = branding.getStringValue("font");
 
@@ -161,17 +170,21 @@ void Gui::postInit(Graphics *const graphics)
                       .append("': ").append(e.getMessage()));
     }
 
+
     // Set particle font
     fontFile = config.getValue("particleFont", "");
-
     if (isJapan)
     {
         fontFile = config.getValue("japanFont", "");
         if (fontFile.empty())
             fontFile = branding.getStringValue("japanFont");
     }
-
-
+    else if (isChinese)
+    {
+        fontFile = config.getValue("chinaFont", "");
+        if (fontFile.empty())
+            fontFile = branding.getStringValue("chinaFont");
+    }
     if (fontFile.empty())
         fontFile = branding.getStringValue("particleFont");
 
@@ -185,6 +198,7 @@ void Gui::postInit(Graphics *const graphics)
         logger->error(std::string("Unable to load '").append(fontFile)
                       .append("': ").append(e.getMessage()));
     }
+
 
     // Set bold font
     fontFile = config.getValue("boldFont", "");
@@ -201,6 +215,7 @@ void Gui::postInit(Graphics *const graphics)
                       .append("': ").append(e.getMessage()));
     }
 
+
     // Set help font
     fontFile = config.getValue("helpFont", "");
     if (fontFile.empty())
@@ -215,6 +230,7 @@ void Gui::postInit(Graphics *const graphics)
         logger->error(std::string("Unable to load '").append(fontFile)
                       .append("': ").append(e.getMessage()));
     }
+
 
     // Set secure font
     fontFile = config.getValue("secureFont", "");
@@ -231,9 +247,22 @@ void Gui::postInit(Graphics *const graphics)
                       .append("': ").append(e.getMessage()));
     }
 
+
     // Set npc font
-    fontFile = config.getValue("npcFont", "");
     const int npcFontSize = config.getIntValue("npcfontSize");
+    fontFile = config.getValue("npcFont", "");
+    if (isJapan)
+    {
+        fontFile = config.getValue("japanFont", "");
+        if (fontFile.empty())
+            fontFile = branding.getStringValue("japanFont");
+    }
+    else if (isChinese)
+    {
+        fontFile = config.getValue("chinaFont", "");
+        if (fontFile.empty())
+            fontFile = branding.getStringValue("chinaFont");
+    }
     if (fontFile.empty())
         fontFile = branding.getStringValue("npcFont");
 
@@ -339,6 +368,14 @@ void Gui::slowLogic()
         mNpcFont->slowLogic(5);
     if (windowContainer)
         windowContainer->slowLogic();
+
+    const int time = cur_time;
+    if (mTime != time)
+    {
+        logger->flush();
+        mTime = time;
+    }
+
     BLOCK_END("Gui::slowLogic")
 }
 

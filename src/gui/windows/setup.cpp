@@ -32,13 +32,14 @@
 #include "gui/widgets/tabs/setup_audio.h"
 #include "gui/widgets/tabs/setup_chat.h"
 #include "gui/widgets/tabs/setup_colors.h"
-#include "gui/widgets/tabs/setup_joystick.h"
-#include "gui/widgets/tabs/setup_other.h"
-#include "gui/widgets/tabs/setup_theme.h"
 #include "gui/widgets/tabs/setup_input.h"
+#include "gui/widgets/tabs/setup_joystick.h"
+#include "gui/widgets/tabs/setup_mods.h"
+#include "gui/widgets/tabs/setup_other.h"
 #include "gui/widgets/tabs/setup_perfomance.h"
 #include "gui/widgets/tabs/setup_players.h"
 #include "gui/widgets/tabs/setup_relations.h"
+#include "gui/widgets/tabs/setup_theme.h"
 #include "gui/widgets/tabs/setup_touch.h"
 #include "gui/widgets/tabs/setup_video.h"
 #include "gui/widgets/tabs/setup_visual.h"
@@ -58,6 +59,7 @@ Setup::Setup() :
     Window(_("Setup"), false, nullptr, "setup.xml"),
     gcn::ActionListener(),
     mTabs(),
+    mModsTab(nullptr),
     mWindowsToReset(),
     mButtons(),
     mResetWindows(nullptr),
@@ -201,11 +203,37 @@ void Setup::setInGame(const bool inGame)
 
 void Setup::externalUpdate()
 {
+    unloadModTab();
+    mModsTab = new Setup_Mods(this);
+    mTabs.push_back(mModsTab);
+    mPanel->addTab(mModsTab->getName(), mModsTab);
     FOR_EACH (std::list<SetupTab*>::const_iterator, it, mTabs)
     {
         if (*it)
             (*it)->externalUpdated();
     }
+}
+
+void Setup::unloadModTab()
+{
+    if (mModsTab)
+    {
+        mTabs.remove(mModsTab);
+        Tab *const tab = mPanel->getTab(mModsTab->getName());
+        mPanel->removeTab(tab);
+        delete mModsTab;
+        mModsTab = nullptr;
+    }
+}
+
+void Setup::externalUnload()
+{
+    FOR_EACH (std::list<SetupTab*>::const_iterator, it, mTabs)
+    {
+        if (*it)
+            (*it)->externalUnloaded();
+    }
+    unloadModTab();
 }
 
 void Setup::registerWindowForReset(Window *const window)

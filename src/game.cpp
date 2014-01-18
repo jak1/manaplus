@@ -65,6 +65,7 @@
 #include "gui/windows/killstats.h"
 #include "gui/windows/minimap.h"
 #include "gui/windows/ministatuswindow.h"
+#include "gui/windows/npcdialog.h"
 #include "gui/windows/okdialog.h"
 #include "gui/windows/outfitwindow.h"
 #include "gui/windows/setup.h"
@@ -487,9 +488,12 @@ Game::~Game()
 
 bool Game::createScreenshot()
 {
+    if (!mainGraphics)
+        return false;
+
     SDL_Surface *screenshot = nullptr;
 
-    if (!config.getBoolValue("showip"))
+    if (!config.getBoolValue("showip") && gui)
     {
         mainGraphics->setSecure(true);
         mainGraphics->prepareScreenshot();
@@ -511,7 +515,6 @@ bool Game::createScreenshot()
 bool Game::saveScreenshot(SDL_Surface *const screenshot)
 {
     std::string screenshotDirectory = client->getScreenshotDirectory();
-
     if (mkdir_r(screenshotDirectory.c_str()) != 0)
     {
         logger->log("Directory %s doesn't exist and can't be created! "
@@ -526,31 +529,51 @@ bool Game::saveScreenshot(SDL_Surface *const screenshot)
     std::fstream testExists;
     bool found = false;
     static unsigned int screenshotCount = 0;
+
+    time_t rawtime;
+    char buffer [100];
+    time(&rawtime);
+    struct tm *const timeinfo = localtime(&rawtime);
+    strftime(buffer, 99, "%Y-%m-%d_%H-%M-%S", timeinfo);
+
+    const std::string serverName = client->getServerName();
+    std::string screenShortStr;
+    if (serverName.empty())
+    {
+        screenShortStr = strprintf("%s_Screenshot_%s_",
+            branding.getValue("appName", "ManaPlus").c_str(),
+            buffer);
+    }
+    else
+    {
+        screenShortStr = strprintf("%s_Screenshot_%s_%s_",
+            branding.getValue("appName", "ManaPlus").c_str(),
+            serverName.c_str(), buffer);
+    }
+
     do
     {
         screenshotCount++;
-        filenameSuffix.str("");
         filename.str("");
         filename << screenshotDirectory << "/";
-        filenameSuffix << branding.getValue("appName", "ManaPlus")
-                       << "_Screenshot_" << screenshotCount << ".png";
-        filename << filenameSuffix.str();
+        filename << screenShortStr << screenshotCount << ".png";
         testExists.open(filename.str().c_str(), std::ios::in);
         found = !testExists.is_open();
         testExists.close();
     }
     while (!found);
 
-    const bool success = ImageWriter::writePNG(screenshot, filename.str());
-
+    const std::string fileNameStr = filename.str();
+    const bool success = ImageWriter::writePNG(screenshot, fileNameStr);
     if (success)
     {
-        std::stringstream chatlogentry;
-        // TRANSLATORS: save file message
-        chatlogentry << strprintf(_("Screenshot saved as %s"),
-            filenameSuffix.str().c_str());
         if (localChatTab)
-            localChatTab->chatLog(chatlogentry.str(), BY_SERVER);
+        {
+            // TRANSLATORS: save file message
+            std::string str = strprintf(_("Screenshot saved as %s"),
+                fileNameStr.c_str());
+            localChatTab->chatLog(str, BY_SERVER);
+        }
     }
     else
     {
@@ -564,7 +587,6 @@ bool Game::saveScreenshot(SDL_Surface *const screenshot)
     }
 
     MSDL_FreeSurface(screenshot);
-
     return success;
 }
 
@@ -803,12 +825,15 @@ void Game::handleMove()
         return;
 
     // Moving player around
-    if (player_node->isAlive() && !PlayerInfo::isTalking()
-        && chatWindow && !chatWindow->isInputFocused()
-        && !InventoryWindow::isAnyInputFocused() && !quitDialog)
+    if (player_node->isAlive()
+        && chatWindow
+        && !chatWindow->isInputFocused()
+        && !InventoryWindow::isAnyInputFocused()
+        && !quitDialog)
     {
-        // Get the state of the keyboard keys
-        keyboard.refreshActiveKeys();
+        NpcDialog *const dialog = NpcDialog::getActive();
+        if (dialog)
+            return;
 
         // Ignore input if either "ignore" key is pressed
         // Stops the character moving about if the user's window manager

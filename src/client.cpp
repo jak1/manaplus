@@ -98,6 +98,7 @@
 #include "resources/db/sounddb.h"
 #include "resources/db/itemdb.h"
 #include "resources/db/mapdb.h"
+#include "resources/db/moddb.h"
 #include "resources/db/monsterdb.h"
 #include "resources/db/npcdb.h"
 #ifdef MANASERV_SUPPORT
@@ -106,6 +107,7 @@
 #include "resources/db/palettedb.h"
 #include "resources/db/petdb.h"
 
+#include "utils/base64.h"
 #include "utils/cpu.h"
 #include "utils/files.h"
 #include "utils/fuzzer.h"
@@ -357,12 +359,16 @@ void Client::gameInit()
     SDL_EventState(SDL_USEREVENT, SDL_IGNORE);
 
 #ifdef WIN32
+    extractDataDir();
+    mountDataDir();
     setIcon();
-#endif
-
+    initGraphics();
+#else
+    setIcon();
     initGraphics();
     extractDataDir();
     mountDataDir();
+#endif
 
     if (mOptions.dataPath.empty()
         && !branding.getStringValue("dataPath").empty())
@@ -412,6 +418,10 @@ void Client::gameInit()
     player_relations.init();
     Joystick::init();
     createWindows();
+
+    keyboard.update();
+    if (joystick)
+        joystick->update();
 
     // Initialize default server
     mCurrentServer.hostname = mOptions.serverName;
@@ -828,6 +838,7 @@ void Client::gameClear()
     PaletteDB::unload();
     PETDB::unload();
     StatusEffect::unload();
+    ModDB::unload();
 
     if (Net::getLoginHandler())
         Net::getLoginHandler()->clearWorlds();
@@ -1170,6 +1181,12 @@ int Client::gameExec()
                 Net::getPartyHandler()->clear();
                 if (chatLogger)
                     chatLogger->clear();
+                if (!mOptions.dataPath.empty())
+                    UpdaterWindow::unloadMods(mOptions.dataPath);
+                else
+                    UpdaterWindow::unloadMods(mOldUpdates);
+                if (!mOptions.skipUpdate)
+                    UpdaterWindow::unloadMods(mOldUpdates + "/fix/");
             }
 
             mOldState = mState;
@@ -1366,6 +1383,7 @@ int Client::gameExec()
                     {
                         mState = STATE_LOAD_DATA;
                         mOldUpdates = "";
+                        UpdaterWindow::loadDirMods(mOptions.dataPath);
                     }
                     else if (loginData.updateType & LoginData::Upd_Skip)
                     {
@@ -1450,6 +1468,7 @@ int Client::gameExec()
                     NPCDB::load();
                     PETDB::load();
                     EmoteDB::load();
+//                    ModDB::load();
                     StatusEffect::load();
                     Units::loadUnits();
 
@@ -1713,6 +1732,8 @@ int Client::gameExec()
                     mServerName.clear();
                     serverConfig.write();
                     serverConfig.unload();
+                    if (setupWindow)
+                        setupWindow->externalUnload();
 
                     mState = STATE_CHOOSE_SERVER;
                     BLOCK_END("Client::gameExec STATE_SWITCH_SERVER")
@@ -2279,40 +2300,39 @@ void Client::initScreenshotDir()
     }
     else if (mScreenshotDir.empty())
     {
+        mScreenshotDir = decodeBase64String(
+            config.getStringValue("screenshotDirectory2"));
+        if (mScreenshotDir.empty())
+        {
 #ifdef __ANDROID__
-        mScreenshotDir = getSdStoragePath() + std::string("/images");
+            mScreenshotDir = getSdStoragePath() + std::string("/images");
 
-        if (mkdir_r(mScreenshotDir.c_str()))
-        {
-            // TRANSLATORS: directory creation error
-            logger->log(strprintf(
-                _("Error: %s doesn't exist and can't be created! "
-                "Exiting."), mScreenshotDir.c_str()));
-        }
-#else
-        const std::string configScreenshotDir =
-            config.getStringValue("screenshotDirectory");
-        if (!configScreenshotDir.empty())
-            mScreenshotDir = configScreenshotDir;
-        else
-            mScreenshotDir = getDesktopDir();
-#endif
-
-//      config.setValue("screenshotDirectory", mScreenshotDir);
-        logger->log("screenshotDirectory: " + mScreenshotDir);
-
-        if (config.getBoolValue("useScreenshotDirectorySuffix"))
-        {
-            const std::string configScreenshotSuffix =
-                branding.getValue("screenshots", "ManaPlus");
-
-            if (!configScreenshotSuffix.empty())
+            if (mkdir_r(mScreenshotDir.c_str()))
             {
-                mScreenshotDir.append(dirSeparator).append(
-                    configScreenshotSuffix);
+                // TRANSLATORS: directory creation error
+                logger->log(strprintf(
+                    _("Error: %s doesn't exist and can't be created! "
+                    "Exiting."), mScreenshotDir.c_str()));
             }
+#else
+            mScreenshotDir = getPicturesDir();
+#endif
+            if (config.getBoolValue("useScreenshotDirectorySuffix"))
+            {
+                const std::string configScreenshotSuffix =
+                    branding.getValue("screenshots", "ManaPlus");
+
+                if (!configScreenshotSuffix.empty())
+                {
+                    mScreenshotDir.append(dirSeparator).append(
+                        configScreenshotSuffix);
+                }
+            }
+            config.setValue("screenshotDirectory2",
+                encodeBase64String(mScreenshotDir));
         }
     }
+    logger->log("screenshotDirectory: " + mScreenshotDir);
 }
 
 void Client::accountLogin(LoginData *const data) const
@@ -2353,7 +2373,9 @@ void Client::storeSafeParameters() const
     std::string particleFont;
     std::string helpFont;
     std::string secureFont;
+    std::string npcFont;
     std::string japanFont;
+    std::string chinaFont;
     bool showBackground;
     bool enableMumble;
     bool enableMapReduce;
@@ -2377,7 +2399,9 @@ void Client::storeSafeParameters() const
     particleFont = config.getStringValue("particleFont");
     helpFont = config.getStringValue("helpFont");
     secureFont = config.getStringValue("secureFont");
+    npcFont = config.getStringValue("npcFont");
     japanFont = config.getStringValue("japanFont");
+    chinaFont = config.getStringValue("chinaFont");
 
     showBackground = config.getBoolValue("showBackground");
     enableMumble = config.getBoolValue("enableMumble");
@@ -2397,7 +2421,9 @@ void Client::storeSafeParameters() const
         config.setValue("particleFont", "fonts/dejavusans.ttf");
         config.setValue("helpFont", "fonts/dejavusansmono.ttf");
         config.setValue("secureFont", "fonts/dejavusansmono.ttf");
+        config.setValue("npcFont", "fonts/dejavusans.ttf");
         config.setValue("japanFont", "fonts/mplus-1p-regular.ttf");
+        config.setValue("chinaFont", "fonts/wqy-microhei.ttf");
         config.setValue("showBackground", false);
         config.setValue("enableMumble", false);
         config.setValue("enableMapReduce", false);
@@ -2437,7 +2463,9 @@ void Client::storeSafeParameters() const
         config.setValue("particleFont", particleFont);
         config.setValue("helpFont", helpFont);
         config.setValue("secureFont", secureFont);
+        config.setValue("npcFont", npcFont);
         config.setValue("japanFont", japanFont);
+        config.setValue("chinaFont", chinaFont);
         config.setValue("showBackground", showBackground);
         config.setValue("enableMumble", enableMumble);
         config.setValue("enableMapReduce", enableMapReduce);
@@ -2967,7 +2995,10 @@ void Client::setIcon()
 
 #ifdef WIN32
     static SDL_SysWMinfo pInfo;
-    SDL::getWindowWMInfo(mainGraphics->getWindow(), &pInfo);
+    if (mainGraphics)
+        SDL::getWindowWMInfo(mainGraphics->getWindow(), &pInfo);
+    else
+        SDL::getWindowWMInfo(nullptr, &pInfo);
     // Attempt to load icon from .ico file
     HICON icon = (HICON) LoadImage(nullptr, iconFile.c_str(),
         IMAGE_ICON, 64, 64, LR_LOADFROMFILE);
@@ -3000,6 +3031,12 @@ bool Client::isKeyboardVisible() const
 #else
     return mKeyboardHeight > 1;
 #endif
+}
+
+void Client::reloadWallpaper()
+{
+    if (mDesktop)
+        mDesktop->reloadWallpaper();
 }
 
 #ifdef ANDROID

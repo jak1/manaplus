@@ -726,7 +726,8 @@ impHandler1(emote)
 
 impHandler1(emotePet)
 {
-    Net::getPetHandler()->emote(static_cast<uint8_t>(atoi(args.c_str())));
+    // need use actual pet id
+    Net::getPetHandler()->emote(static_cast<uint8_t>(atoi(args.c_str())), 0);
 }
 
 impHandler1(away)
@@ -871,7 +872,7 @@ impHandler0(dirs)
 
 impHandler2(info)
 {
-    if (!tab || !player_node || !tmwServerVersion > 0)
+    if (!tab || !player_node || tmwServerVersion > 0)
         return;
 
     switch (tab->getType())
@@ -1261,7 +1262,7 @@ impHandler1(talkRaw)
 impHandler1(talkPet)
 {
     // in future probably need add channel detection
-    if (player_node->getPet())
+    if (!player_node->getPets().empty())
         Net::getChatHandler()->talkPet(args, GENERAL_CHANNEL);
     else
         Net::getChatHandler()->talk(args, GENERAL_CHANNEL);

@@ -29,9 +29,11 @@ namespace SoundDB
 {
     void load();
 
+    void loadXmlFile(const std::string &fileName);
+
     void unload();
 
     std::string &getSound(const int id);
-}
+}  // namespace SoundDB
 
 #endif  // RESOURCES_DB_SOUNDDB_H

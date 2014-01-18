@@ -24,11 +24,11 @@
 #include "game.h"
 #include "touchmanager.h"
 
-#include "being/localplayer.h"
-
 #include "input/joystick.h"
 #include "input/keyboardconfig.h"
 #include "input/keyboarddata.h"
+#include "being/localplayer.h"
+#include "being/playerinfo.h"
 #ifdef USE_SDL2
 #include "input/multitouchmanager.h"
 #endif
@@ -38,10 +38,12 @@
 
 #include "gui/widgets/tabs/setup_input.h"
 
+#include "gui/windows/buydialog.h"
 #include "gui/windows/chatwindow.h"
 #include "gui/windows/inventorywindow.h"
 #include "gui/windows/npcdialog.h"
 #include "gui/windows/npcpostdialog.h"
+#include "gui/windows/selldialog.h"
 #include "gui/windows/setup.h"
 #include "gui/windows/textdialog.h"
 #include "gui/windows/tradewindow.h"
@@ -332,7 +334,20 @@ void InputManager::callbackNewKey()
     mSetupInput->newKeyCallback(mNewKeyIndex);
 }
 
-bool InputManager::isActionActive(const int index)
+bool InputManager::isActionActive(const int index) const
+{
+    if (!isActionActive0(index))
+        return false;
+
+    const KeyData &key = keyData[index];
+//    logger->log("isActionActive mask=%d, condition=%d, index=%d",
+//        mMask, key.condition, index);
+    if ((key.condition & mMask) != key.condition)
+        return false;
+    return true;
+}
+
+bool InputManager::isActionActive0(const int index) const
 {
     if (keyboard.isActionActive(index))
         return true;
@@ -524,6 +539,7 @@ bool InputManager::handleEvent(const SDL_Event &event)
     {
         case SDL_KEYDOWN:
         {
+            keyboard.refreshActiveKeys();
             updateConditionMask();
             if (handleAssignKey(event, INPUT_KEYBOARD))
                 return true;
@@ -551,6 +567,7 @@ bool InputManager::handleEvent(const SDL_Event &event)
         }
         case SDL_KEYUP:
         {
+            keyboard.refreshActiveKeys();
             updateConditionMask();
             keyboard.handleDeActicateKey(event);
             break;
@@ -655,6 +672,9 @@ void InputManager::updateConditionMask()
         mMask |= COND_NOINPUT;
     }
 
+    if (!BuyDialog::isActive() && !SellDialog::isActive())
+        mMask |= COND_NOBUYSELL;
+
     if (!player_node || !player_node->getAway())
         mMask |= COND_NOAWAY;
 
@@ -670,12 +690,18 @@ void InputManager::updateConditionMask()
     const NpcDialog *const dialog = NpcDialog::getActive();
     if (!dialog || !dialog->isTextInputFocused())
         mMask |= COND_NONPCINPUT;
+    if (!dialog || dialog->isCloseState())
+    {
+        mMask |= COND_NONPCDIALOG;
+        if (!InventoryWindow::isStorageActive())
+            mMask |= COND_NOTALKING;
+    }
 
     if (!player_node || !player_node->getDisableGameModifiers())
         mMask |= COND_EMODS;
 
-    if (!isActionActive(Input::KEY_STOP_ATTACK)
-        && !isActionActive(Input::KEY_UNTARGET))
+    if (!isActionActive0(Input::KEY_STOP_ATTACK)
+        && !isActionActive0(Input::KEY_UNTARGET))
     {
         mMask |= COND_NOTARGET;
     }
@@ -688,12 +714,12 @@ void InputManager::updateConditionMask()
 
 bool InputManager::checkKey(const KeyData *const key) const
 {
-//    logger->log("mask=%d, condition=%d", mMask, key->condition);
+    // logger->log("checkKey mask=%d, condition=%d", mMask, key->condition);
     if (!key || (key->condition & mMask) != key->condition)
         return false;
 
     return (key->modKeyIndex == Input::KEY_NO_VALUE
-        || isActionActive(key->modKeyIndex));
+        || isActionActive0(key->modKeyIndex));
 }
 
 bool InputManager::invokeKey(const KeyData *const key, const int keyNum)

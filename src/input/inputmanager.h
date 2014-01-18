@@ -84,10 +84,16 @@ enum KeyCondition
                                               // pressed
     COND_NOFOLLOW = 1024,                     // follow mode disabled
     COND_INGAME = 2048,                       // game must be started
+    COND_NOBUYSELL = 4096,                    // no active buy or sell dialogs
+    COND_NONPCDIALOG = 8192,                  // no active npc dialog or
+                                              // dialog almost closed
+    COND_NOTALKING = 16384,                   // player have no opened
+                                              // dialogs what prevent moving
     COND_SHORTCUT = 2 + 4 + 16 + 512 + 2048,  // flags for shortcut keys
     COND_SHORTCUT0 = 2 + 4 + 16 + 512,        // flags for shortcut keys
     COND_GAME = 2 + 4 + 8 + 16 + 64 + 2048,   // main game key
-    COND_GAME2 = 2 + 8 + 16 + 64 + 2048
+    COND_GAME2 = 2 + 8 + 16 + 64 + 2048,
+    COND_ARROWKEYS = 2 + 8 + 16 + 64 + 2048 + 4096 + 16384
 };
 
 class InputManager final
@@ -130,7 +136,7 @@ class InputManager final
 
         void unassignKey();
 
-        static bool isActionActive(const int index) A_WARN_UNUSED;
+        bool isActionActive(const int index) const A_WARN_UNUSED;
 
         /**
          * Set the index of the new key to be assigned.
@@ -174,6 +180,8 @@ class InputManager final
         void executeAction(const int keyNum);
 
     protected:
+        bool isActionActive0(const int index) const A_WARN_UNUSED;
+
         Setup_Input *mSetupInput;      /**< Reference to setup window */
 
         int mNewKeyIndex;              /**< Index of new key to be assigned */

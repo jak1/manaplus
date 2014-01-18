@@ -23,6 +23,8 @@
 #ifndef RESOURCES_DB_PETDB_H
 #define RESOURCES_DB_PETDB_H
 
+#include <string>
+
 #include "localconsts.h"
 
 class BeingInfo;
@@ -31,9 +33,11 @@ namespace PETDB
 {
     void load();
 
+    void loadXmlFile(const std::string &fileName);
+
     void unload();
 
     BeingInfo *get(const int id) A_WARN_UNUSED;
-}
+}  // namespace PETDB
 
 #endif  // RESOURCES_DB_PETDB_H

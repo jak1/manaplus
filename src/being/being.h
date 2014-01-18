@@ -877,20 +877,26 @@ class Being : public ActorSprite, public ConfigListener
 
         void addPet(const int id);
 
-        void removePet();
+        void removePet(const int id);
 
         void updatePets();
 
         void fixPetSpawnPos(int &dstX, int &dstY) const;
 
-        Being *getPet()
-        { return mPet; }
+        const std::vector<Being*> &getPets() const
+        { return mPets; }
 
-        void setPet(Being *const pet)
-        { mPet = pet; }
+        Being *getFirstPet()
+        { return mPets.empty() ? nullptr : mPets[0]; }
 
         void setOwner(Being *const owner)
         { mOwner = owner; }
+
+        void unassignPet(const Being *const pet);
+
+        void removeAllPets();
+
+        Being *findChildPet(const int id);
 
         void playSfx(const SoundInfo &sound, Being *const being,
                      const bool main, const int x, const int y) const;
@@ -917,6 +923,12 @@ class Being : public ActorSprite, public ConfigListener
         void setMap(Map *const map);
 
         void recreateItemParticles();
+
+        void incUsage()
+        { mUsageCounter ++; }
+
+        int decUsage()
+        { return --mUsageCounter; }
 
     protected:
         /**
@@ -1029,7 +1041,7 @@ class Being : public ActorSprite, public ConfigListener
         int *mSpriteHide;
         int *mSpriteDraw;
         std::string mComment;
-        Being *mPet;
+        std::vector<Being*> mPets;
         Being *mOwner;
         Particle *mSpecialParticle;
 
@@ -1076,8 +1088,8 @@ class Being : public ActorSprite, public ConfigListener
         int mCriticalHit;
         unsigned int mPvpRank;
         unsigned int mNumber;
-        int mPetId;
         int mLook;
+        int mUsageCounter;
         unsigned char mHairColor;
         bool mErased;
         bool mEnemy;

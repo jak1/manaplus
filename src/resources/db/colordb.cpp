@@ -26,6 +26,8 @@
 
 #include "utils/xml.h"
 
+#include "resources/beingcommon.h"
+
 #include "debug.h"
 
 namespace
@@ -43,56 +45,60 @@ void ColorDB::load()
     if (mLoaded)
         unload();
 
-    loadHair();
-    if (serverVersion >= 1)
-        loadColorLists();
+    std::map<int, ItemColor> colors;
+    ColorListsIterator it = mColorLists.find("hair");
+    if (it != mColorLists.end())
+        colors = it->second;
+    loadHair(paths.getStringValue("hairColorFile"), colors);
+    loadHair(paths.getStringValue("hairColorPatchFile"), colors);
+    StringVect list;
+    BeingCommon::getIncludeFiles(paths.getStringValue(
+        "hairColorPatchDir"), list);
+    FOR_EACH (StringVectCIter, it2, list)
+        loadHair(*it2, colors);
 
-    const ColorListsIterator it = mColorLists.find("hair");
+    mColorLists["hair"] = colors;
+
+    if (serverVersion >= 1)
+    {
+        loadColorLists(paths.getStringValue("itemColorsFile"));
+        loadColorLists(paths.getStringValue("itemColorsPatchFile"));
+        loadXmlDir("itemColorsPatchDir", loadColorLists);
+    }
+
+    it = mColorLists.find("hair");
     if (it != mColorLists.end())
         mHairColorsSize = static_cast<int>((*it).second.size());
     else
         mHairColorsSize = 0;
+    mLoaded = true;
 }
 
-void ColorDB::loadHair()
+void ColorDB::loadHair(const std::string &fileName,
+                       std::map<int, ItemColor> &colors)
 {
-    std::map <int, ItemColor> colors;
-    const ColorListsIterator it = mColorLists.find("hair");
-
-    if (it != mColorLists.end())
-        colors = it->second;
-
-    XML::Document *doc = new XML::Document(
-        paths.getStringValue("hairColorFile"));
-    XmlNodePtr root = doc->rootNode();
-    bool hairXml = true;
+    XML::Document *doc = new XML::Document(fileName);
+    const XmlNodePtrConst root = doc->rootNode();
 
     if (!root || !xmlNameEqual(root, "colors"))
     {
-        logger->log("Trying to fall back on "
-            + paths.getStringValue("hairColorFile2"));
-
-        hairXml = false;
-
-        delete doc;
-        doc = new XML::Document(paths.getStringValue("hairColorFile2"));
-        root = doc->rootNode();
-
-        if (!root || !xmlNameEqual(root, "colors"))
-        {
-            logger->log1("ColorDB: Failed to find any color files.");
+        logger->log("ColorDB: Failed to find hair colors file.");
+        if (colors.find(0) == colors.end())
             colors[0] = ItemColor(0, "", "");
-            mLoaded = true;
-
-            delete doc;
-
-            return;
-        }
+        delete doc;
+        return;
     }
 
     for_each_xml_child_node(node, root)
     {
-        if (xmlNameEqual(node, "color"))
+        if (xmlNameEqual(node, "include"))
+        {
+            const std::string name = XML::getProperty(node, "name", "");
+            if (!name.empty())
+                loadHair(name, colors);
+            continue;
+        }
+        else if (xmlNameEqual(node, "color"))
         {
             const int id = XML::getProperty(node, "id", 0);
 
@@ -100,21 +106,17 @@ void ColorDB::loadHair()
                 logger->log("ColorDB: Redefinition of dye ID %d", id);
 
             colors[id] = ItemColor(id, XML::langProperty(node, "name", ""),
-                XML::getProperty(node, hairXml ? "value" : "dye", "#FFFFFF"));
+                XML::getProperty(node, "value", "#FFFFFF"));
         }
     }
 
     delete doc;
-
-    mColorLists["hair"] = colors;
-    mLoaded = true;
 }
 
-void ColorDB::loadColorLists()
+void ColorDB::loadColorLists(const std::string &fileName)
 {
-    XML::Document *doc = new XML::Document(
-        paths.getStringValue("itemColorsFile"));
-    const XmlNodePtr root = doc->rootNode();
+    XML::Document *doc = new XML::Document(fileName);
+    const XmlNodePtrConst root = doc->rootNode();
     if (!root)
     {
         delete doc;
@@ -123,7 +125,14 @@ void ColorDB::loadColorLists()
 
     for_each_xml_child_node(node, root)
     {
-        if (xmlNameEqual(node, "list"))
+        if (xmlNameEqual(node, "include"))
+        {
+            const std::string name = XML::getProperty(node, "name", "");
+            if (!name.empty())
+                loadColorLists(name);
+            continue;
+        }
+        else if (xmlNameEqual(node, "list"))
         {
             const std::string name = XML::getProperty(node, "name", "");
             if (name.empty())

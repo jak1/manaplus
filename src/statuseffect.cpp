@@ -22,12 +22,13 @@
 
 #include "statuseffect.h"
 
+#include "configuration.h"
 #include "logger.h"
 #include "soundmanager.h"
 
 #include "gui/widgets/tabs/chattab.h"
 
-#include "configuration.h"
+#include "resources/beingcommon.h"
 
 #include <map>
 
@@ -127,17 +128,34 @@ void StatusEffect::load()
     if (mLoaded)
         unload();
 
-    XML::Document doc(paths.getStringValue("statusEffectsFile"));
-    const XmlNodePtr rootNode = doc.rootNode();
+    loadXmlFile(paths.getStringValue("statusEffectsFile"));
+    loadXmlFile(paths.getStringValue("statusEffectsPatchFile"));
+    loadXmlDir("statusEffectsPatchDir", loadXmlFile);
+
+    mLoaded = true;
+}
+
+void StatusEffect::loadXmlFile(const std::string &fileName)
+{
+    XML::Document doc(fileName);
+    const XmlNodePtrConst rootNode = doc.rootNode();
 
     if (!rootNode || !xmlNameEqual(rootNode, "status-effects"))
     {
-        logger->log1("Error loading status effects file");
+        logger->log("Error loading status effects file: " + fileName);
         return;
     }
 
     for_each_xml_child_node(node, rootNode)
     {
+        if (xmlNameEqual(node, "include"))
+        {
+            const std::string name = XML::getProperty(node, "name", "");
+            if (!name.empty())
+                loadXmlFile(name);
+            continue;
+        }
+
         status_effect_map *the_map = nullptr;
 
         const int index = atoi(XML::getProperty(node, "id", "-1").c_str());
@@ -158,8 +176,12 @@ void StatusEffect::load()
 
         if (the_map)
         {
-            StatusEffect *const startEffect = new StatusEffect;
-            StatusEffect *const endEffect = new StatusEffect;
+            StatusEffect *startEffect = (*the_map)[1][index];
+            StatusEffect *endEffect = (*the_map)[0][index];
+            if (!startEffect)
+                startEffect = new StatusEffect;
+            if (!endEffect)
+                endEffect = new StatusEffect;
 
             startEffect->mMessage = XML::getProperty(
                 node, "start-message", "");
@@ -182,7 +204,6 @@ void StatusEffect::load()
             (*the_map)[0][index] = endEffect;
         }
     }
-    mLoaded = true;
 }
 
 static void unloadMap(std::map<int, StatusEffect *> &map)
