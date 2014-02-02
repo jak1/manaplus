@@ -1,5 +1,5 @@
 AC_PREREQ(2.60)
-AC_INIT([ManaPlus], [1.4.1.18], [akaras@inbox.ru], [manaplus])
+AC_INIT([ManaPlus], [1.4.2.1], [akaras@inbox.ru], [manaplus])
 AM_INIT_AUTOMAKE([1.9])
 AC_CONFIG_HEADERS([config.h:config.h.in])
 AC_LANG_CPLUSPLUS
@@ -250,7 +250,7 @@ fi
 AM_CONDITIONAL(USE_OPENGL, test x$with_opengl = xyes)
 
 # Option to enable internal guichan
-AC_ARG_WITH(internalguichan,[  --without-internalguichan        don't use internal guichan ] )
+AC_ARG_WITH(internalguichan,[  --without-internalguichan        DEPRICATED. don't use internal guichan ] )
 if test "x$with_internalguichan" == "xno"; then
     with_internalguichan=no
 

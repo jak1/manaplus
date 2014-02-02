@@ -376,9 +376,10 @@ void GraphicsManager::setVideoMode()
     int width = config.getIntValue("screenwidth");
     int height = config.getIntValue("screenheight");
 #endif
+    const int scale = config.getIntValue("scale");
 
     // Try to set the desired video mode
-    if (!mainGraphics->setVideoMode(width, height, bpp,
+    if (!mainGraphics->setVideoMode(width, height, scale, bpp,
         fullscreen, hwaccel, enableResize, noFrame))
     {
         logger->log(strprintf("Couldn't set %dx%dx%d video mode: %s",
@@ -396,7 +397,7 @@ void GraphicsManager::setVideoMode()
             config.setValueInt("screenwidth", oldWidth);
             config.setValueInt("screenheight", oldHeight);
             config.setValue("screen", oldFullscreen == 1);
-            if (!mainGraphics->setVideoMode(oldWidth, oldHeight, bpp,
+            if (!mainGraphics->setVideoMode(oldWidth, oldHeight, scale, bpp,
                 oldFullscreen, hwaccel, enableResize, noFrame))
             {
                 logger->safeError(strprintf("Couldn't restore %dx%dx%d "

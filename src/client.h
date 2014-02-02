@@ -272,6 +272,9 @@ public:
     std::string getSupportUrl() const A_WARN_UNUSED
     { return mCurrentServer.supportUrl; }
 
+    std::string getLogFileName() const A_WARN_UNUSED
+    { return mLogFileName; }
+
     bool isKeyboardVisible() const;
 
     void setGuiAlpha(const float n)
@@ -308,7 +311,11 @@ public:
 
     void writePacketLimits(const std::string &packetLimitsName) const;
 
-    void resizeVideo(int width, int height, const bool always = false);
+    void resizeVideo(int actualWidth,
+                     int actualHeight,
+                     const bool always);
+
+    void applyScale();
 
     bool limitPackets(const int type) A_WARN_UNUSED;
 
@@ -366,7 +373,9 @@ private:
 
     void accountLogin(LoginData *const data) const;
 
+#ifndef ANDROID
     void storeSafeParameters() const;
+#endif
 
     void backupConfig() const;
 
@@ -406,6 +415,7 @@ private:
     std::string mRootDir;
     std::string mServerName;
     std::string mOnlineListUrl;
+    std::string mLogFileName;
 
     ServerInfo mCurrentServer;
 

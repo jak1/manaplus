@@ -152,7 +152,7 @@ DefaultsData* getConfigDefaults()
     AddDEF("lastCharacter", "");
     AddDEF("altfpslimit", 5);
     AddDEF("updatehost", "");
-    AddDEF("screenshotDirectory2", "");
+    AddDEF("screenshotDirectory3", "");
     AddDEF("useScreenshotDirectorySuffix", true);
     AddDEF("screenshotDirectorySuffix", "");
     AddDEF("EnableSync", false);
@@ -345,7 +345,7 @@ DefaultsData* getConfigDefaults()
     AddDEF("uselonglivesprites", false);
     AddDEF("uselonglivesounds", true);
     AddDEF("screenDensity", 0);
-    AddDEF("cfgver", 4);
+    AddDEF("cfgver", 6);
     AddDEF("enableDebugLog", false);
     AddDEF("doubleClick", true);
     AddDEF("useDiagonalSpeed", true);
@@ -356,6 +356,7 @@ DefaultsData* getConfigDefaults()
     AddDEF("showmotd", false);
     AddDEF("playMapAnimations", true);
     AddDEF("usepets", true);
+    AddDEF("scale", 1);
     return configData;
 }
 

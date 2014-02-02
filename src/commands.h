@@ -116,6 +116,7 @@ namespace Commands
     decHandler(dumpTests);
     decHandler(dumpOGL);
     decHandler(dumpGL);
+    decHandler(dumpMods);
     decHandler(cacheInfo);
     decHandler(execute);
     decHandler(testsdlfont);
@@ -129,6 +130,9 @@ namespace Commands
     decHandler(createItems);
     decHandler(talkRaw);
     decHandler(talkPet);
+    decHandler(uploadConfig);
+    decHandler(uploadServerConfig);
+    decHandler(uploadLog);
 
     void replaceVars(std::string &str);
 }  // namespace Commands
@@ -205,6 +209,7 @@ enum
     COMMAND_DUMPT,
     COMMAND_DUMPOGL,
     COMMAND_DUMPGL,
+    COMMAND_DUMPMODS,
     COMMAND_URL,
     COMMAND_OPEN,
     COMMAND_EXECUTE,
@@ -225,6 +230,9 @@ enum
     COMMAND_CREATEITEMS,
     COMMAND_TALKRAW,
     COMMAND_TALKPET,
+    COMMAND_UPLOADCONFIG,
+    COMMAND_UPLOADSERVERCONFIG,
+    COMMAND_UPLOADLOG,
     COMMAND_HACK,
     END_COMMANDS
 };
@@ -301,6 +309,7 @@ static const CommandInfo commands[] =
     {"dumpt", &Commands::dumpTests, -1, false},
     {"dumpogl", &Commands::dumpOGL, -1, false},
     {"dumpgl", &Commands::dumpGL, -1, false},
+    {"dumpmods", &Commands::dumpMods, -1, false},
     {"url", &Commands::url, -1, true},
     {"open", &Commands::open, -1, true},
     {"execute", &Commands::execute, -1, true},
@@ -321,6 +330,9 @@ static const CommandInfo commands[] =
     {"createitems", &Commands::createItems, -1, false},
     {"talkraw", &Commands::talkRaw, -1, true},
     {"talkpet", &Commands::talkPet, -1, true},
+    {"uploadconfig", &Commands::uploadConfig, -1, false},
+    {"uploadserverconfig", &Commands::uploadServerConfig, -1, false},
+    {"uploadlog", &Commands::uploadLog, -1, false},
     {"hack", &Commands::hack, -1, true}
 };
 

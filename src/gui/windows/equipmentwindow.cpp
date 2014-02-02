@@ -48,8 +48,6 @@
 
 #include <guichan/font.hpp>
 
-#include <SDL_mouse.h>
-
 #include "debug.h"
 
 static const int BOX_COUNT = 13;
@@ -425,9 +423,6 @@ void EquipmentWindow::mouseMoved(gcn::MouseEvent &event)
 
     if (item)
     {
-        int mouseX, mouseY;
-        SDL_GetMouseState(&mouseX, &mouseY);
-
         mItemPopup->setItem(item);
         mItemPopup->position(x + getX(), y + getY());
     }

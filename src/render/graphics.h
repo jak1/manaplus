@@ -127,9 +127,13 @@ class Graphics : public gcn::Graphics
         /**
          * Try to create a window with the given settings.
          */
-        virtual bool setVideoMode(const int w, const int h, const int bpp,
-                                  const bool fs, const bool hwaccel,
-                                  const bool resize, const bool noFrame) = 0;
+        virtual bool setVideoMode(const int w, const int h,
+                                  const int scale,
+                                  const int bpp,
+                                  const bool fs,
+                                  const bool hwaccel,
+                                  const bool resize,
+                                  const bool noFrame) = 0;
 
         /**
          * Set fullscreen mode.
@@ -341,8 +345,18 @@ class Graphics : public gcn::Graphics
 
         virtual void completeCache() = 0;
 
+        int getScale() const
+        { return mScale; }
+
+        virtual bool isAllowScale() const
+        { return false; }
+
+        void setScale(int scale);
+
         int mWidth;
         int mHeight;
+        int mActualWidth;
+        int mActualHeight;
 
     protected:
         /**
@@ -350,9 +364,13 @@ class Graphics : public gcn::Graphics
          */
         Graphics();
 
-        void setMainFlags(const int w, const int h, const int bpp,
-                          const bool fs, const bool hwaccel,
-                          const bool resize, const bool noFrame);
+        void setMainFlags(const int w, const int h,
+                          const int scale,
+                          const int bpp,
+                          const bool fs,
+                          const bool hwaccel,
+                          const bool resize,
+                          const bool noFrame);
 
         int getOpenGLFlags() const A_WARN_UNUSED;
 
@@ -386,6 +404,7 @@ class Graphics : public gcn::Graphics
         std::string mName;
         int mStartFreeMem;
         bool mSync;
+        int mScale;
         gcn::Color mColor;
         gcn::Color mColor2;
 };

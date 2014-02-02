@@ -47,7 +47,7 @@ ELSEIF (CMAKE_SYSTEM_NAME STREQUAL Linux)
     SET(EXTRA_LIBRARIES rt)
 ENDIF()
 
-SET(FLAGS "${FLAGS} -DUSE_MUMBLE")
+SET(FLAGS "${FLAGS} -DUSE_MUMBLE -DUSE_INTERNALGUICHAN")
 
 IF (WITH_OPENGL)
     FIND_PACKAGE(OpenGL REQUIRED)
@@ -796,7 +796,6 @@ SET(SRCS_GUICHAN
     guichan/include/guichan/mouseevent.hpp
     guichan/include/guichan/mouseinput.hpp
     guichan/include/guichan/mouselistener.hpp
-    guichan/include/guichan/platform.hpp
     guichan/include/guichan/rectangle.hpp
     guichan/include/guichan/selectionevent.hpp
     guichan/include/guichan/selectionlistener.hpp

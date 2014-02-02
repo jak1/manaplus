@@ -226,6 +226,7 @@ Client::Client(const Options &options) :
     mRootDir(),
     mServerName(),
     mOnlineListUrl(),
+    mLogFileName(),
     mCurrentServer(),
     mGame(nullptr),
     mCurrentDialog(nullptr),
@@ -293,9 +294,10 @@ void Client::gameInit()
 
     // Configure logger
     if (!mOptions.logFileName.empty())
-        logger->setLogFile(mOptions.logFileName);
+        mLogFileName = mOptions.logFileName;
     else
-        logger->setLogFile(mLocalDataDir + "/manaplus.log");
+        mLogFileName = mLocalDataDir + "/manaplus.log";
+    logger->setLogFile(mLogFileName);
 
 #ifdef USE_FUZZER
     Fuzzer::init();
@@ -544,6 +546,7 @@ void Client::initGraphics()
 #endif
 #endif
 
+    checkConfigVersion();
 #if defined(WIN32) || defined(__APPLE__)
     if (config.getBoolValue("centerwindow"))
         setEnv("SDL_VIDEO_CENTERED", "1");
@@ -575,7 +578,6 @@ void Client::initGraphics()
     runCounters = config.getBoolValue("packetcounters");
     applyVSync();
     graphicsManager.setVideoMode();
-    checkConfigVersion();
     getConfigDefaults2(config.getDefaultValues());
     applyGrabMode();
     applyGamma();
@@ -2301,7 +2303,7 @@ void Client::initScreenshotDir()
     else if (mScreenshotDir.empty())
     {
         mScreenshotDir = decodeBase64String(
-            config.getStringValue("screenshotDirectory2"));
+            config.getStringValue("screenshotDirectory3"));
         if (mScreenshotDir.empty())
         {
 #ifdef __ANDROID__
@@ -2328,7 +2330,7 @@ void Client::initScreenshotDir()
                         configScreenshotSuffix);
                 }
             }
-            config.setValue("screenshotDirectory2",
+            config.setValue("screenshotDirectory3",
                 encodeBase64String(mScreenshotDir));
         }
     }
@@ -2359,6 +2361,7 @@ void Client::accountLogin(LoginData *const data) const
     serverConfig.setValue("remember", remember);
 }
 
+#ifndef ANDROID
 void Client::storeSafeParameters() const
 {
     bool tmpHwaccel;
@@ -2477,6 +2480,7 @@ void Client::storeSafeParameters() const
         config.setValue("screenheight", height);
     }
 }
+#endif
 
 void Client::initTradeFilter() const
 {
@@ -2796,25 +2800,30 @@ bool Client::isTmw() const
     return false;
 }
 
-void Client::resizeVideo(int width, int height, const bool always)
+void Client::resizeVideo(int actualWidth,
+                         int actualHeight,
+                         const bool always)
 {
     // Keep a minimum size. This isn't adhered to by the actual window, but
     // it keeps some window positions from getting messed up.
-    width = std::max(470, width);
-    height = std::max(320, height);
+    actualWidth = std::max(470, actualWidth);
+    actualHeight = std::max(320, actualHeight);
 
     if (!mainGraphics)
         return;
-    if (!always && mainGraphics->mWidth == width
-        && mainGraphics->mHeight == height)
+    if (!always
+        && mainGraphics->mActualWidth == actualWidth
+        && mainGraphics->mActualHeight == actualHeight)
     {
         return;
     }
 
-    touchManager.resize(width, height);
-
-    if (mainGraphics->resizeScreen(width, height))
+    if (mainGraphics->resizeScreen(actualWidth, actualHeight))
     {
+        const int width = mainGraphics->mWidth;
+        const int height = mainGraphics->mHeight;
+        touchManager.resize(width, height);
+
         if (gui)
             gui->videoResized();
 
@@ -2850,8 +2859,8 @@ void Client::resizeVideo(int width, int height, const bool always)
         if (gui)
             gui->draw();
 
-        config.setValue("screenwidth", width);
-        config.setValue("screenheight", height);
+        config.setValue("screenwidth", actualWidth);
+        config.setValue("screenheight", actualHeight);
     }
 }
 
@@ -2883,6 +2892,17 @@ void Client::applyKeyRepeat()
     SDL_EnableKeyRepeat(config.getIntValue("repeateDelay"),
         config.getIntValue("repeateInterval"));
 #endif
+}
+
+void Client::applyScale()
+{
+    const int scale = config.getIntValue("scale");
+    if (mainGraphics->getScale() == scale)
+        return;
+    mainGraphics->setScale(scale);
+    resizeVideo(mainGraphics->mActualWidth,
+        mainGraphics->mActualHeight,
+        true);
 }
 
 void Client::setIsMinimized(const bool n)
@@ -2958,8 +2978,10 @@ void Client::checkConfigVersion()
                 Being::NO_NAME_IN_BUBBLE));
         }
     }
+    if (version < 6)
+        config.setValue("blur", false);
 
-    config.setValue("cfgver", 5);
+    config.setValue("cfgver", 6);
 }
 
 Window *Client::openErrorDialog(const std::string &header,

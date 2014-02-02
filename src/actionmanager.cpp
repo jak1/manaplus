@@ -211,11 +211,11 @@ impHandler(outfit)
 
 impHandler0(mouseClick)
 {
-    if (!guiInput)
+    if (!guiInput || !gui)
         return false;
 
     int mouseX, mouseY;
-    SDL_GetMouseState(&mouseX, &mouseY);
+    gui->getMouseState(&mouseX, &mouseY);
     guiInput->simulateMouseClick(mouseX, mouseY, gcn::MouseEvent::RIGHT);
     return true;
 }
@@ -388,7 +388,7 @@ impHandler0(heal)
 {
     if (actorManager)
     {
-        if (inputManager.isActionActive(Input::KEY_MOD))
+        if (inputManager.isActionActive(Input::KEY_STOP_ATTACK))
         {
             Being *target = player_node->getTarget();
             if (!target || target->getType() != ActorSprite::PLAYER)

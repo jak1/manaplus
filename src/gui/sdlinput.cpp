@@ -1,3 +1,23 @@
+/*
+ *  The ManaPlus Client
+ *  Copyright (C) 2011-2014  The ManaPlus Developers
+ *
+ *  This file is part of The ManaPlus Client.
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 /*      _______   __   __   __   ______   __   __   _______   __   __
  *     / _____/\ / /\ / /\ / /\ / ____/\ / /\ / /\ / ___  /\ /  |\/ /\
  *    / /\____\// / // / // / // /\___\// /_// / // /\_/ / // , |/ / /
@@ -6,13 +26,12 @@
  * /______/ //______/ //_/ //_____/\ /_/ //_/ //_/ //_/ //_/ /|_/ /
  * \______\/ \______\/ \_\/ \_____\/ \_\/ \_\/ \_\/ \_\/ \_\/ \_\/
  *
- * Copyright (c) 2004, 2005, 2006, 2007 Olof Naessén and Per Larsson
+ * Copyright (c) 2004, 2005, 2006, 2007 Olof NaessÃ©n and Per Larsson
  * Copyright (C) 2007-2010  The Mana World Development Team
- * Copyright (C) 2011-2014  The ManaPlus Developers
  *
  *                                                         Js_./
  * Per Larsson a.k.a finalman                          _RqZ{a<^_aa
- * Olof Naessén a.k.a jansem/yakslem                _asww7!uY`>  )\a//
+ * Olof NaessÃ©n a.k.a jansem/yakslem                _asww7!uY`>  )\a//
  *                                                 _Qhm`] _f "'c  1!5m
  * Visit: http://guichan.darkbits.org             )Qk<P ` _: :+' .'  "{[
  *                                               .)j(] .d_/ '-(  P .   S
@@ -61,6 +80,8 @@
 #include "sdlshared.h"
 
 #include "input/inputmanager.h"
+
+#include "render/graphics.h"
 
 #ifdef USE_SDL2
 #include "gui/gui.h"
@@ -191,14 +212,19 @@ void SDLInput::pushInput(const SDL_Event &event)
 #endif
 
         case SDL_MOUSEBUTTONDOWN:
+        {
             mMouseDown = true;
-            mouseInput.setX(event.button.x);
-            mouseInput.setY(event.button.y);
+            const int scale = mainGraphics->getScale();
+            const int x = event.button.x / scale;
+            const int y = event.button.y / scale;
+            mouseInput.setX(x);
+            mouseInput.setY(y);
 #ifdef ANDROID
 #ifdef USE_SDL2
-            mouseInput.setReal(event.button.x, event.button.y);
+            mouseInput.setReal(x, y);
 #else
-            mouseInput.setReal(event.button.realx, event.button.realy);
+            mouseInput.setReal(event.button.realx / scale,
+                event.button.realy / scale);
 #endif
 #endif
             mouseInput.setButton(convertMouseButton(event.button.button));
@@ -214,16 +240,21 @@ void SDLInput::pushInput(const SDL_Event &event)
             mouseInput.setTimeStamp(SDL_GetTicks());
             mMouseInputQueue.push(mouseInput);
             break;
-
+        }
         case SDL_MOUSEBUTTONUP:
+        {
             mMouseDown = false;
-            mouseInput.setX(event.button.x);
-            mouseInput.setY(event.button.y);
+            const int scale = mainGraphics->getScale();
+            const int x = event.button.x / scale;
+            const int y = event.button.y / scale;
+            mouseInput.setX(x);
+            mouseInput.setY(y);
 #ifdef ANDROID
 #ifdef USE_SDL2
-            mouseInput.setReal(event.button.x, event.button.y);
+            mouseInput.setReal(x, y);
 #else
-            mouseInput.setReal(event.button.realx, event.button.realy);
+            mouseInput.setReal(event.button.realx / scale,
+                event.button.realy / scale);
 #endif
 #endif
             mouseInput.setButton(convertMouseButton(event.button.button));
@@ -231,15 +262,20 @@ void SDLInput::pushInput(const SDL_Event &event)
             mouseInput.setTimeStamp(SDL_GetTicks());
             mMouseInputQueue.push(mouseInput);
             break;
-
+        }
         case SDL_MOUSEMOTION:
-            mouseInput.setX(event.motion.x);
-            mouseInput.setY(event.motion.y);
+        {
+            const int scale = mainGraphics->getScale();
+            const int x = event.motion.x / scale;
+            const int y = event.motion.y / scale;
+            mouseInput.setX(x);
+            mouseInput.setY(y);
 #ifdef ANDROID
 #ifdef USE_SDL2
-            mouseInput.setReal(event.motion.x, event.motion.y);
+            mouseInput.setReal(x, y);
 #else
-            mouseInput.setReal(event.motion.realx, event.motion.realy);
+            mouseInput.setReal(event.motion.realx / scale,
+                event.motion.realy / scale);
 #endif
 #endif
             mouseInput.setButton(gcn::MouseInput::EMPTY);
@@ -247,7 +283,7 @@ void SDLInput::pushInput(const SDL_Event &event)
             mouseInput.setTimeStamp(SDL_GetTicks());
             mMouseInputQueue.push(mouseInput);
             break;
-
+        }
 #ifndef USE_SDL2
         case SDL_ACTIVEEVENT:
             /*
