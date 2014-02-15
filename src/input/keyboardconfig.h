@@ -56,8 +56,8 @@ class KeyboardConfig final
         /**
          * Get the key function index by providing the keys value.
          */
-        int getKeyIndex(const SDL_Event &event,
-                        const int grp = 1) const A_WARN_UNUSED;
+        static int getKeyIndex(const SDL_Event &event,
+                               const int grp = 1) A_WARN_UNUSED;
 
         /**
          * Set the enable flag, which will stop the user from doing actions.
@@ -75,7 +75,7 @@ class KeyboardConfig final
 
         static SDLKey getKeyFromEvent(const SDL_Event &event) A_WARN_UNUSED;
 
-        int getKeyValueFromEvent(const SDL_Event &event) const A_WARN_UNUSED;
+        static int getKeyValueFromEvent(const SDL_Event &event) A_WARN_UNUSED;
 
         KeysVector *getActionVector(const SDL_Event &event) A_WARN_UNUSED;
 

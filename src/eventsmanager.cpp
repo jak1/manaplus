@@ -60,7 +60,7 @@ void EventsManager::shutdown()
    config.removeListeners(this);
 }
 
-bool EventsManager::handleCommonEvents(const SDL_Event &event)
+bool EventsManager::handleCommonEvents(const SDL_Event &event) const
 {
     if (mLogInput)
         logEvent(event);
@@ -100,7 +100,7 @@ bool EventsManager::handleCommonEvents(const SDL_Event &event)
     return false;
 }
 
-bool EventsManager::handleEvents()
+bool EventsManager::handleEvents() const
 {
     if (Game::instance())
     {
@@ -157,7 +157,7 @@ bool EventsManager::handleEvents()
     return false;
 }
 
-void EventsManager::handleGameEvents()
+void EventsManager::handleGameEvents() const
 {
     Game *const game = Game::instance();
 

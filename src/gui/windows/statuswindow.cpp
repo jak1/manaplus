@@ -36,7 +36,7 @@
 #include "gui/viewport.h"
 
 #include "gui/windows/equipmentwindow.h"
-#include "gui/windows/setup.h"
+#include "gui/windows/setupwindow.h"
 
 #include "gui/widgets/button.h"
 #include "gui/widgets/label.h"
@@ -606,7 +606,7 @@ void StatusWindow::updateJobBar(ProgressBar *const bar, const bool percent)
 }
 
 void StatusWindow::updateProgressBar(ProgressBar *const bar, const int id,
-                                     const bool percent) const
+                                     const bool percent)
 {
     const std::pair<int, int> exp =  PlayerInfo::getStatExperience(id);
     updateProgressBar(bar, exp.first, exp.second, percent);
@@ -733,10 +733,10 @@ void StatusWindow::updateStatusBar(ProgressBar *const bar,
         player_node->getQuickDropCounterString()))
         .append(translateLetter2(player_node->getPickUpTypeString()))
         .append(" ").append(translateLetter2(
-        player_node->getDebugPathString()))
+        LocalPlayer::getDebugPathString()))
         .append(" ").append(translateLetter2(
         player_node->getImitationModeString()))
-        .append(translateLetter2(player_node->getCameraModeString()))
+        .append(translateLetter2(LocalPlayer::getCameraModeString()))
         .append(translateLetter2(player_node->getAwayModeString())));
 
     bar->setProgress(50);

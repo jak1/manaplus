@@ -109,13 +109,6 @@ class ChatTab : public Tab
         void clearText();
 
         /**
-         * Add any extra help text to the output. Allows tabs to define help
-         * for commands defined by the tab itself.
-         */
-        virtual void showHelp()
-        { }
-
-        /**
          * Handle special commands. Allows a tab to handle commands it
          * defines itself.
          *
@@ -193,6 +186,9 @@ class ChatTab : public Tab
         virtual void handleHelp(const std::string &msg);
 
         virtual void getAutoCompleteList(StringVect&) const
+        {}
+
+        virtual void getAutoCompleteCommands(StringVect&) const
         {}
 
         void addRow(std::string &line);

@@ -20,7 +20,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "gui/windows/setup.h"
+#include "gui/windows/setupwindow.h"
 
 #include "configuration.h"
 #include "game.h"
@@ -45,6 +45,7 @@
 #include "gui/widgets/tabs/setup_visual.h"
 
 #include "gui/widgets/label.h"
+#include "gui/widgets/tabbedarea.h"
 
 #include "utils/dtor.h"
 #include "utils/gettext.h"
@@ -52,9 +53,9 @@
 #include "debug.h"
 
 extern Window *statusWindow;
-Setup *setupWindow = nullptr;
+SetupWindow *setupWindow = nullptr;
 
-Setup::Setup() :
+SetupWindow::SetupWindow() :
     // TRANSLATORS: setup window name
     Window(_("Setup"), false, nullptr, "setup.xml"),
     gcn::ActionListener(),
@@ -72,7 +73,7 @@ Setup::Setup() :
     setStickyButtonLock(true);
 }
 
-void Setup::postInit()
+void SetupWindow::postInit()
 {
     int width = 620;
     const int height = 450;
@@ -153,13 +154,13 @@ void Setup::postInit()
     enableVisibleSound(true);
 }
 
-Setup::~Setup()
+SetupWindow::~SetupWindow()
 {
     delete_all(mTabs);
     mButtons.clear();
 }
 
-void Setup::action(const gcn::ActionEvent &event)
+void SetupWindow::action(const gcn::ActionEvent &event)
 {
     if (Game::instance())
         Game::instance()->resetAdjustLevel();
@@ -196,12 +197,12 @@ void Setup::action(const gcn::ActionEvent &event)
     }
 }
 
-void Setup::setInGame(const bool inGame)
+void SetupWindow::setInGame(const bool inGame)
 {
     mResetWindows->setEnabled(inGame);
 }
 
-void Setup::externalUpdate()
+void SetupWindow::externalUpdate()
 {
     unloadModTab();
     mModsTab = new Setup_Mods(this);
@@ -214,7 +215,7 @@ void Setup::externalUpdate()
     }
 }
 
-void Setup::unloadModTab()
+void SetupWindow::unloadModTab()
 {
     if (mModsTab)
     {
@@ -226,7 +227,7 @@ void Setup::unloadModTab()
     }
 }
 
-void Setup::externalUnload()
+void SetupWindow::externalUnload()
 {
     FOR_EACH (std::list<SetupTab*>::const_iterator, it, mTabs)
     {
@@ -236,30 +237,30 @@ void Setup::externalUnload()
     unloadModTab();
 }
 
-void Setup::registerWindowForReset(Window *const window)
+void SetupWindow::registerWindowForReset(Window *const window)
 {
     mWindowsToReset.push_back(window);
 }
 
-void Setup::doCancel()
+void SetupWindow::doCancel()
 {
     setVisible(false);
     for_each(mTabs.begin(), mTabs.end(), std::mem_fun(&SetupTab::cancel));
 }
 
-void Setup::activateTab(const std::string &name)
+void SetupWindow::activateTab(const std::string &name)
 {
     std::string tmp = gettext(name.c_str());
     mPanel->setSelectedTabByName(tmp);
 }
 
-void Setup::setVisible(bool visible)
+void SetupWindow::setVisible(bool visible)
 {
     touchManager.setTempHide(visible);
     Window::setVisible(visible);
 }
 
-void Setup::widgetResized(const gcn::Event &event)
+void SetupWindow::widgetResized(const gcn::Event &event)
 {
     Window::widgetResized(event);
 

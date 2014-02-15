@@ -42,7 +42,6 @@ src/gui/widgets/tabs/setup_touch.cpp
 src/gui/widgets/tabs/setup_video.cpp
 src/gui/widgets/tabs/setup_visual.cpp
 src/gui/widgets/tabs/tradetab.cpp
-src/gui/widgets/tabs/whispertab.cpp
 src/gui/windowmenu.cpp
 src/gui/windows/botcheckerwindow.cpp
 src/gui/windows/buydialog.cpp
@@ -76,7 +75,7 @@ src/gui/windows/quitdialog.cpp
 src/gui/windows/registerdialog.cpp
 src/gui/windows/selldialog.cpp
 src/gui/windows/serverdialog.cpp
-src/gui/windows/setup.cpp
+src/gui/windows/setupwindow.cpp
 src/gui/windows/shopwindow.cpp
 src/gui/windows/skilldialog.cpp
 src/gui/windows/socialwindow.cpp

@@ -136,8 +136,21 @@ void Graphics::setScale(int scale)
     {
         if (!scale)
             scale = 1;
-        if (mActualWidth / scale < 470 || mActualHeight / scale < 320)
-            scale = 1;
+        int scaleW = mActualWidth / scale;
+        int scaleH = mActualHeight / scale;
+        if (scaleW < 470)
+        {
+            scale = mActualWidth / 470;
+            if (scale < 1)
+                scale = 1;
+            scaleH = mActualHeight / scale;
+        }
+        if (scaleH < 320)
+        {
+            scale = mActualHeight / 320;
+            if (scale < 1)
+                scale = 1;
+        }
         logger->log("set scale: %d", scale);
         mScale = scale;
         mWidth = mActualWidth / mScale;
@@ -373,7 +386,7 @@ bool Graphics::videoInfo()
     mDoubleBuffer = ((mWindow->flags & SDL_DOUBLEBUF) == SDL_DOUBLEBUF);
     logger->log("Double buffer mode: %s", mDoubleBuffer ? "yes" : "no");
 
-    imageHelper->dumpSurfaceFormat(mWindow);
+    ImageHelper::dumpSurfaceFormat(mWindow);
 
     const SDL_VideoInfo *const vi = SDL_GetVideoInfo();
     if (!vi)
@@ -420,11 +433,13 @@ bool Graphics::resizeScreen(const int width, const int height)
     mRect.h = height / mScale;
     mWidth = width / mScale;
     mHeight = height / mScale;
+    mActualWidth = width;
+    mActualHeight = height;
 
 #ifdef USE_OPENGL
     // +++ probably this way will not work in windows/mac
     // Setup OpenGL
-    glViewport(0, 0, mWidth, mHeight);
+    glViewport(0, 0, mActualWidth, mActualHeight);
     glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);
 #else
     // +++ need impliment resize in soft mode

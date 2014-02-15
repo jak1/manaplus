@@ -162,6 +162,12 @@ static SetupActionData setupActionData0[] =
     },
     {
         // TRANSLATORS: input action name
+        N_("Open trade window"),
+        Input::KEY_OPEN_TRADE,
+        "",
+    },
+    {
+        // TRANSLATORS: input action name
         N_("Change Map View Mode"),
         Input::KEY_PATHFIND,
         "",
@@ -494,6 +500,30 @@ static SetupActionData setupActionData2[] =
         // TRANSLATORS: input action name
         N_("Next Social Tab"),
         Input::KEY_NEXT_SOCIAL_TAB,
+        "",
+    },
+    {
+        // TRANSLATORS: input action name
+        N_("Previous Shortcuts tab"),
+        Input::KEY_PREV_SHORTCUTS_TAB,
+        "",
+    },
+    {
+        // TRANSLATORS: input action name
+        N_("Next Shortcuts tab"),
+        Input::KEY_NEXT_SHORTCUTS_TAB,
+        "",
+    },
+    {
+        // TRANSLATORS: input action name
+        N_("Previous Commands tab"),
+        Input::KEY_PREV_COMMANDS_TAB,
+        "",
+    },
+    {
+        // TRANSLATORS: input action name
+        N_("Next Commands tab"),
+        Input::KEY_NEXT_COMMANDS_TAB,
         "",
     },
     {

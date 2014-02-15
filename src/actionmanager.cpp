@@ -40,6 +40,7 @@
 #include "gui/windows/skilldialog.h"
 #include "gui/windows/socialwindow.h"
 #include "gui/windows/statuswindow.h"
+#include "gui/windows/tradewindow.h"
 #include "gui/windows/questswindow.h"
 #include "gui/windows/quitdialog.h"
 #include "gui/windows/whoisonline.h"
@@ -57,7 +58,7 @@
 #include "gui/windows/ministatuswindow.h"
 #include "gui/windows/npcdialog.h"
 #include "gui/windows/outfitwindow.h"
-#include "gui/windows/setup.h"
+#include "gui/windows/setupwindow.h"
 #include "gui/windows/shopwindow.h"
 #include "gui/windows/shortcutwindow.h"
 
@@ -67,6 +68,7 @@
 
 #include "net/net.h"
 #include "net/playerhandler.h"
+#include "net/tradehandler.h"
 
 #include "utils/gettext.h"
 
@@ -82,6 +84,7 @@
 #define impHandler0(name) bool name(const InputEvent &event A_UNUSED)
 
 extern ShortcutWindow *spellShortcutWindow;
+extern std::string tradePartnerName;
 extern QuitDialog *quitDialog;
 
 namespace ActionManager
@@ -215,7 +218,7 @@ impHandler0(mouseClick)
         return false;
 
     int mouseX, mouseY;
-    gui->getMouseState(&mouseX, &mouseY);
+    Gui::getMouseState(&mouseX, &mouseY);
     guiInput->simulateMouseClick(mouseX, mouseY, gcn::MouseEvent::RIGHT);
     return true;
 }
@@ -1144,6 +1147,60 @@ impHandler0(showWindows)
     if (viewport)
     {
         viewport->showWindowsPopup();
+        return true;
+    }
+    return false;
+}
+
+impHandler0(nextShortcutsTab)
+{
+    if (itemShortcutWindow)
+    {
+        itemShortcutWindow->nextTab();
+        return true;
+    }
+    return false;
+}
+
+impHandler0(prevShortcutsTab)
+{
+    if (itemShortcutWindow)
+    {
+        itemShortcutWindow->prevTab();
+        return true;
+    }
+    return false;
+}
+
+impHandler0(nextCommandsTab)
+{
+    if (spellShortcutWindow)
+    {
+        spellShortcutWindow->nextTab();
+        return true;
+    }
+    return false;
+}
+
+impHandler0(prevCommandsTab)
+{
+    if (spellShortcutWindow)
+    {
+        spellShortcutWindow->prevTab();
+        return true;
+    }
+    return false;
+}
+
+impHandler0(openTrade)
+{
+    const Being *const being = player_node->getTarget();
+    if (being && being->getType() == ActorSprite::PLAYER)
+    {
+        Net::getTradeHandler()->request(being);
+        tradePartnerName = being->getName();
+        if (tradeWindow)
+            tradeWindow->clear();
         return true;
     }
     return false;

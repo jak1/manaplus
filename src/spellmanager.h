@@ -70,14 +70,14 @@ class SpellManager final
     private:
         void fillSpells();
 
-        void invokeSpell(const TextCommand *const spell,
-                         const Being *const target) const;
+        static void invokeSpell(const TextCommand *const spell,
+                                const Being *const target);
 
-        void invokeSpell(const TextCommand *const spell) const;
+        static void invokeSpell(const TextCommand *const spell);
 
-        std::string parseCommand(std::string command,
-                                 const Being *const target)
-                                 const A_WARN_UNUSED;
+        static std::string parseCommand(std::string command,
+                                        const Being *const target)
+                                        A_WARN_UNUSED;
 
         std::map<unsigned int, TextCommand*> mSpells;
         std::vector<TextCommand*> mSpellsVector;

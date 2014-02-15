@@ -22,7 +22,8 @@
 
 #include "gui/windows/shortcutwindow.h"
 
-#include "gui/windows/setup.h"
+#include "gui/windows/setupwindow.h"
+#include "gui/widgets/tabbedarea.h"
 
 #include "gui/widgets/layout.h"
 #include "gui/widgets/scrollarea.h"
@@ -232,6 +233,18 @@ void ShortcutWindow::widgetMoved(const gcn::Event& event)
         mItems->setRedraw(true);
     FOR_EACH (std::vector<ShortcutContainer*>::iterator, it, mPages)
         (*it)->setRedraw(true);
+}
+
+void ShortcutWindow::nextTab()
+{
+    if (mTabs)
+        mTabs->selectNextTab();
+}
+
+void ShortcutWindow::prevTab()
+{
+    if (mTabs)
+        mTabs->selectPrevTab();
 }
 
 #ifdef USE_PROFILER

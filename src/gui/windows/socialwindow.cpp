@@ -35,7 +35,7 @@
 
 #include "gui/windows/confirmdialog.h"
 #include "gui/windows/okdialog.h"
-#include "gui/windows/setup.h"
+#include "gui/windows/setupwindow.h"
 #include "gui/windows/textdialog.h"
 #include "gui/windows/whoisonline.h"
 
@@ -46,6 +46,7 @@
 #include "gui/widgets/label.h"
 #include "gui/widgets/popup.h"
 #include "gui/widgets/scrollarea.h"
+#include "gui/widgets/tabbedarea.h"
 
 #include "gui/widgets/tabs/chattab.h"
 
@@ -1276,6 +1277,7 @@ SocialWindow::SocialWindow() :
     // TRANSLATORS: social window name
     Window(_("Social"), false, nullptr, "social.xml"),
     gcn::ActionListener(),
+    PlayerRelationsListener(),
     mGuildInvited(0),
     mGuildAcceptDialog(nullptr),
     mGuildCreateDialog(nullptr),
@@ -1372,10 +1374,12 @@ void SocialWindow::postInit()
 
     enableVisibleSound(true);
     updateButtons();
+    player_relations.addListener(this);
 }
 
 SocialWindow::~SocialWindow()
 {
+    player_relations.removeListener(this);
     if (mGuildAcceptDialog)
     {
         mGuildAcceptDialog->close();
@@ -1740,6 +1744,7 @@ void SocialWindow::slowLogic()
     const unsigned int nowTime = cur_time;
     if (mNeedUpdate && nowTime - mLastUpdateTime > 1)
     {
+        logger->log("soc update");
         mPlayers->updateList();
         mFriends->updateList();
         mNeedUpdate = false;
@@ -1819,30 +1824,14 @@ void SocialWindow::removePortal(const int x, const int y)
 
 void SocialWindow::nextTab()
 {
-    if (!mTabs)
-        return;
-
-    int tab = mTabs->getSelectedTabIndex();
-
-    tab++;
-    if (tab == mTabs->getNumberOfTabs())
-        tab = 0;
-
-    mTabs->setSelectedTabByIndex(tab);
+    if (mTabs)
+        mTabs->selectNextTab();
 }
 
 void SocialWindow::prevTab()
 {
-    if (!mTabs)
-        return;
-
-    int tab = mTabs->getSelectedTabIndex();
-
-    if (tab == 0)
-        tab = mTabs->getNumberOfTabs();
-    tab--;
-
-    mTabs->setSelectedTabByIndex(tab);
+    if (mTabs)
+        mTabs->selectPrevTab();
 }
 
 void SocialWindow::updateAttackFilter()
@@ -1906,6 +1895,16 @@ void SocialWindow::updateGuildCounter(const int online, const int total)
             tab->buildCounter(online, total);
         }
     }
+}
+
+void SocialWindow::updatedPlayer(const std::string &name A_UNUSED)
+{
+    mNeedUpdate = true;
+}
+
+void SocialWindow::updateAll()
+{
+    mNeedUpdate = true;
 }
 
 #ifdef USE_PROFILER

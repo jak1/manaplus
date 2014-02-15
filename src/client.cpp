@@ -66,7 +66,7 @@
 #include "gui/windows/registerdialog.h"
 #include "gui/windows/selldialog.h"
 #include "gui/windows/serverdialog.h"
-#include "gui/windows/setup.h"
+#include "gui/windows/setupwindow.h"
 #include "gui/windows/unregisterdialog.h"
 #include "gui/windows/updaterwindow.h"
 #include "gui/windows/quitdialog.h"
@@ -527,7 +527,7 @@ void Client::initSoundManager()
 void Client::createWindows()
 {
     userPalette = new UserPalette;
-    setupWindow = new Setup;
+    setupWindow = new SetupWindow;
     setupWindow->postInit();
     helpWindow = new HelpWindow;
     didYouKnowWindow = new DidYouKnowWindow;
@@ -2106,7 +2106,7 @@ void Client::initServerConfig(std::string serverName)
     dropShortcut = new DropShortcut;
 }
 
-void Client::initFeatures() const
+void Client::initFeatures()
 {
     features.init(paths.getStringValue("featuresFile"), true);
     features.setDefaultValues(getFeaturesDefaults());
@@ -2337,7 +2337,7 @@ void Client::initScreenshotDir()
     logger->log("screenshotDirectory: " + mScreenshotDir);
 }
 
-void Client::accountLogin(LoginData *const data) const
+void Client::accountLogin(LoginData *const data)
 {
     if (!data)
         return;
@@ -2758,7 +2758,7 @@ bool Client::limitPackets(const int type)
     return true;
 }
 
-void Client::setFramerate(const int fpsLimit)
+void Client::setFramerate(const int fpsLimit) const
 {
     if (!fpsLimit)
         return;
@@ -3012,7 +3012,7 @@ void Client::setIcon()
 #else
     iconFile.append(".png");
 #endif
-    iconFile = ResourceManager::getInstance()->getPath(iconFile);
+    iconFile = ResourceManager::getPath(iconFile);
     logger->log("Loading icon from file: %s", iconFile.c_str());
 
 #ifdef WIN32

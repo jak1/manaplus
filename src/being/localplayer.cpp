@@ -62,9 +62,12 @@
 #include "net/chathandler.h"
 #include "net/inventoryhandler.h"
 #include "net/net.h"
+#include "net/pethandler.h"
 #include "net/playerhandler.h"
 
 #include "resources/iteminfo.h"
+
+#include "resources/db/emotedb.h"
 
 #include "utils/gettext.h"
 #include "utils/timer.h"
@@ -2118,7 +2121,7 @@ static const char *const debugPathStrings[] =
     N_("(b) black & white map view")
 };
 
-std::string LocalPlayer::getDebugPathString() const
+std::string LocalPlayer::getDebugPathString()
 {
     return gettext(getVarItem(&debugPathStrings[0],
         viewport->getDebugPath(), debugPathSize));
@@ -2274,7 +2277,7 @@ static const char *const cameraModeStrings[] =
     N_("(?) away")
 };
 
-std::string LocalPlayer::getCameraModeString() const
+std::string LocalPlayer::getCameraModeString()
 {
     return gettext(getVarItem(&cameraModeStrings[0],
         viewport->getCameraMode(), cameraModeSize));
@@ -2793,9 +2796,9 @@ void LocalPlayer::crazyMoveA()
             signed char param = mMoveProgram[mCrazyMoveState++];
             if (param == '?')
             {
-                const char cmd[] = {'l', 'r', 'u', 'd'};
+                const char cmd[] = {'l', 'r', 'u', 'd', 'L', 'R', 'U', 'D'};
                 srand(tick_time);
-                param = cmd[rand() % 4];
+                param = cmd[rand() % 8];
             }
             switch (param)
             {
@@ -2811,26 +2814,38 @@ void LocalPlayer::crazyMoveA()
                 case 'r':
                     move(1, 0);
                     break;
+                case 'D':
+                    move(1, 1);
+                    break;
+                case 'U':
+                    move(-1, -1);
+                    break;
+                case 'L':
+                    move(-1, 1);
+                    break;
+                case 'R':
+                    move(1, -1);
+                    break;
                 case 'f':
-                    switch (mDirection)
-                    {
-                        case UP   : dy = -1; break;
-                        case DOWN : dy = 1; break;
-                        case LEFT : dx = -1; break;
-                        case RIGHT: dx = 1; break;
-                        default: break;
-                    }
+                    if (mDirection | UP)
+                        dy = -1;
+                    else if (mDirection | DOWN)
+                        dy = 1;
+                    if (mDirection | LEFT)
+                        dx = -1;
+                    else if (mDirection | RIGHT)
+                        dx = 1;
                     move(dx, dy);
                     break;
                 case 'b':
-                    switch (mDirection)
-                    {
-                        case UP   : dy = 1; break;
-                        case DOWN : dy = -1; break;
-                        case LEFT : dx = 1; break;
-                        case RIGHT: dx = -1; break;
-                        default: break;
-                    }
+                    if (mDirection | UP)
+                        dy = 1;
+                    else if (mDirection | DOWN)
+                        dy = -1;
+                    if (mDirection | LEFT)
+                        dx = 1;
+                    else if (mDirection | RIGHT)
+                        dx = -1;
                     move(dx, dy);
                     break;
                 default:
@@ -2981,22 +2996,31 @@ void LocalPlayer::crazyMoveA()
         pickUpItems();
     }
     // emote
-    else if (mMoveProgram[mCrazyMoveState] == 'e')
+    else if (mMoveProgram[mCrazyMoveState] == 'e'
+             || mMoveProgram[mCrazyMoveState] == 'E')
     {
         mCrazyMoveState ++;
         const signed char emo = mMoveProgram[mCrazyMoveState];
+        unsigned char emoteId = 0;
         if (emo == '?')
         {
             srand(tick_time);
-            emote(static_cast<unsigned char>(1 + (rand() % 13)));
+            emoteId = static_cast<unsigned char>(
+                1 + (rand() % EmoteDB::size()));
         }
         else
         {
             if (emo >= '0' && emo <= '9')
-                emote(static_cast<unsigned char>(emo - '0' + 1));
-            else if (emo >= 'a' && emo <= 'd')
-                emote(static_cast<unsigned char>(emo - 'a' + 11));
+                emoteId = static_cast<unsigned char>(emo - '0' + 1);
+            else if (emo >= 'a' && emo <= 'z')
+                emoteId = static_cast<unsigned char>(emo - 'a' + 11);
+            else if (emo >= 'A' && emo <= 'Z')
+                emoteId = static_cast<unsigned char>(emo - 'A' + 37);
         }
+        if (mMoveProgram[mCrazyMoveState] == 'e')
+            emote(emoteId);
+        else
+            Net::getPetHandler()->emote(emoteId, 0);
 
         mCrazyMoveState ++;
     }
@@ -3229,7 +3253,7 @@ void LocalPlayer::specialMove(const unsigned char direction)
     }
 }
 
-void LocalPlayer::debugMsg(const std::string &str) const
+void LocalPlayer::debugMsg(const std::string &str)
 {
     if (debugChatTab)
         debugChatTab->chatLog(str);
@@ -4317,7 +4341,7 @@ bool LocalPlayer::checAttackPermissions(const Being *const target) const
 
 const char *LocalPlayer::getVarItem(const char *const *const arr,
                                     const unsigned index,
-                                    const unsigned sz) const
+                                    const unsigned sz)
 {
     if (index < sz)
         return arr[index];

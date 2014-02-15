@@ -43,11 +43,14 @@ class NamesModel : public gcn::ListModel
         StringVect &getNames() A_WARN_UNUSED
         { return mNames; }
 
-        size_t size() A_WARN_UNUSED
+        size_t size() const A_WARN_UNUSED
         { return mNames.size(); }
 
         void clear()
         { mNames.clear(); }
+
+        void add(const std::string &str)
+        { mNames.push_back(str); }
 
         void fillFromArray(const char *const *const arr, std::size_t size);
 

@@ -40,8 +40,6 @@ class PartyTab : public ChatTab, public ConfigListener
 
         virtual ~PartyTab();
 
-        void showHelp() override final;
-
         bool handleCommand(const std::string &restrict type,
                            const std::string &restrict args) override final;
 
@@ -57,7 +55,9 @@ class PartyTab : public ChatTab, public ConfigListener
     protected:
         void handleInput(const std::string &msg) override final;
 
-        virtual void getAutoCompleteList(StringVect&) const override final;
+        void getAutoCompleteList(StringVect&) const override final;
+
+        void getAutoCompleteCommands(StringVect &names) const override final;
 };
 
 extern PartyTab *partyTab;

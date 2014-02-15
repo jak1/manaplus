@@ -94,6 +94,11 @@ namespace ActionManager
     decHandler(stopSit);
     decHandler(showKeyboard);
     decHandler(showWindows);
+    decHandler(nextShortcutsTab);
+    decHandler(prevShortcutsTab);
+    decHandler(nextCommandsTab);
+    decHandler(prevCommandsTab);
+    decHandler(openTrade);
 
     decHandler(hideWindows);
     decHandler(helpWindowShow);

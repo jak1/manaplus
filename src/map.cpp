@@ -290,6 +290,8 @@ void Map::initializeAmbientLayers()
             mForegrounds.push_back(new AmbientLayer(img,
                 getFloatProperty(name + "parallaxX", parallax),
                 getFloatProperty(name + "parallaxY", parallax),
+                getFloatProperty(name + "posX"),
+                getFloatProperty(name + "posY"),
                 getFloatProperty(name + "scrollX"),
                 getFloatProperty(name + "scrollY"),
                 getBoolProperty(name + "keepratio"),
@@ -317,6 +319,8 @@ void Map::initializeAmbientLayers()
             mForegrounds.push_back(new AmbientLayer(img,
                 getFloatProperty(name + "parallaxX", parallax),
                 getFloatProperty(name + "parallaxY", parallax),
+                getFloatProperty(name + "posX"),
+                getFloatProperty(name + "posY"),
                 getFloatProperty(name + "scrollX"),
                 getFloatProperty(name + "scrollY"),
                 getBoolProperty(name + "keepratio"),
@@ -738,7 +742,7 @@ bool Map::getWalk(const int x, const int y, const unsigned char walkmask) const
     return !(mMetaTiles[x + y * mWidth].blockmask & walkmask);
 }
 
-unsigned char Map::getBlockMask(const int x, const int y)
+unsigned char Map::getBlockMask(const int x, const int y) const
 {
     // You can't walk outside of the map
     if (x < 0 || y < 0 || x >= mWidth || y >= mHeight)

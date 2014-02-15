@@ -25,6 +25,8 @@
 
 #include "utils/stringvector.h"
 
+#include "being/playerrelationslistener.h"
+
 #include <list>
 #include <map>
 
@@ -95,21 +97,6 @@ class PlayerIgnoreStrategy
             mShortName()
         {
         }
-};
-
-class PlayerRelationsListener
-{
-    public:
-        virtual ~PlayerRelationsListener()
-        { }
-
-        virtual void updatedPlayer(const std::string &name) = 0;
-
-        virtual void updateAll() = 0;
-
-    protected:
-        PlayerRelationsListener()
-        { }
 };
 
 /**
@@ -270,7 +257,7 @@ class PlayerRelationsManager final
                                // ignored data upon reloading
         unsigned int mDefaultPermissions;
 
-        bool checkName(const std::string &name) const A_WARN_UNUSED;
+        static bool checkName(const std::string &name) A_WARN_UNUSED;
 
         PlayerIgnoreStrategy *mIgnoreStrategy;
         std::map<std::string, PlayerRelation *> mRelations;

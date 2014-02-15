@@ -68,7 +68,7 @@
 #include "gui/windows/npcdialog.h"
 #include "gui/windows/okdialog.h"
 #include "gui/windows/outfitwindow.h"
-#include "gui/windows/setup.h"
+#include "gui/windows/setupwindow.h"
 #include "gui/windows/shopwindow.h"
 #include "gui/windows/shortcutwindow.h"
 #include "gui/windows/skilldialog.h"
@@ -962,7 +962,7 @@ void Game::handleInput()
     }
 
     handleMove();
-    inputManager.handleRepeat();
+    InputManager::handleRepeat();
     BLOCK_END("Game::handleInput 1")
 }
 
@@ -1175,7 +1175,7 @@ void Game::closeDialogs()
     }
 }
 
-void Game::videoResized(const int width, const int height) const
+void Game::videoResized(const int width, const int height)
 {
     if (viewport)
         viewport->setSize(width, height);

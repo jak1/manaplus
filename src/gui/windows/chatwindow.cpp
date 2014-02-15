@@ -43,7 +43,8 @@
 #include "gui/viewport.h"
 
 #include "gui/windows/emotewindow.h"
-#include "gui/windows/setup.h"
+#include "gui/windows/setupwindow.h"
+#include "gui/widgets/tabbedarea.h"
 #include "gui/windows/whoisonline.h"
 
 #include "gui/widgets/tabs/battletab.h"
@@ -452,7 +453,7 @@ ChatTab *ChatWindow::getFocused() const
     return static_cast<ChatTab*>(mChatTabs->getSelectedTab());
 }
 
-void ChatWindow::clearTab(ChatTab *const tab) const
+void ChatWindow::clearTab(ChatTab *const tab)
 {
     if (tab)
         tab->clearText();
@@ -1312,7 +1313,6 @@ void ChatWindow::autoComplete()
     const int caretPos = mChatInput->getCaretPosition();
     int startName = 0;
     const std::string inputText = mChatInput->getText();
-    bool needSecure(false);
     std::string name = inputText.substr(0, caretPos);
 
     for (int f = caretPos - 1; f > -1; f --)
@@ -1335,15 +1335,21 @@ void ChatWindow::autoComplete()
     if (cTab)
         cTab->getAutoCompleteList(nameList);
     std::string newName = autoComplete(nameList, name);
-    if (!newName.empty())
-        needSecure = true;
+    if (!newName.empty() && !startName)
+        secureChatCommand(newName);
+
+    if (cTab && newName.empty())
+    {
+        cTab->getAutoCompleteCommands(nameList);
+        newName = autoComplete(nameList, name);
+    }
 
     if (newName.empty() && actorManager)
     {
         actorManager->getPlayerNames(nameList, true);
         newName = autoComplete(nameList, name);
-        if (!newName.empty())
-            needSecure = true;
+        if (!newName.empty() && !startName)
+            secureChatCommand(newName);
     }
     if (newName.empty())
         newName = autoCompleteHistory(name);
@@ -1366,11 +1372,6 @@ void ChatWindow::autoComplete()
 
     if (!newName.empty())
     {
-        if (!startName && needSecure && (newName[0] == '/'
-            || newName[0] == '@' || newName[0] == '#'))
-        {
-            newName = "_" + newName;
-        }
         mChatInput->setText(inputText.substr(0, startName).append(newName)
             .append(inputText.substr(caretPos,
             inputText.length() - caretPos)));
@@ -1386,7 +1387,7 @@ void ChatWindow::autoComplete()
 }
 
 std::string ChatWindow::autoComplete(StringVect &names,
-                                     std::string partName) const
+                                     std::string partName)
 {
     StringVectCIter i = names.begin();
     const StringVectCIter i_end = names.end();
@@ -1770,7 +1771,7 @@ void ChatWindow::saveState() const
     }
 }
 
-std::string ChatWindow::doReplace(const std::string &msg) const
+std::string ChatWindow::doReplace(const std::string &msg)
 {
     std::string str = msg;
     replaceSpecialChars(str);
@@ -1918,7 +1919,7 @@ void ChatWindow::updateVisibility()
     int mouseY = 0;
     int x = 0;
     int y = 0;
-    gui->getMouseState(&mouseX, &mouseY);
+    Gui::getMouseState(&mouseX, &mouseY);
     getAbsolutePosition(x, y);
     if (mChatInput->isVisible())
     {

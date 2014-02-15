@@ -63,28 +63,6 @@ GuildTab::~GuildTab()
 bool GuildTab::handleCommand(const std::string &restrict type,
                              const std::string &restrict args)
 {
-    if (type == "help")
-    {
-        if (args == "invite")
-        {
-            // TRANSLATORS: guild chat help
-            chatLog(_("Command: /invite <nick>"));
-            // TRANSLATORS: guild chat help
-            chatLog(_("This command invites <nick> to the guild you're in."));
-            // TRANSLATORS: guild chat help
-            chatLog(_("If the <nick> has spaces in it, enclose it in "
-                            "double quotes (\")."));
-        }
-        else if (args == "leave")
-        {
-            // TRANSLATORS: guild chat help
-            chatLog(_("Command: /leave"));
-            // TRANSLATORS: guild chat help
-            chatLog(_("This command causes the player to leave the guild."));
-        }
-        else
-            return false;
-    }
 /*
     else if (type == "create" || type == "new")
     {
@@ -94,7 +72,7 @@ bool GuildTab::handleCommand(const std::string &restrict type,
             Net::getGuildHandler()->create(args);
     }
 */
-    else if (type == "invite" && taGuild)
+    if (type == "invite" && taGuild)
     {
         Net::getGuildHandler()->invite(taGuild->getId(), args);
     }
@@ -127,34 +105,23 @@ void GuildTab::handleInput(const std::string &msg)
     if (!taGuild)
         return;
 
-    if (chatWindow)
-    {
-        Net::getGuildHandler()->chat(taGuild->getId(),
-            chatWindow->doReplace(msg));
-    }
-    else
-    {
-        Net::getGuildHandler()->chat(taGuild->getId(), msg);
-    }
-}
-
-void GuildTab::showHelp()
-{
-    // TRANSLATORS: guild chat help
-    chatLog(_("/help > Display this help."));
-    // TRANSLATORS: guild chat help
-    chatLog(_("/invite > Invite a player to your guild"));
-    // TRANSLATORS: guild chat help
-    chatLog(_("/leave > Leave the guild you are in"));
-    // TRANSLATORS: guild chat help
-    chatLog(_("/kick > Kick someone from the guild you are in"));
+    Net::getGuildHandler()->chat(taGuild->getId(),
+        ChatWindow::doReplace(msg));
 }
 
 void GuildTab::getAutoCompleteList(StringVect &names) const
 {
     if (taGuild)
         taGuild->getNames(names);
+}
+
+void GuildTab::getAutoCompleteCommands(StringVect &names) const
+{
+    names.push_back("/help");
+    names.push_back("/invite ");
+    names.push_back("/kick ");
     names.push_back("/notice ");
+    names.push_back("/leave");
 }
 
 void GuildTab::saveToLogFile(const std::string &msg) const

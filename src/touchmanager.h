@@ -151,7 +151,7 @@ class TouchManager final : public ConfigListener
 
         void loadKeyboard();
 
-        int getPadSize()
+        int getPadSize() const
         { return (mJoystickSize + 2) * 50; }
 
         void setInGame(const bool b);
@@ -160,7 +160,7 @@ class TouchManager final : public ConfigListener
 
         void shutdown();
 
-        void executeAction(const std::string &event);
+        static void executeAction(const std::string &event);
 
     private:
         TouchItem *mKeyboard;
@@ -176,6 +176,8 @@ class TouchManager final : public ConfigListener
         int mButtonsSize;
         int mJoystickSize;
         int mButtonsFormat;
+        int mWidth;
+        int mHeight;
         bool mShow;
         bool mInGame;
         bool mTempHideButtons;

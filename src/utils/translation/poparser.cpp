@@ -214,7 +214,7 @@ bool PoParser::readMsgStr()
     return false;
 }
 
-bool PoParser::checkLine()
+bool PoParser::checkLine() const
 {
     const size_t sz = mLine.size();
     // check is line in format: "text"
@@ -226,14 +226,14 @@ PoDict *PoParser::getEmptyDict()
     return new PoDict("");
 }
 
-bool PoParser::checkLang(std::string lang) const
+bool PoParser::checkLang(std::string lang)
 {
     // check is po file exists
     const ResourceManager *const resman = ResourceManager::getInstance();
     return resman->exists(getFileName(lang));
 }
 
-std::string PoParser::getFileName(std::string lang) const
+std::string PoParser::getFileName(std::string lang)
 {
     // get po file name from lang name
 //    logger->log("getFileName: translations/%s.po", lang.c_str());
@@ -245,7 +245,7 @@ PoDict *PoParser::getDict() const
     return new PoDict(mLang);
 }
 
-void PoParser::convertStr(std::string &str) const
+void PoParser::convertStr(std::string &str)
 {
     if (str.empty())
         return;
