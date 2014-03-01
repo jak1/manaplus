@@ -23,10 +23,9 @@
 #ifndef GUI_WIDGETS_TEXTFIELD_H
 #define GUI_WIDGETS_TEXTFIELD_H
 
-#include "gui/widgets/widget2.h"
+#include "listeners/focuslistener.h"
 
-#include <guichan/focuslistener.hpp>
-#include <guichan/widgets/textfield.hpp>
+#include "gui/base/widgets/textfield.hpp"
 
 #include "localconsts.h"
 
@@ -38,8 +37,7 @@ class PopupMenu;
  * \ingroup GUI
  */
 class TextField : public gcn::TextField,
-                  public gcn::FocusListener,
-                  public Widget2
+                  public FocusListener
 {
     public:
         /**
@@ -48,7 +46,7 @@ class TextField : public gcn::TextField,
         explicit TextField(const Widget2 *restrict const widget,
                            const std::string &restrict text = "",
                            const bool loseFocusOnTab = true,
-                           gcn::ActionListener *restrict
+                           ActionListener *restrict
                            const listener = nullptr,
                            const std::string &restrict eventId = "",
                            const bool sendAlwaysEvents = false);
@@ -60,7 +58,7 @@ class TextField : public gcn::TextField,
         /**
          * Draws the text field.
          */
-        virtual void draw(gcn::Graphics *graphics) override;
+        virtual void draw(Graphics *graphics) override;
 
         /**
          * Update the alpha value to the graphic components.
@@ -70,7 +68,7 @@ class TextField : public gcn::TextField,
         /**
          * Draws the background and border.
          */
-        void drawFrame(gcn::Graphics *graphics) override final;
+        void drawFrame(Graphics *graphics) override final;
 
         /**
          * Determine whether the field should be numeric or not
@@ -89,7 +87,7 @@ class TextField : public gcn::TextField,
         /**
          * Processes one keypress.
          */
-        void keyPressed(gcn::KeyEvent &keyEvent) override;
+        void keyPressed(KeyEvent &keyEvent) override;
 
         /**
          * Set the minimum value for a range
@@ -117,15 +115,15 @@ class TextField : public gcn::TextField,
 
         void setCaretPosition(unsigned int position);
 
-        void mousePressed(gcn::MouseEvent &mouseEvent) override final;
+        void mousePressed(MouseEvent &mouseEvent) override final;
 
         void handlePaste();
 
         void handleCopy() const;
 
-        void focusGained(const gcn::Event &event) override final;
+        void focusGained(const Event &event) override final;
 
-        void focusLost(const gcn::Event &event) override;
+        void focusLost(const Event &event) override;
 
         void moveCaretBack();
 
@@ -142,7 +140,7 @@ class TextField : public gcn::TextField,
         void caretDeleteWord();
 
     protected:
-        void drawCaret(gcn::Graphics* graphics, int x) override final;
+        void drawCaret(Graphics* graphics, int x) override final;
 
         void fixScroll();
 
@@ -161,7 +159,7 @@ class TextField : public gcn::TextField,
         static Skin *mSkin;
 
     private:
-        const gcn::Color *mCaretColor;
+        const Color *mCaretColor;
         PopupMenu *mPopupMenu;
         static int instances;
         static float mAlpha;

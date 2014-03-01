@@ -40,7 +40,8 @@ class ShortcutTab final : public Tab
 {
     public:
         ShortcutTab(const Widget2 *const widget,
-                    std::string name, ShortcutContainer *const content) :
+                    std::string name,
+                    ShortcutContainer *const content) :
             Tab(widget),
             mContent(content)
         {
@@ -58,7 +59,7 @@ ShortcutWindow::ShortcutWindow(const std::string &restrict title,
                                int width, int height) :
     Window("Window", false, nullptr, skinFile),
     mItems(content),
-    mScrollArea(new ScrollArea(mItems, false)),
+    mScrollArea(new ScrollArea(this, mItems, false)),
     mTabs(nullptr),
     mPages()
 {
@@ -160,7 +161,7 @@ ShortcutWindow::~ShortcutWindow()
 void ShortcutWindow::addTab(const std::string &name,
                             ShortcutContainer *const content)
 {
-    ScrollArea *const scroll = new ScrollArea(content, false);
+    ScrollArea *const scroll = new ScrollArea(this, content, false);
     scroll->setPosition(SCROLL_PADDING, SCROLL_PADDING);
     scroll->setHorizontalScrollPolicy(gcn::ScrollArea::SHOW_NEVER);
     content->setWidget2(this);
@@ -176,7 +177,7 @@ int ShortcutWindow::getTabIndex() const
     return mTabs->getSelectedTabIndex();
 }
 
-void ShortcutWindow::widgetHidden(const gcn::Event &event)
+void ShortcutWindow::widgetHidden(const Event &event)
 {
     if (mItems)
         mItems->widgetHidden(event);
@@ -195,21 +196,21 @@ void ShortcutWindow::widgetHidden(const gcn::Event &event)
     }
 }
 
-void ShortcutWindow::mousePressed(gcn::MouseEvent &event)
+void ShortcutWindow::mousePressed(MouseEvent &event)
 {
     Window::mousePressed(event);
 
     if (event.isConsumed())
         return;
 
-    if (event.getButton() == gcn::MouseEvent::LEFT)
+    if (event.getButton() == MouseEvent::LEFT)
     {
         mDragOffsetX = event.getX();
         mDragOffsetY = event.getY();
     }
 }
 
-void ShortcutWindow::mouseDragged(gcn::MouseEvent &event)
+void ShortcutWindow::mouseDragged(MouseEvent &event)
 {
     Window::mouseDragged(event);
 
@@ -226,7 +227,7 @@ void ShortcutWindow::mouseDragged(gcn::MouseEvent &event)
     }
 }
 
-void ShortcutWindow::widgetMoved(const gcn::Event& event)
+void ShortcutWindow::widgetMoved(const Event& event)
 {
     Window::widgetMoved(event);
     if (mItems)

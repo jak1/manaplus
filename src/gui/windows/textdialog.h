@@ -25,7 +25,7 @@
 
 #include "gui/widgets/window.h"
 
-#include <guichan/actionlistener.hpp>
+#include "listeners/actionlistener.h"
 
 class Button;
 class PasswordField;
@@ -36,7 +36,8 @@ class TextField;
  *
  * \ingroup GUI
  */
-class TextDialog final : public Window, public gcn::ActionListener
+class TextDialog final : public Window,
+                         public ActionListener
 {
 public:
     /**
@@ -58,7 +59,7 @@ public:
     /**
      * Called when receiving actions from the widgets.
      */
-    void action(const gcn::ActionEvent &event) override final;
+    void action(const ActionEvent &event) override final;
 
     /**
      * Get the text in the textfield

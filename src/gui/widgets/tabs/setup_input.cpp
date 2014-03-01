@@ -28,6 +28,7 @@
 #include "input/inputmanager.h"
 #include "input/keyboardconfig.h"
 
+#include "gui/gui.h"
 #include "gui/setupactiondata.h"
 
 #include "gui/windows/okdialog.h"
@@ -38,7 +39,7 @@
 #include "gui/widgets/scrollarea.h"
 #include "gui/widgets/tabstrip.h"
 
-#include <guichan/listmodel.hpp>
+#include "gui/models/listmodel.h"
 
 #include "debug.h"
 
@@ -50,7 +51,7 @@ static const int setupGroups = 9;
  *
  * \ingroup Interface
  */
-class KeyListModel final : public gcn::ListModel
+class KeyListModel final : public ListModel
 {
     public:
         KeyListModel() :
@@ -103,7 +104,8 @@ Setup_Input::Setup_Input(const Widget2 *const widget) :
     // TRANSLATORS: button in input settings tab
     mResetKeysButton(new Button(this, _("Reset all keys"), "resetkeys", this)),
     mTabs(new TabStrip(this, config.getIntValue("fontSize") + 10)),
-    mScrollArea(new ScrollArea(mKeyList, true, "setup_input_background.xml")),
+    mScrollArea(new ScrollArea(this, mKeyList,
+        true, "setup_input_background.xml")),
     mKeySetting(false),
     mActionDataSize(new int [9])
 {
@@ -125,7 +127,7 @@ Setup_Input::Setup_Input(const Widget2 *const widget) :
     mKeyListModel->setSize(mActionDataSize[0]);
     refreshKeys();
     if (gui)
-        mKeyList->setFont(reinterpret_cast<gcn::Font*>(gui->getHelpFont()));
+        mKeyList->setFont(gui->getHelpFont());
     mKeyList->addActionListener(this);
 
     mScrollArea->setHorizontalScrollPolicy(ScrollArea::SHOW_NEVER);
@@ -162,7 +164,7 @@ Setup_Input::Setup_Input(const Widget2 *const widget) :
     if (config.getIntValue("screenwidth") >= 730)
         width += 100;
 
-    setDimension(gcn::Rectangle(0, 0, width, 350));
+    setDimension(Rect(0, 0, width, 350));
 }
 
 Setup_Input::~Setup_Input()
@@ -213,7 +215,7 @@ void Setup_Input::cancel()
     refreshKeys();
 }
 
-void Setup_Input::action(const gcn::ActionEvent &event)
+void Setup_Input::action(const ActionEvent &event)
 {
     const std::string id = event.getId();
 

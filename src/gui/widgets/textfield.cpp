@@ -26,10 +26,10 @@
 
 #include "input/inputmanager.h"
 
-#include "input/keyevent.h"
+#include "events/keyevent.h"
 
-#include "gui/sdlinput.h"
-
+#include "gui/font.h"
+#include "gui/gui.h"
 #include "gui/viewport.h"
 
 #include "gui/popups/popupmenu.h"
@@ -38,8 +38,6 @@
 
 #include "utils/copynpaste.h"
 #include "utils/timer.h"
-
-#include <guichan/font.hpp>
 
 #undef DELETE  // Win32 compatibility hack
 
@@ -53,12 +51,11 @@ ImageRect TextField::skin;
 TextField::TextField(const Widget2 *restrict const widget,
                      const std::string &restrict text,
                      const bool loseFocusOnTab,
-                     gcn::ActionListener *restrict const listener,
+                     ActionListener *restrict const listener,
                      const std::string &restrict eventId,
                      const bool sendAlwaysEvents):
-    gcn::TextField(text),
-    gcn::FocusListener(),
-    Widget2(widget),
+    gcn::TextField(widget, text),
+    FocusListener(),
     mSendAlwaysEvents(sendAlwaysEvents),
     mCaretColor(&getThemeColor(Theme::CARET)),
     mPopupMenu(nullptr),
@@ -137,30 +134,32 @@ void TextField::updateAlpha()
     }
 }
 
-void TextField::draw(gcn::Graphics *graphics)
+void TextField::draw(Graphics *graphics)
 {
     BLOCK_START("TextField::draw")
     updateAlpha();
 
-    gcn::Font *const font = getFont();
+    Font *const font = getFont();
     if (isFocused())
     {
         drawCaret(graphics,
             font->getWidth(mText.substr(0, mCaretPosition)) - mXScroll);
     }
 
-    static_cast<Graphics*>(graphics)->setColorAll(
-        mForegroundColor, mForegroundColor2);
+    graphics->setColorAll(mForegroundColor, mForegroundColor2);
     font->drawString(graphics, mText, mPadding - mXScroll, mPadding);
     BLOCK_END("TextField::draw")
 }
 
-void TextField::drawFrame(gcn::Graphics *graphics)
+void TextField::drawFrame(Graphics *graphics)
 {
     BLOCK_START("TextField::drawFrame")
     const int bs = 2 * mFrameSize;
-    static_cast<Graphics*>(graphics)->drawImageRect(0, 0,
-        mDimension.width + bs, mDimension.height + bs, skin);
+    graphics->drawImageRect(0,
+        0,
+        mDimension.width + bs,
+        mDimension.height + bs,
+        skin);
     BLOCK_END("TextField::drawFrame")
 }
 
@@ -196,13 +195,13 @@ int TextField::getValue() const
     return value;
 }
 
-void TextField::keyPressed(gcn::KeyEvent &keyEvent)
+void TextField::keyPressed(KeyEvent &keyEvent)
 {
     const int val = keyEvent.getKey().getValue();
 #ifdef USE_SDL2
     if (val == Key::TEXTINPUT)
     {
-        std::string str = static_cast<KeyEvent*>(&keyEvent)->getText();
+        std::string str = keyEvent.getText();
         mText.insert(mCaretPosition, str);
         mCaretPosition += str.size();
         keyEvent.consume();
@@ -252,7 +251,7 @@ void TextField::keyPressed(gcn::KeyEvent &keyEvent)
             }
 
             if (len > 1)
-                buf[0] |= static_cast<char>(255 << (8 - len));
+                buf[0] |= static_cast<char>(255U << (8 - len));
 
             mText.insert(mCaretPosition, std::string(buf, buf + len));
             mCaretPosition += len;
@@ -291,7 +290,7 @@ void TextField::keyPressed(gcn::KeyEvent &keyEvent)
     }
     else
     {
-        const int action = static_cast<KeyEvent*>(&keyEvent)->getActionId();
+        const int action = keyEvent.getActionId();
         if (!inputManager.isActionActive(static_cast<int>(
             Input::KEY_GUI_CTRL)))
         {
@@ -661,12 +660,14 @@ void TextField::handleCopy() const
     sendBuffer(text);
 }
 
-void TextField::drawCaret(gcn::Graphics* graphics, int x)
+void TextField::drawCaret(Graphics* graphics, int x)
 {
-    const gcn::Rectangle &clipArea = graphics->getCurrentClipArea();
+    const Rect *const clipArea = graphics->getCurrentClipArea();
+    if (!clipArea)
+        return;
 
     graphics->setColor(*mCaretColor);
-    graphics->drawLine(x + mPadding, clipArea.height - mPadding,
+    graphics->drawLine(x + mPadding, clipArea->height - mPadding,
         x + mPadding, mPadding);
 }
 
@@ -722,13 +723,13 @@ void TextField::fontChanged()
     fixScroll();
 }
 
-void TextField::mousePressed(gcn::MouseEvent &mouseEvent)
+void TextField::mousePressed(MouseEvent &mouseEvent)
 {
 #ifdef ANDROID
     if (!client->isKeyboardVisible())
         inputManager.executeAction(Input::KEY_SHOW_KEYBOARD);
 #endif
-    if (mouseEvent.getButton() == gcn::MouseEvent::RIGHT)
+    if (mouseEvent.getButton() == MouseEvent::RIGHT)
     {
         if (viewport)
         {
@@ -756,7 +757,7 @@ void TextField::mousePressed(gcn::MouseEvent &mouseEvent)
     }
 }
 
-void TextField::focusGained(const gcn::Event &event A_UNUSED)
+void TextField::focusGained(const Event &event A_UNUSED)
 {
 #ifdef ANDROID
     if (!client->isKeyboardVisible())
@@ -764,6 +765,6 @@ void TextField::focusGained(const gcn::Event &event A_UNUSED)
 #endif
 }
 
-void TextField::focusLost(const gcn::Event &event A_UNUSED)
+void TextField::focusLost(const Event &event A_UNUSED)
 {
 }

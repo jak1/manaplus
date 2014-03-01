@@ -24,9 +24,8 @@
 
 #include "gui/widgets/window.h"
 
-#include "being/playerrelationslistener.h"
-
-#include <guichan/actionlistener.hpp>
+#include "listeners/actionlistener.h"
+#include "listeners/playerrelationslistener.h"
 
 #include <string>
 #include <map>
@@ -48,7 +47,7 @@ class TextDialog;
  * \ingroup Interface
  */
 class SocialWindow final : public Window,
-                           private gcn::ActionListener,
+                           private ActionListener,
                            public PlayerRelationsListener
 {
 public:
@@ -68,7 +67,7 @@ public:
 
     bool removeTab(Party *const party);
 
-    void action(const gcn::ActionEvent &event) override final;
+    void action(const ActionEvent &event) override final;
 
     void showGuildInvite(const std::string &restrict guildName,
                          const int guildId,
@@ -123,7 +122,7 @@ public:
 
     void updatePickupFilter();
 
-    void widgetResized(const gcn::Event &event) override final;
+    void widgetResized(const Event &event) override final;
 
     void setCounter(const SocialTab *const tab, const std::string &str);
 

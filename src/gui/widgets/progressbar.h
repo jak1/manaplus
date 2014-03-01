@@ -23,10 +23,9 @@
 #ifndef GUI_WIDGETS_PROGRESSBAR_H
 #define GUI_WIDGETS_PROGRESSBAR_H
 
-#include "gui/widgets/widget2.h"
+#include "gui/widgets/widget.h"
 
-#include <guichan/widget.hpp>
-#include <guichan/widgetlistener.hpp>
+#include "listeners/widgetlistener.h"
 
 #include <string>
 
@@ -40,18 +39,20 @@ class Skin;
  *
  * \ingroup GUI
  */
-class ProgressBar final : public gcn::Widget,
-                          public Widget2,
-                          public gcn::WidgetListener
+class ProgressBar final : public Widget,
+                          public WidgetListener
 {
     public:
         /**
          * Constructor, initializes the progress with the given value.
          */
-        ProgressBar(const Widget2 *const widget, float progress,
-                    const int width, const int height,
+        ProgressBar(const Widget2 *const widget,
+                    float progress,
+                    const int width,
+                    const int height,
                     const int backColor,
-                    const std::string &skin, const std::string &skinFill);
+                    const std::string &skin,
+                    const std::string &skinFill);
 
         A_DELETE_COPY(ProgressBar)
 
@@ -70,7 +71,7 @@ class ProgressBar final : public gcn::Widget,
         /**
          * Draws the progress bar.
          */
-        void draw(gcn::Graphics *graphics) override final;
+        void draw(Graphics *graphics) override final;
 
         /**
          * Sets the current progress.
@@ -92,14 +93,14 @@ class ProgressBar final : public gcn::Widget,
         /**
          * Change the color of the progress bar.
          */
-        void setBackgroundColor(const gcn::Color &color);
+        void setBackgroundColor(const Color &color);
 
-        void setColor(const gcn::Color &color1, const gcn::Color &color2);
+        void setColor(const Color &color1, const Color &color2);
 
         /**
          * Returns the color of the progress bar.
          */
-        const gcn::Color &getBackgroundColor() const A_WARN_UNUSED
+        const Color &getBackgroundColor() const A_WARN_UNUSED
         { return mBackgroundColor; }
 
         /**
@@ -131,9 +132,9 @@ class ProgressBar final : public gcn::Widget,
          */
         void render(Graphics *graphics);
 
-        void widgetResized(const gcn::Event &event) override final;
+        void widgetResized(const Event &event) override final;
 
-        void widgetMoved(const gcn::Event &event) override final;
+        void widgetMoved(const Event &event) override final;
 
         void setPadding(unsigned int padding)
         { mPadding = padding; }
@@ -144,7 +145,7 @@ class ProgressBar final : public gcn::Widget,
         float mProgress;
         float mProgressToGo;
 
-        gcn::Color mBackgroundColorToGo;
+        Color mBackgroundColorToGo;
 
         std::string mText;
         ImageCollection *mVertexes;

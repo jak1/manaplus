@@ -51,7 +51,7 @@
 OutfitWindow::OutfitWindow():
     // TRANSLATORS: outfits window name
     Window(_("Outfits"), false, nullptr, "outfits.xml"),
-    gcn::ActionListener(),
+    ActionListener(),
     // TRANSLATORS: outfits window button
     mPreviousButton(new Button(this, _("<"), "previous", this)),
     // TRANSLATORS: outfits window button
@@ -91,8 +91,8 @@ OutfitWindow::OutfitWindow():
     setMinWidth(145);
     setMinHeight(220);
 
-    mCurrentLabel->setAlignment(gcn::Graphics::CENTER);
-    mKeyLabel->setAlignment(gcn::Graphics::CENTER);
+    mCurrentLabel->setAlignment(Graphics::CENTER);
+    mKeyLabel->setAlignment(Graphics::CENTER);
 
     mUnequipCheck->setActionEventId("unequip");
     mUnequipCheck->addActionListener(this);
@@ -225,7 +225,7 @@ void OutfitWindow::save() const
     serverConfig.setValue("OutfitAwayIndex", mAwayOutfit);
 }
 
-void OutfitWindow::action(const gcn::ActionEvent &event)
+void OutfitWindow::action(const ActionEvent &event)
 {
     const std::string eventId = event.getId();
     if (eventId == "next")
@@ -310,11 +310,10 @@ void OutfitWindow::copyOutfit(const int src, const int dst)
     save();
 }
 
-void OutfitWindow::draw(gcn::Graphics *graphics)
+void OutfitWindow::draw(Graphics *graphics)
 {
     BLOCK_START("OutfitWindow::draw")
     Window::draw(graphics);
-    Graphics *const g = static_cast<Graphics*>(graphics);
 
     if (mCurrentOutfit < 0 || mCurrentOutfit
         >= static_cast<signed int>(OUTFITS_COUNT))
@@ -326,12 +325,12 @@ void OutfitWindow::draw(gcn::Graphics *graphics)
     {
         const int itemX = mPadding + ((i % mGridWidth) * mBoxWidth);
         const int itemY = mPadding + mTitleBarHeight
-            + ((i / mGridWidth) * mBoxHeight);
+            + ((i / static_cast<unsigned int>(mGridWidth)) * mBoxHeight);
 
         graphics->setColor(mBorderColor);
-        graphics->drawRectangle(gcn::Rectangle(itemX, itemY, 32, 32));
+        graphics->drawRectangle(Rect(itemX, itemY, 32, 32));
         graphics->setColor(mBackgroundColor);
-        graphics->fillRectangle(gcn::Rectangle(itemX, itemY, 32, 32));
+        graphics->fillRectangle(Rect(itemX, itemY, 32, 32));
 
         if (mItems[mCurrentOutfit][i] < 0)
             continue;
@@ -348,7 +347,7 @@ void OutfitWindow::draw(gcn::Graphics *graphics)
                 const Image *const image = item->getImage();
                 if (image)
                 {
-                    g->drawImage2(image, itemX, itemY);
+                    graphics->drawImage(image, itemX, itemY);
                     foundItem = true;
                 }
             }
@@ -359,7 +358,7 @@ void OutfitWindow::draw(gcn::Graphics *graphics)
                 mItemColors[mCurrentOutfit][i]);
             if (image)
             {
-                g->drawImage2(image, itemX, itemY);
+                graphics->drawImage(image, itemX, itemY);
                 image->decRef();
             }
         }
@@ -367,9 +366,9 @@ void OutfitWindow::draw(gcn::Graphics *graphics)
     BLOCK_END("OutfitWindow::draw")
 }
 
-void OutfitWindow::mouseDragged(gcn::MouseEvent &event)
+void OutfitWindow::mouseDragged(MouseEvent &event)
 {
-    if (event.getButton() == gcn::MouseEvent::LEFT)
+    if (event.getButton() == MouseEvent::LEFT)
     {
         if (dragDrop.isEmpty() && mItemClicked)
         {
@@ -410,12 +409,12 @@ void OutfitWindow::mouseDragged(gcn::MouseEvent &event)
     Window::mouseDragged(event);
 }
 
-void OutfitWindow::mousePressed(gcn::MouseEvent &event)
+void OutfitWindow::mousePressed(MouseEvent &event)
 {
     const int index = getIndexFromGrid(event.getX(), event.getY());
     if (index == -1)
     {
-        if (event.getButton() == gcn::MouseEvent::RIGHT && viewport)
+        if (event.getButton() == MouseEvent::RIGHT && viewport)
         {
             viewport->showOutfitsPopup();
             event.consume();
@@ -447,9 +446,9 @@ void OutfitWindow::mousePressed(gcn::MouseEvent &event)
     Window::mousePressed(event);
 }
 
-void OutfitWindow::mouseReleased(gcn::MouseEvent &event)
+void OutfitWindow::mouseReleased(MouseEvent &event)
 {
-    if (event.getButton() == gcn::MouseEvent::LEFT)
+    if (event.getButton() == MouseEvent::LEFT)
     {
         if (mCurrentOutfit < 0 || mCurrentOutfit
             >= static_cast<signed int>(OUTFITS_COUNT))
@@ -484,7 +483,7 @@ void OutfitWindow::mouseReleased(gcn::MouseEvent &event)
 
 int OutfitWindow::getIndexFromGrid(const int pointX, const int pointY) const
 {
-    const gcn::Rectangle tRect = gcn::Rectangle(mPadding, mTitleBarHeight,
+    const Rect tRect = Rect(mPadding, mTitleBarHeight,
         mGridWidth * mBoxWidth, mGridHeight * mBoxHeight);
     if (!tRect.isPointInRect(pointX, pointY))
         return -1;

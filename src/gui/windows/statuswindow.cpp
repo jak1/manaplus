@@ -113,7 +113,7 @@ class DerDisplay final : public AttrDisplay
         { return DERIVED; }
 };
 
-class ChangeDisplay final : public AttrDisplay, gcn::ActionListener
+class ChangeDisplay final : public AttrDisplay, ActionListener
 {
     public:
         ChangeDisplay(const Widget2 *const widget,
@@ -129,7 +129,7 @@ class ChangeDisplay final : public AttrDisplay, gcn::ActionListener
 
         void setPointsNeeded(const int needed);
 
-        void action(const gcn::ActionEvent &event) override final;
+        void action(const ActionEvent &event) override final;
 
     private:
         int mNeeded;
@@ -142,7 +142,7 @@ class ChangeDisplay final : public AttrDisplay, gcn::ActionListener
 StatusWindow::StatusWindow() :
     Window(player_node ? player_node->getName() :
         "?", false, nullptr, "status.xml"),
-    gcn::ActionListener(),
+    ActionListener(),
     // TRANSLATORS: status window label
     mLvlLabel(new Label(this, strprintf(_("Level: %d"), 0))),
     // TRANSLATORS: status window label
@@ -159,9 +159,9 @@ StatusWindow::StatusWindow() :
     mJobLabel(nullptr),
     mJobBar(nullptr),
     mAttrCont(new VertContainer(this, 32)),
-    mAttrScroll(new ScrollArea(mAttrCont, false)),
+    mAttrScroll(new ScrollArea(this, mAttrCont, false)),
     mDAttrCont(new VertContainer(this, 32)),
-    mDAttrScroll(new ScrollArea(mDAttrCont, false)),
+    mDAttrScroll(new ScrollArea(this, mDAttrCont, false)),
     mCharacterPointsLabel(new Label(this, "C")),
     mCorrectionPointsLabel(nullptr),
     // TRANSLATORS: status window button
@@ -746,7 +746,7 @@ void StatusWindow::updateStatusBar(ProgressBar *const bar,
         bar->setBackgroundColor(Theme::getThemeColor(Theme::STATUSBAR_OFF));
 }
 
-void StatusWindow::action(const gcn::ActionEvent &event)
+void StatusWindow::action(const ActionEvent &event)
 {
     if (!chatWindow)
         return;
@@ -820,7 +820,7 @@ ChangeDisplay::ChangeDisplay(const Widget2 *const widget,
                              const int id, const std::string &restrict name,
                              const std::string &restrict shortName) :
     AttrDisplay(widget, id, name, shortName),
-    gcn::ActionListener(),
+    ActionListener(),
     mNeeded(1),
     // TRANSLATORS: status window label
     mPoints(new Label(this, _("Max"))),
@@ -873,7 +873,7 @@ void ChangeDisplay::setPointsNeeded(const int needed)
     update();
 }
 
-void ChangeDisplay::action(const gcn::ActionEvent &event)
+void ChangeDisplay::action(const ActionEvent &event)
 {
     if (Net::getPlayerHandler()->canCorrectAttributes() &&
         event.getSource() == mDec)

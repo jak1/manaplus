@@ -21,7 +21,6 @@
 #ifndef GUI_WIDGETS_WIDGET2_H
 #define GUI_WIDGETS_WIDGET2_H
 
-#include "gui/gui.h"
 #include "gui/theme.h"
 
 #include "render/renderers.h"
@@ -33,16 +32,16 @@ class Widget2
         {
         }
 
-        inline const gcn::Color &getThemeColor(const int type,
-                                               const int alpha = 255)
-                                               const A_WARN_UNUSED
+        inline const Color &getThemeColor(const int type,
+                                          const int alpha = 255)
+                                          const A_WARN_UNUSED
         {
             return Theme::getThemeColor(mPaletteOffset + type, alpha);
         }
 
-        inline const gcn::Color &getThemeCharColor(const signed char c,
-                                                   bool &valid)
-                                                   const A_WARN_UNUSED
+        inline const Color &getThemeCharColor(const signed char c,
+                                              bool &valid)
+                                              const A_WARN_UNUSED
         {
             const int colorId = Theme::getThemeIdByChar(c, valid);
             if (valid)
@@ -72,18 +71,12 @@ class Widget2
             }
         }
 
-        void setForegroundColor2(const gcn::Color &color)
+        void setForegroundColor2(const Color &color)
         {
             mForegroundColor2 = color;
         }
 
     protected:
-        Widget2() :
-            mPaletteOffset(0),
-            mForegroundColor2()
-        {
-        }
-
         explicit Widget2(const Widget2 *const widget) :
             mPaletteOffset(widget ? widget->mPaletteOffset : 0),
             mForegroundColor2()
@@ -92,7 +85,7 @@ class Widget2
         }
 
         int mPaletteOffset;
-        gcn::Color mForegroundColor2;
+        Color mForegroundColor2;
 };
 
 extern RenderType openGLMode;

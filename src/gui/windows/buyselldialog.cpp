@@ -37,7 +37,7 @@ BuySellDialog::DialogList BuySellDialog::dialogInstances;
 BuySellDialog::BuySellDialog(const int npcId) :
     // TRANSLATORS: shop window name
     Window(_("Shop"), false, nullptr, "buysell.xml"),
-    gcn::ActionListener(),
+    ActionListener(),
     mNpcId(npcId),
     mNick(""),
     mBuyButton(nullptr)
@@ -48,7 +48,7 @@ BuySellDialog::BuySellDialog(const int npcId) :
 BuySellDialog::BuySellDialog(const std::string &nick) :
     // TRANSLATORS: shop window name
     Window(_("Shop"), false, nullptr, "buysell.xml"),
-    gcn::ActionListener(),
+    ActionListener(),
     mNpcId(-1),
     mNick(nick),
     mBuyButton(nullptr)
@@ -119,7 +119,7 @@ void BuySellDialog::setVisible(bool visible)
     }
 }
 
-void BuySellDialog::action(const gcn::ActionEvent &event)
+void BuySellDialog::action(const ActionEvent &event)
 {
     const std::string &eventId = event.getId();
     if (eventId == "Buy")

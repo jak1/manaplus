@@ -24,8 +24,9 @@
 
 #include "client.h"
 
+#include "events/keyevent.h"
+
 #include "input/keydata.h"
-#include "input/keyevent.h"
 
 #include "gui/windows/okdialog.h"
 
@@ -44,7 +45,7 @@
 #include "debug.h"
 
 WrongDataNoticeListener::WrongDataNoticeListener():
-    gcn::ActionListener(),
+    ActionListener(),
     mTarget(nullptr)
 {
 }
@@ -54,7 +55,7 @@ void WrongDataNoticeListener::setTarget(TextField *const textField)
     mTarget = textField;
 }
 
-void WrongDataNoticeListener::action(const gcn::ActionEvent &event)
+void WrongDataNoticeListener::action(const ActionEvent &event)
 {
     if (event.getId() == "ok" && mTarget)
         mTarget->requestFocus();
@@ -63,8 +64,8 @@ void WrongDataNoticeListener::action(const gcn::ActionEvent &event)
 RegisterDialog::RegisterDialog(LoginData *const data) :
     // TRANSLATORS: register dialog name
     Window(_("Register"), false, nullptr, "register.xml"),
-    gcn::ActionListener(),
-    gcn::KeyListener(),
+    ActionListener(),
+    KeyListener(),
     mLoginData(data),
     mUserField(new TextField(this, mLoginData->username)),
     mPasswordField(new PasswordField(this, mLoginData->password)),
@@ -172,7 +173,7 @@ RegisterDialog::~RegisterDialog()
     mWrongDataNoticeListener = nullptr;
 }
 
-void RegisterDialog::action(const gcn::ActionEvent &event)
+void RegisterDialog::action(const ActionEvent &event)
 {
     const std::string &eventId = event.getId();
     if (eventId == "cancel")
@@ -281,23 +282,22 @@ void RegisterDialog::action(const gcn::ActionEvent &event)
     }
 }
 
-void RegisterDialog::keyPressed(gcn::KeyEvent &keyEvent)
+void RegisterDialog::keyPressed(KeyEvent &keyEvent)
 {
     if (keyEvent.isConsumed())
     {
         mRegisterButton->setEnabled(canSubmit());
         return;
     }
-    const int actionId = static_cast<KeyEvent*>(
-        &keyEvent)->getActionId();
+    const int actionId = keyEvent.getActionId();
     if (actionId == static_cast<int>(Input::KEY_GUI_CANCEL))
     {
-        action(gcn::ActionEvent(nullptr, mCancelButton->getActionEventId()));
+        action(ActionEvent(nullptr, mCancelButton->getActionEventId()));
     }
     else if (actionId == static_cast<int>(Input::KEY_GUI_SELECT)
              || actionId == static_cast<int>(Input::KEY_GUI_SELECT2))
     {
-        action(gcn::ActionEvent(nullptr, mRegisterButton->getActionEventId()));
+        action(ActionEvent(nullptr, mRegisterButton->getActionEventId()));
     }
     else
     {

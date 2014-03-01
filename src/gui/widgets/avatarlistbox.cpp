@@ -28,15 +28,15 @@
 
 #include "being/localplayer.h"
 
+#include "gui/font.h"
 #include "gui/gui.h"
-#include "gui/sdlfont.h"
 #include "gui/viewport.h"
+
+#include "gui/models/avatarlistmodel.h"
 
 #include "gui/windows/chatwindow.h"
 
 #include "resources/image.h"
-
-#include <guichan/font.hpp>
 
 #include "debug.h"
 
@@ -90,7 +90,7 @@ AvatarListBox::~AvatarListBox()
     }
 }
 
-void AvatarListBox::draw(gcn::Graphics *gcnGraphics)
+void AvatarListBox::draw(Graphics *graphics)
 {
     BLOCK_START("AvatarListBox::draw")
     if (!mListModel || !player_node)
@@ -102,12 +102,10 @@ void AvatarListBox::draw(gcn::Graphics *gcnGraphics)
     AvatarListModel *const model = static_cast<AvatarListModel *const>(
         mListModel);
     updateAlpha();
-    Graphics *const graphics = static_cast<Graphics *const>(gcnGraphics);
 
-    gcn::Font *const font = getFont();
-
+    Font *const font = getFont();
     const int fontHeight = getFont()->getHeight();
-    const gcn::Widget *const parent = mParent;
+    const Widget *const parent = mParent;
     const std::string name = player_node->getName();
 
     // Draw the list elements
@@ -137,7 +135,7 @@ void AvatarListBox::draw(gcn::Graphics *gcnGraphics)
                 }
                 else
                 {
-                    graphics->drawImage2(icon, mImagePadding, y + mPadding);
+                    graphics->drawImage(icon, mImagePadding, y + mPadding);
                 }
             }
         }
@@ -158,13 +156,13 @@ void AvatarListBox::draw(gcn::Graphics *gcnGraphics)
             }
             if (parent && a->getMaxHp())
             {
-                gcn::Color color = Theme::getProgressColor(
+                Color color = Theme::getProgressColor(
                         Theme::PROG_HP, static_cast<float>(a->getHp())
                         / static_cast<float>(a->getMaxHp()));
                 color.a = 80;
                 graphics->setColor(color);
 
-                graphics->fillRectangle(gcn::Rectangle(mPadding, y + mPadding,
+                graphics->fillRectangle(Rect(mPadding, y + mPadding,
                     parent->getWidth() * a->getHp() / a->getMaxHp()
                     - 2 * mPadding, fontHeight));
             }
@@ -184,12 +182,11 @@ void AvatarListBox::draw(gcn::Graphics *gcnGraphics)
 
             if (parent)
             {
-                gcn::Color color = Theme::getProgressColor(Theme::PROG_HP,
-                        1);
+                Color color = Theme::getProgressColor(Theme::PROG_HP, 1);
 
                 color.a = 80;
                 graphics->setColor(color);
-                graphics->fillRectangle(gcn::Rectangle(mPadding, y + mPadding,
+                graphics->fillRectangle(Rect(mPadding, y + mPadding,
                     parent->getWidth() * a->getDamageHp() / 1024
                     - 2 * mPadding, fontHeight));
 
@@ -312,7 +309,7 @@ void AvatarListBox::draw(gcn::Graphics *gcnGraphics)
     BLOCK_END("AvatarListBox::draw")
 }
 
-void AvatarListBox::mousePressed(gcn::MouseEvent &event)
+void AvatarListBox::mousePressed(MouseEvent &event)
 {
     if (!actorManager || !player_node || !viewport
         || !getFont()->getHeight())
@@ -336,7 +333,7 @@ void AvatarListBox::mousePressed(gcn::MouseEvent &event)
         return;
 
     const unsigned int eventButton = event.getButton();
-    if (eventButton == gcn::MouseEvent::LEFT)
+    if (eventButton == MouseEvent::LEFT)
     {
         if (ava->getType() == AVATAR_PLAYER)
         {
@@ -350,7 +347,7 @@ void AvatarListBox::mousePressed(gcn::MouseEvent &event)
             player_node->navigateTo(ava->getX(), ava->getY());
         }
     }
-    else if (eventButton == gcn::MouseEvent::RIGHT)
+    else if (eventButton == MouseEvent::RIGHT)
     {
         switch (ava->getType())
         {
@@ -409,7 +406,7 @@ void AvatarListBox::mousePressed(gcn::MouseEvent &event)
             }
         }
     }
-    else if (eventButton == gcn::MouseEvent::MIDDLE)
+    else if (eventButton == MouseEvent::MIDDLE)
     {
         if (ava->getType() == AVATAR_PLAYER && chatWindow)
         {
@@ -421,7 +418,7 @@ void AvatarListBox::mousePressed(gcn::MouseEvent &event)
     }
 }
 
-void AvatarListBox::mouseReleased(gcn::MouseEvent &event A_UNUSED)
+void AvatarListBox::mouseReleased(MouseEvent &event A_UNUSED)
 {
 }
 

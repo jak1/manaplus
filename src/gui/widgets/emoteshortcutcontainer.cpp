@@ -27,20 +27,21 @@
 
 #include "input/inputmanager.h"
 
+#include "gui/font.h"
 #include "gui/viewport.h"
 
 #include "gui/popups/textpopup.h"
 
 #include "resources/image.h"
 
-#include <guichan/font.hpp>
+#include "resources/db/emotedb.h"
 
 #include "debug.h"
 
 static const int MAX_ITEMS = 48;
 
-EmoteShortcutContainer::EmoteShortcutContainer():
-    ShortcutContainer(),
+EmoteShortcutContainer::EmoteShortcutContainer(Widget2 *const widget) :
+    ShortcutContainer(widget),
     mEmoteImg(),
     mEmotePopup(new TextPopup),
     mEmoteClicked(false),
@@ -99,7 +100,7 @@ void EmoteShortcutContainer::setWidget2(const Widget2 *const widget)
     mForegroundColor2 = getThemeColor(Theme::TEXT_OUTLINE);
 }
 
-void EmoteShortcutContainer::draw(gcn::Graphics *graphics)
+void EmoteShortcutContainer::draw(Graphics *graphics)
 {
     if (!emoteShortcut)
         return;
@@ -112,11 +113,10 @@ void EmoteShortcutContainer::draw(gcn::Graphics *graphics)
         mAlpha = client->getGuiAlpha();
     }
 
-    Graphics *const g = static_cast<Graphics *const>(graphics);
-    gcn::Font *const font = getFont();
-    drawBackground(g);
+    Font *const font = getFont();
+    drawBackground(graphics);
 
-    g->setColorAll(mForegroundColor, mForegroundColor2);
+    graphics->setColorAll(mForegroundColor, mForegroundColor2);
     for (unsigned i = 0; i < mMaxItems; i++)
     {
         const int emoteX = (i % mGridWidth) * mBoxWidth;
@@ -126,7 +126,7 @@ void EmoteShortcutContainer::draw(gcn::Graphics *graphics)
         const std::string key = inputManager.getKeyValueString(
             Input::KEY_EMOTE_1 + i);
 
-        font->drawString(g, key, emoteX + 2, emoteY + 2);
+        font->drawString(graphics, key, emoteX + 2, emoteY + 2);
     }
     unsigned sz = static_cast<unsigned>(mEmoteImg.size());
     if (sz > mMaxItems)
@@ -139,7 +139,8 @@ void EmoteShortcutContainer::draw(gcn::Graphics *graphics)
             const AnimatedSprite *const sprite = emoteImg->sprite;
             if (sprite)
             {
-                sprite->draw(g, (i % mGridWidth) * mBoxWidth + 2,
+                sprite->draw(graphics,
+                    (i % mGridWidth) * mBoxWidth + 2,
                     (i / mGridWidth) * mBoxHeight + 10);
             }
         }
@@ -148,11 +149,11 @@ void EmoteShortcutContainer::draw(gcn::Graphics *graphics)
     BLOCK_END("EmoteShortcutContainer::draw")
 }
 
-void EmoteShortcutContainer::mouseDragged(gcn::MouseEvent &event A_UNUSED)
+void EmoteShortcutContainer::mouseDragged(MouseEvent &event A_UNUSED)
 {
 }
 
-void EmoteShortcutContainer::mousePressed(gcn::MouseEvent &event)
+void EmoteShortcutContainer::mousePressed(MouseEvent &event)
 {
     if (!emoteShortcut)
         return;
@@ -174,12 +175,12 @@ void EmoteShortcutContainer::mousePressed(gcn::MouseEvent &event)
     }
 }
 
-void EmoteShortcutContainer::mouseReleased(gcn::MouseEvent &event)
+void EmoteShortcutContainer::mouseReleased(MouseEvent &event)
 {
     if (!emoteShortcut)
         return;
 
-    if (event.getButton() == gcn::MouseEvent::LEFT)
+    if (event.getButton() == MouseEvent::LEFT)
     {
         const int index = getIndexFromGrid(event.getX(), event.getY());
 
@@ -206,7 +207,7 @@ void EmoteShortcutContainer::mouseReleased(gcn::MouseEvent &event)
     }
 }
 
-void EmoteShortcutContainer::mouseMoved(gcn::MouseEvent &event)
+void EmoteShortcutContainer::mouseMoved(MouseEvent &event)
 {
     if (!emoteShortcut || !mEmotePopup)
         return;
@@ -226,13 +227,13 @@ void EmoteShortcutContainer::mouseMoved(gcn::MouseEvent &event)
     }
 }
 
-void EmoteShortcutContainer::mouseExited(gcn::MouseEvent &event A_UNUSED)
+void EmoteShortcutContainer::mouseExited(MouseEvent &event A_UNUSED)
 {
     if (mEmotePopup)
         mEmotePopup->setVisible(false);
 }
 
-void EmoteShortcutContainer::widgetHidden(const gcn::Event &event A_UNUSED)
+void EmoteShortcutContainer::widgetHidden(const Event &event A_UNUSED)
 {
     if (mEmotePopup)
         mEmotePopup->setVisible(false);

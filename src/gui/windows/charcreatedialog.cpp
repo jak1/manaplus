@@ -24,12 +24,14 @@
 
 #include "main.h"
 
+#include "events/keyevent.h"
+
 #include "input/keydata.h"
-#include "input/keyevent.h"
 
 #include "gui/windows/okdialog.h"
 
 #include "gui/widgets/button.h"
+#include "gui/windows/charselectdialog.h"
 #include "gui/widgets/label.h"
 #include "gui/widgets/playerbox.h"
 #include "gui/widgets/radiobutton.h"
@@ -63,8 +65,8 @@ CharCreateDialog::CharCreateDialog(CharSelectDialog *const parent,
                                    const int slot) :
     // TRANSLATORS: char create dialog name
     Window(_("New Character"), true, parent, "charcreate.xml"),
-    gcn::ActionListener(),
-    gcn::KeyListener(),
+    ActionListener(),
+    KeyListener(),
     mCharSelectDialog(parent),
     mNameField(new TextField(this, "")),
     // TRANSLATORS: char create dialog label
@@ -123,7 +125,7 @@ CharCreateDialog::CharCreateDialog(CharSelectDialog *const parent,
     mMaxLook(CharDB::getMaxLook()),
     mPlayer(new Being(0, ActorSprite::PLAYER, static_cast<uint16_t>(mRace),
             nullptr)),
-    mPlayerBox(new PlayerBox(mPlayer, "charcreate_playerbox.xml",
+    mPlayerBox(new PlayerBox(this, mPlayer, "charcreate_playerbox.xml",
         "charcreate_selectedplayerbox.xml")),
     mHairStyle(0),
     mHairColor(0),
@@ -206,13 +208,13 @@ CharCreateDialog::CharCreateDialog(CharSelectDialog *const parent,
     const int h = 350;
 
     setContentSize(w, h);
-    mPlayerBox->setDimension(gcn::Rectangle(360, 0, 110, 90));
+    mPlayerBox->setDimension(Rect(360, 0, 110, 90));
     mActionButton->setPosition(385, 100);
     mRotateButton->setPosition(415, 100);
 
     mNameLabel->setPosition(5, 2);
     mNameField->setDimension(
-            gcn::Rectangle(60, 2, 300, mNameField->getHeight()));
+            Rect(60, 2, 300, mNameField->getHeight()));
 
     const int leftX = 120;
     const int rightX = 300;
@@ -318,16 +320,12 @@ CharCreateDialog::~CharCreateDialog()
         Net::getCharServerHandler()->setCharCreateDialog(nullptr);
 }
 
-void CharCreateDialog::action(const gcn::ActionEvent &event)
+void CharCreateDialog::action(const ActionEvent &event)
 {
     const std::string id = event.getId();
     if (id == "create")
     {
-        if (
-#ifdef MANASERV_SUPPORT
-            Net::getNetworkType() == ServerInfo::MANASERV ||
-#endif
-            getName().length() >= 4)
+        if (getName().length() >= 4)
         {
             // Attempt to create the character
             mCreateButton->setEnabled(false);
@@ -339,14 +337,7 @@ void CharCreateDialog::action(const gcn::ActionEvent &event)
                     mAttributeSlider[i]->getValue()));
             }
 
-#ifdef MANASERV_SUPPORT
-            int characterSlot = mSlot;
-            // On Manaserv, the slots start at 1, so we offset them.
-            if (Net::getNetworkType() == ServerInfo::MANASERV)
-                ++characterSlot;
-#else
             const int characterSlot = mSlot;
-#endif
 
             Net::getCharServerHandler()->newCharacter(getName(), characterSlot,
                 mFemale->isSelected(), mHairStyle, mHairColor,
@@ -527,8 +518,8 @@ void CharCreateDialog::setAttributes(const StringVect &labels,
         mAttributeLabel[i]->adjustSize();
         add(mAttributeLabel[i]);
 
-        mAttributeSlider[i] = new Slider(min, max);
-        mAttributeSlider[i]->setDimension(gcn::Rectangle(140, y + i * 24,
+        mAttributeSlider[i] = new Slider(this, min, max);
+        mAttributeSlider[i]->setDimension(Rect(140, y + i * 24,
                                                          150, 12));
         mAttributeSlider[i]->setActionEventId("statslider");
         mAttributeSlider[i]->addActionListener(this);
@@ -664,14 +655,14 @@ void CharCreateDialog::updatePlayer()
     }
 }
 
-void CharCreateDialog::keyPressed(gcn::KeyEvent &keyEvent)
+void CharCreateDialog::keyPressed(KeyEvent &keyEvent)
 {
-    const int actionId = static_cast<KeyEvent*>(&keyEvent)->getActionId();
+    const int actionId = keyEvent.getActionId();
     switch (actionId)
     {
         case Input::KEY_GUI_CANCEL:
             keyEvent.consume();
-            action(gcn::ActionEvent(mCancelButton,
+            action(ActionEvent(mCancelButton,
                 mCancelButton->getActionEventId()));
             break;
 

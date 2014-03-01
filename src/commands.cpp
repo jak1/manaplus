@@ -1024,7 +1024,7 @@ impHandler0(cacheInfo)
         return;
 
 /*
-    SDLFont *const font = dynamic_cast<SDLFont *const>(chatWindow->getFont());
+    Font *const font = chatWindow->getFont();
     if (!font)
         return;
 
@@ -1323,7 +1323,8 @@ static int uploadUpdate(void *ptr,
 
 static void uploadFile(const std::string &str,
                        const std::string &fileName,
-                       const std::string &addStr)
+                       const std::string &addStr,
+                       ChatTab *const tab)
 {
     UploadChatInfo *const info = new UploadChatInfo();
     Net::Download *const upload = new Net::Download(info,
@@ -1333,35 +1334,39 @@ static void uploadFile(const std::string &str,
     info->upload = upload;
     info->text = str;
     info->addStr = addStr;
+    info->tab = tab;
     upload->setFile(fileName);
     upload->start();
 }
 
-impHandler0(uploadConfig)
+impHandler2(uploadConfig)
 {
     uploadFile(_("Uploaded config into:"),
         config.getFileName(),
-        "?xml");
+        "?xml",
+        tab);
 }
 
-impHandler0(uploadServerConfig)
+impHandler2(uploadServerConfig)
 {
     uploadFile(_("Uploaded server config into:"),
         serverConfig.getFileName(),
-        "?xml");
+        "?xml",
+        tab);
 }
 
-impHandler0(uploadLog)
+impHandler2(uploadLog)
 {
     uploadFile(_("Uploaded log into:"),
         client->getLogFileName(),
-        "?txt");
+        "?txt",
+        tab);
 }
 
 impHandler0(testsdlfont)
 {
 #if defined USE_OPENGL && defined DEBUG_SDLFONT
-    SDLFont *font = new SDLFont("fonts/dejavusans.ttf", 18);
+    Font *font = new Font("fonts/dejavusans.ttf", 18);
     timespec time1;
     timespec time2;
     NullOpenGLGraphics *nullGraphics = new NullOpenGLGraphics;

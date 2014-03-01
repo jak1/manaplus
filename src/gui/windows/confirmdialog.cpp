@@ -29,7 +29,7 @@
 
 #include "utils/gettext.h"
 
-#include <guichan/font.hpp>
+#include "gui/font.h"
 
 #include "debug.h"
 
@@ -39,7 +39,7 @@ ConfirmDialog::ConfirmDialog(const std::string &restrict title,
                              const bool ignore,
                              const bool modal, Window *const parent):
     Window(title, modal, parent, "confirm.xml"),
-    gcn::ActionListener(),
+    ActionListener(),
     mTextBox(new TextBox(this)),
     mIgnore(ignore)
 {
@@ -107,7 +107,7 @@ void ConfirmDialog::postInit()
     yesButton->requestFocus();
 }
 
-void ConfirmDialog::action(const gcn::ActionEvent &event)
+void ConfirmDialog::action(const ActionEvent &event)
 {
     setActionEventId(event.getId());
     distributeActionEvent();

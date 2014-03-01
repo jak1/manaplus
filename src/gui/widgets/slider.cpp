@@ -25,8 +25,11 @@
 #include "client.h"
 #include "graphicsvertexes.h"
 
+#include "events/keyevent.h"
+
 #include "input/keydata.h"
-#include "input/keyevent.h"
+
+#include "gui/gui.h"
 
 #include "resources/image.h"
 
@@ -42,9 +45,9 @@ static std::string const data[2] =
     "slider_highlighted.xml"
 };
 
-Slider::Slider(const double scaleEnd) :
-    gcn::Slider(scaleEnd),
-    Widget2(),
+Slider::Slider(Widget2 *const widget,
+               const double scaleEnd) :
+    gcn::Slider(widget, scaleEnd),
     mVertexes(new ImageCollection),
     mHasMouse(false),
     mRedraw(true)
@@ -52,9 +55,10 @@ Slider::Slider(const double scaleEnd) :
     init();
 }
 
-Slider::Slider(const double scaleStart, const double scaleEnd) :
-    gcn::Slider(scaleStart, scaleEnd),
-    Widget2(),
+Slider::Slider(Widget2 *const widget,
+               const double scaleStart,
+               const double scaleEnd) :
+    gcn::Slider(widget, scaleStart, scaleEnd),
     mVertexes(new ImageCollection),
     mHasMouse(false),
     mRedraw(true)
@@ -118,7 +122,7 @@ void Slider::updateAlpha()
     }
 }
 
-void Slider::draw(gcn::Graphics *graphics)
+void Slider::draw(Graphics *graphics)
 {
     BLOCK_START("Slider::draw")
     if (!buttons[0].grid[HSTART] || !buttons[1].grid[HSTART]
@@ -133,19 +137,18 @@ void Slider::draw(gcn::Graphics *graphics)
     int x = 0;
     const int y = mHasMouse ? (h - buttons[1].grid[HSTART]->getHeight()) / 2 :
         (h - buttons[0].grid[HSTART]->getHeight()) / 2;
-    Graphics *const g = static_cast<Graphics*>(graphics);
 
     updateAlpha();
 
     if (isBatchDrawRenders(openGLMode))
     {
-        if (mRedraw || g->getRedraw())
+        if (mRedraw || graphics->getRedraw())
         {
             mRedraw = false;
             mVertexes->clear();
             if (!mHasMouse)
             {
-                g->calcTileCollection(mVertexes,
+                graphics->calcTileCollection(mVertexes,
                     buttons[0].grid[HSTART], x, y);
 
                 const int width = buttons[0].grid[HSTART]->getWidth();
@@ -155,24 +158,31 @@ void Slider::draw(gcn::Graphics *graphics)
                 if (buttons[0].grid[HMID])
                 {
                     const Image *const hMid = buttons[0].grid[HMID];
-                    g->calcPattern(mVertexes, hMid, x, y,
+                    graphics->calcPattern(mVertexes,
+                        hMid,
+                        x, y,
                         w, hMid->getHeight());
                 }
 
                 x += w;
-                g->calcTileCollection(mVertexes, buttons[0].grid[HEND], x, y);
+                graphics->calcTileCollection(mVertexes,
+                    buttons[0].grid[HEND],
+                    x, y);
 
                 const Image *const img = buttons[0].grid[HGRIP];
                 if (img)
                 {
-                    g->calcTileCollection(mVertexes, img, getMarkerPosition(),
+                    graphics->calcTileCollection(mVertexes,
+                        img,
+                        getMarkerPosition(),
                         (mDimension.height - img->getHeight()) / 2);
                 }
             }
             else
             {
-                g->calcTileCollection(mVertexes,
-                    buttons[1].grid[HSTART], x, y);
+                graphics->calcTileCollection(mVertexes,
+                    buttons[1].grid[HSTART],
+                    x, y);
 
                 const int width = buttons[1].grid[HSTART]->getWidth();
                 w -= width;
@@ -183,32 +193,36 @@ void Slider::draw(gcn::Graphics *graphics)
                 if (buttons[1].grid[HMID])
                 {
                     const Image *const hMid = buttons[1].grid[HMID];
-                    g->calcPattern(mVertexes, hMid, x, y,
+                    graphics->calcPattern(mVertexes,
+                        hMid,
+                        x, y,
                         w, hMid->getHeight());
                 }
 
                 x += w;
                 if (buttons[1].grid[HEND])
                 {
-                    g->calcTileCollection(mVertexes,
+                    graphics->calcTileCollection(mVertexes,
                         buttons[1].grid[HEND], x, y);
                 }
 
                 const Image *const img = buttons[1].grid[HGRIP];
                 if (img)
                 {
-                    g->calcTileCollection(mVertexes, img, getMarkerPosition(),
+                    graphics->calcTileCollection(mVertexes,
+                        img,
+                        getMarkerPosition(),
                         (mDimension.height - img->getHeight()) / 2);
                 }
             }
         }
-        g->drawTileCollection(mVertexes);
+        graphics->drawTileCollection(mVertexes);
     }
     else
     {
         if (!mHasMouse)
         {
-            g->drawImage2(buttons[0].grid[HSTART], x, y);
+            graphics->drawImage(buttons[0].grid[HSTART], x, y);
             const int width = buttons[0].grid[HSTART]->getWidth();
             w -= width + buttons[0].grid[HEND]->getWidth();
             x += width;
@@ -216,22 +230,22 @@ void Slider::draw(gcn::Graphics *graphics)
             if (buttons[0].grid[HMID])
             {
                 const Image *const hMid = buttons[0].grid[HMID];
-                g->drawPattern(hMid, x, y, w, hMid->getHeight());
+                graphics->drawPattern(hMid, x, y, w, hMid->getHeight());
             }
 
             x += w;
-            g->drawImage2(buttons[0].grid[HEND], x, y);
+            graphics->drawImage(buttons[0].grid[HEND], x, y);
 
             const Image *const img = buttons[0].grid[HGRIP];
             if (img)
             {
-                g->drawImage2(img, getMarkerPosition(),
+                graphics->drawImage(img, getMarkerPosition(),
                     (mDimension.height - img->getHeight()) / 2);
             }
         }
         else
         {
-            g->drawImage2(buttons[1].grid[HSTART], x, y);
+            graphics->drawImage(buttons[1].grid[HSTART], x, y);
 
             const int width = buttons[1].grid[HSTART]->getWidth();
             w -= width;
@@ -242,17 +256,17 @@ void Slider::draw(gcn::Graphics *graphics)
             if (buttons[1].grid[HMID])
             {
                 const Image *const hMid = buttons[1].grid[HMID];
-                g->drawPattern(hMid, x, y, w, hMid->getHeight());
+                graphics->drawPattern(hMid, x, y, w, hMid->getHeight());
             }
 
             x += w;
             if (buttons[1].grid[HEND])
-                g->drawImage2(buttons[1].grid[HEND], x, y);
+                graphics->drawImage(buttons[1].grid[HEND], x, y);
 
             const Image *const img = buttons[1].grid[HGRIP];
             if (img)
             {
-                g->drawImage2(img, getMarkerPosition(),
+                graphics->drawImage(img, getMarkerPosition(),
                     (mDimension.height - img->getHeight()) / 2);
             }
         }
@@ -261,21 +275,21 @@ void Slider::draw(gcn::Graphics *graphics)
     BLOCK_END("Slider::draw")
 }
 
-void Slider::mouseEntered(gcn::MouseEvent& event A_UNUSED)
+void Slider::mouseEntered(MouseEvent& event A_UNUSED)
 {
     mHasMouse = true;
     mRedraw = true;
 }
 
-void Slider::mouseExited(gcn::MouseEvent& event A_UNUSED)
+void Slider::mouseExited(MouseEvent& event A_UNUSED)
 {
     mHasMouse = false;
     mRedraw = true;
 }
 
-void Slider::mousePressed(gcn::MouseEvent &mouseEvent)
+void Slider::mousePressed(MouseEvent &mouseEvent)
 {
-    if (mouseEvent.getButton() == gcn::MouseEvent::LEFT
+    if (mouseEvent.getButton() == MouseEvent::LEFT
         && mouseEvent.getX() >= 0
         && mouseEvent.getX() <= getWidth()
         && mouseEvent.getY() >= 0
@@ -296,7 +310,7 @@ void Slider::mousePressed(gcn::MouseEvent &mouseEvent)
     }
 }
 
-void Slider::mouseDragged(gcn::MouseEvent &mouseEvent)
+void Slider::mouseDragged(MouseEvent &mouseEvent)
 {
     if (getOrientation() == HORIZONTAL)
     {
@@ -314,7 +328,7 @@ void Slider::mouseDragged(gcn::MouseEvent &mouseEvent)
     mouseEvent.consume();
 }
 
-void Slider::mouseWheelMovedUp(gcn::MouseEvent &mouseEvent)
+void Slider::mouseWheelMovedUp(MouseEvent &mouseEvent)
 {
     setValue2(getValue() + getStepLength());
     distributeActionEvent();
@@ -322,7 +336,7 @@ void Slider::mouseWheelMovedUp(gcn::MouseEvent &mouseEvent)
     mouseEvent.consume();
 }
 
-void Slider::mouseWheelMovedDown(gcn::MouseEvent &mouseEvent)
+void Slider::mouseWheelMovedDown(MouseEvent &mouseEvent)
 {
     setValue2(getValue() - getStepLength());
     distributeActionEvent();
@@ -330,9 +344,9 @@ void Slider::mouseWheelMovedDown(gcn::MouseEvent &mouseEvent)
     mouseEvent.consume();
 }
 
-void Slider::keyPressed(gcn::KeyEvent& keyEvent)
+void Slider::keyPressed(KeyEvent& keyEvent)
 {
-    const int action = static_cast<KeyEvent*>(&keyEvent)->getActionId();
+    const int action = keyEvent.getActionId();
 
     if (getOrientation() == HORIZONTAL)
     {

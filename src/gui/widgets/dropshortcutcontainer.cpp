@@ -36,12 +36,12 @@
 
 #include "resources/image.h"
 
-#include <guichan/font.hpp>
+#include "gui/font.h"
 
 #include "debug.h"
 
-DropShortcutContainer::DropShortcutContainer():
-    ShortcutContainer(),
+DropShortcutContainer::DropShortcutContainer(Widget2 *const widget):
+    ShortcutContainer(widget),
     mItemClicked(false),
     mItemPopup(new ItemPopup),
     mEquipedColor(getThemeColor(Theme::ITEM_EQUIPPED)),
@@ -94,7 +94,7 @@ void DropShortcutContainer::setWidget2(const Widget2 *const widget)
     mUnEquipedColor2 = getThemeColor(Theme::ITEM_NOT_EQUIPPED_OUTLINE);
 }
 
-void DropShortcutContainer::draw(gcn::Graphics *graphics)
+void DropShortcutContainer::draw(Graphics *graphics)
 {
     if (!dropShortcut)
         return;
@@ -107,8 +107,7 @@ void DropShortcutContainer::draw(gcn::Graphics *graphics)
             mBackgroundImg->setAlpha(mAlpha);
     }
 
-    Graphics *const g = static_cast<Graphics*>(graphics);
-    drawBackground(g);
+    drawBackground(graphics);
 
     const Inventory *const inv = PlayerInfo::getInventory();
     if (!inv)
@@ -117,7 +116,7 @@ void DropShortcutContainer::draw(gcn::Graphics *graphics)
         return;
     }
 
-    gcn::Font *const font = getFont();
+    Font *const font = getFont();
 
     for (unsigned i = 0; i < mMaxItems; i++)
     {
@@ -144,12 +143,12 @@ void DropShortcutContainer::draw(gcn::Graphics *graphics)
                     caption = "Eq.";
 
                 image->setAlpha(1.0F);
-                g->drawImage2(image, itemX, itemY);
+                graphics->drawImage(image, itemX, itemY);
                 if (item->isEquipped())
-                    g->setColorAll(mEquipedColor, mEquipedColor2);
+                    graphics->setColorAll(mEquipedColor, mEquipedColor2);
                 else
-                    g->setColorAll(mUnEquipedColor, mUnEquipedColor2);
-                font->drawString(g, caption,
+                    graphics->setColorAll(mUnEquipedColor, mUnEquipedColor2);
+                font->drawString(graphics, caption,
                     itemX + (mBoxWidth - font->getWidth(caption)) / 2,
                     itemY + mBoxHeight - 14);
             }
@@ -158,12 +157,12 @@ void DropShortcutContainer::draw(gcn::Graphics *graphics)
     BLOCK_END("DropShortcutContainer::draw")
 }
 
-void DropShortcutContainer::mouseDragged(gcn::MouseEvent &event)
+void DropShortcutContainer::mouseDragged(MouseEvent &event)
 {
     if (!dropShortcut)
         return;
 
-    if (event.getButton() == gcn::MouseEvent::LEFT)
+    if (event.getButton() == MouseEvent::LEFT)
     {
         if (dragDrop.isEmpty() && mItemClicked)
         {
@@ -197,7 +196,7 @@ void DropShortcutContainer::mouseDragged(gcn::MouseEvent &event)
     }
 }
 
-void DropShortcutContainer::mousePressed(gcn::MouseEvent &event)
+void DropShortcutContainer::mousePressed(MouseEvent &event)
 {
     if (!dropShortcut || !inventoryWindow)
         return;
@@ -208,7 +207,7 @@ void DropShortcutContainer::mousePressed(gcn::MouseEvent &event)
         return;
 
     const int eventButton = event.getButton();
-    if (eventButton == gcn::MouseEvent::LEFT)
+    if (eventButton == MouseEvent::LEFT)
     {
         if (dropShortcut->getItem(index) > 0)
         {
@@ -224,7 +223,7 @@ void DropShortcutContainer::mousePressed(gcn::MouseEvent &event)
             }
         }
     }
-    else if (eventButton == gcn::MouseEvent::RIGHT)
+    else if (eventButton == MouseEvent::RIGHT)
     {
         const Inventory *const inv = PlayerInfo::getInventory();
         if (!inv)
@@ -238,12 +237,12 @@ void DropShortcutContainer::mousePressed(gcn::MouseEvent &event)
     }
 }
 
-void DropShortcutContainer::mouseReleased(gcn::MouseEvent &event)
+void DropShortcutContainer::mouseReleased(MouseEvent &event)
 {
     if (!dropShortcut)
         return;
 
-    if (event.getButton() == gcn::MouseEvent::LEFT)
+    if (event.getButton() == MouseEvent::LEFT)
     {
         if (dropShortcut->isItemSelected())
             dropShortcut->setItemSelected(-1);
@@ -270,7 +269,7 @@ void DropShortcutContainer::mouseReleased(gcn::MouseEvent &event)
 }
 
 // Show ItemTooltip
-void DropShortcutContainer::mouseMoved(gcn::MouseEvent &event)
+void DropShortcutContainer::mouseMoved(MouseEvent &event)
 {
     if (!dropShortcut)
         return;
@@ -303,13 +302,13 @@ void DropShortcutContainer::mouseMoved(gcn::MouseEvent &event)
     }
 }
 
-void DropShortcutContainer::mouseExited(gcn::MouseEvent &event A_UNUSED)
+void DropShortcutContainer::mouseExited(MouseEvent &event A_UNUSED)
 {
     if (mItemPopup)
         mItemPopup->setVisible(false);
 }
 
-void DropShortcutContainer::widgetHidden(const gcn::Event &event A_UNUSED)
+void DropShortcutContainer::widgetHidden(const Event &event A_UNUSED)
 {
     if (mItemPopup)
         mItemPopup->setVisible(false);

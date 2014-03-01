@@ -23,29 +23,27 @@
 #ifndef GUI_WIDGETS_TEXTPREVIEW_H
 #define GUI_WIDGETS_TEXTPREVIEW_H
 
-#include "gui/widgets/widget2.h"
-
-#include <guichan/widget.hpp>
+#include "gui/widgets/widget.h"
 
 #include "localconsts.h"
 
 /**
  * Preview widget for particle colors, etc.
  */
-class TextPreview final : public gcn::Widget,
-                          public Widget2
+class TextPreview final : public Widget
 {
     public:
-        TextPreview(const Widget2 *const widget, const std::string &text);
+        TextPreview(const Widget2 *const widget,
+                    const std::string &text);
 
         A_DELETE_COPY(TextPreview)
 
         ~TextPreview();
 
-        inline void setTextColor(const gcn::Color *color)
+        inline void setTextColor(const Color *color)
         { mTextColor = color; adjustSize(); }
 
-        inline void setTextColor2(const gcn::Color *color)
+        inline void setTextColor2(const Color *color)
         { mTextColor2 = color; adjustSize(); }
 
         /**
@@ -62,7 +60,7 @@ class TextPreview final : public gcn::Widget,
          *
          * @param color the color to set
          */
-        inline void setTextBGColor(const gcn::Color *color)
+        inline void setTextBGColor(const Color *color)
         { mTextBGColor = color; }
 
         /**
@@ -70,7 +68,7 @@ class TextPreview final : public gcn::Widget,
          *
          * @param color the color to set
          */
-        inline void setBGColor(const gcn::Color *color)
+        inline void setBGColor(const Color *color)
         { mBGColor = color; }
 
         /**
@@ -78,7 +76,7 @@ class TextPreview final : public gcn::Widget,
          *
          * @param font the font to use.
          */
-        inline void setFont(gcn::Font *const font)
+        inline void setFont(Font *const font)
         { mFont = font; }
 
         /**
@@ -102,7 +100,7 @@ class TextPreview final : public gcn::Widget,
          *
          * @param graphics graphics to draw into
          */
-        void draw(gcn::Graphics *graphics) override final;
+        void draw(Graphics *graphics) override final;
 
         /**
          * Set opacity for this widget (whether or not to show the background
@@ -123,12 +121,12 @@ class TextPreview final : public gcn::Widget,
         void adjustSize();
 
     private:
-        gcn::Font *mFont;
+        Font *mFont;
         std::string mText;
-        const gcn::Color *mTextColor;
-        const gcn::Color *mTextColor2;
-        const gcn::Color *mBGColor;
-        const gcn::Color *mTextBGColor;
+        const Color *mTextColor;
+        const Color *mTextColor2;
+        const Color *mBGColor;
+        const Color *mTextBGColor;
         int mPadding;
         static int instances;
         static float mAlpha;

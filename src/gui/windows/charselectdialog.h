@@ -29,13 +29,12 @@
 
 #include "net/charserverhandler.h"
 
-#include <guichan/actionlistener.hpp>
-#include <guichan/keylistener.hpp>
+#include "listeners/actionlistener.h"
+#include "listeners/keylistener.h"
 
 class Button;
 class CharacterDisplay;
 class CharacterViewBase;
-class Label;
 class LoginData;
 class TextDialog;
 
@@ -45,8 +44,8 @@ class TextDialog;
  * \ingroup Interface
  */
 class CharSelectDialog final : public Window,
-                               public gcn::ActionListener,
-                               public gcn::KeyListener
+                               public ActionListener,
+                               public KeyListener
 {
     public:
         friend class CharDeleteConfirm;
@@ -61,9 +60,9 @@ class CharSelectDialog final : public Window,
 
         ~CharSelectDialog();
 
-        void action(const gcn::ActionEvent &event) override final;
+        void action(const ActionEvent &event) override final;
 
-        void keyPressed(gcn::KeyEvent &keyEvent) override final;
+        void keyPressed(KeyEvent &keyEvent) override final;
 
         enum SelectAction
         {
@@ -86,7 +85,7 @@ class CharSelectDialog final : public Window,
 
         void close() override final;
 
-        void widgetResized(const gcn::Event &event) override final;
+        void widgetResized(const Event &event) override final;
 
         void updateState();
 

@@ -22,9 +22,10 @@
 
 #if defined(ANDROID) || defined(__native_client__)
 #include "resources/resourcemanager.h"
-#endif
 
 #include "utils/mkdir.h"
+#endif
+
 #include "utils/physfstools.h"
 
 #include "localconsts.h"

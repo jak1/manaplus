@@ -22,29 +22,21 @@
 #ifndef GUI_WIDGETS_AVATARLISTBOX_H
 #define GUI_WIDGETS_AVATARLISTBOX_H
 
-#include "avatar.h"
-
-#include "configlistener.h"
+#include "listeners/configlistener.h"
 
 #include "gui/widgets/listbox.h"
 
 #include <string>
 
+class AvatarListModel;
 class Image;
 
-class AvatarListModel : public gcn::ListModel
+class AvatarListBox final : public ListBox,
+                            public ConfigListener
 {
 public:
-    virtual Avatar *getAvatarAt(const int i) A_WARN_UNUSED = 0;
-
-    std::string getElementAt(int i) override final A_WARN_UNUSED
-    { return getAvatarAt(i)->getName(); }
-};
-
-class AvatarListBox final : public ListBox, public ConfigListener
-{
-public:
-    AvatarListBox(const Widget2 *const widget, AvatarListModel *const model);
+    AvatarListBox(const Widget2 *const widget,
+                  AvatarListModel *const model);
 
     A_DELETE_COPY(AvatarListBox)
 
@@ -53,11 +45,11 @@ public:
     /**
      * Draws the list box.
      */
-    void draw(gcn::Graphics *gcnGraphics) override final;
+    void draw(Graphics *gcnGraphics) override final;
 
-    void mousePressed(gcn::MouseEvent &event) override final;
+    void mousePressed(MouseEvent &event) override final;
 
-    void mouseReleased(gcn::MouseEvent &event A_UNUSED) override final;
+    void mouseReleased(MouseEvent &event A_UNUSED) override final;
 
     void optionChanged(const std::string &value) override final;
 

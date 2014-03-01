@@ -59,22 +59,6 @@ unsigned char MessageIn::readInt8()
     return value;
 }
 
-void MessageIn::readCoordinates(uint16_t &restrict x, uint16_t &restrict y)
-{
-    if (mPos + 3 <= mLength)
-    {
-        const unsigned char *const p
-            = reinterpret_cast<unsigned char const *const>(mData + mPos);
-        x = static_cast<uint16_t>(p[0] | ((p[1] & 0x07) << 8));
-        y = static_cast<uint16_t>((p[1] >> 3) | ((p[2] & 0x3F) << 5));
-    }
-    mPos += 3;
-    PacketCounters::incInBytes(3);
-    DEBUGLOG(std::string("readCoordinates: ").append(toString(
-        static_cast<int>(x))).append(",").append(toString(
-        static_cast<int>(y))));
-}
-
 uint8_t MessageIn::fromServerDirection(const uint8_t serverDir)
 {
     // Translate from eAthena format
@@ -97,10 +81,7 @@ uint8_t MessageIn::fromServerDirection(const uint8_t serverDir)
         case 7:
             return 9;
         case 8:
-#ifdef MANASERV_SUPPORT
-            if (Net::getNetworkType() != ServerInfo::MANASERV)
-#endif
-                return 8;
+            return 8;
         default:
             logger->log("incorrect direction: %d",
                 static_cast<int>(serverDir));
@@ -115,7 +96,7 @@ void MessageIn::readCoordinates(uint16_t &restrict x, uint16_t &restrict y,
     if (mPos + 3 <= mLength)
     {
         const char *const data = mData + mPos;
-        int16_t temp = MAKEWORD(data[1] & 0x00c0, data[0] & 0x00ff);
+        uint16_t temp = MAKEWORD(data[1] & 0x00c0, data[0] & 0x00ff);
         x = static_cast<uint16_t>(temp >> 6);
         temp = MAKEWORD(data[2] & 0x00f0, data[1] & 0x003f);
         y = static_cast<uint16_t>(temp >> 4);
@@ -147,7 +128,7 @@ void MessageIn::readCoordinatePair(uint16_t &restrict srcX,
     if (mPos + 5 <= mLength)
     {
         const char *const data = mData + mPos;
-        int16_t temp = MAKEWORD(data[3], data[2] & 0x000f);
+        uint16_t temp = MAKEWORD(data[3], data[2] & 0x000f);
         dstX = static_cast<uint16_t>(temp >> 2);
 
         dstY = MAKEWORD(data[4], data[3] & 0x0003);

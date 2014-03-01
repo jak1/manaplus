@@ -23,14 +23,14 @@
 #ifndef GUI_WINDOWS_CHATWINDOW_H
 #define GUI_WINDOWS_CHATWINDOW_H
 
-#include "depricatedlistener.h"
+#include "listeners/depricatedlistener.h"
 
-#include "configlistener.h"
+#include "listeners/configlistener.h"
 
 #include "gui/widgets/window.h"
 
-#include <guichan/actionlistener.hpp>
-#include <guichan/keylistener.hpp>
+#include "listeners/actionlistener.h"
+#include "listeners/keylistener.h"
 
 #include <list>
 #include <map>
@@ -83,8 +83,8 @@ struct CHATLOG final
  * \ingroup Interface
  */
 class ChatWindow final : public Window,
-                         public gcn::ActionListener,
-                         public gcn::KeyListener,
+                         public ActionListener,
+                         public KeyListener,
                          public DepricatedListener,
                          public ConfigListener
 {
@@ -139,7 +139,7 @@ class ChatWindow final : public Window,
         /**
          * Performs action.
          */
-        void action(const gcn::ActionEvent &event) override final;
+        void action(const ActionEvent &event) override final;
 
         /**
          * Request focus for typing chat message.
@@ -169,7 +169,7 @@ class ChatWindow final : public Window,
         void localChatInput(const std::string &msg) const;
 
         /** Called when key is pressed */
-        void keyPressed(gcn::KeyEvent &event) override final;
+        void keyPressed(KeyEvent &event) override final;
 
         /** Set the chat input as the given text. */
         void setInputText(const std::string &text);
@@ -186,12 +186,12 @@ class ChatWindow final : public Window,
         /**
          * Handles mouse when dragged.
          */
-        void mouseDragged(gcn::MouseEvent &event) override final;
+        void mouseDragged(MouseEvent &event) override final;
 
         /**
          * Handles mouse when pressed.
          */
-        void mousePressed(gcn::MouseEvent &event) override final;
+        void mousePressed(MouseEvent &event) override final;
 
         void processEvent(const Channels channel,
                           const DepricatedEvent &event) override final;
@@ -274,19 +274,19 @@ class ChatWindow final : public Window,
 
         void optionChanged(const std::string &name) override final;
 
-        void mouseEntered(gcn::MouseEvent& mouseEvent) override final;
+        void mouseEntered(MouseEvent& mouseEvent) override final;
 
-        void mouseMoved(gcn::MouseEvent &event) override final;
+        void mouseMoved(MouseEvent &event) override final;
 
-        void mouseExited(gcn::MouseEvent& mouseEvent A_UNUSED) override final;
+        void mouseExited(MouseEvent& mouseEvent A_UNUSED) override final;
 
-        void draw(gcn::Graphics* graphics) override final;
+        void draw(Graphics* graphics) override final;
 
         void updateVisibility();
 
         void unHideWindow();
 
-        void widgetResized(const gcn::Event &event) override final;
+        void widgetResized(const Event &event) override final;
 
         void addGlobalMessage(const std::string &line);
 

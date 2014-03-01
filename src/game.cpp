@@ -49,9 +49,6 @@
 #include "input/keyboardconfig.h"
 
 #include "gui/gui.h"
-#ifdef MANASERV_SUPPORT
-#include "gui/specialswindow.h"
-#endif
 #include "gui/viewport.h"
 #include "gui/windowmenu.h"
 
@@ -139,9 +136,6 @@ DebugWindow *debugWindow = nullptr;
 ShortcutWindow *itemShortcutWindow = nullptr;
 ShortcutWindow *emoteShortcutWindow = nullptr;
 OutfitWindow *outfitWindow = nullptr;
-#ifdef MANASERV_SUPPORT
-SpecialsWindow *specialsWindow = nullptr;
-#endif
 ShortcutWindow *dropShortcutWindow = nullptr;
 ShortcutWindow *spellShortcutWindow = nullptr;
 WhoIsOnline *whoIsOnline = nullptr;
@@ -236,7 +230,7 @@ static void createGuiWindows()
     for (unsigned f = 0; f < SHORTCUT_TABS; f ++)
     {
         itemShortcutWindow->addTab(toString(f + 1),
-            new ItemShortcutContainer(f));
+            new ItemShortcutContainer(nullptr, f));
     }
     if (config.getBoolValue("showDidYouKnow"))
     {
@@ -245,20 +239,20 @@ static void createGuiWindows()
     }
 
     emoteShortcutWindow = new ShortcutWindow("EmoteShortcut",
-        new EmoteShortcutContainer, "emotes.xml", 130, 480);
+        new EmoteShortcutContainer(nullptr),
+        "emotes.xml",
+        130, 480);
     outfitWindow = new OutfitWindow();
-#ifdef MANASERV_SUPPORT
-    specialsWindow = new SpecialsWindow();
-#endif
     dropShortcutWindow = new ShortcutWindow("DropShortcut",
-        new DropShortcutContainer, "drops.xml");
+        new DropShortcutContainer(nullptr),
+        "drops.xml");
 
     spellShortcutWindow = new ShortcutWindow("SpellShortcut", "spells.xml",
                                              265, 328);
     for (unsigned f = 0; f < SPELL_SHORTCUT_TABS; f ++)
     {
         spellShortcutWindow->addTab(toString(f + 1),
-            new SpellShortcutContainer(f));
+            new SpellShortcutContainer(nullptr, f));
     }
 
     botCheckerWindow = new BotCheckerWindow;
@@ -370,9 +364,6 @@ static void destroyGuiWindows()
     del_0(itemShortcutWindow)
     del_0(emoteShortcutWindow)
     del_0(outfitWindow)
-#ifdef MANASERV_SUPPORT
-    del_0(specialsWindow)
-#endif
     del_0(socialWindow)
     del_0(dropShortcutWindow);
     del_0(spellShortcutWindow);

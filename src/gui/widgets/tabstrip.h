@@ -23,24 +23,24 @@
 
 #include "gui/widgets/widgetgroup.h"
 
-#include <guichan/widget.hpp>
-
 class TabStrip final : public WidgetGroup
 {
     public:
         TabStrip(const Widget2 *const widget,
-                 const std::string &group, const int height,
+                 const std::string &group,
+                 const int height,
                  const int spacing = 0);
 
         TabStrip(const Widget2 *const widget,
-                 const int height, const int spacing = 0);
+                 const int height,
+                 const int spacing = 0);
 
         A_DELETE_COPY(TabStrip)
 
-        gcn::Widget *createWidget(const std::string &name)
-                                  const override final A_WARN_UNUSED;
+        Widget *createWidget(const std::string &name)
+                             const override final A_WARN_UNUSED;
 
-        void action(const gcn::ActionEvent &event) override final;
+        void action(const ActionEvent &event) override final;
 };
 
 #endif  // GUI_WIDGETS_TABSTRIP_H

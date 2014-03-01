@@ -42,7 +42,7 @@ NpcPostDialog::DialogList NpcPostDialog::instances;
 NpcPostDialog::NpcPostDialog(const int npcId):
     // TRANSLATORS: npc post dialog caption
     Window(_("NPC"), false, nullptr, "npcpost.xml"),
-    gcn::ActionListener(),
+    ActionListener(),
     mNpcId(npcId),
     mText(new TextBox(this)),
     mSender(new TextField(this))
@@ -74,9 +74,9 @@ void NpcPostDialog::postInit()
     mText->setEditable(true);
 
     // create scroll box for letter text
-    ScrollArea *const scrollArea = new ScrollArea(mText);
+    ScrollArea *const scrollArea = new ScrollArea(this, mText);
     scrollArea->setHorizontalScrollPolicy(gcn::ScrollArea::SHOW_NEVER);
-    scrollArea->setDimension(gcn::Rectangle(
+    scrollArea->setDimension(Rect(
                 5, mSender->getHeight() + 5,
                 380, 140 - (mSender->getHeight() + sendButton->getHeight())));
 
@@ -98,7 +98,7 @@ NpcPostDialog::~NpcPostDialog()
     instances.remove(this);
 }
 
-void NpcPostDialog::action(const gcn::ActionEvent &event)
+void NpcPostDialog::action(const ActionEvent &event)
 {
     const std::string &eventId = event.getId();
     if (eventId == "send")

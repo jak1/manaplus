@@ -25,7 +25,7 @@
 
 #include "gui/widgets/window.h"
 
-#include <guichan/actionlistener.hpp>
+#include "listeners/actionlistener.h"
 
 #include <list>
 
@@ -41,7 +41,7 @@ class TabbedArea;
  * \ingroup GUI
  */
 class SetupWindow final : public Window,
-                          public gcn::ActionListener
+                          public ActionListener
 {
     public:
         SetupWindow();
@@ -52,7 +52,7 @@ class SetupWindow final : public Window,
 
         void postInit() override final;
 
-        void action(const gcn::ActionEvent &event) override final;
+        void action(const ActionEvent &event) override final;
 
         void setInGame(const bool inGame);
 
@@ -71,7 +71,7 @@ class SetupWindow final : public Window,
 
         void setVisible(bool visible) override final;
 
-        void widgetResized(const gcn::Event &event) override final;
+        void widgetResized(const Event &event) override final;
 
     private:
         void unloadModTab();

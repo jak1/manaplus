@@ -23,12 +23,11 @@
 #ifndef GUI_WIDGETS_ITEMCONTAINER_H
 #define GUI_WIDGETS_ITEMCONTAINER_H
 
-#include "gui/widgets/widget2.h"
+#include "listeners/keylistener.h"
+#include "listeners/mouselistener.h"
+#include "listeners/widgetlistener.h"
 
-#include <guichan/keylistener.hpp>
-#include <guichan/mouselistener.hpp>
-#include <guichan/widget.hpp>
-#include <guichan/widgetlistener.hpp>
+#include "gui/widgets/widget.h"
 
 #include <list>
 
@@ -38,22 +37,17 @@ class Image;
 class Inventory;
 class Item;
 class ItemPopup;
-
-namespace gcn
-{
-    class SelectionListener;
-}
+class SelectionListener;
 
 /**
  * An item container. Used to show items in inventory and trade dialog.
  *
  * \ingroup GUI
  */
-class ItemContainer final : public gcn::Widget,
-                            public Widget2,
-                            public gcn::KeyListener,
-                            public gcn::MouseListener,
-                            public gcn::WidgetListener
+class ItemContainer final : public Widget,
+                            public KeyListener,
+                            public MouseListener,
+                            public WidgetListener
 {
     public:
         /**
@@ -85,21 +79,21 @@ class ItemContainer final : public gcn::Widget,
         /**
          * Draws the items.
          */
-        void draw(gcn::Graphics *graphics) override final;
+        void draw(Graphics *graphics) override final;
 
         // KeyListener
-        void keyPressed(gcn::KeyEvent &event) override final;
-        void keyReleased(gcn::KeyEvent &event) override final;
+        void keyPressed(KeyEvent &event) override final;
+        void keyReleased(KeyEvent &event) override final;
 
         // MouseListener
-        void mousePressed(gcn::MouseEvent &event) override final;
-        void mouseDragged(gcn::MouseEvent &event) override final;
-        void mouseReleased(gcn::MouseEvent &event) override final;
-        void mouseMoved(gcn::MouseEvent &event) override final;
-        void mouseExited(gcn::MouseEvent &event) override final;
+        void mousePressed(MouseEvent &event) override final;
+        void mouseDragged(MouseEvent &event) override final;
+        void mouseReleased(MouseEvent &event) override final;
+        void mouseMoved(MouseEvent &event) override final;
+        void mouseExited(MouseEvent &event) override final;
 
         // WidgetListener
-        void widgetResized(const gcn::Event &event) override final;
+        void widgetResized(const Event &event) override final;
 
         /**
          * Returns the selected item.
@@ -115,14 +109,14 @@ class ItemContainer final : public gcn::Widget,
          * Adds a listener to the list that's notified each time a change to
          * the selection occurs.
          */
-        void addSelectionListener(gcn::SelectionListener *listener)
+        void addSelectionListener(SelectionListener *listener)
         { mSelectionListeners.push_back(listener); }
 
         /**
          * Removes a listener from the list that's notified each time a change
          * to the selection occurs.
          */
-        void removeSelectionListener(gcn::SelectionListener *listener)
+        void removeSelectionListener(SelectionListener *listener)
         { mSelectionListeners.remove(listener); }
 
         void setFilter(const int tag);
@@ -187,11 +181,11 @@ class ItemContainer final : public gcn::Widget,
         ItemPopup *mItemPopup;
         int *mShowMatrix;
         Skin *mSkin;
-        gcn::Color mEquipedColor;
-        gcn::Color mEquipedColor2;
-        gcn::Color mUnEquipedColor;
-        gcn::Color mUnEquipedColor2;
-        typedef std::list<gcn::SelectionListener*> SelectionListenerList;
+        Color mEquipedColor;
+        Color mEquipedColor2;
+        Color mUnEquipedColor;
+        Color mUnEquipedColor2;
+        typedef std::list<SelectionListener*> SelectionListenerList;
         typedef SelectionListenerList::iterator SelectionListenerIterator;
         SelectionListenerList mSelectionListeners;
         int mGridColumns;

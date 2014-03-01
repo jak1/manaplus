@@ -24,25 +24,26 @@
 
 #include "client.h"
 
-#include "input/keydata.h"
-#include "input/keyevent.h"
+#include "events/keyevent.h"
 
+#include "input/keydata.h"
+
+#include "gui/focushandler.h"
+#include "gui/font.h"
 #include "gui/gui.h"
 
-#include <guichan/focushandler.hpp>
-#include <guichan/font.hpp>
-#include <guichan/graphics.hpp>
-#include <guichan/listmodel.hpp>
+#include "gui/models/listmodel.h"
+
+#include "render/graphics.h"
 
 #include "debug.h"
 
 float ListBox::mAlpha = 1.0;
 
 ListBox::ListBox(const Widget2 *const widget,
-                 gcn::ListModel *const listModel,
+                 ListModel *const listModel,
                  const std::string &skin) :
-    gcn::ListBox(listModel),
-    Widget2(widget),
+    gcn::ListBox(widget, listModel),
     mHighlightColor(getThemeColor(Theme::HIGHLIGHT)),
     mForegroundSelectedColor(getThemeColor(Theme::LISTBOX_SELECTED)),
     mForegroundSelectedColor2(getThemeColor(Theme::LISTBOX_SELECTED_OUTLINE)),
@@ -68,7 +69,7 @@ ListBox::ListBox(const Widget2 *const widget,
         mItemPadding = mSkin->getOption("itemPadding");
     }
 
-    const gcn::Font *const font = getFont();
+    const Font *const font = getFont();
     if (font)
         mRowHeight = font->getHeight() + 2 * mItemPadding;
     else
@@ -98,18 +99,17 @@ void ListBox::updateAlpha()
         mAlpha = alpha;
 }
 
-void ListBox::draw(gcn::Graphics *graphics)
+void ListBox::draw(Graphics *graphics)
 {
     if (!mListModel)
         return;
 
     BLOCK_START("ListBox::draw")
     updateAlpha();
-    Graphics *const g = static_cast<Graphics*>(graphics);
 
     mHighlightColor.a = static_cast<int>(mAlpha * 255.0F);
     graphics->setColor(mHighlightColor);
-    gcn::Font *const font = getFont();
+    Font *const font = getFont();
     const int rowHeight = getRowHeight();
     const int width = mDimension.width;
 
@@ -118,11 +118,11 @@ void ListBox::draw(gcn::Graphics *graphics)
         // Draw filled rectangle around the selected list element
         if (mSelected >= 0)
         {
-            graphics->fillRectangle(gcn::Rectangle(mPadding,
+            graphics->fillRectangle(Rect(mPadding,
                 rowHeight * mSelected + mPadding,
                 mDimension.width - 2 * mPadding, rowHeight));
 
-            g->setColorAll(mForegroundSelectedColor,
+            graphics->setColorAll(mForegroundSelectedColor,
                 mForegroundSelectedColor2);
             const std::string str = mListModel->getElementAt(mSelected);
             font->drawString(graphics, str,
@@ -130,7 +130,7 @@ void ListBox::draw(gcn::Graphics *graphics)
                 mSelected * rowHeight + mPadding + mItemPadding);
         }
         // Draw the list elements
-        g->setColorAll(mForegroundColor, mForegroundColor2);
+        graphics->setColorAll(mForegroundColor, mForegroundColor2);
         const int sz = mListModel->getNumberOfElements();
         for (int i = 0, y = mPadding + mItemPadding;
              i < sz; ++i, y += rowHeight)
@@ -148,18 +148,18 @@ void ListBox::draw(gcn::Graphics *graphics)
         // Draw filled rectangle around the selected list element
         if (mSelected >= 0)
         {
-            graphics->fillRectangle(gcn::Rectangle(mPadding,
+            graphics->fillRectangle(Rect(mPadding,
                 rowHeight * mSelected + mPadding,
                 mDimension.width - 2 * mPadding, rowHeight));
 
-            g->setColorAll(mForegroundSelectedColor,
+            graphics->setColorAll(mForegroundSelectedColor,
                 mForegroundSelectedColor2);
             const std::string str = mListModel->getElementAt(mSelected);
             font->drawString(graphics, str, mPadding,
                 mSelected * rowHeight + mPadding + mItemPadding);
         }
         // Draw the list elements
-        g->setColorAll(mForegroundColor, mForegroundColor2);
+        graphics->setColorAll(mForegroundColor, mForegroundColor2);
         const int sz = mListModel->getNumberOfElements();
         for (int i = 0, y = mPadding + mItemPadding; i < sz;
              ++i, y += rowHeight)
@@ -174,9 +174,9 @@ void ListBox::draw(gcn::Graphics *graphics)
     BLOCK_END("ListBox::draw")
 }
 
-void ListBox::keyPressed(gcn::KeyEvent &keyEvent)
+void ListBox::keyPressed(KeyEvent &keyEvent)
 {
-    const int action = static_cast<KeyEvent*>(&keyEvent)->getActionId();
+    const int action = keyEvent.getActionId();
     if (action == Input::KEY_GUI_SELECT)
     {
         distributeActionEvent();
@@ -213,20 +213,20 @@ void ListBox::keyPressed(gcn::KeyEvent &keyEvent)
 
 // Don't do anything on scrollwheel. ScrollArea will deal with that.
 
-void ListBox::mouseWheelMovedUp(gcn::MouseEvent &mouseEvent A_UNUSED)
+void ListBox::mouseWheelMovedUp(MouseEvent &mouseEvent A_UNUSED)
 {
 }
 
-void ListBox::mouseWheelMovedDown(gcn::MouseEvent &mouseEvent A_UNUSED)
+void ListBox::mouseWheelMovedDown(MouseEvent &mouseEvent A_UNUSED)
 {
 }
 
-void ListBox::mousePressed(gcn::MouseEvent &event)
+void ListBox::mousePressed(MouseEvent &event)
 {
     mPressedIndex = getSelectionByMouse(event.getY());
 }
 
-void ListBox::mouseReleased(gcn::MouseEvent &event)
+void ListBox::mouseReleased(MouseEvent &event)
 {
     if (mPressedIndex != getSelectionByMouse(event.getY()))
         return;
@@ -261,18 +261,18 @@ void ListBox::mouseReleased(gcn::MouseEvent &event)
     mPressedIndex = -2;
 }
 
-void ListBox::mouseReleased1(const gcn::MouseEvent &mouseEvent)
+void ListBox::mouseReleased1(const MouseEvent &mouseEvent)
 {
-    if (mouseEvent.getButton() == gcn::MouseEvent::LEFT)
+    if (mouseEvent.getButton() == MouseEvent::LEFT)
     {
         setSelected(std::max(0, getSelectionByMouse(mouseEvent.getY())));
         distributeActionEvent();
     }
 }
 
-void ListBox::mouseDragged(gcn::MouseEvent &event)
+void ListBox::mouseDragged(MouseEvent &event)
 {
-    if (event.getButton() != gcn::MouseEvent::LEFT || getRowHeight() == 0)
+    if (event.getButton() != MouseEvent::LEFT || getRowHeight() == 0)
         return;
 
     // Make list selection update on drag, but guard against negative y

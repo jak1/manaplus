@@ -45,7 +45,7 @@
 UnRegisterDialog::UnRegisterDialog(LoginData *const data) :
     // TRANSLATORS: unregister dialog name
     Window(_("Unregister"), true, nullptr, "unregister.xml"),
-    gcn::ActionListener(),
+    ActionListener(),
     mLoginData(data),
     mPasswordField(new PasswordField(this, mLoginData->password)),
     // TRANSLATORS: unregister dialog. button.
@@ -101,7 +101,7 @@ UnRegisterDialog::~UnRegisterDialog()
     mWrongDataNoticeListener = nullptr;
 }
 
-void UnRegisterDialog::action(const gcn::ActionEvent &event)
+void UnRegisterDialog::action(const ActionEvent &event)
 {
     const std::string &eventId = event.getId();
     if (eventId == "cancel")

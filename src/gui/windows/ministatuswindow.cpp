@@ -308,21 +308,21 @@ void MiniStatusWindow::logic()
     BLOCK_END("MiniStatusWindow::logic")
 }
 
-void MiniStatusWindow::draw(gcn::Graphics *graphics)
+void MiniStatusWindow::draw(Graphics *graphics)
 {
     BLOCK_START("MiniStatusWindow::draw")
     drawChildren(graphics);
     BLOCK_END("MiniStatusWindow::draw")
 }
 
-void MiniStatusWindow::mouseMoved(gcn::MouseEvent &event)
+void MiniStatusWindow::mouseMoved(MouseEvent &event)
 {
     Popup::mouseMoved(event);
 
     const int x = event.getX();
     const int y = event.getY();
 
-    const gcn::Rectangle &rect = mDimension;
+    const Rect &rect = mDimension;
     if (event.getSource() == mStatusBar)
     {
         mStatusPopup->view(x + rect.x, y + rect.y);
@@ -433,12 +433,12 @@ void MiniStatusWindow::mouseMoved(gcn::MouseEvent &event)
     }
 }
 
-void MiniStatusWindow::mousePressed(gcn::MouseEvent &event)
+void MiniStatusWindow::mousePressed(MouseEvent &event)
 {
     if (!viewport)
         return;
 
-    if (event.getButton() == gcn::MouseEvent::RIGHT)
+    if (event.getButton() == MouseEvent::RIGHT)
     {
         const ProgressBar *const bar = dynamic_cast<ProgressBar*>(
             event.getSource());
@@ -452,7 +452,7 @@ void MiniStatusWindow::mousePressed(gcn::MouseEvent &event)
     }
 }
 
-void MiniStatusWindow::mouseExited(gcn::MouseEvent &event)
+void MiniStatusWindow::mouseExited(MouseEvent &event)
 {
     Popup::mouseExited(event);
 
@@ -535,12 +535,12 @@ void MiniStatusWindow::updateArrows()
     StatusWindow::updateArrowsBar(mArrowsBar);
 }
 
-gcn::Rectangle MiniStatusWindow::getChildrenArea()
+Rect MiniStatusWindow::getChildrenArea()
 {
     const int padding = mPadding;
     const int padding2 = padding * 2;
-    const gcn::Rectangle &rect = mDimension;
-    return gcn::Rectangle(padding, padding,
+    const Rect &rect = mDimension;
+    return Rect(padding, padding,
         rect.width - padding2,
         rect.height - padding2);
 }

@@ -23,9 +23,7 @@
 #ifndef GUI_WIDGETS_CHECKBOX_H
 #define GUI_WIDGETS_CHECKBOX_H
 
-#include "gui/widgets/widget2.h"
-
-#include <guichan/widgets/checkbox.hpp>
+#include "gui/base/widgets/checkbox.hpp"
 
 #include "localconsts.h"
 
@@ -36,8 +34,7 @@ class Skin;
  *
  * \ingroup GUI
  */
-class CheckBox final : public gcn::CheckBox,
-                       public Widget2
+class CheckBox final : public gcn::CheckBox
 {
     public:
         /**
@@ -46,7 +43,7 @@ class CheckBox final : public gcn::CheckBox,
         CheckBox(const Widget2 *const widget,
                  const std::string &restrict caption,
                  const bool selected = false,
-                 gcn::ActionListener *const listener = nullptr,
+                 ActionListener *const listener = nullptr,
                  const std::string &restrict eventId = "");
 
         A_DELETE_COPY(CheckBox)
@@ -59,7 +56,7 @@ class CheckBox final : public gcn::CheckBox,
         /**
          * Draws the caption, then calls drawBox to draw the check box.
          */
-        void draw(gcn::Graphics *const graphics) override final;
+        void draw(Graphics *const graphics) override final;
 
         /**
          * Update the alpha value to the checkbox components.
@@ -69,19 +66,19 @@ class CheckBox final : public gcn::CheckBox,
         /**
          * Draws the check box, not the caption.
          */
-        void drawBox(gcn::Graphics *const graphics);
+        void drawBox(Graphics *const graphics);
 
         /**
          * Called when the mouse enteres the widget area.
          */
-        void mouseEntered(gcn::MouseEvent& event) override final;
+        void mouseEntered(MouseEvent& event) override final;
 
         /**
          * Called when the mouse leaves the widget area.
          */
-        void mouseExited(gcn::MouseEvent& event) override final;
+        void mouseExited(MouseEvent& event) override final;
 
-        void keyPressed(gcn::KeyEvent& keyEvent) override final;
+        void keyPressed(KeyEvent& keyEvent) override final;
 
         void adjustSize();
 

@@ -42,7 +42,7 @@ void WindowContainer::slowLogic()
     mDeathList.clear();
 }
 
-void WindowContainer::scheduleDelete(gcn::Widget *const widget)
+void WindowContainer::scheduleDelete(Widget *const widget)
 {
     if (widget)
         mDeathList.push_back(widget);
@@ -58,8 +58,8 @@ void WindowContainer::adjustAfterResize(const int oldScreenWidth,
     }
 }
 
-void WindowContainer::moveWidgetAfter(gcn::Widget *const after,
-                                      gcn::Widget *const widget)
+void WindowContainer::moveWidgetAfter(Widget *const after,
+                                      Widget *const widget)
 {
     const WidgetListIterator widgetIter = std::find(
         mWidgets.begin(), mWidgets.end(), widget);
@@ -79,7 +79,7 @@ void WindowContainer::moveWidgetAfter(gcn::Widget *const after,
 }
 
 #ifdef USE_PROFILER
-void WindowContainer::draw(gcn::Graphics* graphics)
+void WindowContainer::draw(Graphics* graphics)
 {
     BLOCK_START("WindowContainer::draw")
     Container::draw(graphics);

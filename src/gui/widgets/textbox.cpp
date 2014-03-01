@@ -22,18 +22,19 @@
 
 #include "gui/widgets/textbox.h"
 
-#include "input/keydata.h"
-#include "input/keyevent.h"
+#include "events/keyevent.h"
 
-#include <guichan/font.hpp>
+#include "input/keydata.h"
+
+#include "gui/font.h"
+#include "gui/gui.h"
 
 #include <sstream>
 
 #include "debug.h"
 
 TextBox::TextBox(const Widget2 *const widget) :
-    gcn::TextBox(),
-    Widget2(widget),
+    gcn::TextBox(widget),
     mMinWidth(getWidth())
 {
     mForegroundColor = getThemeColor(Theme::TEXTBOX);
@@ -87,7 +88,7 @@ void TextBox::setTextWrapped(const std::string &text, const int minDimension)
             text.substr(lastNewlinePos, newlinePos - lastNewlinePos);
         size_t lastSpacePos = 0;
         xpos = 0;
-        const gcn::Font *const font = getFont();
+        const Font *const font = getFont();
         const int spaceWidth = font->getWidth(" ");
         size_t sz = line.size();
 
@@ -165,10 +166,10 @@ void TextBox::setTextWrapped(const std::string &text, const int minDimension)
     gcn::TextBox::setText(wrappedStream.str());
 }
 
-void TextBox::keyPressed(gcn::KeyEvent& keyEvent)
+void TextBox::keyPressed(KeyEvent& keyEvent)
 {
-    const gcn::Key &key = keyEvent.getKey();
-    const int action = static_cast<KeyEvent*>(&keyEvent)->getActionId();
+    const Key &key = keyEvent.getKey();
+    const int action = keyEvent.getActionId();
 
     switch (action)
     {
@@ -291,7 +292,7 @@ void TextBox::keyPressed(gcn::KeyEvent& keyEvent)
 
         case Input::KEY_GUI_PAGE_UP:
         {
-            gcn::Widget *const par = getParent();
+            Widget *const par = getParent();
 
             if (par)
             {
@@ -307,7 +308,7 @@ void TextBox::keyPressed(gcn::KeyEvent& keyEvent)
 
         case Input::KEY_GUI_PAGE_DOWN:
         {
-            gcn::Widget *const par = getParent();
+            Widget *const par = getParent();
 
             if (par)
             {
@@ -350,16 +351,16 @@ void TextBox::keyPressed(gcn::KeyEvent& keyEvent)
     keyEvent.consume();
 }
 
-void TextBox::draw(gcn::Graphics* graphics)
+void TextBox::draw(Graphics* graphics)
 {
     BLOCK_START("TextBox::draw")
     if (mOpaque)
     {
         graphics->setColor(mBackgroundColor);
-        graphics->fillRectangle(gcn::Rectangle(0, 0, getWidth(), getHeight()));
+        graphics->fillRectangle(Rect(0, 0, getWidth(), getHeight()));
     }
 
-    gcn::Font *const font = getFont();
+    Font *const font = getFont();
     if (isFocused() && isEditable())
     {
         drawCaret(graphics, font->getWidth(
@@ -367,8 +368,7 @@ void TextBox::draw(gcn::Graphics* graphics)
             mCaretRow * font->getHeight());
     }
 
-    static_cast<Graphics*>(graphics)->setColorAll(
-        mForegroundColor, mForegroundColor2);
+    graphics->setColorAll(mForegroundColor, mForegroundColor2);
     const int fontHeight = font->getHeight();
 
     for (size_t i = 0, sz = mTextRows.size(); i < sz; i++)
@@ -379,14 +379,14 @@ void TextBox::draw(gcn::Graphics* graphics)
     BLOCK_END("TextBox::draw")
 }
 
-void TextBox::setForegroundColor(const gcn::Color &color)
+void TextBox::setForegroundColor(const Color &color)
 {
     mForegroundColor = color;
     mForegroundColor2 = color;
 }
 
-void TextBox::setForegroundColorAll(const gcn::Color &color1,
-                                    const gcn::Color &color2)
+void TextBox::setForegroundColorAll(const Color &color1,
+                                    const Color &color2)
 {
     mForegroundColor = color1;
     mForegroundColor2 = color2;

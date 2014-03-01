@@ -22,14 +22,18 @@
 
 #include "gui/widgets/tabs/setup_theme.h"
 
+#include "gui/gui.h"
+
 #include "gui/windows/okdialog.h"
+
+#include "gui/models/extendedlistmodel.h"
+#include "gui/models/fontsmodel.h"
+#include "gui/models/themesmodel.h"
 
 #include "gui/widgets/button.h"
 #include "gui/widgets/dropdown.h"
-#include "gui/widgets/extendedlistmodel.h"
 #include "gui/widgets/label.h"
 #include "gui/widgets/layouthelper.h"
-#include "gui/widgets/namesmodel.h"
 
 #include "configuration.h"
 
@@ -50,31 +54,6 @@ const char* ACTION_NPC_FONT = "npc font";
 const char* ACTION_JAPAN_FONT = "japanese font";
 const char* ACTION_CHINA_FONT = "chinese font";
 const char* ACTION_INFO = "info";
-
-class ThemesModel final : public NamesModel
-{
-public:
-    ThemesModel() :
-        NamesModel()
-    {
-        mNames.push_back(gettext("(default)"));
-        Theme::fillSkinsList(mNames);
-    }
-
-    ~ThemesModel()
-    { }
-};
-
-class FontsModel final : public NamesModel
-{
-public:
-    FontsModel() :
-        NamesModel()
-    { Theme::fillFontsList(mNames); }
-
-    ~FontsModel()
-    { }
-};
 
 const int maxFontSizes = 16;
 
@@ -114,7 +93,7 @@ const char *SIZE_NAME[maxFontSizes] =
     N_("Huge (23)"),
 };
 
-class FontSizeChoiceListModel final : public gcn::ListModel
+class FontSizeChoiceListModel final : public ListModel
 {
 public:
     ~FontSizeChoiceListModel()
@@ -387,7 +366,7 @@ Setup_Theme::Setup_Theme(const Widget2 *const widget) :
     else if (size > maxWidth)
         size = maxWidth;
 
-    setDimension(gcn::Rectangle(0, 0, size, 500));
+    setDimension(Rect(0, 0, size, 500));
 }
 
 Setup_Theme::~Setup_Theme()
@@ -433,7 +412,7 @@ void Setup_Theme::updateInfo()
     mInfoButton->setEnabled(!mThemeInfo.empty());
 }
 
-void Setup_Theme::action(const gcn::ActionEvent &event)
+void Setup_Theme::action(const ActionEvent &event)
 {
     const std::string &eventId = event.getId();
     if (eventId == ACTION_THEME)

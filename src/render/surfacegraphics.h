@@ -63,7 +63,7 @@ class SurfaceGraphics final : public Graphics
         void _endDraw() override final
         { }
 
-        bool pushClipArea(gcn::Rectangle rect A_UNUSED) override final
+        bool pushClipArea(Rect rect A_UNUSED) override final
         { return true; }
 
         void popClipArea() override final
@@ -158,10 +158,10 @@ class SurfaceGraphics final : public Graphics
         BlitMode getBlitMode() const A_WARN_UNUSED
         { return mBlitMode; }
 
-        void fillRectangle(const gcn::Rectangle &rect A_UNUSED) override final
+        void fillRectangle(const Rect &rect A_UNUSED) override final
         { }
 
-        void drawRectangle(const gcn::Rectangle &rect A_UNUSED) override final
+        void drawRectangle(const Rect &rect A_UNUSED) override final
         { }
 
         void drawPoint(int x A_UNUSED, int y A_UNUSED) override final
@@ -179,8 +179,8 @@ class SurfaceGraphics final : public Graphics
                           const bool noFrame A_UNUSED) override final
         { return false; }
 
-        bool drawImage2(const Image *const image,
-                        int dstX, int dstY) override final;
+        bool drawImage(const Image *const image,
+                       int dstX, int dstY) override final;
 
         void drawImageCached(const Image *const image,
                              int x, int y) override final;

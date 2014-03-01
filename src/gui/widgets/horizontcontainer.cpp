@@ -24,9 +24,10 @@
 #include "debug.h"
 
 HorizontContainer::HorizontContainer(const Widget2 *const widget,
-                                     const int height, const int spacing) :
+                                     const int height,
+                                     const int spacing) :
     Container(widget),
-    gcn::WidgetListener(),
+    WidgetListener(),
     mSpacing(spacing),
     mCount(0),
     mLastX(spacing)
@@ -35,12 +36,12 @@ HorizontContainer::HorizontContainer(const Widget2 *const widget,
     addWidgetListener(this);
 }
 
-void HorizontContainer::add(gcn::Widget *widget)
+void HorizontContainer::add(Widget *widget)
 {
     add(widget, mSpacing);
 }
 
-void HorizontContainer::add(gcn::Widget *const widget, const int spacing)
+void HorizontContainer::add(Widget *const widget, const int spacing)
 {
     if (!widget)
         return;
@@ -58,6 +59,6 @@ void HorizontContainer::clear()
     mCount = 0;
 }
 
-void HorizontContainer::widgetResized(const gcn::Event &event A_UNUSED)
+void HorizontContainer::widgetResized(const Event &event A_UNUSED)
 {
 }

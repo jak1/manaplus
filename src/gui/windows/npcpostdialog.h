@@ -25,13 +25,13 @@
 
 #include "gui/widgets/window.h"
 
-#include <guichan/actionlistener.hpp>
+#include "listeners/actionlistener.h"
 
 class TextBox;
 class TextField;
 
 class NpcPostDialog final : public Window,
-                            public gcn::ActionListener
+                            public ActionListener
 {
     public:
         /**
@@ -48,7 +48,7 @@ class NpcPostDialog final : public Window,
         /**
          * Called when receiving actions from the widgets.
          */
-        void action(const gcn::ActionEvent &event) override final;
+        void action(const ActionEvent &event) override final;
 
         void setVisible(bool visible) override final;
 

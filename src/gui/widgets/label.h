@@ -22,9 +22,7 @@
 #ifndef GUI_WIDGETS_LABEL_H
 #define GUI_WIDGETS_LABEL_H
 
-#include "gui/widgets/widget2.h"
-
-#include <guichan/widgets/label.hpp>
+#include "gui/base/widgets/label.hpp"
 
 #include "localconsts.h"
 
@@ -36,7 +34,7 @@ class Skin;
  *
  * \ingroup GUI
  */
-class Label final : public gcn::Label, public Widget2
+class Label final : public gcn::Label
 {
     public:
         /**
@@ -48,7 +46,8 @@ class Label final : public gcn::Label, public Widget2
          * Constructor. This version of the constructor sets the label with an
          * inintialization string.
          */
-        Label(const Widget2 *const widget, const std::string &caption);
+        Label(const Widget2 *const widget,
+              const std::string &caption);
 
         A_DELETE_COPY(Label)
 
@@ -59,14 +58,14 @@ class Label final : public gcn::Label, public Widget2
         /**
          * Draws the label.
          */
-        void draw(gcn::Graphics *graphics) override final;
+        void draw(Graphics *graphics) override final;
 
         void adjustSize();
 
-        void setForegroundColor(const gcn::Color &color);
+        void setForegroundColor(const Color &color);
 
-        void setForegroundColorAll(const gcn::Color &color1,
-                                   const gcn::Color &color2);
+        void setForegroundColorAll(const Color &color1,
+                                   const Color &color2);
 
         void resizeTo(const int maxSize, const int minSize);
 

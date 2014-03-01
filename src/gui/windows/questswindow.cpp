@@ -26,13 +26,15 @@
 
 #include "being/localplayer.h"
 
-#include "gui/sdlfont.h"
+#include "gui/font.h"
+#include "gui/gui.h"
+
+#include "gui/models/questsmodel.h"
 
 #include "gui/widgets/browserbox.h"
 #include "gui/widgets/button.h"
 #include "gui/widgets/layout.h"
 #include "gui/widgets/extendedlistbox.h"
-#include "gui/widgets/extendednamesmodel.h"
 #include "gui/widgets/itemlinkhandler.h"
 #include "gui/widgets/scrollarea.h"
 
@@ -87,20 +89,6 @@ struct QuestItem final
     bool broken;
 };
 
-class QuestsModel final : public ExtendedNamesModel
-{
-    public:
-        QuestsModel() :
-            ExtendedNamesModel()
-        {
-        }
-
-        A_DELETE_COPY(QuestsModel)
-
-        ~QuestsModel()
-        { }
-};
-
 struct QuestEffect final
 {
     QuestEffect() :
@@ -122,15 +110,15 @@ struct QuestEffect final
 QuestsWindow::QuestsWindow() :
     // TRANSLATORS: quests window name
     Window(_("Quests"), false, nullptr, "quests.xml"),
-    gcn::ActionListener(),
+    ActionListener(),
     mQuestsModel(new QuestsModel),
     mQuestsListBox(new ExtendedListBox(this,
         mQuestsModel, "extendedlistbox.xml")),
-    mQuestScrollArea(new ScrollArea(mQuestsListBox,
+    mQuestScrollArea(new ScrollArea(this, mQuestsListBox,
         getOptionBool("showlistbackground"), "quests_list_background.xml")),
     mItemLinkHandler(new ItemLinkHandler),
     mText(new BrowserBox(this, BrowserBox::AUTO_WRAP, true, "browserbox.xml")),
-    mTextScrollArea(new ScrollArea(mText,
+    mTextScrollArea(new ScrollArea(this, mText,
         getOptionBool("showtextbackground"), "quests_text_background.xml")),
     // TRANSLATORS: quests window button
     mCloseButton(new Button(this, _("Close"), "close", this)),
@@ -166,7 +154,7 @@ QuestsWindow::QuestsWindow() :
     mText->setLinkHandler(mItemLinkHandler);
     mTextScrollArea->setHorizontalScrollPolicy(gcn::ScrollArea::SHOW_NEVER);
     mQuestsListBox->setWidth(500);
-    if (gui->getNpcFont()->getHeight() < 20)
+    if (gui && gui->getNpcFont()->getHeight() < 20)
         mQuestsListBox->setRowHeight(20);
     else
         mQuestsListBox->setRowHeight(gui->getNpcFont()->getHeight());
@@ -318,7 +306,7 @@ void QuestsWindow::loadEffect(const int var, const XmlNodePtr node)
     mAllEffects.push_back(effect);
 }
 
-void QuestsWindow::action(const gcn::ActionEvent &event)
+void QuestsWindow::action(const ActionEvent &event)
 {
     const std::string &eventId = event.getId();
     if (eventId == "select")

@@ -25,7 +25,7 @@
 
 #include <string>
 
-#include <guichan/mouselistener.hpp>
+#include "listeners/mouselistener.h"
 
 /**
  * A simple interface to windows that need to handle links from BrowserBox
@@ -38,7 +38,7 @@ class LinkHandler
         { }
 
         virtual void handleLink(const std::string &link,
-                                gcn::MouseEvent *event) = 0;
+                                MouseEvent *event) = 0;
 };
 
 #endif  // GUI_WIDGETS_LINKHANDLER_H

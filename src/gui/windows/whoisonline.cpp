@@ -87,7 +87,7 @@ WhoIsOnline::WhoIsOnline() :
     mCurlError(new char[CURL_ERROR_SIZE]),
     mBrowserBox(new BrowserBox(this, BrowserBox::AUTO_SIZE, true,
         "onlinebrowserbox.xml")),
-    mScrollArea(new ScrollArea(mBrowserBox, false)),
+    mScrollArea(new ScrollArea(this, mBrowserBox, false)),
     mUpdateTimer(0),
     mOnlinePlayers(),
     mOnlineNicks(),
@@ -116,10 +116,10 @@ void WhoIsOnline::postInit()
     setSaveVisible(true);
 
     mUpdateButton->setEnabled(false);
-    mUpdateButton->setDimension(gcn::Rectangle(5, 5, w - 10, 20 + 5));
+    mUpdateButton->setDimension(Rect(5, 5, w - 10, 20 + 5));
 
     mBrowserBox->setOpaque(false);
-    mScrollArea->setDimension(gcn::Rectangle(5, 20 + 10, w - 10, h - 10 - 30));
+    mScrollArea->setDimension(Rect(5, 20 + 10, w - 10, h - 10 - 30));
     mScrollArea->setSize(w - 10, h - 10 - 30);
     mBrowserBox->setLinkHandler(this);
 
@@ -133,7 +133,7 @@ void WhoIsOnline::postInit()
 
     download();
 
-    widgetResized(gcn::Event(nullptr));
+    widgetResized(Event(nullptr));
     config.addListener("updateOnlineList", this);
     config.addListener("groupFriends", this);
     mGroupFriends = config.getBoolValue("groupFriends");
@@ -159,9 +159,9 @@ WhoIsOnline::~WhoIsOnline()
     mOnlineNicks.clear();
 }
 
-void WhoIsOnline::handleLink(const std::string& link, gcn::MouseEvent *event)
+void WhoIsOnline::handleLink(const std::string& link, MouseEvent *event)
 {
-    if (!event || event->getButton() == gcn::MouseEvent::LEFT)
+    if (!event || event->getButton() == MouseEvent::LEFT)
     {
         if (chatWindow)
         {
@@ -177,7 +177,7 @@ void WhoIsOnline::handleLink(const std::string& link, gcn::MouseEvent *event)
             }
         }
     }
-    else if (event->getButton() == gcn::MouseEvent::RIGHT)
+    else if (event->getButton() == MouseEvent::RIGHT)
     {
         if (player_node && link == player_node->getName())
             return;
@@ -683,7 +683,7 @@ void WhoIsOnline::slowLogic()
     BLOCK_END("WhoIsOnline::slowLogic")
 }
 
-void WhoIsOnline::action(const gcn::ActionEvent &event)
+void WhoIsOnline::action(const ActionEvent &event)
 {
     if (event.getId() == "update")
     {
@@ -715,7 +715,7 @@ void WhoIsOnline::action(const gcn::ActionEvent &event)
     }
 }
 
-void WhoIsOnline::widgetResized(const gcn::Event &event)
+void WhoIsOnline::widgetResized(const Event &event)
 {
     Window::widgetResized(event);
     updateSize();
@@ -723,7 +723,7 @@ void WhoIsOnline::widgetResized(const gcn::Event &event)
 
 void WhoIsOnline::updateSize()
 {
-    const gcn::Rectangle area = getChildrenArea();
+    const Rect area = getChildrenArea();
     if (mUpdateButton)
         mUpdateButton->setWidth(area.width - 10);
 

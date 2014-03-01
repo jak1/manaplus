@@ -42,7 +42,7 @@
 
 #include "gui/windows/ministatuswindow.h"
 
-#include <guichan/font.hpp>
+#include "gui/font.h"
 
 #include "debug.h"
 
@@ -51,7 +51,7 @@ extern MiniStatusWindow *miniStatusWindow;
 
 Viewport::Viewport() :
     WindowContainer(nullptr),
-    gcn::MouseListener(),
+    MouseListener(),
     mMap(nullptr),
     mScrollRadius(config.getIntValue("ScrollRadius")),
     mScrollLaziness(config.getIntValue("ScrollLaziness")),
@@ -114,21 +114,19 @@ void Viewport::setMap(Map *const map)
     mMap = map;
 }
 
-void Viewport::draw(gcn::Graphics *gcnGraphics)
+void Viewport::draw(Graphics *graphics)
 {
     BLOCK_START("Viewport::draw 1")
     static int lastTick = tick_time;
 
     if (!mMap || !player_node)
     {
-        gcnGraphics->setColor(gcn::Color(64, 64, 64));
-        gcnGraphics->fillRectangle(
-                gcn::Rectangle(0, 0, getWidth(), getHeight()));
+        graphics->setColor(Color(64, 64, 64));
+        graphics->fillRectangle(
+                Rect(0, 0, getWidth(), getHeight()));
         BLOCK_END("Viewport::draw 1")
         return;
     }
-
-    Graphics *const graphics = static_cast<Graphics* const>(gcnGraphics);
 
     // Avoid freaking out when tick_time overflows
     if (tick_time < lastTick)
@@ -260,7 +258,7 @@ void Viewport::draw(gcn::Graphics *gcnGraphics)
         miniStatusWindow->drawIcons(graphics);
 
     // Draw contained widgets
-    WindowContainer::draw(gcnGraphics);
+    WindowContainer::draw(graphics);
     BLOCK_END("Viewport::draw 1")
 }
 
@@ -282,13 +280,13 @@ void Viewport::_followMouse()
     if (mPlayerFollowMouse && (button & SDL_BUTTON(1)))
     {
         // We create a mouse event and send it to mouseDragged.
-        gcn::MouseEvent mouseEvent(nullptr,
+        MouseEvent mouseEvent(nullptr,
             0,
             false,
             false,
             false,
-            gcn::MouseEvent::DRAGGED,
-            gcn::MouseEvent::LEFT,
+            MouseEvent::DRAGGED,
+            MouseEvent::LEFT,
             mMouseX,
             mMouseY,
             0);
@@ -340,54 +338,29 @@ void Viewport::_drawDebugPath(Graphics *const graphics)
 }
 
 void Viewport::_drawPath(Graphics *const graphics, const Path &path,
-                         const gcn::Color &color) const
+                         const Color &color) const
 {
     graphics->setColor(color);
-    gcn::Font *const font = getFont();
+    Font *const font = getFont();
 
-#ifdef MANASERV_SUPPORT
-    if (Net::getNetworkType() != ServerInfo::MANASERV)
-#endif
+    int cnt = 1;
+    FOR_EACH (Path::const_iterator, i, path)
     {
-        int cnt = 1;
-        FOR_EACH (Path::const_iterator, i, path)
-        {
-            const int squareX = i->x * mapTileSize - mPixelViewX + 12;
-            const int squareY = i->y * mapTileSize - mPixelViewY + 12;
+        const int squareX = i->x * mapTileSize - mPixelViewX + 12;
+        const int squareY = i->y * mapTileSize - mPixelViewY + 12;
 
-            graphics->fillRectangle(gcn::Rectangle(squareX, squareY, 8, 8));
-            if (mMap)
-            {
-                const std::string str = toString(cnt);
-                font->drawString(graphics, str, squareX + 4
-                    - font->getWidth(str) / 2, squareY + 12);
-            }
-            cnt ++;
-        }
-    }
-#ifdef MANASERV_SUPPORT
-    else if (Net::getNetworkType() == ServerInfo::MANASERV)
-    {
-        FOR_EACH (Path::const_iterator, i, path)
+        graphics->fillRectangle(Rect(squareX, squareY, 8, 8));
+        if (mMap)
         {
-            const int squareX = i->x - mPixelViewX;
-            const int squareY = i->y - mPixelViewY;
-
-            graphics->fillRectangle(gcn::Rectangle(squareX - 4, squareY - 4,
-                                                   8, 8));
-            if (mMap)
-            {
-                const std::string str = toString(mMap->getMetaTile(
-                    i->x / mapTileSize, i->y / mapTileSize)->Gcost);
-                font->drawString(graphics, str,
-                    squareX + 4 - font->getWidth(text) / 2, squareY + 12);
-            }
+            const std::string str = toString(cnt);
+            font->drawString(graphics, str, squareX + 4
+                - font->getWidth(str) / 2, squareY + 12);
         }
+        cnt ++;
     }
-#endif
 }
 
-void Viewport::mousePressed(gcn::MouseEvent &event)
+void Viewport::mousePressed(MouseEvent &event)
 {
     if (event.getSource() != this)
         return;
@@ -408,7 +381,7 @@ void Viewport::mousePressed(gcn::MouseEvent &event)
     const int pixelY = eventY + mPixelViewY;
 
     // Right click might open a popup
-    if (eventButton == gcn::MouseEvent::RIGHT)
+    if (eventButton == MouseEvent::RIGHT)
     {
         mPlayerFollowMouse = false;
         if (mHoverBeing)
@@ -462,7 +435,7 @@ void Viewport::mousePressed(gcn::MouseEvent &event)
     }
 
     // Left click can cause different actions
-    if (eventButton == gcn::MouseEvent::LEFT)
+    if (eventButton == MouseEvent::LEFT)
     {
         // Interact with some being
         if (mHoverBeing)
@@ -534,7 +507,7 @@ void Viewport::mousePressed(gcn::MouseEvent &event)
             _followMouse();
         }
     }
-    else if (eventButton == gcn::MouseEvent::MIDDLE)
+    else if (eventButton == MouseEvent::MIDDLE)
     {
         mPlayerFollowMouse = false;
         validateSpeed();
@@ -550,7 +523,7 @@ void Viewport::mousePressed(gcn::MouseEvent &event)
     }
 }
 
-void Viewport::mouseDragged(gcn::MouseEvent &event)
+void Viewport::mouseDragged(MouseEvent &event)
 {
     if (!mMap || !player_node)
         return;
@@ -559,127 +532,111 @@ void Viewport::mouseDragged(gcn::MouseEvent &event)
         Input::KEY_STOP_ATTACK) && !inputManager.isActionActive(
         Input::KEY_UNTARGET))
     {
-#ifdef MANASERV_SUPPORT
-        if (Net::getNetworkType() == ServerInfo::MANASERV)
+        if (mLocalWalkTime != player_node->getActionTime())
         {
-            if (get_elapsed_time(mLocalWalkTime) >= walkingMouseDelay)
+            mLocalWalkTime = cur_time;
+            player_node->unSetPickUpTarget();
+            int playerX = player_node->getTileX();
+            int playerY = player_node->getTileY();
+            if (mMouseDirectionMove)
             {
-                mLocalWalkTime = tick_time;
-                player_node->unSetPickUpTarget();
-                player_node->setDestination(event.getX() + mPixelViewX,
-                    event.getY() + mPixelViewY);
-                player_node->pathSetByMouse();
-            }
-        }
-        else
-#endif
-        {
-            if (mLocalWalkTime != player_node->getActionTime())
-            {
-                mLocalWalkTime = cur_time;
-                player_node->unSetPickUpTarget();
-                int playerX = player_node->getTileX();
-                int playerY = player_node->getTileY();
-                if (mMouseDirectionMove)
+                const int width = mainGraphics->mWidth / 2;
+                const int height = mainGraphics->mHeight / 2;
+                const float wh = static_cast<float>(width)
+                    / static_cast<float>(height);
+                int x = event.getX() - width;
+                int y = event.getY() - height;
+                if (!x && !y)
+                    return;
+                const int x2 = abs(x);
+                const int y2 = abs(y);
+                const float diff = 2;
+                int dx = 0;
+                int dy = 0;
+                if (x2 > y2)
                 {
-                    const int width = mainGraphics->mWidth / 2;
-                    const int height = mainGraphics->mHeight / 2;
-                    const float wh = static_cast<float>(width)
-                        / static_cast<float>(height);
-                    int x = event.getX() - width;
-                    int y = event.getY() - height;
-                    if (!x && !y)
-                        return;
-                    const int x2 = abs(x);
-                    const int y2 = abs(y);
-                    const float diff = 2;
-                    int dx = 0;
-                    int dy = 0;
-                    if (x2 > y2)
-                    {
-                        if (y2 && x2 / y2 / wh > diff)
-                            y = 0;
-                    }
-                    else
-                    {
-                        if (x2 && y2 * wh / x2 > diff)
-                            x = 0;
-                    }
-                    if (x > 0)
-                        dx = 1;
-                    else if (x < 0)
-                        dx = -1;
-                    if (y > 0)
-                        dy = 1;
-                    else if (y < 0)
-                        dy = -1;
-
-                    if (mMap->getWalk(playerX + dx, playerY + dy))
-                    {
-                        player_node->navigateTo(playerX + dx, playerY + dy);
-                    }
-                    else
-                    {
-                        if (dx && dy)
-                        {
-                            // try avoid diagonal collision
-                            if (x2 > y2)
-                            {
-                                if (mMap->getWalk(playerX + dx, playerY))
-                                    dy = 0;
-                                else
-                                    dx = 0;
-                            }
-                            else
-                            {
-                                if (mMap->getWalk(playerX, playerY + dy))
-                                    dx = 0;
-                                else
-                                    dy = 0;
-                            }
-                        }
-                        else
-                        {
-                            // try avoid vertical or horisontal collision
-                            if (!dx)
-                            {
-                                if (mMap->getWalk(playerX + 1, playerY + dy))
-                                    dx = 1;
-                                if (mMap->getWalk(playerX - 1, playerY + dy))
-                                    dx = -1;
-                            }
-                            if (!dy)
-                            {
-                                if (mMap->getWalk(playerX + dx, playerY + 1))
-                                    dy = 1;
-                                if (mMap->getWalk(playerX + dx, playerY - 1))
-                                    dy = -1;
-                            }
-                        }
-                        player_node->navigateTo(playerX + dx, playerY + dy);
-                    }
+                    if (y2 && x2 / y2 / wh > diff)
+                        y = 0;
                 }
                 else
                 {
-                    const int destX = (event.getX() + mPixelViewX)
-                        / static_cast<float>(mMap->getTileWidth());
-                    const int destY = (event.getY() + mPixelViewY)
-                        / static_cast<float>(mMap->getTileHeight());
-                    if (playerX != destX || playerY != destY)
+                    if (x2 && y2 * wh / x2 > diff)
+                        x = 0;
+                }
+                if (x > 0)
+                    dx = 1;
+                else if (x < 0)
+                    dx = -1;
+                if (y > 0)
+                    dy = 1;
+                else if (y < 0)
+                    dy = -1;
+
+                if (mMap->getWalk(playerX + dx, playerY + dy))
+                {
+                    player_node->navigateTo(playerX + dx, playerY + dy);
+                }
+                else
+                {
+                    if (dx && dy)
                     {
-                        if (!player_node->navigateTo(destX, destY))
+                        // try avoid diagonal collision
+                        if (x2 > y2)
                         {
-                            if (playerX > destX)
-                                playerX --;
-                            else if (playerX < destX)
-                                playerX ++;
-                            if (playerY > destY)
-                                playerY --;
-                            else if (playerY < destY)
-                                playerY ++;
-                            if (mMap->getWalk(playerX, playerY, 0))
-                                player_node->navigateTo(playerX, playerY);
+                            if (mMap->getWalk(playerX + dx, playerY))
+                                dy = 0;
+                            else
+                                dx = 0;
                         }
+                        else
+                        {
+                            if (mMap->getWalk(playerX, playerY + dy))
+                                dx = 0;
+                            else
+                                dy = 0;
+                        }
+                    }
+                    else
+                    {
+                        // try avoid vertical or horisontal collision
+                        if (!dx)
+                        {
+                            if (mMap->getWalk(playerX + 1, playerY + dy))
+                                dx = 1;
+                            if (mMap->getWalk(playerX - 1, playerY + dy))
+                                dx = -1;
+                        }
+                        if (!dy)
+                        {
+                            if (mMap->getWalk(playerX + dx, playerY + 1))
+                                dy = 1;
+                            if (mMap->getWalk(playerX + dx, playerY - 1))
+                                dy = -1;
+                        }
+                    }
+                    player_node->navigateTo(playerX + dx, playerY + dy);
+                }
+            }
+            else
+            {
+                const int destX = (event.getX() + mPixelViewX)
+                    / static_cast<float>(mMap->getTileWidth());
+                const int destY = (event.getY() + mPixelViewY)
+                    / static_cast<float>(mMap->getTileHeight());
+                if (playerX != destX || playerY != destY)
+                {
+                    if (!player_node->navigateTo(destX, destY))
+                    {
+                        if (playerX > destX)
+                            playerX --;
+                        else if (playerX < destX)
+                            playerX ++;
+                        if (playerY > destY)
+                            playerY --;
+                        else if (playerY < destY)
+                            playerY ++;
+                        if (mMap->getWalk(playerX, playerY, 0))
+                            player_node->navigateTo(playerX, playerY);
                     }
                 }
             }
@@ -687,10 +644,9 @@ void Viewport::mouseDragged(gcn::MouseEvent &event)
     }
 }
 
-void Viewport::mouseReleased(gcn::MouseEvent &event A_UNUSED)
+void Viewport::mouseReleased(MouseEvent &event A_UNUSED)
 {
     mPlayerFollowMouse = false;
-    // Only useful for eAthena but doesn't hurt under ManaServ
     mLocalWalkTime = -1;
 }
 
@@ -840,7 +796,7 @@ void Viewport::optionChanged(const std::string &name)
         mMouseDirectionMove = config.getBoolValue("mouseDirectionMove");
 }
 
-void Viewport::mouseMoved(gcn::MouseEvent &event A_UNUSED)
+void Viewport::mouseMoved(MouseEvent &event A_UNUSED)
 {
     // Check if we are on the map
     if (!mMap || !player_node || !actorManager)

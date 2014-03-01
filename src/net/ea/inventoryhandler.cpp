@@ -29,6 +29,8 @@
 
 #include "gui/windows/ministatuswindow.h"
 
+#include "net/messagein.h"
+
 #include "net/ea/eaprotocol.h"
 
 #include "debug.h"
@@ -150,7 +152,7 @@ int InventoryHandler::convertFromServerSlot(const int serverSlot) const
     return EQUIP_CONVERT[serverSlot];
 }
 
-int InventoryHandler::getSlot(const int eAthenaSlot) const
+int InventoryHandler::getSlot(const int eAthenaSlot)
 {
     if (eAthenaSlot == 0)
         return Equipment::EQUIP_VECTOREND;
@@ -158,7 +160,7 @@ int InventoryHandler::getSlot(const int eAthenaSlot) const
     if (eAthenaSlot & 0x8000)
         return Equipment::EQUIP_PROJECTILE_SLOT;
 
-    int mask = 1;
+    unsigned int mask = 1;
     int position = 0;
     while (!(eAthenaSlot & mask))
     {
@@ -564,7 +566,7 @@ void InventoryHandler::processPlayerUnEquip(Net::MessageIn &msg)
         miniStatusWindow->updateArrows();
 }
 
-void InventoryHandler::processPlayerAttackRange(Net::MessageIn &msg) const
+void InventoryHandler::processPlayerAttackRange(Net::MessageIn &msg)
 {
     const int range = msg.readInt16();
     if (player_node)

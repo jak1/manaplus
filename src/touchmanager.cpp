@@ -22,17 +22,20 @@
 
 #include "configuration.h"
 #include "graphicsvertexes.h"
-#include "mouseinput.h"
 #include "touchactions.h"
 
+#include "input/mouseinput.h"
+
+#include "gui/font.h"
 #include "gui/gui.h"
-#include "gui/sdlfont.h"
 
 #include "input/inputmanager.h"
 
 #include "render/graphics.h"
 
 #include "gui/theme.h"
+
+#include "resources/image.h"
 
 #include "debug.h"
 
@@ -160,7 +163,7 @@ void TouchManager::loadTouchItem(TouchItem **item, const std::string &name,
                 default:
                     break;
             }
-            *item = new TouchItem(text, gcn::Rectangle(x + diff, y + diff,
+            *item = new TouchItem(text, Rect(x + diff, y + diff,
                 width + border2, height + border2), type,
                 eventPressed, eventReleased, images, icon,
                 x + pad, y + pad, width, height,
@@ -229,7 +232,7 @@ void TouchManager::draw()
                 const Image *const icon = item->icon;
                 if (icon)
                 {
-                    mainGraphics->drawImage2(icon,
+                    mainGraphics->drawImage(icon,
                         item->x + (item->width - icon->mBounds.w) / 2,
                         item->y + (item->height - icon->mBounds.h) / 2);
                 }
@@ -239,7 +242,7 @@ void TouchManager::draw()
     if (!gui)
         return;
 
-    SDLFont *const font = boldFont;
+    Font *const font = boldFont;
     mainGraphics->setColorAll(Theme::getThemeColor(Theme::TEXT),
         Theme::getThemeColor(Theme::TEXT_OUTLINE));
     FOR_EACH (TouchItemVectorCIter, it, mObjects)
@@ -267,7 +270,7 @@ bool TouchManager::processEvent(const MouseInput &mouseInput)
         const TouchItem *const item = *it;
         if (!item || (!mShow && (item != mKeyboard || !mShowKeyboard)))
             continue;
-        const gcn::Rectangle &rect = item->rect;
+        const Rect &rect = item->rect;
         if (rect.isPointInRect(x, y))
         {
             MouseInput event = mouseInput;
@@ -278,13 +281,13 @@ bool TouchManager::processEvent(const MouseInput &mouseInput)
 
             switch (mouseInput.getType())
             {
-                case gcn::MouseInput::PRESSED:
+                case MouseInput::PRESSED:
                     if (!item->eventPressed.empty())
                         executeAction(item->eventPressed);
                     else if (item->funcPressed)
                         item->funcPressed(event);
                     break;
-                case gcn::MouseInput::RELEASED:
+                case MouseInput::RELEASED:
                     if (!item->eventReleased.empty())
                         executeAction(item->eventReleased);
                     else if (item->funcReleased)

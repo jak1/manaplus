@@ -139,8 +139,8 @@ static inline void drawRescaledQuad(const Image *const image A_UNUSED,
     }
 }
 
-bool NullOpenGLGraphics::drawImage2(const Image *const image,
-                                    int dstX, int dstY)
+bool NullOpenGLGraphics::drawImage(const Image *const image,
+                                   int dstX, int dstY)
 {
     return drawImageInline(image, dstX, dstY);
 }
@@ -148,7 +148,7 @@ bool NullOpenGLGraphics::drawImage2(const Image *const image,
 bool NullOpenGLGraphics::drawImageInline(const Image *const image,
                                          int dstX, int dstY)
 {
-    FUNC_BLOCK("Graphics::drawImage2", 1)
+    FUNC_BLOCK("Graphics::drawImage", 1)
     if (!image)
         return false;
 
@@ -918,7 +918,7 @@ void NullOpenGLGraphics::updateScreen()
 
 void NullOpenGLGraphics::_beginDraw()
 {
-    pushClipArea(gcn::Rectangle(0, 0, 640, 480));
+    pushClipArea(Rect(0, 0, 640, 480));
 }
 
 void NullOpenGLGraphics::_endDraw()
@@ -935,21 +935,21 @@ SDL_Surface* NullOpenGLGraphics::getScreenshot()
     return nullptr;
 }
 
-bool NullOpenGLGraphics::pushClipArea(gcn::Rectangle area)
+bool NullOpenGLGraphics::pushClipArea(Rect area)
 {
     int transX = 0;
     int transY = 0;
 
     if (!mClipStack.empty())
     {
-        const gcn::ClipRectangle &clipArea = mClipStack.top();
+        const ClipRect &clipArea = mClipStack.top();
         transX = -clipArea.xOffset;
         transY = -clipArea.yOffset;
     }
 
-    const bool result = gcn::Graphics::pushClipArea(area);
+    const bool result = Graphics::pushClipArea(area);
 
-    const gcn::ClipRectangle &clipArea = mClipStack.top();
+    const ClipRect &clipArea = mClipStack.top();
     transX += clipArea.xOffset;
     transY += clipArea.yOffset;
 
@@ -958,7 +958,7 @@ bool NullOpenGLGraphics::pushClipArea(gcn::Rectangle area)
 
 void NullOpenGLGraphics::popClipArea()
 {
-    gcn::Graphics::popClipArea();
+    Graphics::popClipArea();
 
     if (mClipStack.empty())
         return;
@@ -984,12 +984,12 @@ void NullOpenGLGraphics::drawLine(int x1, int y1,
     drawLineArrayf(4);
 }
 
-void NullOpenGLGraphics::drawRectangle(const gcn::Rectangle& rect)
+void NullOpenGLGraphics::drawRectangle(const Rect& rect)
 {
     drawRectangle(rect, false);
 }
 
-void NullOpenGLGraphics::fillRectangle(const gcn::Rectangle& rect)
+void NullOpenGLGraphics::fillRectangle(const Rect& rect)
 {
     drawRectangle(rect, true);
 }
@@ -1017,7 +1017,7 @@ void NullOpenGLGraphics::setTexturingAndBlending(const bool enable)
     }
 }
 
-void NullOpenGLGraphics::drawRectangle(const gcn::Rectangle& rect A_UNUSED,
+void NullOpenGLGraphics::drawRectangle(const Rect& rect A_UNUSED,
                                        const bool filled A_UNUSED)
 {
     BLOCK_START("Graphics::drawRectangle")

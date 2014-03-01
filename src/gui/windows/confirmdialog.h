@@ -29,7 +29,7 @@
 
 #include "gui/widgets/window.h"
 
-#include <guichan/actionlistener.hpp>
+#include "listeners/actionlistener.h"
 
 class TextBox;
 
@@ -38,7 +38,8 @@ class TextBox;
  *
  * \ingroup GUI
  */
-class ConfirmDialog : public Window, public gcn::ActionListener
+class ConfirmDialog : public Window,
+                      public ActionListener
 {
     public:
         /**
@@ -57,7 +58,7 @@ class ConfirmDialog : public Window, public gcn::ActionListener
         /**
          * Called when receiving actions from the widgets.
          */
-        void action(const gcn::ActionEvent &event) override;
+        void action(const ActionEvent &event) override;
 
         void postInit() override final;
 

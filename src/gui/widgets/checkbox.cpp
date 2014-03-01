@@ -24,12 +24,14 @@
 
 #include "client.h"
 
+#include "events/keyevent.h"
+
 #include "input/keydata.h"
-#include "input/keyevent.h"
 
 #include "resources/image.h"
 
-#include <guichan/font.hpp>
+#include "gui/font.h"
+#include "gui/gui.h"
 
 #include "debug.h"
 
@@ -38,11 +40,11 @@ Skin *CheckBox::mSkin = nullptr;
 float CheckBox::mAlpha = 1.0;
 
 CheckBox::CheckBox(const Widget2 *const widget,
-                   const std::string &restrict caption, const bool selected,
-                   gcn::ActionListener *const listener,
+                   const std::string &restrict caption,
+                   const bool selected,
+                   ActionListener *const listener,
                    const std::string &restrict eventId) :
-    gcn::CheckBox(caption, selected),
-    Widget2(widget),
+    gcn::CheckBox(widget, caption, selected),
     mPadding(0),
     mImagePadding(0),
     mImageSize(9),
@@ -94,15 +96,13 @@ CheckBox::~CheckBox()
     }
 }
 
-void CheckBox::draw(gcn::Graphics *const graphics)
+void CheckBox::draw(Graphics *const graphics)
 {
     BLOCK_START("CheckBox::draw")
     drawBox(graphics);
 
-    gcn::Font *const font = getFont();
-    static_cast<Graphics *const>(graphics)->setColorAll(
-        mForegroundColor, mForegroundColor2);
-
+    Font *const font = getFont();
+    graphics->setColorAll(mForegroundColor, mForegroundColor2);
     font->drawString(graphics, mCaption, mPadding + mImageSize + mSpacing,
         mPadding);
     BLOCK_END("CheckBox::draw")
@@ -129,7 +129,7 @@ void CheckBox::updateAlpha()
     }
 }
 
-void CheckBox::drawBox(gcn::Graphics *const graphics)
+void CheckBox::drawBox(Graphics *const graphics)
 {
     if (!mSkin || !mDrawBox)
         return;
@@ -167,24 +167,25 @@ void CheckBox::drawBox(gcn::Graphics *const graphics)
 
     if (box)
     {
-        static_cast<Graphics*>(graphics)->drawImage2(
-            box, mImagePadding, (getHeight() - mImageSize) / 2);
+        graphics->drawImage(box,
+            mImagePadding,
+            (getHeight() - mImageSize) / 2);
     }
 }
 
-void CheckBox::mouseEntered(gcn::MouseEvent& event A_UNUSED)
+void CheckBox::mouseEntered(MouseEvent& event A_UNUSED)
 {
     mHasMouse = true;
 }
 
-void CheckBox::mouseExited(gcn::MouseEvent& event A_UNUSED)
+void CheckBox::mouseExited(MouseEvent& event A_UNUSED)
 {
     mHasMouse = false;
 }
 
-void CheckBox::keyPressed(gcn::KeyEvent& keyEvent)
+void CheckBox::keyPressed(KeyEvent& keyEvent)
 {
-    const int action = static_cast<KeyEvent*>(&keyEvent)->getActionId();
+    const int action = keyEvent.getActionId();
 
     if (action == Input::KEY_GUI_SELECT)
     {

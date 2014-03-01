@@ -26,13 +26,11 @@
 #include "configuration.h"
 #include "textmanager.h"
 
+#include "gui/font.h"
 #include "gui/gui.h"
-#include "gui/sdlfont.h"
 #include "gui/theme.h"
 
 #include "resources/image.h"
-
-#include <guichan/font.hpp>
 
 #include "debug.h"
 
@@ -40,9 +38,9 @@ int Text::mInstances = 0;
 ImageRect Text::mBubble;
 
 Text::Text(const std::string &text, const int x, const int y,
-           const gcn::Graphics::Alignment alignment,
-           const gcn::Color *const color, const bool isSpeech,
-           gcn::Font *const font) :
+           const Graphics::Alignment alignment,
+           const Color *const color, const bool isSpeech,
+           Font *const font) :
     mFont(font ? font : (gui ? gui->getFont() : nullptr)),
     mX(x),
     mY(y),
@@ -78,13 +76,13 @@ Text::Text(const std::string &text, const int x, const int y,
 
     switch (alignment)
     {
-        case gcn::Graphics::LEFT:
+        case Graphics::LEFT:
             mXOffset = 0;
             break;
-        case gcn::Graphics::CENTER:
+        case Graphics::CENTER:
             mXOffset = mWidth / 2;
             break;
-        case gcn::Graphics::RIGHT:
+        case Graphics::RIGHT:
             mXOffset = mWidth;
             break;
         default:
@@ -114,7 +112,7 @@ Text::~Text()
     }
 }
 
-void Text::setColor(const gcn::Color *const color)
+void Text::setColor(const Color *const color)
 {
     mColor = color;
 }
@@ -137,9 +135,11 @@ void Text::draw(Graphics *const graphics, const int xOff, const int yOff)
     BLOCK_START("Text::draw")
     if (mIsSpeech)
     {
-        static_cast<Graphics*>(graphics)->drawImageRect(
-                mX - xOff - 5, mY - yOff - 5, mWidth + 10, mHeight + 10,
-                mBubble);
+        graphics->drawImageRect(mX - xOff - 5,
+            mY - yOff - 5,
+            mWidth + 10,
+            mHeight + 10,
+            mBubble);
     }
 
     graphics->setColor(*mColor);
@@ -151,8 +151,8 @@ void Text::draw(Graphics *const graphics, const int xOff, const int yOff)
 }
 
 FlashText::FlashText(const std::string &text, const int x, const int y,
-                     const gcn::Graphics::Alignment alignment,
-                     const gcn::Color *const color, gcn::Font *const font) :
+                     const Graphics::Alignment alignment,
+                     const Color *const color, Font *const font) :
     Text(text, x, y, alignment, color, false, font),
     mTime(0)
 {

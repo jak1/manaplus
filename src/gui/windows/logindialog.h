@@ -25,8 +25,8 @@
 
 #include "gui/widgets/window.h"
 
-#include <guichan/actionlistener.hpp>
-#include <guichan/keylistener.hpp>
+#include "listeners/actionlistener.h"
+#include "listeners/keylistener.h"
 
 #include <string>
 
@@ -44,8 +44,9 @@ class UpdateTypeModel;
  *
  * \ingroup Interface
  */
-class LoginDialog final : public Window, public gcn::ActionListener,
-                          public gcn::KeyListener
+class LoginDialog final : public Window,
+                          public ActionListener,
+                          public KeyListener
 {
     public:
         /**
@@ -65,12 +66,12 @@ class LoginDialog final : public Window, public gcn::ActionListener,
         /**
          * Called when receiving actions from the widgets.
          */
-        void action(const gcn::ActionEvent &event) override final;
+        void action(const ActionEvent &event) override final;
 
         /**
          * Called when a key is pressed in one of the text fields.
          */
-        void keyPressed(gcn::KeyEvent &keyEvent) override final;
+        void keyPressed(KeyEvent &keyEvent) override final;
 
         void close() override final;
 

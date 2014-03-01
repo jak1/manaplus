@@ -21,8 +21,11 @@
 
 #include "gui/windows/editserverdialog.h"
 
+#include "events/keyevent.h"
+
 #include "input/keydata.h"
-#include "input/keyevent.h"
+
+#include "gui/models/typelistmodel.h"
 
 #include "gui/windows/okdialog.h"
 #include "gui/windows/serverdialog.h"
@@ -35,36 +38,13 @@
 
 #include "utils/gettext.h"
 
-std::string TypeListModel::getElementAt(int elementIndex)
-{
-    if (elementIndex == 0)
-        return "TmwAthena";
-    else if (elementIndex == 1)
-        return "Evol";
-#ifdef EATHENA_SUPPORT
-    else if (elementIndex == 2)
-        return "eAthena";
-#ifdef MANASERV_SUPPORT
-    else if (elementIndex == 3)
-        return "ManaServ";
-#endif
-#else
-#ifdef MANASERV_SUPPORT
-    else if (elementIndex == 2)
-        return "ManaServ";
-#endif
-#endif
-    else
-        return "Unknown";
-}
-
 EditServerDialog::EditServerDialog(ServerDialog *const parent,
                                    ServerInfo server,
                                    const int index) :
     // TRANSLATORS: edit server dialog name
     Window(_("Edit Server"), true, parent),
-    gcn::ActionListener(),
-    gcn::KeyListener(),
+    ActionListener(),
+    KeyListener(),
     mServerAddressField(new TextField(this, std::string())),
     mPortField(new TextField(this, std::string())),
     mNameField(new TextField(this, std::string())),
@@ -159,17 +139,6 @@ EditServerDialog::EditServerDialog(ServerDialog *const parent,
         case ServerInfo::EATHENA:
             mTypeField->setSelected(2);
             break;
-        case ServerInfo::MANASERV:
-#ifdef MANASERV_SUPPORT
-            mTypeField->setSelected(3);
-            break;
-#endif
-#else
-        case ServerInfo::MANASERV:
-#ifdef MANASERV_SUPPORT
-            mTypeField->setSelected(2);
-            break;
-#endif
 #endif
         default:
         case ServerInfo::UNKNOWN:
@@ -198,7 +167,7 @@ void EditServerDialog::postInit()
     mNameField->requestFocus();
 }
 
-void EditServerDialog::action(const gcn::ActionEvent &event)
+void EditServerDialog::action(const ActionEvent &event)
 {
     const std::string &eventId = event.getId();
 
@@ -246,17 +215,6 @@ void EditServerDialog::action(const gcn::ActionEvent &event)
                     case 2:
                         mServer.type = ServerInfo::EATHENA;
                         break;
-#ifdef MANASERV_SUPPORT
-                    case 3:
-                        mServer.type = ServerInfo::MANASERV;
-                        break;
-#endif
-#else
-#ifdef MANASERV_SUPPORT
-                    case 2:
-                        mServer.type = ServerInfo::MANASERV;
-                        break;
-#endif
 #endif
                     default:
                         mServer.type = ServerInfo::UNKNOWN;
@@ -284,13 +242,12 @@ void EditServerDialog::action(const gcn::ActionEvent &event)
     }
 }
 
-void EditServerDialog::keyPressed(gcn::KeyEvent &keyEvent)
+void EditServerDialog::keyPressed(KeyEvent &keyEvent)
 {
     if (keyEvent.isConsumed())
         return;
 
-    const int actionId = static_cast<KeyEvent*>(
-        &keyEvent)->getActionId();
+    const int actionId = keyEvent.getActionId();
 
     if (actionId == static_cast<int>(Input::KEY_GUI_CANCEL))
     {
@@ -299,6 +256,6 @@ void EditServerDialog::keyPressed(gcn::KeyEvent &keyEvent)
     else if (actionId == static_cast<int>(Input::KEY_GUI_SELECT)
              || actionId == static_cast<int>(Input::KEY_GUI_SELECT2))
     {
-        action(gcn::ActionEvent(nullptr, mOkButton->getActionEventId()));
+        action(ActionEvent(nullptr, mOkButton->getActionEventId()));
     }
 }

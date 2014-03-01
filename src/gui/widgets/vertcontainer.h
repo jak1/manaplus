@@ -24,7 +24,7 @@
 
 #include "gui/widgets/container.h"
 
-#include <guichan/widgetlistener.hpp>
+#include "listeners/widgetlistener.h"
 
 #include <vector>
 
@@ -35,26 +35,28 @@
  *
  * This container places it's contents veritcally.
  */
-class VertContainer final : public Container, public gcn::WidgetListener
+class VertContainer final : public Container,
+                            public WidgetListener
 {
     public:
         VertContainer(const Widget2 *const widget,
-                      const int verticalItemSize, const bool resizable = true,
+                      const int verticalItemSize,
+                      const bool resizable = true,
                       const int leftSpacing = 0);
 
         A_DELETE_COPY(VertContainer)
 
-        void add2(gcn::Widget *const widget, const bool resizable,
+        void add2(Widget *const widget, const bool resizable,
                   const int spacing = -1);
 
-        void add1(gcn::Widget *const widget, const int spacing = -1);
+        void add1(Widget *const widget, const int spacing = -1);
 
         void clear();
 
-        void widgetResized(const gcn::Event &event) override final;
+        void widgetResized(const Event &event) override final;
 
     private:
-        std::vector<gcn::Widget*> mResizableWidgets;
+        std::vector<Widget*> mResizableWidgets;
         int mVerticalItemSize;
         int mCount;
         int mNextY;

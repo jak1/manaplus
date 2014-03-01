@@ -35,25 +35,27 @@
 
 #include "resources/db/itemdb.h"
 
-#include <string>
+#include "listeners/actionlistener.h"
 
-#include <guichan/actionlistener.hpp>
-#include <guichan/mouseinput.hpp>
+#include "input/mouseinput.h"
+
+#include <string>
 
 #include "debug.h"
 
 namespace
 {
-    struct OpenUrlListener : public gcn::ActionListener
+    struct OpenUrlListener : public ActionListener
     {
         OpenUrlListener() :
+            ActionListener(),
             url()
         {
         }
 
         A_DELETE_COPY(OpenUrlListener)
 
-        void action(const gcn::ActionEvent &event) override final
+        void action(const ActionEvent &event) override final
         {
             if (event.getId() == "yes")
                 openBrowser(url);
@@ -64,6 +66,7 @@ namespace
 }  // namespace
 
 ItemLinkHandler::ItemLinkHandler() :
+    LinkHandler(),
     mItemPopup(new ItemPopup)
 {
     mItemPopup->postInit();
@@ -75,8 +78,7 @@ ItemLinkHandler::~ItemLinkHandler()
     mItemPopup = nullptr;
 }
 
-void ItemLinkHandler::handleLink(const std::string &link,
-                                 gcn::MouseEvent *event)
+void ItemLinkHandler::handleLink(const std::string &link, MouseEvent *event)
 {
     if (strStartWith(link, "http://") || strStartWith(link, "https://"))
     {
@@ -86,7 +88,7 @@ void ItemLinkHandler::handleLink(const std::string &link,
         replaceAll(url, " ", "");
         listener.url = url;
         const int button = event->getButton();
-        if (button == gcn::MouseInput::LEFT)
+        if (button == MouseInput::LEFT)
         {
             ConfirmDialog *const confirmDlg = new ConfirmDialog(
                 // TRANSLATORS: dialog message
@@ -94,7 +96,7 @@ void ItemLinkHandler::handleLink(const std::string &link,
             confirmDlg->postInit();
             confirmDlg->addActionListener(&listener);
         }
-        else if (button == gcn::MouseInput::RIGHT)
+        else if (button == MouseInput::RIGHT)
         {
             if (viewport)
                 viewport->showLinkPopup(url);

@@ -26,48 +26,14 @@ class Button;
 class TextField;
 class DropDown;
 class ServerDialog;
+class TypeListModel;
 
 #include "gui/widgets/window.h"
 
 #include "net/serverinfo.h"
 
-#include <guichan/actionlistener.hpp>
-#include <guichan/keylistener.hpp>
-#include <guichan/listmodel.hpp>
-
-/**
- * Server Type List Model
- */
-class TypeListModel : public gcn::ListModel
-{
-    public:
-        TypeListModel()
-        { }
-
-        /**
-         * Used to get number of line in the list
-         */
-        int getNumberOfElements() override final A_WARN_UNUSED
-#ifdef EATHENA_SUPPORT
-#ifdef MANASERV_SUPPORT
-        { return 4; }
-#else
-        { return 3; }
-#endif
-#else
-#ifdef MANASERV_SUPPORT
-        { return 3; }
-#else
-        { return 2; }
-#endif
-#endif
-
-        /**
-         * Used to get an element from the list
-         */
-        std::string getElementAt(int elementIndex)
-                                 override final A_WARN_UNUSED;
-};
+#include "listeners/actionlistener.h"
+#include "listeners/keylistener.h"
 
 /**
  * The custom server addition dialog.
@@ -75,8 +41,8 @@ class TypeListModel : public gcn::ListModel
  * \ingroup Interface
  */
 class EditServerDialog final : public Window,
-                               public gcn::ActionListener,
-                               public gcn::KeyListener
+                               public ActionListener,
+                               public KeyListener
 {
     public:
         EditServerDialog(ServerDialog *const parent, ServerInfo server,
@@ -91,9 +57,9 @@ class EditServerDialog final : public Window,
         /**
          * Called when receiving actions from the widgets.
          */
-        void action(const gcn::ActionEvent &event) override final;
+        void action(const ActionEvent &event) override final;
 
-        void keyPressed(gcn::KeyEvent &keyEvent) override final;
+        void keyPressed(KeyEvent &keyEvent) override final;
 
     private:
         TextField *mServerAddressField;

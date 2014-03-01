@@ -30,7 +30,7 @@
 
 #include "utils/xml.h"
 
-#include <guichan/actionlistener.hpp>
+#include "listeners/actionlistener.h"
 
 #include <vector>
 
@@ -60,7 +60,8 @@ struct EquipmentBox final
  *
  * \ingroup Interface
  */
-class EquipmentWindow final : public Window, public gcn::ActionListener
+class EquipmentWindow final : public Window,
+                              public ActionListener
 {
     public:
         /**
@@ -81,11 +82,11 @@ class EquipmentWindow final : public Window, public gcn::ActionListener
         /**
          * Draws the equipment window.
          */
-        void draw(gcn::Graphics *graphics) override final;
+        void draw(Graphics *graphics) override final;
 
-        void action(const gcn::ActionEvent &event) override final;
+        void action(const ActionEvent &event) override final;
 
-        void mousePressed(gcn::MouseEvent& mouseEvent) override final;
+        void mousePressed(MouseEvent& mouseEvent) override final;
 
         const Item* getEquipment(const int i) const A_WARN_UNUSED
         { return mEquipment ? mEquipment->getEquipment(i) : nullptr; }
@@ -96,11 +97,11 @@ class EquipmentWindow final : public Window, public gcn::ActionListener
 
         void resetBeing(const Being *const being);
 
-        void mouseExited(gcn::MouseEvent &event) override final;
+        void mouseExited(MouseEvent &event) override final;
 
-        void mouseMoved(gcn::MouseEvent &event) override final;
+        void mouseMoved(MouseEvent &event) override final;
 
-        void mouseReleased(gcn::MouseEvent &event) override final;
+        void mouseReleased(MouseEvent &event) override final;
 
         void recalcSize();
 
@@ -135,10 +136,10 @@ class EquipmentWindow final : public Window, public gcn::ActionListener
         ImageSet *mImageSet;
         Being *mBeing;
         std::vector<EquipmentBox*> mBoxes;
-        gcn::Color mHighlightColor;
-        gcn::Color mBorderColor;
-        gcn::Color mLabelsColor;
-        gcn::Color mLabelsColor2;
+        Color mHighlightColor;
+        Color mBorderColor;
+        Color mLabelsColor;
+        Color mLabelsColor2;
         Image *mSlotBackground;
         Image *mSlotHighlightedBackground;
         ImageCollection *mVertexes;

@@ -26,14 +26,17 @@
 
 #include "being/being.h"
 
+#include "gui/gui.h"
+
 #include "resources/image.h"
 
 #include "debug.h"
 
-PlayerBox::PlayerBox(Being *const being, const std::string &skin,
+PlayerBox::PlayerBox(Widget2 *const widget,
+                     Being *const being,
+                     const std::string &skin,
                      const std::string &selectedSkin) :
-    Widget2(),
-    ScrollArea(),
+    ScrollArea(widget),
     mBeing(being),
     mAlpha(1.0),
     mBackground(),
@@ -48,9 +51,10 @@ PlayerBox::PlayerBox(Being *const being, const std::string &skin,
     init(skin, selectedSkin);
 }
 
-PlayerBox::PlayerBox(const std::string &skin,
+PlayerBox::PlayerBox(Widget2 *const widget,
+                     const std::string &skin,
                      const std::string &selectedSkin) :
-    ScrollArea(),
+    ScrollArea(widget),
     mBeing(nullptr),
     mAlpha(1.0),
     mBackground(),
@@ -107,7 +111,7 @@ void PlayerBox::init(std::string name, std::string selectedName)
     }
 }
 
-void PlayerBox::draw(gcn::Graphics *graphics)
+void PlayerBox::draw(Graphics *graphics)
 {
     BLOCK_START("PlayerBox::draw")
     if (mBeing)
@@ -115,7 +119,7 @@ void PlayerBox::draw(gcn::Graphics *graphics)
         const int bs = mFrameSize;
         const int x = mDimension.width / 2 + bs + mOffsetX;
         const int y = mDimension.height - bs + mOffsetY;
-        mBeing->drawSpriteAt(static_cast<Graphics*>(graphics), x, y);
+        mBeing->drawSpriteAt(graphics, x, y);
     }
 
     if (client->getGuiAlpha() != mAlpha)
@@ -130,7 +134,7 @@ void PlayerBox::draw(gcn::Graphics *graphics)
     BLOCK_END("PlayerBox::draw")
 }
 
-void PlayerBox::drawFrame(gcn::Graphics *graphics)
+void PlayerBox::drawFrame(Graphics *graphics)
 {
     BLOCK_START("PlayerBox::drawFrame")
     if (mDrawBackground)
@@ -140,23 +144,17 @@ void PlayerBox::drawFrame(gcn::Graphics *graphics)
         const int h = mDimension.height + bs;
 
         if (!mSelected)
-        {
-            static_cast<Graphics*>(graphics)->drawImageRect(
-                0, 0, w, h, mBackground);
-        }
+            graphics->drawImageRect(0, 0, w, h, mBackground);
         else
-        {
-            static_cast<Graphics*>(graphics)->drawImageRect(
-                0, 0, w, h, mSelectedBackground);
-        }
+            graphics->drawImageRect(0, 0, w, h, mSelectedBackground);
     }
     BLOCK_END("PlayerBox::drawFrame")
 }
 
-void PlayerBox::mouseReleased(gcn::MouseEvent& event)
+void PlayerBox::mouseReleased(MouseEvent& event)
 {
     ScrollArea::mouseReleased(event);
-    if (event.getButton() == gcn::MouseEvent::LEFT)
+    if (event.getButton() == MouseEvent::LEFT)
     {
         if (!mActionEventId.empty())
             distributeActionEvent();

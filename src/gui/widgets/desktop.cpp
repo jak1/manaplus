@@ -35,7 +35,7 @@
 
 Desktop::Desktop(const Widget2 *const widget) :
     Container(widget),
-    gcn::WidgetListener(),
+    WidgetListener(),
     mWallpaper(nullptr),
     mVersionLabel(nullptr),
     mSkin(nullptr),
@@ -98,17 +98,16 @@ void Desktop::reloadWallpaper()
     setBestFittingWallpaper();
 }
 
-void Desktop::widgetResized(const gcn::Event &event A_UNUSED)
+void Desktop::widgetResized(const Event &event A_UNUSED)
 {
     setBestFittingWallpaper();
 }
 
-void Desktop::draw(gcn::Graphics *graphics)
+void Desktop::draw(Graphics *graphics)
 {
     BLOCK_START("Desktop::draw")
-    Graphics *const g = static_cast<Graphics *const>(graphics);
 
-    const gcn::Rectangle &rect = mDimension;
+    const Rect &rect = mDimension;
     const int width = rect.width;
     const int height = rect.height;
     if (mWallpaper)
@@ -118,30 +117,30 @@ void Desktop::draw(gcn::Graphics *graphics)
 
         if (width > wallpWidth || height > wallpHeight)
         {
-            g->setColor(mBackgroundGrayColor);
-            g->fillRectangle(gcn::Rectangle(0, 0, width, height));
+            graphics->setColor(mBackgroundGrayColor);
+            graphics->fillRectangle(Rect(0, 0, width, height));
         }
 
         if (imageHelper->useOpenGL() == RENDER_SOFTWARE)
         {
-            g->drawImage2(mWallpaper,
+            graphics->drawImage(mWallpaper,
                 (width - wallpWidth) / 2,
                 (height - wallpHeight) / 2);
         }
         else
         {
-            g->drawRescaledImage(mWallpaper, 0, 0, width, height);
+            graphics->drawRescaledImage(mWallpaper, 0, 0, width, height);
         }
     }
     else
     {
-        g->setColor(mBackgroundGrayColor);
-        g->fillRectangle(gcn::Rectangle(0, 0, width, height));
+        graphics->setColor(mBackgroundGrayColor);
+        graphics->fillRectangle(Rect(0, 0, width, height));
     }
 
     // Draw a thin border under the application version...
-    g->setColor(mBackgroundColor);
-    g->fillRectangle(gcn::Rectangle(mVersionLabel->getDimension()));
+    graphics->setColor(mBackgroundColor);
+    graphics->fillRectangle(Rect(mVersionLabel->getDimension()));
 
     Container::draw(graphics);
     BLOCK_END("Desktop::draw")
@@ -166,7 +165,7 @@ void Desktop::setBestFittingWallpaper()
             mWallpaper = nullptr;
         }
 
-        const gcn::Rectangle &rect = mDimension;
+        const Rect &rect = mDimension;
         const int width = rect.width;
         const int height = rect.height;
 

@@ -20,12 +20,13 @@
 
 #include "gui/widgets/sliderlist.h"
 
+#include "gui/font.h"
 #include "gui/gui.h"
+
+#include "gui/models/listmodel.h"
 
 #include "gui/widgets/button.h"
 #include "gui/widgets/label.h"
-
-#include <guichan/font.hpp>
 
 #include "debug.h"
 
@@ -34,10 +35,10 @@ static const int buttonSpace = 30;
 static const int sliderHeight = 30;
 
 SliderList::SliderList(const Widget2 *const widget,
-                       gcn::ListModel *const listModel) :
+                       ListModel *const listModel) :
     Container(widget),
-    gcn::ActionListener(),
-    gcn::MouseListener(),
+    ActionListener(),
+    MouseListener(),
     mLabel(new Label(this)),
     mListModel(listModel),
     mPrevEventId(),
@@ -48,7 +49,7 @@ SliderList::SliderList(const Widget2 *const widget,
     setHeight(sliderHeight);
 }
 
-void SliderList::postInit(gcn::ActionListener *const listener,
+void SliderList::postInit(ActionListener *const listener,
                           const std::string &eventId)
 {
     mPrevEventId = eventId + "_prev";
@@ -80,13 +81,13 @@ void SliderList::updateAlpha()
     Button::updateAlpha();
 }
 
-void SliderList::mouseWheelMovedUp(gcn::MouseEvent& mouseEvent)
+void SliderList::mouseWheelMovedUp(MouseEvent& mouseEvent)
 {
     setSelected(mSelectedIndex - 1);
     mouseEvent.consume();
 }
 
-void SliderList::mouseWheelMovedDown(gcn::MouseEvent& mouseEvent)
+void SliderList::mouseWheelMovedDown(MouseEvent& mouseEvent)
 {
     setSelected(mSelectedIndex + 1);
     mouseEvent.consume();
@@ -103,7 +104,7 @@ void SliderList::resize()
     updateLabel();
 }
 
-void SliderList::draw(gcn::Graphics *graphics)
+void SliderList::draw(Graphics *graphics)
 {
     BLOCK_START("SliderList::draw")
     const int width = mDimension.width;
@@ -138,7 +139,7 @@ void SliderList::updateLabel()
         mLabel->setPosition(buttonSpace + (space - labelWidth) / 2, labelY);
 }
 
-void SliderList::action(const gcn::ActionEvent &event)
+void SliderList::action(const ActionEvent &event)
 {
     if (!mListModel)
         return;
@@ -209,7 +210,7 @@ int SliderList::getMaxLabelWidth() const
         return 1;
 
     int maxWidth = 0;
-    const gcn::Font *const font = getFont();
+    const Font *const font = getFont();
 
     const int num = mListModel->getNumberOfElements();
     for (int f = 0; f < num; f ++)

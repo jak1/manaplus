@@ -20,13 +20,60 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/*      _______   __   __   __   ______   __   __   _______   __   __
+ *     / _____/\ / /\ / /\ / /\ / ____/\ / /\ / /\ / ___  /\ /  |\/ /\
+ *    / /\____\// / // / // / // /\___\// /_// / // /\_/ / // , |/ / /
+ *   / / /__   / / // / // / // / /    / ___  / // ___  / // /| ' / /
+ *  / /_// /\ / /_// / // / // /_/_   / / // / // /\_/ / // / |  / /
+ * /______/ //______/ //_/ //_____/\ /_/ //_/ //_/ //_/ //_/ /|_/ /
+ * \______\/ \______\/ \_\/ \_____\/ \_\/ \_\/ \_\/ \_\/ \_\/ \_\/
+ *
+ * Copyright (c) 2004 - 2008 Olof Naessén and Per Larsson
+ *
+ *
+ * Per Larsson a.k.a finalman
+ * Olof Naessén a.k.a jansem/yakslem
+ *
+ * Visit: http://guichan.sourceforge.net
+ *
+ * License: (BSD)
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in
+ *    the documentation and/or other materials provided with the
+ *    distribution.
+ * 3. Neither the name of Guichan nor the names of its contributors may
+ *    be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+ * TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
 #include "gui/widgets/tabs/tab.h"
 
 #include "client.h"
 #include "graphicsvertexes.h"
 
+#include "gui/gui.h"
+
 #include "gui/widgets/label.h"
 #include "gui/widgets/tabbedarea.h"
+
+#include "resources/image.h"
 
 #include "debug.h"
 
@@ -44,10 +91,9 @@ static std::string const data[Tab::TAB_COUNT] =
 Skin *Tab::tabImg[Tab::TAB_COUNT];
 
 Tab::Tab(const Widget2 *const widget) :
-    gcn::BasicContainer(),
-    Widget2(widget),
-    gcn::MouseListener(),
-    gcn::WidgetListener(),
+    gcn::BasicContainer(widget),
+    MouseListener(),
+    WidgetListener(),
     mLabel(new Label(this)),
     mTabbedArea(nullptr),
     mTabColor(&getThemeColor(Theme::TAB)),
@@ -153,7 +199,7 @@ void Tab::updateAlpha()
     }
 }
 
-void Tab::draw(gcn::Graphics *graphics)
+void Tab::draw(Graphics *graphics)
 {
     BLOCK_START("Tab::draw")
     int mode = TAB_STANDARD;
@@ -204,19 +250,19 @@ void Tab::draw(gcn::Graphics *graphics)
 
     updateAlpha();
 
-    Graphics *const g = static_cast<Graphics*>(graphics);
-
     // draw tab
     if (isBatchDrawRenders(openGLMode))
     {
         const ImageRect &rect = skin->getBorder();
-        if (mRedraw || mode != mMode || g->getRedraw())
+        if (mRedraw || mode != mMode || graphics->getRedraw())
         {
             mMode = mode;
             mRedraw = false;
             mVertexes->clear();
-            g->calcWindow(mVertexes, 0, 0,
-                mDimension.width, mDimension.height, rect);
+            graphics->calcWindow(mVertexes,
+                0, 0,
+                mDimension.width, mDimension.height,
+                rect);
 
             if (mImage)
             {
@@ -224,25 +270,28 @@ void Tab::draw(gcn::Graphics *graphics)
                 if (skin1)
                 {
                     const int padding = skin1->getPadding();
-                    g->calcTileCollection(mVertexes, mImage,
-                        padding, padding);
+                    graphics->calcTileCollection(mVertexes,
+                        mImage,
+                        padding,
+                        padding);
                 }
             }
         }
 
-        g->drawTileCollection(mVertexes);
+        graphics->drawTileCollection(mVertexes);
     }
     else
     {
-        g->drawImageRect(0, 0,
-            mDimension.width, mDimension.height, skin->getBorder());
+        graphics->drawImageRect(0, 0,
+            mDimension.width, mDimension.height,
+            skin->getBorder());
         if (mImage)
         {
             const Skin *const skin1 = tabImg[TAB_STANDARD];
             if (skin1)
             {
                 const int padding = skin1->getPadding();
-                g->drawImage2(mImage, padding, padding);
+                graphics->drawImage(mImage, padding, padding);
             }
         }
     }
@@ -251,17 +300,17 @@ void Tab::draw(gcn::Graphics *graphics)
     BLOCK_END("Tab::draw")
 }
 
-void Tab::widgetResized(const gcn::Event &event A_UNUSED)
+void Tab::widgetResized(const Event &event A_UNUSED)
 {
     mRedraw = true;
 }
 
-void Tab::widgetMoved(const gcn::Event &event A_UNUSED)
+void Tab::widgetMoved(const Event &event A_UNUSED)
 {
     mRedraw = true;
 }
 
-void Tab::setLabelFont(gcn::Font *const font)
+void Tab::setLabelFont(Font *const font)
 {
     if (!mLabel)
         return;
@@ -324,12 +373,12 @@ const std::string &Tab::getCaption() const
     return mLabel->getCaption();
 }
 
-void Tab::mouseEntered(gcn::MouseEvent& mouseEvent A_UNUSED)
+void Tab::mouseEntered(MouseEvent& mouseEvent A_UNUSED)
 {
     mHasMouse = true;
 }
 
-void Tab::mouseExited(gcn::MouseEvent& mouseEvent A_UNUSED)
+void Tab::mouseExited(MouseEvent& mouseEvent A_UNUSED)
 {
     mHasMouse = false;
 }

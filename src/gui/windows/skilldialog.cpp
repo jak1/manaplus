@@ -29,9 +29,12 @@
 
 #include "being/localplayer.h"
 
+#include "gui/font.h"
 #include "gui/viewport.h"
 
 #include "gui/popups/textpopup.h"
+
+#include "gui/models/skillmodel.h"
 
 #include "gui/windows/setupwindow.h"
 #include "gui/windows/shortcutwindow.h"
@@ -40,7 +43,6 @@
 #include "gui/widgets/label.h"
 #include "gui/widgets/listbox.h"
 #include "gui/widgets/scrollarea.h"
-#include "gui/widgets/skillmodel.h"
 #include "gui/widgets/tabs/tab.h"
 #include "gui/widgets/tabbedarea.h"
 
@@ -53,14 +55,13 @@
 
 #include "resources/beingcommon.h"
 
-#include <guichan/font.hpp>
-
 #include "debug.h"
 
 class SkillListBox final : public ListBox
 {
     public:
-        SkillListBox(const Widget2 *const widget, SkillModel *const model) :
+        SkillListBox(const Widget2 *const widget,
+                     SkillModel *const model) :
             ListBox(widget, model, "skilllistbox.xml"),
             mModel(model),
             mPopup(new TextPopup),
@@ -100,15 +101,13 @@ class SkillListBox final : public ListBox
             return static_cast<SkillModel*>(mListModel)->getSkillAt(selected);
         }
 
-        void draw(gcn::Graphics *gcnGraphics) override
+        void draw(Graphics *graphics) override
         {
             if (!mListModel)
                 return;
 
             SkillModel *const model = static_cast<SkillModel*>(mListModel);
             updateAlpha();
-            Graphics *const graphics = static_cast<Graphics *const>(
-                gcnGraphics);
 
             mHighlightColor.a = static_cast<int>(mAlpha * 255.0F);
             graphics->setColor(mHighlightColor);
@@ -116,14 +115,14 @@ class SkillListBox final : public ListBox
             // Draw filled rectangle around the selected list element
             if (mSelected >= 0)
             {
-                graphics->fillRectangle(gcn::Rectangle(mPadding, getRowHeight()
+                graphics->fillRectangle(Rect(mPadding, getRowHeight()
                     * mSelected + mPadding, getWidth() - 2 * mPadding,
                     getRowHeight()));
             }
 
             // Draw the list elements
             graphics->setColorAll(mTextColor, mTextColor2);
-            gcn::Font *const font = getFont();
+            Font *const font = getFont();
             const int space = font->getHeight() + mSpacing;
             const int width2 = getWidth() - mPadding;
             for (int i = 0, y = 1;
@@ -136,7 +135,7 @@ class SkillListBox final : public ListBox
                     const SkillData *const data = e->data;
                     const int yPad = y + mPadding;
                     const std::string &description = data->description;
-                    graphics->drawImage2(data->icon, mPadding, yPad);
+                    graphics->drawImage(data->icon, mPadding, yPad);
                     font->drawString(graphics, data->name, mTextPadding, yPad);
                     if (!description.empty())
                     {
@@ -159,7 +158,7 @@ class SkillListBox final : public ListBox
         unsigned int getRowHeight() const override
         { return mRowHeight; }
 
-        const SkillInfo *getSkillByEvent(const gcn::MouseEvent &event) const
+        const SkillInfo *getSkillByEvent(const MouseEvent &event) const
         {
             const int y = (event.getY() + mPadding) / getRowHeight();
             if (!mModel || y >= mModel->getNumberOfElements())
@@ -170,7 +169,7 @@ class SkillListBox final : public ListBox
             return skill;
         }
 
-        void mouseMoved(gcn::MouseEvent &event) override
+        void mouseMoved(MouseEvent &event) override
         {
             ListBox::mouseMoved(event);
             if (!viewport || !dragDrop.isEmpty())
@@ -184,9 +183,9 @@ class SkillListBox final : public ListBox
                 skill->data->dispName, skill->data->description);
         }
 
-        void mouseDragged(gcn::MouseEvent &event)
+        void mouseDragged(MouseEvent &event)
         {
-            if (event.getButton() == gcn::MouseEvent::LEFT)
+            if (event.getButton() == MouseEvent::LEFT)
             {
                 if (dragDrop.isEmpty())
                 {
@@ -208,10 +207,10 @@ class SkillListBox final : public ListBox
             }
         }
 
-        void mousePressed(gcn::MouseEvent &event)
+        void mousePressed(MouseEvent &event)
         {
             ListBox::mousePressed(event);
-            if (event.getButton() == gcn::MouseEvent::LEFT)
+            if (event.getButton() == MouseEvent::LEFT)
             {
                 const SkillInfo *const skill = getSkillByEvent(event);
                 if (!skill)
@@ -220,12 +219,12 @@ class SkillListBox final : public ListBox
             }
         }
 
-        void mouseReleased(gcn::MouseEvent &event)
+        void mouseReleased(MouseEvent &event)
         {
             ListBox::mouseReleased(event);
         }
 
-        void mouseExited(gcn::MouseEvent &event A_UNUSED) override
+        void mouseExited(MouseEvent &event A_UNUSED) override
         {
             mPopup->hide();
         }
@@ -233,8 +232,8 @@ class SkillListBox final : public ListBox
     private:
         SkillModel *mModel;
         TextPopup *mPopup;
-        gcn::Color mTextColor;
-        gcn::Color mTextColor2;
+        Color mTextColor;
+        Color mTextColor2;
         int mTextPadding;
         int mSpacing;
         bool mSkillClicked;
@@ -244,7 +243,8 @@ class SkillTab final : public Tab
 {
     public:
         SkillTab(const Widget2 *const widget,
-                 const std::string &name, SkillListBox *const listBox) :
+                 const std::string &name,
+                 SkillListBox *const listBox) :
             Tab(widget),
             mListBox(listBox)
         {
@@ -281,7 +281,7 @@ class SkillTab final : public Tab
 SkillDialog::SkillDialog() :
     // TRANSLATORS: skills dialog name
     Window(_("Skills"), false, nullptr, "skills.xml"),
-    gcn::ActionListener(),
+    ActionListener(),
     mSkills(),
     mTabs(new TabbedArea(this)),
     mDeleteTabs(),
@@ -323,7 +323,7 @@ SkillDialog::~SkillDialog()
     clearSkills();
 }
 
-void SkillDialog::action(const gcn::ActionEvent &event)
+void SkillDialog::action(const ActionEvent &event)
 {
     const std::string &eventId = event.getId();
     if (eventId == "inc")
@@ -544,7 +544,7 @@ void SkillDialog::loadXmlFile(const std::string &fileName)
             SkillListBox *const listbox = new SkillListBox(this, model);
             listbox->setActionEventId("sel");
             listbox->addActionListener(this);
-            ScrollArea *const scroll = new ScrollArea(listbox, false);
+            ScrollArea *const scroll = new ScrollArea(this, listbox, false);
             scroll->setHorizontalScrollPolicy(ScrollArea::SHOW_NEVER);
             scroll->setVerticalScrollPolicy(ScrollArea::SHOW_ALWAYS);
 
@@ -619,7 +619,7 @@ SkillInfo* SkillDialog::getSkillByItem(const int itemId) const
     return nullptr;
 }
 
-void SkillDialog::widgetResized(const gcn::Event &event)
+void SkillDialog::widgetResized(const Event &event)
 {
     Window::widgetResized(event);
 

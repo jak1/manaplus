@@ -30,27 +30,14 @@
 
 #include "gui/viewport.h"
 
+#include "gui/models/soundsmodel.h"
+
 #include "gui/widgets/layouthelper.h"
-#include "gui/widgets/namesmodel.h"
 #include "gui/widgets/scrollarea.h"
 
 #include "utils/gettext.h"
 
 #include "debug.h"
-
-class SoundsModel final : public NamesModel
-{
-public:
-    SoundsModel() :
-        NamesModel()
-    {
-        mNames.push_back(gettext("(no sound)"));
-        Theme::fillSoundsList(mNames);
-    }
-
-    ~SoundsModel()
-    { }
-};
 
 Setup_Audio::Setup_Audio(const Widget2 *const widget) :
     SetupTabScroll(widget),
@@ -168,7 +155,7 @@ Setup_Audio::Setup_Audio(const Widget2 *const widget) :
     new SetupItemCheckBox(_("Download music"), "",
         "download-music", this, "download-musicEvent");
 
-    setDimension(gcn::Rectangle(0, 0, 550, 350));
+    setDimension(Rect(0, 0, 550, 350));
 }
 
 Setup_Audio::~Setup_Audio()

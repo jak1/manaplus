@@ -23,7 +23,6 @@
 #include "configuration.h"
 
 #include "gui/widgets/characterdisplay.h"
-#include "gui/widgets/characterviewsmall.h"
 
 #include "debug.h"
 
@@ -87,6 +86,6 @@ void CharacterViewNormal::resize()
         (*mCharacterEntries)[f]->setPosition((f - 5) * width, y);
 }
 
-void CharacterViewNormal::action(const gcn::ActionEvent &event A_UNUSED)
+void CharacterViewNormal::action(const ActionEvent &event A_UNUSED)
 {
 }

@@ -27,21 +27,20 @@
 #include "itemshortcut.h"
 #include "spellshortcut.h"
 
+#include "gui/font.h"
 #include "gui/viewport.h"
 
 #include "gui/popups/spellpopup.h"
 
-#include "gui/windows/inventorywindow.h"
 #include "gui/windows/shortcutwindow.h"
 
 #include "resources/image.h"
 
-#include <guichan/font.hpp>
-
 #include "debug.h"
 
-SpellShortcutContainer::SpellShortcutContainer(const unsigned number) :
-    ShortcutContainer(),
+SpellShortcutContainer::SpellShortcutContainer(Widget2 *const widget,
+                                               const unsigned number) :
+    ShortcutContainer(widget),
     mSpellPopup(new SpellPopup),
     mNumber(number),
     mSpellClicked(false)
@@ -90,7 +89,7 @@ void SpellShortcutContainer::setWidget2(const Widget2 *const widget)
     mForegroundColor2 = getThemeColor(Theme::TEXT_OUTLINE);
 }
 
-void SpellShortcutContainer::draw(gcn::Graphics *graphics)
+void SpellShortcutContainer::draw(Graphics *graphics)
 {
     if (!spellShortcut)
         return;
@@ -103,12 +102,11 @@ void SpellShortcutContainer::draw(gcn::Graphics *graphics)
             mBackgroundImg->setAlpha(mAlpha);
     }
 
-    Graphics *const g = static_cast<Graphics *const>(graphics);
-    gcn::Font *const font = getFont();
+    Font *const font = getFont();
 
     const int selectedId = spellShortcut->getSelectedItem();
-    g->setColorAll(mForegroundColor, mForegroundColor2);
-    drawBackground(g);
+    graphics->setColorAll(mForegroundColor, mForegroundColor2);
+    drawBackground(graphics);
 
     for (unsigned i = 0; i < mMaxItems; i++)
     {
@@ -118,7 +116,7 @@ void SpellShortcutContainer::draw(gcn::Graphics *graphics)
         const int itemId = getItemByIndex(i);
         if (selectedId >= 0 && itemId == selectedId)
         {
-            g->drawRectangle(gcn::Rectangle(itemX + 1, itemY + 1,
+            graphics->drawRectangle(Rect(itemX + 1, itemY + 1,
                 mBoxWidth - 1, mBoxHeight - 1));
         }
 
@@ -135,11 +133,11 @@ void SpellShortcutContainer::draw(gcn::Graphics *graphics)
                 if (image)
                 {
                     image->setAlpha(1.0F);
-                    g->drawImage2(image, itemX, itemY);
+                    graphics->drawImage(image, itemX, itemY);
                 }
             }
 
-            font->drawString(g, spell->getSymbol(),
+            font->drawString(graphics, spell->getSymbol(),
                 itemX + 2, itemY + mBoxHeight / 2);
         }
     }
@@ -147,9 +145,9 @@ void SpellShortcutContainer::draw(gcn::Graphics *graphics)
     BLOCK_END("SpellShortcutContainer::draw")
 }
 
-void SpellShortcutContainer::mouseDragged(gcn::MouseEvent &event)
+void SpellShortcutContainer::mouseDragged(MouseEvent &event)
 {
-    if (event.getButton() == gcn::MouseEvent::LEFT)
+    if (event.getButton() == MouseEvent::LEFT)
     {
         if (dragDrop.isEmpty() && mSpellClicked)
         {
@@ -178,7 +176,7 @@ void SpellShortcutContainer::mouseDragged(gcn::MouseEvent &event)
     }
 }
 
-void SpellShortcutContainer::mousePressed(gcn::MouseEvent &event)
+void SpellShortcutContainer::mousePressed(MouseEvent &event)
 {
     const int index = getIndexFromGrid(event.getX(), event.getY());
 
@@ -186,16 +184,16 @@ void SpellShortcutContainer::mousePressed(gcn::MouseEvent &event)
         return;
 
     const unsigned int eventButton = event.getButton();
-    if (eventButton == gcn::MouseEvent::LEFT)
+    if (eventButton == MouseEvent::LEFT)
     {
         const int itemId = getItemByIndex(index);
         if (itemId > 0)
             mSpellClicked = true;
     }
-    else if (eventButton == gcn::MouseEvent::RIGHT)
+    else if (eventButton == MouseEvent::RIGHT)
     {
     }
-    else if (eventButton == gcn::MouseEvent::MIDDLE)
+    else if (eventButton == MouseEvent::MIDDLE)
     {
         if (!spellShortcut || !spellManager)
             return;
@@ -205,7 +203,7 @@ void SpellShortcutContainer::mousePressed(gcn::MouseEvent &event)
     }
 }
 
-void SpellShortcutContainer::mouseReleased(gcn::MouseEvent &event)
+void SpellShortcutContainer::mouseReleased(MouseEvent &event)
 {
     if (!spellShortcut || !spellManager)
         return;
@@ -221,7 +219,7 @@ void SpellShortcutContainer::mouseReleased(gcn::MouseEvent &event)
     const int itemId = getItemByIndex(index);
     const unsigned int eventButton = event.getButton();
 
-    if (eventButton == gcn::MouseEvent::LEFT)
+    if (eventButton == MouseEvent::LEFT)
     {
         mSpellClicked = false;
 
@@ -273,7 +271,7 @@ void SpellShortcutContainer::mouseReleased(gcn::MouseEvent &event)
             }
         }
     }
-    else if (eventButton == gcn::MouseEvent::RIGHT)
+    else if (eventButton == MouseEvent::RIGHT)
     {
         TextCommand *spell = nullptr;
         if (itemId >= 0)
@@ -285,7 +283,7 @@ void SpellShortcutContainer::mouseReleased(gcn::MouseEvent &event)
 }
 
 // Show ItemTooltip
-void SpellShortcutContainer::mouseMoved(gcn::MouseEvent &event)
+void SpellShortcutContainer::mouseMoved(MouseEvent &event)
 {
     if (!mSpellPopup || !spellShortcut || !spellManager)
         return;
@@ -309,13 +307,13 @@ void SpellShortcutContainer::mouseMoved(gcn::MouseEvent &event)
     }
 }
 
-void SpellShortcutContainer::mouseExited(gcn::MouseEvent &event A_UNUSED)
+void SpellShortcutContainer::mouseExited(MouseEvent &event A_UNUSED)
 {
     if (mSpellPopup)
         mSpellPopup->setVisible(false);
 }
 
-void SpellShortcutContainer::widgetHidden(const gcn::Event &event A_UNUSED)
+void SpellShortcutContainer::widgetHidden(const Event &event A_UNUSED)
 {
     if (mSpellPopup)
         mSpellPopup->setVisible(false);

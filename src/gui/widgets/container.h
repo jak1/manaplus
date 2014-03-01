@@ -23,13 +23,7 @@
 #ifndef GUI_WIDGETS_CONTAINER_H
 #define GUI_WIDGETS_CONTAINER_H
 
-#include "gui/widgets/widget2.h"
-
-#include <guichan/widgets/container.hpp>
-
-#if !defined USE_INTERNALGUICHAN
-typedef std::list<gcn::Widget *>::const_iterator WidgetListConstIterator;
-#endif
+#include "gui/base/widgets/container.hpp"
 
 /**
  * A widget container.
@@ -40,15 +34,14 @@ typedef std::list<gcn::Widget *>::const_iterator WidgetListConstIterator;
  *
  * This container is also non-opaque by default.
  */
-class Container : public gcn::Container,
-                  public Widget2
+class Container : public gcn::Container
 {
     public:
         explicit Container(const Widget2 *const widget);
 
         virtual ~Container();
 
-        bool safeRemove(gcn::Widget *const widget);
+        bool safeRemove(Widget *const widget);
 
         void removeControls();
 };

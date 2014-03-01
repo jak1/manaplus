@@ -26,7 +26,7 @@
 #include "gui/widgets/linkhandler.h"
 #include "gui/widgets/window.h"
 
-#include <guichan/actionlistener.hpp>
+#include "listeners/actionlistener.h"
 
 class Button;
 class BrowserBox;
@@ -38,7 +38,7 @@ class ScrollArea;
  */
 class DidYouKnowWindow final : public Window,
                                public LinkHandler,
-                               public gcn::ActionListener
+                               public ActionListener
 {
     public:
         /**
@@ -53,13 +53,13 @@ class DidYouKnowWindow final : public Window,
         /**
          * Called when receiving actions from the widgets.
          */
-        void action(const gcn::ActionEvent &event) override final;
+        void action(const ActionEvent &event) override final;
 
         /**
          * Handles link action.
          */
         void handleLink(const std::string &link,
-                        gcn::MouseEvent *event) override final;
+                        MouseEvent *event) override final;
 
         void loadData(int num = 0);
 

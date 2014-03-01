@@ -23,13 +23,17 @@
 #ifndef GUI_WIDGETS_LISTBOX_H
 #define GUI_WIDGETS_LISTBOX_H
 
-#include "gui/widgets/widget2.h"
+#include "gui/color.h"
 
-#include <guichan/widgets/listbox.hpp>
+#include "gui/base/widgets/listbox.hpp"
 
 #include "localconsts.h"
 
 class Skin;
+class KeyEvent;
+class ListModel;
+class MouseEvent;
+class Widget2;
 
 /**
  * A list box, meant to be used inside a scroll area. Same as the Guichan list
@@ -38,15 +42,14 @@ class Skin;
  *
  * \ingroup GUI
  */
-class ListBox : public gcn::ListBox,
-                public Widget2
+class ListBox : public gcn::ListBox
 {
     public:
         /**
          * Constructor.
          */
         ListBox(const Widget2 *const widget,
-                gcn::ListModel *const listModel,
+                ListModel *const listModel,
                 const std::string &skin);
 
         A_DELETE_COPY(ListBox)
@@ -58,7 +61,7 @@ class ListBox : public gcn::ListBox,
         /**
          * Draws the list box.
          */
-        void draw(gcn::Graphics *graphics) override;
+        void draw(Graphics *graphics) override;
 
         /**
          * Update the alpha value to the graphic components.
@@ -67,21 +70,21 @@ class ListBox : public gcn::ListBox,
 
         // Inherited from KeyListener
 
-        void keyPressed(gcn::KeyEvent& keyEvent) override final;
+        void keyPressed(KeyEvent& keyEvent) override final;
 
         // Inherited from MouseListener
 
-        void mouseWheelMovedUp(gcn::MouseEvent& mouseEvent) override final;
+        void mouseWheelMovedUp(MouseEvent& mouseEvent) override final;
 
-        void mouseWheelMovedDown(gcn::MouseEvent& mouseEvent) override final;
+        void mouseWheelMovedDown(MouseEvent& mouseEvent) override final;
 
-        void mousePressed(gcn::MouseEvent &event) override;
+        void mousePressed(MouseEvent &event) override;
 
-        void mouseReleased(gcn::MouseEvent &event) override;
+        void mouseReleased(MouseEvent &event) override;
 
-        void mouseReleased1(const gcn::MouseEvent &event);
+        void mouseReleased1(const MouseEvent &event);
 
-        void mouseDragged(gcn::MouseEvent &event) override;
+        void mouseDragged(MouseEvent &event) override;
 
         void refocus();
 
@@ -107,9 +110,9 @@ class ListBox : public gcn::ListBox,
         { mRowHeight = n; }
 
     protected:
-        gcn::Color mHighlightColor;
-        gcn::Color mForegroundSelectedColor;
-        gcn::Color mForegroundSelectedColor2;
+        Color mHighlightColor;
+        Color mForegroundSelectedColor;
+        Color mForegroundSelectedColor2;
         int mOldSelected;
         int mPadding;
         int mPressedIndex;

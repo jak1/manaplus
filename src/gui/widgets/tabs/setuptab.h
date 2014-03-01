@@ -25,8 +25,8 @@
 
 #include "gui/widgets/container.h"
 
-#include <guichan/actionlistener.hpp>
-#include <guichan/widgetlistener.hpp>
+#include "listeners/actionlistener.h"
+#include "listeners/widgetlistener.h"
 
 #include <string>
 
@@ -36,8 +36,8 @@
  * A container for the contents of a tab in the setup window.
  */
 class SetupTab : public Container,
-                 public gcn::ActionListener,
-                 public gcn::WidgetListener
+                 public ActionListener,
+                 public WidgetListener
 {
     public:
         A_DELETE_COPY(SetupTab)

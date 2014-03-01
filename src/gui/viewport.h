@@ -23,12 +23,13 @@
 #ifndef GUI_VIEWPORT_H
 #define GUI_VIEWPORT_H
 
-#include "configlistener.h"
 #include "position.h"
+
+#include "listeners/configlistener.h"
 
 #include "gui/widgets/windowcontainer.h"
 
-#include <guichan/mouselistener.hpp>
+#include "listeners/mouselistener.h"
 
 class ActorSprite;
 class Button;
@@ -59,7 +60,7 @@ const int walkingMouseDelay = 500;
  * coordinates.
  */
 class Viewport final : public WindowContainer,
-                       public gcn::MouseListener,
+                       public MouseListener,
                        public ConfigListener
 {
     public:
@@ -83,7 +84,7 @@ class Viewport final : public WindowContainer,
         /**
          * Draws the viewport.
          */
-        void draw(gcn::Graphics *graphics) override final;
+        void draw(Graphics *graphics) override final;
 
         /**
          * Implements player to keep following mouse.
@@ -102,22 +103,22 @@ class Viewport final : public WindowContainer,
         /**
          * Handles mouse press on map.
          */
-        void mousePressed(gcn::MouseEvent &event) override final;
+        void mousePressed(MouseEvent &event) override final;
 
         /**
          * Handles mouse move on map
          */
-        void mouseDragged(gcn::MouseEvent &event) override final;
+        void mouseDragged(MouseEvent &event) override final;
 
         /**
          * Handles mouse button release on map.
          */
-        void mouseReleased(gcn::MouseEvent &event) override final;
+        void mouseReleased(MouseEvent &event) override final;
 
         /**
          * Handles mouse move on map.
          */
-        void mouseMoved(gcn::MouseEvent &event) override final;
+        void mouseMoved(MouseEvent &event) override final;
 
         /**
          * Shows a popup for an item.
@@ -297,7 +298,7 @@ class Viewport final : public WindowContainer,
          * Draws the given path.
          */
         void _drawPath(Graphics *const graphics, const Path &path,
-                       const gcn::Color &color = gcn::Color(255, 0, 0)) const;
+                       const Color &color = Color(255, 0, 0)) const;
 
         /**
          * Make the player go to the mouse position.

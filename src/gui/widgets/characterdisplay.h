@@ -26,10 +26,7 @@
 #include "gui/widgets/container.h"
 #include "gui/widgets/playerbox.h"
 
-#include "net/charserverhandler.h"
-#include "net/net.h"
-
-#include <guichan/widgetlistener.hpp>
+#include "listeners/widgetlistener.h"
 
 #include "localconsts.h"
 
@@ -37,9 +34,14 @@ class CharSelectDialog;
 class Label;
 class TextPopup;
 
+namespace Net
+{
+    struct Character;
+}
+
 class CharacterDisplay final : public Container,
-                               public gcn::MouseListener,
-                               public gcn::WidgetListener
+                               public MouseListener,
+                               public WidgetListener
 {
     public:
         CharacterDisplay(const Widget2 *const widget,
@@ -73,13 +75,13 @@ class CharacterDisplay final : public Container,
         void setSelect(bool b)
         { mPlayerBox->setSelected(b); }
 
-        void widgetHidden(const gcn::Event &event) override final;
+        void widgetHidden(const Event &event) override final;
 
-        void mouseExited(gcn::MouseEvent &event) override final;
+        void mouseExited(MouseEvent &event) override final;
 
-        void mouseMoved(gcn::MouseEvent &event) override final;
+        void mouseMoved(MouseEvent &event) override final;
 
-        void mousePressed(gcn::MouseEvent &event) override final;
+        void mousePressed(MouseEvent &event) override final;
 
     private:
         void update();

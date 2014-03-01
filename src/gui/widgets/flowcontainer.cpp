@@ -24,9 +24,10 @@
 #include "debug.h"
 
 FlowContainer::FlowContainer(const Widget2 *const widget,
-                             const int boxWidth, const int boxHeight) :
+                             const int boxWidth,
+                             const int boxHeight) :
     Container(widget),
-    gcn::WidgetListener(),
+    WidgetListener(),
     mBoxWidth(boxWidth),
     mBoxHeight(boxHeight),
     mGridWidth(1),
@@ -39,7 +40,7 @@ FlowContainer::FlowContainer(const Widget2 *const widget,
         mBoxHeight = 1;
 }
 
-void FlowContainer::widgetResized(const gcn::Event &event A_UNUSED)
+void FlowContainer::widgetResized(const Event &event A_UNUSED)
 {
     if (getWidth() < mBoxWidth)
     {
@@ -85,12 +86,12 @@ void FlowContainer::widgetResized(const gcn::Event &event A_UNUSED)
     }
 }
 
-void FlowContainer::add(gcn::Widget *widget)
+void FlowContainer::add(Widget *widget)
 {
     if (!widget)
         return;
 
     Container::add(widget);
     widget->setSize(mBoxWidth, mBoxHeight);
-    widgetResized(gcn::Event(nullptr));
+    widgetResized(Event(nullptr));
 }

@@ -25,11 +25,11 @@
 
 #include "gui/widgets/window.h"
 
-#include <guichan/actionlistener.hpp>
+#include "listeners/actionlistener.h"
 
 class Button;
 class DropDown;
-class IconsModal;
+class IconsModel;
 class IntTextField;
 class Label;
 class MagicSchoolModel;
@@ -38,7 +38,8 @@ class TargetTypeModel;
 class TextCommand;
 class TextField;
 
-class TextCommandEditor final : public Window, public gcn::ActionListener
+class TextCommandEditor final : public Window,
+                                public ActionListener
 {
     public:
         /**
@@ -55,7 +56,7 @@ class TextCommandEditor final : public Window, public gcn::ActionListener
 
         void postInit() override final;
 
-        void action(const gcn::ActionEvent &event) override final;
+        void action(const ActionEvent &event) override final;
 
         void scheduleDelete() override final;
 
@@ -82,7 +83,7 @@ class TextCommandEditor final : public Window, public gcn::ActionListener
         TargetTypeModel *mTargetTypeModel;
         Label *mTypeLabel;
         DropDown *mTypeDropDown;
-        IconsModal *mIconsModal;
+        IconsModel *mIconsModel;
         Label *mIconLabel;
         DropDown *mIconDropDown;
         Label *mManaLabel;

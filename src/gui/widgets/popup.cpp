@@ -27,15 +27,13 @@
 
 #include "gui/viewport.h"
 
-#include <guichan/exception.hpp>
-
 #include "debug.h"
 
 Popup::Popup(const std::string &name,
              std::string skin) :
     Container(nullptr),
-    gcn::MouseListener(),
-    gcn::WidgetListener(),
+    MouseListener(),
+    WidgetListener(),
     mPadding(3),
     mSkin(nullptr),
     mPopupName(name),
@@ -47,9 +45,6 @@ Popup::Popup(const std::string &name,
     mRedraw(true)
 {
     logger->log("Popup::Popup(\"%s\")", name.c_str());
-
-    if (!windowContainer)
-        throw GCN_EXCEPTION("Popup::Popup(): no windowContainer set");
 
     addWidgetListener(this);
 
@@ -67,7 +62,8 @@ Popup::Popup(const std::string &name,
         }
     }
 
-    windowContainer->add(this);
+    if (windowContainer)
+        windowContainer->add(this);
 
     // Popups are invisible by default
     setVisible(false);
@@ -94,10 +90,9 @@ void Popup::setWindowContainer(WindowContainer *const wc)
     windowContainer = wc;
 }
 
-void Popup::draw(gcn::Graphics *graphics)
+void Popup::draw(Graphics *graphics)
 {
     BLOCK_START("Popup::draw")
-    Graphics *const g = static_cast<Graphics*>(graphics);
 
     if (mSkin)
     {
@@ -107,16 +102,18 @@ void Popup::draw(gcn::Graphics *graphics)
             {
                 mRedraw = false;
                 mVertexes->clear();
-                g->calcWindow(mVertexes, 0, 0,
+                graphics->calcWindow(mVertexes,
+                    0, 0,
                     mDimension.width, mDimension.height,
                     mSkin->getBorder());
             }
 
-            g->drawTileCollection(mVertexes);
+            graphics->drawTileCollection(mVertexes);
         }
         else
         {
-            g->drawImageRect(0, 0, mDimension.width, mDimension.height,
+            graphics->drawImageRect(0, 0,
+                mDimension.width, mDimension.height,
                 mSkin->getBorder());
         }
     }
@@ -125,10 +122,10 @@ void Popup::draw(gcn::Graphics *graphics)
     BLOCK_END("Popup::draw")
 }
 
-gcn::Rectangle Popup::getChildrenArea()
+Rect Popup::getChildrenArea()
 {
     const int pad2 = mPadding * 2;
-    return gcn::Rectangle(mPadding, mPadding,
+    return Rect(mPadding, mPadding,
         mDimension.width - pad2, mDimension.height - pad2);
 }
 
@@ -151,7 +148,7 @@ void Popup::setContentSize(int width, int height)
     mRedraw = true;
 }
 
-void Popup::setLocationRelativeTo(const gcn::Widget *const widget)
+void Popup::setLocationRelativeTo(const Widget *const widget)
 {
     if (!widget)
         return;
@@ -230,7 +227,7 @@ void Popup::position(const int x, const int y)
     mRedraw = true;
 }
 
-void Popup::mouseMoved(gcn::MouseEvent &event A_UNUSED)
+void Popup::mouseMoved(MouseEvent &event A_UNUSED)
 {
     if (viewport)
         viewport->hideBeingPopup();
@@ -243,12 +240,12 @@ void Popup::hide()
     mRedraw = true;
 }
 
-void Popup::widgetResized(const gcn::Event &event A_UNUSED)
+void Popup::widgetResized(const Event &event A_UNUSED)
 {
     mRedraw = true;
 }
 
-void Popup::widgetMoved(const gcn::Event &event A_UNUSED)
+void Popup::widgetMoved(const Event &event A_UNUSED)
 {
     mRedraw = true;
 }

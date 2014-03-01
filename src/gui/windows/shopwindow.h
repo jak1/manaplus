@@ -25,8 +25,8 @@
 
 #include "gui/widgets/window.h"
 
-#include <guichan/actionlistener.hpp>
-#include <guichan/selectionlistener.hpp>
+#include "listeners/actionlistener.h"
+#include "listeners/selectionlistener.h"
 
 class Button;
 class CheckBox;
@@ -43,8 +43,8 @@ class ShopListBox;
  * \ingroup Interface
  */
 class ShopWindow final : public Window,
-                         public gcn::ActionListener,
-                         public gcn::SelectionListener
+                         public ActionListener,
+                         public SelectionListener
 {
     public:
         enum ShopMode
@@ -72,12 +72,12 @@ class ShopWindow final : public Window,
         /**
          * Called when receiving actions from the widgets.
          */
-        void action(const gcn::ActionEvent &event) override final;
+        void action(const ActionEvent &event) override final;
 
         /**
          * Updates the labels according to the selected item.
          */
-        void valueChanged(const gcn::SelectionEvent &event) override final;
+        void valueChanged(const SelectionEvent &event) override final;
 
         /**
          * Updates the state of buttons and labels.

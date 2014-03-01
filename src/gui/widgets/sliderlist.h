@@ -21,9 +21,8 @@
 #ifndef GUI_WIDGETS_SLIDERLIST_H
 #define GUI_WIDGETS_SLIDERLIST_H
 
-#include <guichan/actionlistener.hpp>
-#include <guichan/listmodel.hpp>
-#include <guichan/mouselistener.hpp>
+#include "listeners/actionlistener.h"
+#include "listeners/mouselistener.h"
 
 #include "gui/widgets/container.h"
 
@@ -31,33 +30,34 @@
 
 class Button;
 class Label;
+class ListModel;
 
 class SliderList final : public Container,
-                         public gcn::ActionListener,
-                         public gcn::MouseListener
+                         public ActionListener,
+                         public MouseListener
 {
     public:
         SliderList(const Widget2 *const widget,
-                   gcn::ListModel *const listModel);
+                   ListModel *const listModel);
 
         A_DELETE_COPY(SliderList)
 
         ~SliderList();
 
-        void postInit(gcn::ActionListener *const listener,
+        void postInit(ActionListener *const listener,
                       const std::string &eventId);
 
         void updateAlpha();
 
-        void mouseWheelMovedUp(gcn::MouseEvent& mouseEvent) override final;
+        void mouseWheelMovedUp(MouseEvent& mouseEvent) override final;
 
-        void mouseWheelMovedDown(gcn::MouseEvent& mouseEvent) override final;
+        void mouseWheelMovedDown(MouseEvent& mouseEvent) override final;
 
         void resize();
 
-        void draw(gcn::Graphics *graphics) override final;
+        void draw(Graphics *graphics) override final;
 
-        void action(const gcn::ActionEvent &event) override final;
+        void action(const ActionEvent &event) override final;
 
         void setSelectedString(const std::string &str);
 
@@ -77,7 +77,7 @@ class SliderList final : public Container,
 
         Button *mButtons[2];
         Label *mLabel;
-        gcn::ListModel *mListModel;
+        ListModel *mListModel;
         std::string mPrevEventId;
         std::string mNextEventId;
         int mOldWidth;

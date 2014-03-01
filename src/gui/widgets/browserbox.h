@@ -24,10 +24,9 @@
 #ifndef GUI_WIDGETS_BROWSERBOX_H
 #define GUI_WIDGETS_BROWSERBOX_H
 
-#include "gui/widgets/widget2.h"
+#include "listeners/mouselistener.h"
 
-#include <guichan/mouselistener.hpp>
-#include <guichan/widget.hpp>
+#include "gui/widgets/widget.h"
 
 #include <list>
 #include <vector>
@@ -60,8 +59,8 @@ struct BrowserLink final
 class LinePart final
 {
     public:
-        LinePart(const int x, const int y, const gcn::Color &color,
-                 const gcn::Color &color2, const std::string &text,
+        LinePart(const int x, const int y, const Color &color,
+                 const Color &color2, const std::string &text,
                  const bool bold) :
             mX(x),
             mY(y),
@@ -74,8 +73,8 @@ class LinePart final
         {
         }
 
-        LinePart(const int x, const int y, const gcn::Color &color,
-                 const gcn::Color &color2, Image *const image) :
+        LinePart(const int x, const int y, const Color &color,
+                 const Color &color2, Image *const image) :
             mX(x),
             mY(y),
             mColor(color),
@@ -90,8 +89,8 @@ class LinePart final
         ~LinePart();
 
         int mX, mY;
-        gcn::Color mColor;
-        gcn::Color mColor2;
+        Color mColor;
+        Color mColor2;
         std::string mText;
         unsigned char mType;
         Image *mImage;
@@ -102,9 +101,8 @@ class LinePart final
  * A simple browser box able to handle links and forward events to the
  * parent conteiner.
  */
-class BrowserBox final : public gcn::Widget,
-                         public Widget2,
-                         public gcn::MouseListener
+class BrowserBox final : public Widget,
+                         public MouseListener
 {
     public:
         /**
@@ -158,14 +156,14 @@ class BrowserBox final : public gcn::Widget,
         /**
          * Handles mouse actions.
          */
-        void mousePressed(gcn::MouseEvent &event) override final;
+        void mousePressed(MouseEvent &event) override final;
 
-        void mouseMoved(gcn::MouseEvent &event) override final;
+        void mouseMoved(MouseEvent &event) override final;
 
         /**
          * Draws the browser box.
          */
-        void draw(gcn::Graphics *graphics) override final;
+        void draw(Graphics *graphics) override final;
 
         void updateHeight();
 
@@ -231,8 +229,8 @@ class BrowserBox final : public gcn::Widget,
         int getPadding() const A_WARN_UNUSED
         { return mPadding; }
 
-        void setForegroundColorAll(const gcn::Color &color1,
-                                   const gcn::Color &color2);
+        void setForegroundColorAll(const Color &color1,
+                                   const Color &color2);
 
         int getDataWidth() const
         { return mDataWidth; }
@@ -269,9 +267,9 @@ class BrowserBox final : public gcn::Widget,
         int mItemPadding;
         unsigned int mDataWidth;
 
-        gcn::Color mHighlightColor;
-        gcn::Color mHyperLinkColor;
-        gcn::Color mColors[2][COLORS_MAX];
+        Color mHighlightColor;
+        Color mHyperLinkColor;
+        Color mColors[2][COLORS_MAX];
 
         bool mOpaque;
         bool mUseLinksAndUserColors;

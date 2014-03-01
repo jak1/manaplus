@@ -20,14 +20,56 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/*      _______   __   __   __   ______   __   __   _______   __   __
+ *     / _____/\ / /\ / /\ / /\ / ____/\ / /\ / /\ / ___  /\ /  |\/ /\
+ *    / /\____\// / // / // / // /\___\// /_// / // /\_/ / // , |/ / /
+ *   / / /__   / / // / // / // / /    / ___  / // ___  / // /| ' / /
+ *  / /_// /\ / /_// / // / // /_/_   / / // / // /\_/ / // / |  / /
+ * /______/ //______/ //_/ //_____/\ /_/ //_/ //_/ //_/ //_/ /|_/ /
+ * \______\/ \______\/ \_\/ \_____\/ \_\/ \_\/ \_\/ \_\/ \_\/ \_\/
+ *
+ * Copyright (c) 2004 - 2008 Olof Naessén and Per Larsson
+ *
+ *
+ * Per Larsson a.k.a finalman
+ * Olof Naessén a.k.a jansem/yakslem
+ *
+ * Visit: http://guichan.sourceforge.net
+ *
+ * License: (BSD)
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in
+ *    the documentation and/or other materials provided with the
+ *    distribution.
+ * 3. Neither the name of Guichan nor the names of its contributors may
+ *    be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+ * TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
 #ifndef GUI_WIDGETS_TABS_TAB_H
 #define GUI_WIDGETS_TABS_TAB_H
 
-#include "gui/widgets/widget2.h"
+#include "gui/base/basiccontainer.hpp"
 
-#include <guichan/basiccontainer.hpp>
-#include <guichan/mouselistener.hpp>
-#include <guichan/widgetlistener.hpp>
+#include "listeners/mouselistener.h"
+#include "listeners/widgetlistener.h"
 
 #include "localconsts.h"
 
@@ -40,9 +82,8 @@ class TabbedArea;
  * A tab, the same as the Guichan tab in 0.8, but extended
  */
 class Tab : public gcn::BasicContainer,
-            public Widget2,
-            public gcn::MouseListener,
-            public gcn::WidgetListener
+            public MouseListener,
+            public WidgetListener
 {
     public:
         explicit Tab(const Widget2 *const widget);
@@ -68,13 +109,13 @@ class Tab : public gcn::BasicContainer,
         /**
          * Draw the tabbed area.
          */
-        void draw(gcn::Graphics *graphics) override final;
+        void draw(Graphics *graphics) override final;
 
         /**
          * Set the normal color for the tab's text.
          */
-        void setTabColor(const gcn::Color *const color1,
-                         const gcn::Color *const color2)
+        void setTabColor(const Color *const color1,
+                         const Color *const color2)
         {
             mTabColor = color1;
             mTabOutlineColor = color2;
@@ -83,8 +124,8 @@ class Tab : public gcn::BasicContainer,
         /**
          * Set the highlighted color for the tab's text.
          */
-        void setHighlightedTabColor(const gcn::Color *const color1,
-                                    const gcn::Color *const color2)
+        void setHighlightedTabColor(const Color *const color1,
+                                    const Color *const color2)
         {
             mTabHighlightedColor = color1;
             mTabHighlightedOutlineColor = color2;
@@ -93,8 +134,8 @@ class Tab : public gcn::BasicContainer,
         /**
          * Set the selected color for the tab's text.
          */
-        void setSelectedTabColor(const gcn::Color *const color1,
-                                 const gcn::Color *const color2)
+        void setSelectedTabColor(const Color *const color1,
+                                 const Color *const color2)
         {
             mTabSelectedColor = color1;
             mTabSelectedOutlineColor = color2;
@@ -103,8 +144,8 @@ class Tab : public gcn::BasicContainer,
         /**
          * Set the flash color for the tab's text.
          */
-        void setFlashTabColor(const gcn::Color *const color1,
-                              const gcn::Color *const color2)
+        void setFlashTabColor(const Color *const color1,
+                              const Color *const color2)
         {
             mFlashColor = color1;
             mFlashOutlineColor = color2;
@@ -113,8 +154,8 @@ class Tab : public gcn::BasicContainer,
         /**
          * Set the player flash color for the tab's text.
          */
-        void setPlayerFlashTabColor(const gcn::Color *const color1,
-                                    const gcn::Color *const color2)
+        void setPlayerFlashTabColor(const Color *const color1,
+                                    const Color *const color2)
         {
             mPlayerFlashColor = color1;
             mPlayerFlashOutlineColor = color2;
@@ -129,11 +170,11 @@ class Tab : public gcn::BasicContainer,
         int getFlash() const A_WARN_UNUSED
         { return mFlash; }
 
-        void widgetResized(const gcn::Event &event) override final;
+        void widgetResized(const Event &event) override final;
 
-        void widgetMoved(const gcn::Event &event) override final;
+        void widgetMoved(const Event &event) override final;
 
-        void setLabelFont(gcn::Font *const font);
+        void setLabelFont(Font *const font);
 
         Label *getLabel() const A_WARN_UNUSED
         { return mLabel; }
@@ -148,9 +189,9 @@ class Tab : public gcn::BasicContainer,
 
         const std::string &getCaption() const A_WARN_UNUSED;
 
-        void mouseEntered(gcn::MouseEvent &mouseEvent) override final;
+        void mouseEntered(MouseEvent &mouseEvent) override final;
 
-        void mouseExited(gcn::MouseEvent &mouseEvent) override final;
+        void mouseExited(MouseEvent &mouseEvent) override final;
 
         void setImage(Image *const image);
 
@@ -173,16 +214,16 @@ class Tab : public gcn::BasicContainer,
         static int mInstances;           /**< Number of tab instances */
         static float mAlpha;
 
-        const gcn::Color *mTabColor;
-        const gcn::Color *mTabOutlineColor;
-        const gcn::Color *mTabHighlightedColor;
-        const gcn::Color *mTabHighlightedOutlineColor;
-        const gcn::Color *mTabSelectedColor;
-        const gcn::Color *mTabSelectedOutlineColor;
-        const gcn::Color *mFlashColor;
-        const gcn::Color *mFlashOutlineColor;
-        const gcn::Color *mPlayerFlashColor;
-        const gcn::Color *mPlayerFlashOutlineColor;
+        const Color *mTabColor;
+        const Color *mTabOutlineColor;
+        const Color *mTabHighlightedColor;
+        const Color *mTabHighlightedOutlineColor;
+        const Color *mTabSelectedColor;
+        const Color *mTabSelectedOutlineColor;
+        const Color *mFlashColor;
+        const Color *mFlashOutlineColor;
+        const Color *mPlayerFlashColor;
+        const Color *mPlayerFlashOutlineColor;
         int mFlash;
         ImageCollection *mVertexes;
         Image *mImage;

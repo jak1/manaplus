@@ -22,10 +22,12 @@
 
 #include "gui/widgets/layouthelper.h"
 
+#include "gui/base/widgets/container.hpp"
+
 #include "debug.h"
 
 LayoutHelper::LayoutHelper(gcn::Container *const container) :
-    gcn::WidgetListener(),
+    WidgetListener(),
     mLayout(),
     mContainer(container)
 {
@@ -43,7 +45,7 @@ const Layout &LayoutHelper::getLayout() const
 }
 
 LayoutCell &LayoutHelper::place(const int x, const int y,
-                                gcn::Widget *const wg,
+                                Widget *const wg,
                                 const int w, const int h)
 {
     mContainer->add(wg);
@@ -61,9 +63,9 @@ void LayoutHelper::reflowLayout(int w, int h)
     mContainer->setSize(w, h);
 }
 
-void LayoutHelper::widgetResized(const gcn::Event &event A_UNUSED)
+void LayoutHelper::widgetResized(const Event &event A_UNUSED)
 {
-    const gcn::Rectangle area = mContainer->getChildrenArea();
+    const Rect area = mContainer->getChildrenArea();
     int w = area.width;
     int h = area.height;
     mLayout.reflow(w, h);

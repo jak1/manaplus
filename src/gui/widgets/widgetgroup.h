@@ -23,14 +23,14 @@
 
 #include "gui/widgets/container.h"
 
-#include <guichan/actionlistener.hpp>
-#include <guichan/widgetlistener.hpp>
+#include "listeners/actionlistener.h"
+#include "listeners/widgetlistener.h"
 
 #include "localconsts.h"
 
 class WidgetGroup : public Container,
-                    public gcn::WidgetListener,
-                    public gcn::ActionListener
+                    public WidgetListener,
+                    public ActionListener
 {
     public:
         A_DELETE_COPY(WidgetGroup)
@@ -40,21 +40,22 @@ class WidgetGroup : public Container,
         virtual void addButton(const std::string &restrict text,
                                const std::string &restrict tag);
 
-        void action(const gcn::ActionEvent &event) override;
+        void action(const ActionEvent &event) override;
 
-        virtual void add(gcn::Widget *const widget,
+        virtual void add(Widget *const widget,
                          const int spacing);
 
         virtual void clear();
 
-        void widgetResized(const gcn::Event &event) override final;
+        void widgetResized(const Event &event) override final;
 
         virtual Widget *createWidget(const std::string &name)
                                      const A_WARN_UNUSED = 0;
 
     protected:
         WidgetGroup(const Widget2 *const widget,
-                    const std::string &group, const int height,
+                    const std::string &group,
+                    const int height,
                     const int spacing);
 
         int mSpacing;

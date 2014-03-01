@@ -32,8 +32,8 @@
 
 #include "being/being.h"
 
+#include "gui/font.h"
 #include "gui/gui.h"
-#include "gui/sdlfont.h"
 #include "gui/viewport.h"
 
 #include "gui/windows/inventorywindow.h"
@@ -59,8 +59,6 @@
 #include "utils/copynpaste.h"
 #include "utils/gettext.h"
 
-#include <guichan/font.hpp>
-
 #include "debug.h"
 
 // TRANSLATORS: npc dialog button
@@ -80,18 +78,18 @@ typedef std::vector<Image *>::iterator ImageVectorIter;
 NpcDialog::NpcDialog(const int npcId) :
     // TRANSLATORS: npc dialog name
     Window(_("NPC"), false, nullptr, "npc.xml"),
-    gcn::ActionListener(),
+    ActionListener(),
     mNpcId(npcId),
     mDefaultInt(0),
     mDefaultString(),
     mTextBox(new BrowserBox(this, BrowserBox::AUTO_WRAP, true,
         "browserbox.xml")),
-    mScrollArea(new ScrollArea(mTextBox,
+    mScrollArea(new ScrollArea(this, mTextBox,
         getOptionBool("showtextbackground"), "npc_textbackground.xml")),
     mText(),
     mNewText(),
     mItemList(new ExtendedListBox(this, this, "extendedlistbox.xml")),
-    mListScrollArea(new ScrollArea(mItemList,
+    mListScrollArea(new ScrollArea(this, mItemList,
         getOptionBool("showlistbackground"), "npc_listbackground.xml")),
     mItems(),
     mImages(),
@@ -113,7 +111,7 @@ NpcDialog::NpcDialog(const int npcId) :
     mResetButton(new Button(this, _("Reset"), "reset", this)),
     mInventory(new Inventory(Inventory::NPC, 1)),
     mItemContainer(new ItemContainer(this, mInventory)),
-    mItemScrollArea(new ScrollArea(mItemContainer,
+    mItemScrollArea(new ScrollArea(this, mItemContainer,
         getOptionBool("showitemsbackground"), "npc_listbackground.xml")),
     mInputState(NPC_INPUT_NONE),
     mActionState(NPC_ACTION_WAIT),
@@ -170,7 +168,7 @@ NpcDialog::NpcDialog(const int npcId) :
     mTextField->setVisible(true);
     mIntField->setVisible(true);
 
-    const gcn::Font *const fnt = mButton->getFont();
+    const Font *const fnt = mButton->getFont();
     int width = std::max(fnt->getWidth(CAPTION_WAITING),
         fnt->getWidth(CAPTION_NEXT));
     width = std::max(width, fnt->getWidth(CAPTION_CLOSE));
@@ -295,7 +293,7 @@ void NpcDialog::showCloseButton()
     buildLayout();
 }
 
-void NpcDialog::action(const gcn::ActionEvent &event)
+void NpcDialog::action(const ActionEvent &event)
 {
     const std::string &eventId = event.getId();
     if (eventId == "ok")
@@ -965,10 +963,10 @@ void NpcDialog::clearDialogs()
     mNpcDialogs.clear();
 }
 
-void NpcDialog::mousePressed(gcn::MouseEvent &event)
+void NpcDialog::mousePressed(MouseEvent &event)
 {
     Window::mousePressed(event);
-    if (event.getButton() == gcn::MouseEvent::RIGHT
+    if (event.getButton() == MouseEvent::RIGHT
         && event.getSource() == mTextBox)
     {
         if (viewport)

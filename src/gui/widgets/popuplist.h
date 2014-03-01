@@ -23,21 +23,21 @@
 
 #include "gui/widgets/popup.h"
 
-#include <guichan/focuslistener.hpp>
-#include <guichan/listmodel.hpp>
+#include "listeners/focuslistener.h"
 
 #include "localconsts.h"
 
 class DropDown;
 class ListBox;
+class ListModel;
 class ScrollArea;
 
 class PopupList final : public Popup,
-                        public gcn::FocusListener
+                        public FocusListener
 {
     public:
         PopupList(DropDown *const widget,
-                  gcn::ListModel *const listModel, bool extended,
+                  ListModel *const listModel, bool extended,
                   bool modal = false);
 
         ~PopupList();
@@ -48,29 +48,29 @@ class PopupList final : public Popup,
 
         void show(int x, int y);
 
-        void widgetResized(const gcn::Event &event) override final;
+        void widgetResized(const Event &event) override final;
 
         void setSelected(int selected);
 
         int getSelected() const;
 
-        void setListModel(gcn::ListModel *const model);
+        void setListModel(ListModel *const model);
 
-        gcn::ListModel *getListModel() const
+        ListModel *getListModel() const
         { return mListModel; }
 
         void adjustSize();
 
-        void focusGained(const gcn::Event& event A_UNUSED) override final;
+        void focusGained(const Event& event A_UNUSED) override final;
 
-        void focusLost(const gcn::Event& event A_UNUSED) override final;
+        void focusLost(const Event& event A_UNUSED) override final;
 
-        void mousePressed(gcn::MouseEvent& mouseEvent) override final;
+        void mousePressed(MouseEvent& mouseEvent) override final;
 
-        void mouseReleased(gcn::MouseEvent& mouseEvent) override final;
+        void mouseReleased(MouseEvent& mouseEvent) override final;
 
     private:
-        gcn::ListModel *mListModel;
+        ListModel *mListModel;
         ListBox *mListBox;
         ScrollArea *mScrollArea;
         DropDown *mDropDown;

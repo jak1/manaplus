@@ -23,11 +23,12 @@
 #ifndef MAP_H
 #define MAP_H
 
-#include "configlistener.h"
 #include "position.h"
 #include "properties.h"
 
 #include "being/actor.h"
+
+#include "listeners/configlistener.h"
 
 #include "render/renderers.h"
 
@@ -276,29 +277,6 @@ class Map final : public Properties, public ConfigListener
          * Gives the map id based on filepath (ex: 009-1)
          */
         const std::string getFilename() const A_WARN_UNUSED;
-
-#ifdef MANASERV_SUPPORT
-        /**
-         * Check the current position against surrounding blocking tiles, and
-         * correct the position offset within tile when needed.
-         */
-        Position checkNodeOffsets(int radius, const unsigned char walkMask,
-                                  const Position &position)
-                                  const A_WARN_UNUSED;
-
-        Position checkNodeOffsets(const int radius,
-                                  const unsigned char walkMask,
-                                  const int x, const int y) const A_WARN_UNUSED
-        { return checkNodeOffsets(radius, walkMask, Position(x, y)); }
-
-        /**
-         * Find a pixel path from one location to the next.
-         */
-        Path findPixelPath(const int startPixelX, const int startPixelY,
-                           const int destPixelX, const int destPixelY,
-                           const int radius, const unsigned char walkmask,
-                           const int maxCost = 20) A_WARN_UNUSED;
-#endif
 
         /**
          * Find a path from one location to the next.

@@ -26,19 +26,18 @@
 #include "gui/widgets/linkhandler.h"
 #include "gui/widgets/popup.h"
 
-#include "being/actorsprite.h"
-
-#include <guichan/actionlistener.hpp>
-#include <guichan/listmodel.hpp>
+#include "listeners/actionlistener.h"
 
 #include "localconsts.h"
 
+class ActorSprite;
 class Being;
 class BrowserBox;
 class Button;
 class ChatTab;
 class FloorItem;
 class Item;
+class ListModel;
 class MapItem;
 class ScrollArea;
 class TextCommand;
@@ -47,14 +46,14 @@ class TextField;
 class ProgressBar;
 class Window;
 
-class RenameListener final : public gcn::ActionListener
+class RenameListener final : public ActionListener
 {
     public:
         RenameListener();
 
         A_DELETE_COPY(RenameListener)
 
-        void action(const gcn::ActionEvent &event) override final;
+        void action(const ActionEvent &event) override final;
 
         void setMapItem(MapItem *const mapItem);
 
@@ -67,14 +66,14 @@ class RenameListener final : public gcn::ActionListener
         TextDialog *mDialog;
 };
 
-class PlayerListener : public gcn::ActionListener
+class PlayerListener : public ActionListener
 {
     public:
         PlayerListener();
 
         A_DELETE_COPY(PlayerListener)
 
-        void action(const gcn::ActionEvent &event) override final;
+        void action(const ActionEvent &event) override final;
 
         void setNick(std::string name)
         { mNick = name; }
@@ -173,7 +172,7 @@ class PopupMenu final : public Popup, public LinkHandler
 
         void showChangePos(const int x, const int y);
 
-        void showPopup(const int x, const int y, gcn::ListModel *const model);
+        void showPopup(const int x, const int y, ListModel *const model);
 
         void showTextFieldPopup(int x, int y, TextField *const input);
 
@@ -187,7 +186,7 @@ class PopupMenu final : public Popup, public LinkHandler
          * Handles link action.
          */
         void handleLink(const std::string &link,
-                        gcn::MouseEvent *event A_UNUSED) override final;
+                        MouseEvent *event A_UNUSED) override final;
 
         void clear();
 

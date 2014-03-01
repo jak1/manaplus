@@ -20,10 +20,11 @@
 
 #include "gui/windows/emotewindow.h"
 
-#include "gui/widgets/colormodel.h"
+#include "gui/models/colormodel.h"
+#include "gui/models/namesmodel.h"
+
 #include "gui/widgets/colorpage.h"
 #include "gui/widgets/emotepage.h"
-#include "gui/widgets/namesmodel.h"
 #include "gui/widgets/scrollarea.h"
 #include "gui/widgets/tabbedarea.h"
 
@@ -51,10 +52,10 @@ EmoteWindow::EmoteWindow() :
     mEmotePage(new EmotePage(this)),
     mColorModel(ColorModel::createDefault(this)),
     mColorPage(new ColorPage(this, mColorModel, "colorpage.xml")),
-    mScrollColorPage(new ScrollArea(mColorPage, false, "emotepage.xml")),
+    mScrollColorPage(new ScrollArea(this, mColorPage, false, "emotepage.xml")),
     mFontModel(new NamesModel),
     mFontPage(new ListBox(this, mFontModel, "")),
-    mScrollFontPage(new ScrollArea(mFontPage, false, "fontpage.xml")),
+    mScrollFontPage(new ScrollArea(this, mFontPage, false, "fontpage.xml")),
     mImageSet(Theme::getImageSetFromThemeXml("emotetabs.xml", "", 17, 16))
 {
     mTabs->postInit();
@@ -207,14 +208,14 @@ void EmoteWindow::clearFont()
     setVisible(false);
 }
 
-void EmoteWindow::addListeners(gcn::ActionListener *const listener)
+void EmoteWindow::addListeners(ActionListener *const listener)
 {
     mEmotePage->addActionListener(listener);
     mColorPage->addActionListener(listener);
     mFontPage->addActionListener(listener);
 }
 
-void EmoteWindow::widgetResized(const gcn::Event &event)
+void EmoteWindow::widgetResized(const Event &event)
 {
     Window::widgetResized(event);
     const int pad2 = mPadding * 2;
@@ -229,7 +230,7 @@ void EmoteWindow::widgetResized(const gcn::Event &event)
     mEmotePage->widgetResized(event);
 }
 
-void EmoteWindow::widgetMoved(const gcn::Event &event)
+void EmoteWindow::widgetMoved(const Event &event)
 {
     Window::widgetMoved(event);
     mEmotePage->widgetResized(event);

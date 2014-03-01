@@ -24,12 +24,14 @@
 
 #include "client.h"
 
+#include "events/keyevent.h"
+
 #include "input/keydata.h"
-#include "input/keyevent.h"
 
 #include "resources/image.h"
 
-#include <guichan/font.hpp>
+#include "gui/font.h"
+#include "gui/gui.h"
 
 #include "debug.h"
 
@@ -41,8 +43,7 @@ RadioButton::RadioButton(const Widget2 *const widget,
                          const std::string &restrict caption,
                          const std::string &restrict group,
                          const bool marked):
-    gcn::RadioButton(caption, group, marked),
-    Widget2(widget),
+    gcn::RadioButton(widget, caption, group, marked),
     mPadding(0),
     mImagePadding(0),
     mImageSize(9),
@@ -110,7 +111,7 @@ void RadioButton::updateAlpha()
     }
 }
 
-void RadioButton::drawBox(gcn::Graphics* graphics)
+void RadioButton::drawBox(Graphics* graphics)
 {
     if (!mSkin)
         return;
@@ -149,38 +150,37 @@ void RadioButton::drawBox(gcn::Graphics* graphics)
 
     if (box)
     {
-        static_cast<Graphics*>(graphics)->drawImage2(
-            box, mImagePadding, (getHeight() - mImageSize) / 2);
+        graphics->drawImage(box,
+            mImagePadding,
+            (getHeight() - mImageSize) / 2);
     }
 }
 
-void RadioButton::draw(gcn::Graphics* graphics)
+void RadioButton::draw(Graphics* graphics)
 {
     BLOCK_START("RadioButton::draw")
     drawBox(graphics);
 
-    gcn::Font *const font = getFont();
-    static_cast<Graphics *const>(graphics)->setColorAll(
-        mForegroundColor, mForegroundColor2);
-
+    Font *const font = getFont();
+    graphics->setColorAll(mForegroundColor, mForegroundColor2);
     font->drawString(graphics, mCaption, mPadding + mImageSize + mSpacing,
         mPadding);
     BLOCK_END("RadioButton::draw")
 }
 
-void RadioButton::mouseEntered(gcn::MouseEvent& event A_UNUSED)
+void RadioButton::mouseEntered(MouseEvent& event A_UNUSED)
 {
     mHasMouse = true;
 }
 
-void RadioButton::mouseExited(gcn::MouseEvent& event A_UNUSED)
+void RadioButton::mouseExited(MouseEvent& event A_UNUSED)
 {
     mHasMouse = false;
 }
 
-void RadioButton::keyPressed(gcn::KeyEvent& keyEvent)
+void RadioButton::keyPressed(KeyEvent& keyEvent)
 {
-    const int action = static_cast<KeyEvent*>(&keyEvent)->getActionId();
+    const int action = keyEvent.getActionId();
     if (action == Input::KEY_GUI_SELECT)
     {
         setSelected(true);
@@ -191,7 +191,7 @@ void RadioButton::keyPressed(gcn::KeyEvent& keyEvent)
 
 void RadioButton::adjustSize()
 {
-    gcn::Font *const font = getFont();
+    Font *const font = getFont();
     setHeight(font->getHeight() + 2 * mPadding);
     setWidth(mImagePadding + mImageSize + mSpacing
         + font->getWidth(mCaption) + mPadding);

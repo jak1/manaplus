@@ -33,6 +33,8 @@
 #include "net/net.h"
 #include "gui/viewport.h"
 
+#include "gui/models/itemsmodel.h"
+
 #include "gui/popups/itempopup.h"
 
 #include "gui/windows/shopwindow.h"
@@ -49,55 +51,6 @@
 #include "utils/gettext.h"
 
 #include "debug.h"
-
-class ItemsModal final : public gcn::ListModel
-{
-public:
-    ItemsModal() :
-        mStrings()
-    {
-        const std::map<int, ItemInfo*> &items = ItemDB::getItemInfos();
-        std::list<std::string> tempStrings;
-
-        for (std::map<int, ItemInfo*>::const_iterator
-             i = items.begin(), i_end = items.end();
-             i != i_end; ++i)
-        {
-            if (i->first < 0)
-                continue;
-
-            const ItemInfo &info = *i->second;
-            const std::string name = info.getName();
-            if (name != "unnamed" && !info.getName().empty()
-                && info.getName() != "unnamed")
-            {
-                tempStrings.push_back(name);
-            }
-        }
-        tempStrings.sort();
-        FOR_EACH (std::list<std::string>::const_iterator, i, tempStrings)
-            mStrings.push_back(*i);
-    }
-
-    A_DELETE_COPY(ItemsModal)
-
-    ~ItemsModal()
-    { }
-
-    int getNumberOfElements() override final
-    {
-        return static_cast<int>(mStrings.size());
-    }
-
-    std::string getElementAt(int i) override final
-    {
-        if (i < 0 || i >= getNumberOfElements())
-            return "???";
-        return mStrings.at(i);
-    }
-private:
-    StringVect mStrings;
-};
 
 void ItemAmountWindow::finish(Item *const item, const int amount,
                               const int price, const Usage usage)
@@ -138,8 +91,8 @@ void ItemAmountWindow::finish(Item *const item, const int amount,
 ItemAmountWindow::ItemAmountWindow(const Usage usage, Window *const parent,
                                    Item *const item, const int maxRange) :
     Window("", false, parent, "amount.xml"),
-    gcn::ActionListener(),
-    gcn::KeyListener(),
+    ActionListener(),
+    KeyListener(),
     mItemAmountTextField(new IntTextField(this, 1)),
     mItemPriceTextField(nullptr),
     mGPLabel(nullptr),
@@ -148,7 +101,7 @@ ItemAmountWindow::ItemAmountWindow(const Usage usage, Window *const parent,
     mMax(maxRange),
     mUsage(usage),
     mItemPopup(new ItemPopup),
-    mItemAmountSlide(new Slider(1.0, mMax)),
+    mItemAmountSlide(new Slider(this, 1.0, mMax)),
     mItemPriceSlide(nullptr),
     mItemDropDown(nullptr),
     mItemsModal(nullptr),
@@ -182,7 +135,7 @@ ItemAmountWindow::ItemAmountWindow(const Usage usage, Window *const parent,
         mItemPriceTextField->setWidth(35);
         mItemPriceTextField->addKeyListener(this);
 
-        mItemPriceSlide = new Slider(1.0, 10000000);
+        mItemPriceSlide = new Slider(this, 1.0, 10000000);
         mItemPriceSlide->setHeight(10);
         mItemPriceSlide->setActionEventId("slidePrice");
         mItemPriceSlide->addActionListener(this);
@@ -313,7 +266,7 @@ ItemAmountWindow::~ItemAmountWindow()
 }
 
 // Show ItemTooltip
-void ItemAmountWindow::mouseMoved(gcn::MouseEvent &event)
+void ItemAmountWindow::mouseMoved(MouseEvent &event)
 {
     Window::mouseMoved(event);
 
@@ -328,7 +281,7 @@ void ItemAmountWindow::mouseMoved(gcn::MouseEvent &event)
 }
 
 // Hide ItemTooltip
-void ItemAmountWindow::mouseExited(gcn::MouseEvent &event A_UNUSED)
+void ItemAmountWindow::mouseExited(MouseEvent &event A_UNUSED)
 {
     if (mItemPopup)
         mItemPopup->setVisible(false);
@@ -339,7 +292,7 @@ void ItemAmountWindow::resetAmount()
     mItemAmountTextField->setValue(1);
 }
 
-void ItemAmountWindow::action(const gcn::ActionEvent &event)
+void ItemAmountWindow::action(const ActionEvent &event)
 {
     const std::string &eventId = event.getId();
     if (eventId == "cancel")
@@ -435,7 +388,7 @@ void ItemAmountWindow::close()
     scheduleDelete();
 }
 
-void ItemAmountWindow::keyReleased(gcn::KeyEvent &keyEvent A_UNUSED)
+void ItemAmountWindow::keyReleased(KeyEvent &keyEvent A_UNUSED)
 {
     mItemAmountSlide->setValue2(mItemAmountTextField->getValue());
 }

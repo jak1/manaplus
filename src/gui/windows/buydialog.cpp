@@ -28,13 +28,15 @@
 
 #include "gui/windows/tradewindow.h"
 
+#include "gui/models/shopitems.h"
+#include "gui/models/sortlistmodelbuy.h"
+
 #include "gui/widgets/button.h"
 #include "gui/widgets/dropdown.h"
 #include "gui/widgets/inttextfield.h"
 #include "gui/widgets/label.h"
 #include "gui/widgets/layout.h"
 #include "gui/widgets/scrollarea.h"
-#include "gui/widgets/shopitems.h"
 #include "gui/widgets/shoplistbox.h"
 #include "gui/widgets/slider.h"
 
@@ -50,41 +52,6 @@
 #include <algorithm>
 
 #include "debug.h"
-
-static const char *const SORT_NAME_BUY[7] =
-{
-    // TRANSLATORS: buy dialog sort type.
-    N_("unsorted"),
-    // TRANSLATORS: buy dialog sort type.
-    N_("by price"),
-    // TRANSLATORS: buy dialog sort type.
-    N_("by name"),
-    // TRANSLATORS: buy dialog sort type.
-    N_("by id"),
-    // TRANSLATORS: buy dialog sort type.
-    N_("by weight"),
-    // TRANSLATORS: buy dialog sort type.
-    N_("by amount"),
-    // TRANSLATORS: buy dialog sort type.
-    N_("by type")
-};
-
-class SortListModelBuy final : public gcn::ListModel
-{
-public:
-    ~SortListModelBuy()
-    { }
-
-    int getNumberOfElements()
-    { return 7; }
-
-    std::string getElementAt(int i)
-    {
-        if (i >= getNumberOfElements() || i < 0)
-            return "???";
-        return gettext(SORT_NAME_BUY[i]);
-    }
-};
 
 class SortItemPriceFunctor final
 {
@@ -193,8 +160,8 @@ BuyDialog::DialogList BuyDialog::instances;
 BuyDialog::BuyDialog() :
     // TRANSLATORS: buy dialog name
     Window(_("Create items"), false, nullptr, "buy.xml"),
-    gcn::ActionListener(),
-    gcn::SelectionListener(),
+    ActionListener(),
+    SelectionListener(),
     mNpcId(-2), mMoney(0), mAmountItems(0), mMaxItems(0), mNick(),
     mSortModel(nullptr),
     mSortDropDown(nullptr)
@@ -205,8 +172,8 @@ BuyDialog::BuyDialog() :
 BuyDialog::BuyDialog(const int npcId) :
     // TRANSLATORS: buy dialog name
     Window(_("Buy"), false, nullptr, "buy.xml"),
-    gcn::ActionListener(),
-    gcn::SelectionListener(),
+    ActionListener(),
+    SelectionListener(),
     mNpcId(npcId), mMoney(0), mAmountItems(0), mMaxItems(0), mNick(),
     mSortModel(nullptr),
     mSortDropDown(nullptr)
@@ -217,8 +184,8 @@ BuyDialog::BuyDialog(const int npcId) :
 BuyDialog::BuyDialog(std::string nick) :
     // TRANSLATORS: buy dialog name
     Window(_("Buy"), false, nullptr, "buy.xml"),
-    gcn::ActionListener(),
-    gcn::SelectionListener(),
+    ActionListener(),
+    SelectionListener(),
     mNpcId(-1), mMoney(0), mAmountItems(0), mMaxItems(0), mNick(nick),
     mSortModel(new SortListModelBuy),
     mSortDropDown(new DropDown(this, mSortModel, false, false, this, "sort"))
@@ -240,14 +207,14 @@ void BuyDialog::init()
 
     mShopItemList = new ShopListBox(this, mShopItems, mShopItems);
     mShopItemList->postInit();
-    mScrollArea = new ScrollArea(mShopItemList,
+    mScrollArea = new ScrollArea(this, mShopItemList,
         getOptionBool("showbackground"), "buy_background.xml");
     mScrollArea->setHorizontalScrollPolicy(gcn::ScrollArea::SHOW_NEVER);
 
-    mSlider = new Slider(1.0);
+    mSlider = new Slider(this, 1.0);
     mQuantityLabel = new Label(this, strprintf(
         "%d / %d", mAmountItems, mMaxItems));
-    mQuantityLabel->setAlignment(gcn::Graphics::CENTER);
+    mQuantityLabel->setAlignment(Graphics::CENTER);
     // TRANSLATORS: buy dialog label
     mMoneyLabel = new Label(this, strprintf(
         _("Price: %s / Total: %s"), "", ""));
@@ -388,7 +355,7 @@ void BuyDialog::sort()
     }
 }
 
-void BuyDialog::action(const gcn::ActionEvent &event)
+void BuyDialog::action(const ActionEvent &event)
 {
     const std::string &eventId = event.getId();
     if (eventId == "quit")
@@ -482,7 +449,7 @@ void BuyDialog::action(const gcn::ActionEvent &event)
     }
 }
 
-void BuyDialog::valueChanged(const gcn::SelectionEvent &event A_UNUSED)
+void BuyDialog::valueChanged(const SelectionEvent &event A_UNUSED)
 {
     // Reset amount of items and update labels
     mAmountItems = 1;

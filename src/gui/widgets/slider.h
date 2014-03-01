@@ -23,9 +23,7 @@
 #ifndef GUI_WIDGETS_SLIDER_H
 #define GUI_WIDGETS_SLIDER_H
 
-#include "gui/widgets/widget2.h"
-
-#include <guichan/widgets/slider.hpp>
+#include "gui/base/widgets/slider.hpp"
 
 #include "localconsts.h"
 
@@ -36,19 +34,21 @@ class ImageCollection;
  *
  * \ingroup GUI
  */
-class Slider final : public gcn::Slider,
-                     public Widget2
+class Slider final : public gcn::Slider
 {
     public:
         /**
          * Constructor with scale start equal to 0.
          */
-        explicit Slider(const double scaleEnd = 1.0);
+        explicit Slider(Widget2 *const widget,
+                        const double scaleEnd = 1.0);
 
         /**
          * Constructor.
          */
-        Slider(const double scaleStart, const double scaleEnd);
+        Slider(Widget2 *const widget,
+               const double scaleStart,
+               const double scaleEnd);
 
         A_DELETE_COPY(Slider)
 
@@ -65,27 +65,27 @@ class Slider final : public gcn::Slider,
         /**
          * Draws the slider.
          */
-        void draw(gcn::Graphics *graphics) override final;
+        void draw(Graphics *graphics) override final;
 
         /**
          * Called when the mouse enteres the widget area.
          */
-        void mouseEntered(gcn::MouseEvent& event) override final;
+        void mouseEntered(MouseEvent& event) override final;
 
         /**
          * Called when the mouse leaves the widget area.
          */
-        void mouseExited(gcn::MouseEvent& event) override final;
+        void mouseExited(MouseEvent& event) override final;
 
-        void mousePressed(gcn::MouseEvent &mouseEvent) override final;
+        void mousePressed(MouseEvent &mouseEvent) override final;
 
-        void mouseDragged(gcn::MouseEvent &mouseEvent) override final;
+        void mouseDragged(MouseEvent &mouseEvent) override final;
 
-        void mouseWheelMovedUp(gcn::MouseEvent &mouseEvent) override final;
+        void mouseWheelMovedUp(MouseEvent &mouseEvent) override final;
 
-        void mouseWheelMovedDown(gcn::MouseEvent &mouseEvent) override final;
+        void mouseWheelMovedDown(MouseEvent &mouseEvent) override final;
 
-        void keyPressed(gcn::KeyEvent& keyEvent) override final;
+        void keyPressed(KeyEvent& keyEvent) override final;
 
         void setValue2(const double value);
 

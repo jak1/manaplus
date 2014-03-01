@@ -25,7 +25,7 @@
 
 #include "gui/widgets/window.h"
 
-#include <guichan/actionlistener.hpp>
+#include "listeners/actionlistener.h"
 
 class Button;
 class LoginData;
@@ -37,7 +37,8 @@ class WrongDataNoticeListener;
  *
  * \ingroup Interface
  */
-class UnRegisterDialog final : public Window, public gcn::ActionListener
+class UnRegisterDialog final : public Window,
+                               public ActionListener
 {
     public:
         /**
@@ -56,7 +57,7 @@ class UnRegisterDialog final : public Window, public gcn::ActionListener
         /**
          * Called when receiving actions from the widgets.
          */
-        void action(const gcn::ActionEvent &event) override final;
+        void action(const ActionEvent &event) override final;
 
     private:
         LoginData *mLoginData;

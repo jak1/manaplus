@@ -25,11 +25,13 @@
 
 #include "being/being.h"
 
-#include "gui/windows/charselectdialog.h"
+#include "gui/widgets/window.h"
 
-#include <guichan/actionlistener.hpp>
-#include <guichan/keylistener.hpp>
+#include "listeners/actionlistener.h"
+#include "listeners/keylistener.h"
 
+class Button;
+class CharSelectDialog;
 class Label;
 class PlayerBox;
 class RadioButton;
@@ -42,8 +44,8 @@ class TextField;
  * \ingroup Interface
  */
 class CharCreateDialog final : public Window,
-                               public gcn::ActionListener,
-                               public gcn::KeyListener
+                               public ActionListener,
+                               public KeyListener
 {
     public:
         /**
@@ -58,7 +60,7 @@ class CharCreateDialog final : public Window,
          */
         ~CharCreateDialog();
 
-        void action(const gcn::ActionEvent &event) override final;
+        void action(const ActionEvent &event) override final;
 
         /**
          * Unlocks the dialog, enabling the create character button again.
@@ -76,7 +78,7 @@ class CharCreateDialog final : public Window,
 
         void updatePlayer();
 
-        void keyPressed(gcn::KeyEvent &keyEvent) override final;
+        void keyPressed(KeyEvent &keyEvent) override final;
 
     private:
         int getDistributedPoints() const A_WARN_UNUSED;

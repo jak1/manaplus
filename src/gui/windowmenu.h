@@ -23,21 +23,21 @@
 #ifndef GUI_WINDOWMENU_H
 #define GUI_WINDOWMENU_H
 
-#include "configlistener.h"
+#include "listeners/configlistener.h"
 
 #include "gui/widgets/container.h"
-#include "gui/widgets/button.h"
 
-#include <guichan/actionlistener.hpp>
-#include <guichan/selectionlistener.hpp>
+#include "listeners/actionlistener.h"
+#include "listeners/mouselistener.h"
+#include "listeners/selectionlistener.h"
 
 #include "localconsts.h"
 
 #include <map>
 #include <vector>
 
+class Button;
 class TextPopup;
-class Window;
 
 struct ButtonInfo final
 {
@@ -77,9 +77,9 @@ struct ButtonText final
  */
 class WindowMenu final : public Container,
                          public ConfigListener,
-                         public gcn::ActionListener,
-                         public gcn::SelectionListener,
-                         public gcn::MouseListener
+                         public ActionListener,
+                         public SelectionListener,
+                         public MouseListener
 {
     public:
         explicit WindowMenu(const Widget2 *const widget);
@@ -88,13 +88,13 @@ class WindowMenu final : public Container,
 
         ~WindowMenu();
 
-        void action(const gcn::ActionEvent &event) override final;
+        void action(const ActionEvent &event) override final;
 
-        void mousePressed(gcn::MouseEvent &event) override final;
+        void mousePressed(MouseEvent &event) override final;
 
-        void mouseMoved(gcn::MouseEvent &event) override final;
+        void mouseMoved(MouseEvent &event) override final;
 
-        void mouseExited(gcn::MouseEvent& mouseEvent A_UNUSED) override final;
+        void mouseExited(MouseEvent& mouseEvent A_UNUSED) override final;
 
         std::map <std::string, ButtonInfo*> &getButtonNames() A_WARN_UNUSED
         { return mButtonNames; }
@@ -118,7 +118,7 @@ class WindowMenu final : public Container,
 #endif
 
     protected:
-        void drawChildren(gcn::Graphics* graphics) override final;
+        void drawChildren(Graphics* graphics) override final;
 
     private:
         inline void addButton(const char *const text,

@@ -25,8 +25,8 @@
 
 #include "gui/widgets/window.h"
 
-#include <guichan/actionlistener.hpp>
-#include <guichan/keylistener.hpp>
+#include "listeners/actionlistener.h"
+#include "listeners/keylistener.h"
 
 class Button;
 class LoginData;
@@ -38,7 +38,7 @@ class TextField;
  * to the field which contained wrong data when the Ok button was pressed on
  * the error notice.
  */
-class WrongDataNoticeListener final : public gcn::ActionListener
+class WrongDataNoticeListener final : public ActionListener
 {
     public:
         WrongDataNoticeListener();
@@ -47,7 +47,7 @@ class WrongDataNoticeListener final : public gcn::ActionListener
 
         void setTarget(TextField *const textField);
 
-        void action(const gcn::ActionEvent &event) override final;
+        void action(const ActionEvent &event) override final;
     private:
         TextField *mTarget;
 };
@@ -58,8 +58,8 @@ class WrongDataNoticeListener final : public gcn::ActionListener
  * \ingroup Interface
  */
 class RegisterDialog final : public Window,
-                             public gcn::ActionListener,
-                             public gcn::KeyListener
+                             public ActionListener,
+                             public KeyListener
 {
     public:
         /**
@@ -82,12 +82,12 @@ class RegisterDialog final : public Window,
         /**
          * Called when receiving actions from the widgets.
          */
-        void action(const gcn::ActionEvent &event) override;
+        void action(const ActionEvent &event) override;
 
         /**
          * Called when a key is pressed in one of the text fields.
          */
-        void keyPressed(gcn::KeyEvent &keyEvent) override;
+        void keyPressed(KeyEvent &keyEvent) override;
 
         void close() override;
 

@@ -24,10 +24,12 @@
 #include "main.h"
 #include "soundmanager.h"
 
-#include "gui/sdlfont.h"
+#include "gui/font.h"
+#include "gui/gui.h"
 
 #include "gui/windows/editdialog.h"
 
+#include "gui/widgets/button.h"
 #include "gui/widgets/checkbox.h"
 #include "gui/widgets/dropdown.h"
 #include "gui/widgets/horizontcontainer.h"
@@ -37,11 +39,11 @@
 #include "gui/widgets/sliderlist.h"
 #include "gui/widgets/vertcontainer.h"
 
+#include "gui/widgets/tabs/setuptabscroll.h"
+
 #include "utils/base64.h"
 #include "utils/gettext.h"
 #include "utils/mathutils.h"
-
-#include <guichan/font.hpp>
 
 #include "debug.h"
 
@@ -51,8 +53,8 @@ SetupItem::SetupItem(const std::string &restrict text,
                      SetupTabScroll *restrict const parent,
                      const std::string &restrict eventName,
                      const bool mainConfig) :
-    gcn::ActionListener(),
-    Widget2(),
+    ActionListener(),
+    Widget2(parent),
     mText(text),
     mDescription(description),
     mKeyName(keyName),
@@ -75,8 +77,8 @@ SetupItem::SetupItem(const std::string &restrict text,
                      const std::string &restrict eventName,
                      const std::string &restrict def,
                      const bool mainConfig) :
-    gcn::ActionListener(),
-    Widget2(),
+    ActionListener(),
+    Widget2(parent),
     mText(text),
     mDescription(description),
     mKeyName(keyName),
@@ -154,7 +156,7 @@ std::string SetupItem::getActionEventId() const
     return mWidget->getActionEventId();
 }
 
-void SetupItem::action(const gcn::ActionEvent &event)
+void SetupItem::action(const ActionEvent &event)
 {
     if (!mWidget)
         return;
@@ -189,7 +191,7 @@ void SetupItem::externalUnloaded(const std::string &eventName A_UNUSED)
 {
 }
 
-void SetupItem::fixFirstItemSize(gcn::Widget *const widget)
+void SetupItem::fixFirstItemSize(Widget *const widget)
 {
     const int maxSize = mParent->getPreferredFirstItemSize();
     if (widget->getWidth() < maxSize)
@@ -393,7 +395,7 @@ void SetupItemTextField::toWidget()
     mTextField->setText(mValue);
 }
 
-void SetupItemTextField::action(const gcn::ActionEvent &event)
+void SetupItemTextField::action(const ActionEvent &event)
 {
     if (!mTextField)
         return;
@@ -529,7 +531,7 @@ void SetupItemIntTextField::toWidget()
     mTextField->setText(mValue);
 }
 
-void SetupItemIntTextField::action(const gcn::ActionEvent &event)
+void SetupItemIntTextField::action(const ActionEvent &event)
 {
     if (!mTextField)
         return;
@@ -609,7 +611,7 @@ void SetupItemLabel::toWidget()
 {
 }
 
-void SetupItemLabel::action(const gcn::ActionEvent &event A_UNUSED)
+void SetupItemLabel::action(const ActionEvent &event A_UNUSED)
 {
 }
 
@@ -623,7 +625,7 @@ SetupItemDropDown::SetupItemDropDown(const std::string &restrict text,
                                      const std::string &restrict keyName,
                                      SetupTabScroll *restrict const parent,
                                      const std::string &restrict eventName,
-                                     gcn::ListModel *restrict const model,
+                                     ListModel *restrict const model,
                                      const int width,
                                      const bool mainConfig) :
     SetupItem(text, description, keyName, parent, eventName, mainConfig),
@@ -642,7 +644,7 @@ SetupItemDropDown::SetupItemDropDown(const std::string &restrict text,
                                      const std::string &restrict keyName,
                                      SetupTabScroll *restrict const parent,
                                      const std::string &restrict eventName,
-                                     gcn::ListModel *restrict const model,
+                                     ListModel *restrict const model,
                                      const int width,
                                      const std::string &restrict def,
                                      const bool mainConfig) :
@@ -764,7 +766,7 @@ void SetupItemSlider::createControls()
     mHorizont = new HorizontContainer(this, 32, 2);
 
     mLabel = new Label(this, mText);
-    mSlider = new Slider(mMin, mMax);
+    mSlider = new Slider(this, mMin, mMax);
     mSlider->setActionEventId(mEventName);
     mSlider->addActionListener(mParent);
     mSlider->setValue2(atof(mValue.c_str()));
@@ -799,7 +801,7 @@ void SetupItemSlider::toWidget()
     mSlider->setValue2(atof(mValue.c_str()));
 }
 
-void SetupItemSlider::action(const gcn::ActionEvent &event A_UNUSED)
+void SetupItemSlider::action(const ActionEvent &event A_UNUSED)
 {
     fromWidget();
     if (mOnTheFly)
@@ -888,7 +890,7 @@ void SetupItemSlider2::createControls()
     mLabel = new Label(this, mText);
     mLabel2 = new Label(this, "");
     mLabel2->setWidth(width);
-    mSlider = new Slider(mMin, mMax);
+    mSlider = new Slider(this, mMin, mMax);
     mSlider->setActionEventId(mEventName);
     mSlider->addActionListener(mParent);
     mSlider->setValue2(atof(mValue.c_str()));
@@ -918,7 +920,7 @@ int SetupItemSlider2::getMaxWidth()
     int maxWidth = 0;
     SetupItemNamesConstIter it = mValues->begin();
     const SetupItemNamesConstIter it_end = mValues->end();
-    const gcn::Font *const font = gui->getFont();
+    const Font *const font = gui->getFont();
 
     while (it != it_end)
     {
@@ -954,7 +956,7 @@ void SetupItemSlider2::toWidget()
     updateLabel();
 }
 
-void SetupItemSlider2::action(const gcn::ActionEvent &event A_UNUSED)
+void SetupItemSlider2::action(const ActionEvent &event A_UNUSED)
 {
     fromWidget();
     updateLabel();
@@ -1002,7 +1004,7 @@ SetupItemSliderList::SetupItemSliderList(const std::string &restrict text,
                                          const std::string &restrict keyName,
                                          SetupTabScroll *restrict const parent,
                                          const std::string &restrict eventName,
-                                         gcn::ListModel *restrict const model,
+                                         ListModel *restrict const model,
                                          const int width, const bool onTheFly,
                                          const bool mainConfig) :
     SetupItem(text, description, keyName, parent, eventName, mainConfig),
@@ -1022,7 +1024,7 @@ SetupItemSliderList::SetupItemSliderList(const std::string &restrict text,
                                          const std::string &restrict keyName,
                                          SetupTabScroll *restrict const parent,
                                          const std::string &restrict eventName,
-                                         gcn::ListModel *restrict const model,
+                                         ListModel *restrict const model,
                                          const std::string &restrict def,
                                          const int width,
                                          const bool onTheFly,
@@ -1086,7 +1088,7 @@ void SetupItemSliderList::toWidget()
     mSlider->setSelectedString(mValue);
 }
 
-void SetupItemSliderList::action(const gcn::ActionEvent &event A_UNUSED)
+void SetupItemSliderList::action(const ActionEvent &event A_UNUSED)
 {
     fromWidget();
     if (mOnTheFly)
@@ -1107,7 +1109,7 @@ SetupItemSound::SetupItemSound(const std::string &restrict text,
                                const std::string &restrict keyName,
                                SetupTabScroll *restrict const parent,
                                const std::string &restrict eventName,
-                               gcn::ListModel *restrict const model,
+                               ListModel *restrict const model,
                                const int width, const bool onTheFly,
                                const bool mainConfig) :
     SetupItemSliderList(text, description, keyName, parent, eventName,
@@ -1124,7 +1126,7 @@ void SetupItemSound::addMoreControls()
     mHorizont->add(mButton);
 }
 
-void SetupItemSound::action(const gcn::ActionEvent &event)
+void SetupItemSound::action(const ActionEvent &event)
 {
     if (event.getId() == mEventName + "_PLAY")
     {
@@ -1145,7 +1147,7 @@ SetupItemSliderInt::SetupItemSliderInt(const std::string &restrict text,
                                        const std::string &restrict keyName,
                                        SetupTabScroll *restrict const parent,
                                        const std::string &restrict eventName,
-                                       gcn::ListModel *restrict const model,
+                                       ListModel *restrict const model,
                                        const int min,
                                        const int width,
                                        const bool onTheFly,

@@ -30,11 +30,12 @@
 #include "gui/windows/confirmdialog.h"
 #include "gui/windows/tradewindow.h"
 
+#include "gui/models/shopitems.h"
+
 #include "gui/widgets/button.h"
 #include "gui/widgets/label.h"
 #include "gui/widgets/layout.h"
 #include "gui/widgets/scrollarea.h"
-#include "gui/widgets/shopitems.h"
 #include "gui/widgets/shoplistbox.h"
 #include "gui/widgets/slider.h"
 
@@ -53,8 +54,8 @@ SellDialog::DialogList SellDialog::instances;
 SellDialog::SellDialog(const int npcId) :
     // TRANSLATORS: sell dialog name
     Window(_("Sell"), false, nullptr, "sell.xml"),
-    gcn::ActionListener(),
-    gcn::SelectionListener(),
+    ActionListener(),
+    SelectionListener(),
     mNpcId(npcId), mMaxItems(0), mAmountItems(0), mNick("")
 {
     init();
@@ -63,8 +64,8 @@ SellDialog::SellDialog(const int npcId) :
 SellDialog::SellDialog(const std::string &nick):
     // TRANSLATORS: sell dialog name
     Window(_("Sell"), false, nullptr, "sell.xml"),
-    gcn::ActionListener(),
-    gcn::SelectionListener(),
+    ActionListener(),
+    SelectionListener(),
     mNpcId(-1), mMaxItems(0), mAmountItems(0), mNick(nick)
 {
     init();
@@ -86,15 +87,15 @@ void SellDialog::init()
     mShopItemList = new ShopListBox(this, mShopItems, mShopItems);
     mShopItemList->postInit();
     mShopItemList->setProtectItems(true);
-    mScrollArea = new ScrollArea(mShopItemList,
+    mScrollArea = new ScrollArea(this, mShopItemList,
         getOptionBool("showbackground"), "sell_background.xml");
     mScrollArea->setHorizontalScrollPolicy(gcn::ScrollArea::SHOW_NEVER);
 
-    mSlider = new Slider(1.0);
+    mSlider = new Slider(this, 1.0);
 
     mQuantityLabel = new Label(this, strprintf(
         "%d / %d", mAmountItems, mMaxItems));
-    mQuantityLabel->setAlignment(gcn::Graphics::CENTER);
+    mQuantityLabel->setAlignment(Graphics::CENTER);
     // TRANSLATORS: sell dialog label
     mMoneyLabel = new Label(this, strprintf(_("Price: %s / Total: %s"),
                                       "", ""));
@@ -185,7 +186,7 @@ void SellDialog::addItem(const int id, const unsigned char color,
 }
 
 
-void SellDialog::action(const gcn::ActionEvent &event)
+void SellDialog::action(const ActionEvent &event)
 {
     const std::string &eventId = event.getId();
 
@@ -257,20 +258,10 @@ void SellDialog::action(const gcn::ActionEvent &event)
             mMaxItems -= mAmountItems;
             while (mAmountItems > 0)
             {
-#ifdef MANASERV_SUPPORT
-                // This order is important, item->getCurrentInvIndex() would
-                // return the inventory index of the next Duplicate otherwise.
-                int itemIndex = item->getCurrentInvIndex();
-                const int sellCount = item->sellCurrentDuplicate(mAmountItems);
-                // For Manaserv, the Item id is to be given as index.
-                if ((Net::getNetworkType() == ServerInfo::MANASERV))
-                    itemIndex = item->getId();
-#else
                 // This order is important, item->getCurrentInvIndex() would
                 // return the inventory index of the next Duplicate otherwise.
                 const int itemIndex = item->getCurrentInvIndex();
                 const int sellCount = item->sellCurrentDuplicate(mAmountItems);
-#endif
                 Net::getNpcHandler()->sellItem(mNpcId, itemIndex, sellCount);
                 mAmountItems -= sellCount;
             }
@@ -291,7 +282,7 @@ void SellDialog::action(const gcn::ActionEvent &event)
                 delete mShopItems->at(selectedItem);
                 mShopItems->erase(selectedItem);
 
-                gcn::Rectangle scroll;
+                Rect scroll;
                 scroll.y = mShopItemList->getRowHeight() * (selectedItem + 1);
                 scroll.height = mShopItemList->getRowHeight();
                 mShopItemList->showPart(scroll);
@@ -309,7 +300,7 @@ void SellDialog::action(const gcn::ActionEvent &event)
     }
 }
 
-void SellDialog::valueChanged(const gcn::SelectionEvent &event A_UNUSED)
+void SellDialog::valueChanged(const SelectionEvent &event A_UNUSED)
 {
     // Reset amount of items and update labels
     mAmountItems = 1;

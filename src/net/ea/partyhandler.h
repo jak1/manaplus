@@ -22,15 +22,18 @@
 #ifndef NET_EA_PARTYHANDLER_H
 #define NET_EA_PARTYHANDLER_H
 
-#include "net/messagein.h"
 #include "net/partyhandler.h"
 
-#include "net/ea/gui/partytab.h"
+class Party;
 
-#include "party.h"
+namespace Net
+{
+    class MessageIn;
+}
 
 namespace Ea
 {
+class PartyTab;
 
 class PartyHandler : public Net::PartyHandler
 {
@@ -49,7 +52,7 @@ class PartyHandler : public Net::PartyHandler
         PartyShare getShareItems() const override final A_WARN_UNUSED
         { return mShareItems; }
 
-        void reload() const;
+        static void reload();
 
         void clear() const override final;
 

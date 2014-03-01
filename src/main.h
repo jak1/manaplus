@@ -40,13 +40,13 @@
  * by the map, interleaved with the tiles in the fringe layer.
  *
  * The client supports two servers, \link EAthena eAthena\endlink (the TMW
- * version) and the \link ManaServ Mana server\endlink. To achieve this, the
+ * version) and the \link EvolServ server\endlink. To achieve this, the
  * \link Net network communication layer\endlink is abstracted in many
  * different interfaces, which have different implementations for each server.
  */
 
-#define SMALL_VERSION "1.4.2.15"
-#define CHECK_VERSION "01.04.02.15"
+#define SMALL_VERSION "1.4.3.1"
+#define CHECK_VERSION "01.04.03.01"
 
 #ifdef HAVE_CONFIG_H
 #include "../config.h"

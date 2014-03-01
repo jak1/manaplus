@@ -41,6 +41,7 @@
 
 #include "resources/db/deaddb.h"
 
+#include "net/messagein.h"
 #include "net/net.h"
 
 #include "net/ea/eaprotocol.h"
@@ -60,9 +61,9 @@ namespace
     /**
      * Listener used for handling the overweigth message.
      */
-    struct WeightListener final : public gcn::ActionListener
+    struct WeightListener final : public ActionListener
     {
-        void action(const gcn::ActionEvent &event A_UNUSED)
+        void action(const ActionEvent &event A_UNUSED)
         {
             weightNotice = nullptr;
         }
@@ -71,9 +72,9 @@ namespace
     /**
      * Listener used for handling death message.
      */
-    struct DeathListener final : public gcn::ActionListener
+    struct DeathListener final : public ActionListener
     {
-        void action(const gcn::ActionEvent &event A_UNUSED)
+        void action(const ActionEvent &event A_UNUSED)
         {
             if (Net::getPlayerHandler())
                 Net::getPlayerHandler()->respawn();

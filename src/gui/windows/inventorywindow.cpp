@@ -28,10 +28,15 @@
 
 #include "being/playerinfo.h"
 
-#include "input/inputmanager.h"
-#include "input/keyevent.h"
+#include "events/keyevent.h"
 
+#include "input/inputmanager.h"
+
+#include "gui/font.h"
+#include "gui/gui.h"
 #include "gui/viewport.h"
+
+#include "gui/models/sortlistmodelinv.h"
 
 #include "gui/popups/textpopup.h"
 
@@ -41,7 +46,6 @@
 #include "gui/windows/setupwindow.h"
 #include "gui/windows/shopwindow.h"
 #include "gui/windows/tradewindow.h"
-
 
 #include "gui/widgets/button.h"
 #include "gui/widgets/dropdown.h"
@@ -57,53 +61,17 @@
 
 #include "utils/gettext.h"
 
-#include <guichan/font.hpp>
-
 #include <string>
 
 #include "debug.h"
-
-static const char *const SORT_NAME_INVENTORY[6] =
-{
-    // TRANSLATORS: inventory sort mode
-    N_("default"),
-    // TRANSLATORS: inventory sort mode
-    N_("by name"),
-    // TRANSLATORS: inventory sort mode
-    N_("by id"),
-    // TRANSLATORS: inventory sort mode
-    N_("by weight"),
-    // TRANSLATORS: inventory sort mode
-    N_("by amount"),
-    // TRANSLATORS: inventory sort mode
-    N_("by type")
-};
-
-class SortListModelInv final : public gcn::ListModel
-{
-public:
-    ~SortListModelInv()
-    { }
-
-    int getNumberOfElements() override final
-    { return 6; }
-
-    std::string getElementAt(int i) override final
-    {
-        if (i >= getNumberOfElements() || i < 0)
-            return "???";
-
-        return gettext(SORT_NAME_INVENTORY[i]);
-    }
-};
 
 InventoryWindow::WindowList InventoryWindow::invInstances;
 
 InventoryWindow::InventoryWindow(Inventory *const inventory):
     Window("Inventory", false, nullptr, "inventory.xml"),
-    gcn::ActionListener(),
-    gcn::KeyListener(),
-    gcn::SelectionListener(),
+    ActionListener(),
+    KeyListener(),
+    SelectionListener(),
     InventoryListener(),
     mInventory(inventory),
     mItems(new ItemContainer(this, mInventory)),
@@ -183,8 +151,8 @@ InventoryWindow::InventoryWindow(Inventory *const inventory):
 
     mItems->addSelectionListener(this);
 
-    gcn::ScrollArea *const invenScroll = new ScrollArea(
-        mItems, getOptionBool("showbackground"), "inventory_background.xml");
+    gcn::ScrollArea *const invenScroll = new ScrollArea(this, mItems,
+        getOptionBool("showbackground"), "inventory_background.xml");
     invenScroll->setHorizontalScrollPolicy(gcn::ScrollArea::SHOW_NEVER);
 
     const int size = config.getIntValue("fontSize");
@@ -295,7 +263,7 @@ void InventoryWindow::postInit()
     slotsChanged(mInventory);
 
     mItems->setSortType(mSortDropDown->getSelected());
-    widgetResized(gcn::Event(nullptr));
+    widgetResized(Event(nullptr));
     if (!isMainInventory())
         setVisible(true);
 }
@@ -335,7 +303,7 @@ void InventoryWindow::storeSortOrder()
     }
 }
 
-void InventoryWindow::action(const gcn::ActionEvent &event)
+void InventoryWindow::action(const ActionEvent &event)
 {
     const std::string &eventId = event.getId();
     if (eventId == "outfit")
@@ -459,13 +427,13 @@ void InventoryWindow::unselectItem()
     mItems->selectNone();
 }
 
-void InventoryWindow::widgetHidden(const gcn::Event &event)
+void InventoryWindow::widgetHidden(const Event &event)
 {
     Window::widgetHidden(event);
     mItems->hidePopup();
 }
 
-void InventoryWindow::mouseClicked(gcn::MouseEvent &event)
+void InventoryWindow::mouseClicked(MouseEvent &event)
 {
     Window::mouseClicked(event);
 
@@ -481,7 +449,7 @@ void InventoryWindow::mouseClicked(gcn::MouseEvent &event)
         && inputManager.isActionActive(static_cast<int>(
         Input::KEY_STOP_ATTACK)));
 
-    if (!mod && !mod2 && event.getButton() == gcn::MouseEvent::RIGHT)
+    if (!mod && !mod2 && event.getButton() == MouseEvent::RIGHT)
     {
         Item *const item = mItems->getSelectedItem();
 
@@ -501,8 +469,8 @@ void InventoryWindow::mouseClicked(gcn::MouseEvent &event)
     if (!mInventory)
         return;
 
-    if (event.getButton() == gcn::MouseEvent::LEFT
-        || event.getButton() == gcn::MouseEvent::RIGHT)
+    if (event.getButton() == MouseEvent::LEFT
+        || event.getButton() == MouseEvent::RIGHT)
     {
         Item *const item = mItems->getSelectedItem();
 
@@ -513,7 +481,7 @@ void InventoryWindow::mouseClicked(gcn::MouseEvent &event)
         {
             if (mInventory->isMainInventory())
             {
-                if (event.getButton() == gcn::MouseEvent::RIGHT)
+                if (event.getButton() == MouseEvent::RIGHT)
                 {
                     ItemAmountWindow::showWindow(ItemAmountWindow::StoreAdd,
                         inventoryWindow, item);
@@ -527,7 +495,7 @@ void InventoryWindow::mouseClicked(gcn::MouseEvent &event)
             }
             else
             {
-                if (event.getButton() == gcn::MouseEvent::RIGHT)
+                if (event.getButton() == MouseEvent::RIGHT)
                 {
                     ItemAmountWindow::showWindow(ItemAmountWindow::StoreRemove,
                         inventoryWindow, item);
@@ -544,7 +512,7 @@ void InventoryWindow::mouseClicked(gcn::MouseEvent &event)
         {
             if (PlayerInfo::isItemProtected(item->getId()))
                 return;
-            if (event.getButton() == gcn::MouseEvent::RIGHT)
+            if (event.getButton() == MouseEvent::RIGHT)
             {
                 ItemAmountWindow::showWindow(ItemAmountWindow::TradeAdd,
                     tradeWindow, item);
@@ -588,15 +556,15 @@ void InventoryWindow::mouseClicked(gcn::MouseEvent &event)
     }
 }
 
-void InventoryWindow::mouseMoved(gcn::MouseEvent &event)
+void InventoryWindow::mouseMoved(MouseEvent &event)
 {
     Window::mouseMoved(event);
-    const gcn::Widget *const src = event.getSource();
+    const Widget *const src = event.getSource();
     if (src == mSlotsBar || src == mWeightBar)
     {
         const int x = event.getX();
         const int y = event.getY();
-        const gcn::Rectangle &rect = mDimension;
+        const Rect &rect = mDimension;
         mTextPopup->show(rect.x + x, rect.y + y, strprintf(_("Money: %s"),
             Units::formatCurrency(PlayerInfo::getAttribute(
             PlayerInfo::MONEY)).c_str()));
@@ -607,30 +575,24 @@ void InventoryWindow::mouseMoved(gcn::MouseEvent &event)
     }
 }
 
-void InventoryWindow::mouseExited(gcn::MouseEvent &event A_UNUSED)
+void InventoryWindow::mouseExited(MouseEvent &event A_UNUSED)
 {
     mTextPopup->hide();
 }
 
-void InventoryWindow::keyPressed(gcn::KeyEvent &event)
+void InventoryWindow::keyPressed(KeyEvent &event)
 {
-    if (static_cast<KeyEvent*>(&event)->getActionId()
-        == static_cast<int>(Input::KEY_GUI_MOD))
-    {
+    if (event.getActionId() == static_cast<int>(Input::KEY_GUI_MOD))
         mSplit = true;
-    }
 }
 
-void InventoryWindow::keyReleased(gcn::KeyEvent &event)
+void InventoryWindow::keyReleased(KeyEvent &event)
 {
-    if (static_cast<KeyEvent*>(&event)->getActionId()
-        == static_cast<int>(Input::KEY_GUI_MOD))
-    {
+    if (event.getActionId() == static_cast<int>(Input::KEY_GUI_MOD))
         mSplit = false;
-    }
 }
 
-void InventoryWindow::valueChanged(const gcn::SelectionEvent &event A_UNUSED)
+void InventoryWindow::valueChanged(const SelectionEvent &event A_UNUSED)
 {
     if (!mInventory || !mInventory->isMainInventory())
         return;
@@ -812,7 +774,7 @@ bool InventoryWindow::isAnyInputFocused()
     return false;
 }
 
-void InventoryWindow::widgetResized(const gcn::Event &event)
+void InventoryWindow::widgetResized(const Event &event)
 {
     Window::widgetResized(event);
 

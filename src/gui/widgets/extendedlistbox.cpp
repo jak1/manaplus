@@ -20,16 +20,18 @@
 
 #include "gui/widgets/extendedlistbox.h"
 
-#include "gui/widgets/extendedlistmodel.h"
+#include "gui/models/extendedlistmodel.h"
 
-#include <guichan/font.hpp>
-#include <guichan/graphics.hpp>
-#include <guichan/listmodel.hpp>
+#include "gui/font.h"
+
+#include "gui/models/listmodel.h"
+
+#include "render/graphics.h"
 
 #include "debug.h"
 
 ExtendedListBox::ExtendedListBox(const Widget2 *const widget,
-                                 gcn::ListModel *const listModel,
+                                 ListModel *const listModel,
                                  const std::string &skin,
                                  const int rowHeight) :
     ListBox(widget, listModel, skin),
@@ -47,7 +49,7 @@ ExtendedListBox::~ExtendedListBox()
 {
 }
 
-void ExtendedListBox::draw(gcn::Graphics *graphics)
+void ExtendedListBox::draw(Graphics *graphics)
 {
     if (!mListModel)
         return;
@@ -55,10 +57,9 @@ void ExtendedListBox::draw(gcn::Graphics *graphics)
     BLOCK_START("ExtendedListBox::draw")
     ExtendedListModel *const model = static_cast<ExtendedListModel* const>(
         mListModel);
-    Graphics *const g = static_cast<Graphics *const>(graphics);
 
     updateAlpha();
-    gcn::Font *const font = getFont();
+    Font *const font = getFont();
 
     const int height = mRowHeight;
     const int pad2 = 2 + mPadding;
@@ -133,7 +134,7 @@ void ExtendedListBox::draw(gcn::Graphics *graphics)
     {
         mHighlightColor.a = static_cast<int>(mAlpha * 255.0F);
         graphics->setColor(mHighlightColor);
-        graphics->fillRectangle(gcn::Rectangle(mPadding, minY + mPadding,
+        graphics->fillRectangle(Rect(mPadding, minY + mPadding,
             width - pad2, maxY - minY + height));
     }
 
@@ -146,13 +147,14 @@ void ExtendedListBox::draw(gcn::Graphics *graphics)
             const Image *const image = model->getImageAt(row1);
             if (image)
             {
-                g->drawImage2(image, mImagePadding, item.y + (height
-                    - image->getHeight()) / 2 + mPadding);
+                graphics->drawImage(image,
+                    mImagePadding,
+                    item.y + (height - image->getHeight()) / 2 + mPadding);
             }
         }
     }
 
-    g->setColorAll(mForegroundColor, mForegroundColor2);
+    graphics->setColorAll(mForegroundColor, mForegroundColor2);
 
     for (int f = 0; f < itemsSz; ++f)
     {
@@ -180,13 +182,14 @@ void ExtendedListBox::draw(gcn::Graphics *graphics)
             const Image *const image = model->getImageAt(row1);
             if (image)
             {
-                g->drawImage2(image, mImagePadding, item.y + (height
-                    - image->getHeight()) / 2 + mPadding);
+                graphics->drawImage(image,
+                    mImagePadding,
+                    item.y + (height - image->getHeight()) / 2 + mPadding);
             }
         }
     }
 
-    g->setColorAll(mForegroundSelectedColor, mForegroundSelectedColor2);
+    graphics->setColorAll(mForegroundSelectedColor, mForegroundSelectedColor2);
 
     for (int f = 0; f < selSz; ++f)
     {

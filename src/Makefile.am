@@ -25,30 +25,15 @@ else
 manaplus_SOURCES =
 endif
 
-if USE_INTERNALGUICHAN
-dyecmd_CXXFLAGS = -I$(srcdir)/guichan/include -DUSE_INTERNALGUICHAN
-dyecmd_SOURCES = guichan/actionevent.cpp \
-	      guichan/cliprectangle.cpp \
-	      guichan/color.cpp \
-	      guichan/event.cpp \
-	      guichan/exception.cpp \
-	      guichan/font.cpp \
-	      guichan/graphics.cpp \
-	      guichan/rectangle.cpp \
-	      guichan/widget.cpp \
-	      guichan/include/guichan/actionevent.hpp \
-	      guichan/include/guichan/cliprectangle.hpp \
-	      guichan/include/guichan/color.hpp \
-	      guichan/include/guichan/event.hpp \
-	      guichan/include/guichan/exception.hpp \
-	      guichan/include/guichan/font.hpp \
-	      guichan/include/guichan/graphics.hpp \
-	      guichan/include/guichan/rectangle.hpp \
-	      guichan/include/guichan/widget.hpp
-else
 dyecmd_CXXFLAGS =
-dyecmd_SOURCES =
-endif
+dyecmd_SOURCES = gui/cliprect.cpp \
+	      gui/color.cpp \
+	      gui/rect.cpp \
+	      events/actionevent.h \
+	      gui/cliprect.h \
+	      gui/color.h \
+	      events/event.h \
+	      gui/rect.h
 
 dyecmd_SOURCES += dyetool/dyemain.cpp \
 	      animatedsprite.cpp \
@@ -133,6 +118,8 @@ dyecmd_SOURCES += dyetool/dyemain.cpp \
 	      utils/timer.h \
 	      utils/xml.cpp \
 	      utils/xml.h \
+	      utils/xmlutils.cpp \
+	      utils/xmlutils.h \
 	      utils/translation/podict.cpp \
 	      utils/translation/podict.h
 
@@ -163,85 +150,63 @@ manaplus_CXXFLAGS += -DUSE_SDL2
 endif
 endif
 
-if USE_INTERNALGUICHAN
-manaplus_CXXFLAGS += -I$(srcdir)/guichan/include -DUSE_INTERNALGUICHAN
-manaplus_SOURCES += guichan/include/guichan/actionevent.hpp \
-	      guichan/include/guichan/actionlistener.hpp \
-	      guichan/include/guichan/basiccontainer.hpp \
-	      guichan/include/guichan/cliprectangle.hpp \
-	      guichan/include/guichan/color.hpp \
-	      guichan/include/guichan/deathlistener.hpp \
-	      guichan/include/guichan/event.hpp \
-	      guichan/include/guichan/exception.hpp \
-	      guichan/include/guichan/focushandler.hpp \
-	      guichan/include/guichan/focuslistener.hpp \
-	      guichan/include/guichan/font.hpp \
-	      guichan/include/guichan/graphics.hpp \
-	      guichan/include/guichan/gui.hpp \
-	      guichan/include/guichan/image.hpp \
-	      guichan/include/guichan/input.hpp \
-	      guichan/include/guichan/inputevent.hpp \
-	      guichan/include/guichan/key.hpp \
-	      guichan/include/guichan/keyevent.hpp \
-	      guichan/include/guichan/keyinput.hpp \
-	      guichan/include/guichan/keylistener.hpp \
-	      guichan/include/guichan/listmodel.hpp \
-	      guichan/include/guichan/mouseevent.hpp \
-	      guichan/include/guichan/mouseinput.hpp \
-	      guichan/include/guichan/mouselistener.hpp \
-	      guichan/include/guichan/rectangle.hpp \
-	      guichan/include/guichan/selectionevent.hpp \
-	      guichan/include/guichan/selectionlistener.hpp \
-	      guichan/include/guichan/sdl/sdlpixel.hpp \
-	      guichan/include/guichan/widget.hpp \
-	      guichan/include/guichan/widgetlistener.hpp \
-	      guichan/include/guichan/widgets/button.hpp \
-	      guichan/include/guichan/widgets/checkbox.hpp \
-	      guichan/include/guichan/widgets/container.hpp \
-	      guichan/include/guichan/widgets/label.hpp \
-	      guichan/include/guichan/widgets/listbox.hpp \
-	      guichan/include/guichan/widgets/radiobutton.hpp \
-	      guichan/include/guichan/widgets/scrollarea.hpp \
-	      guichan/include/guichan/widgets/slider.hpp \
-	      guichan/include/guichan/widgets/textbox.hpp \
-	      guichan/include/guichan/widgets/textfield.hpp \
-	      guichan/include/guichan/widgets/window.hpp
-
-manaplus_SOURCES += guichan/actionevent.cpp \
-	      guichan/basiccontainer.cpp \
-	      guichan/cliprectangle.cpp \
-	      guichan/color.cpp \
-	      guichan/event.cpp \
-	      guichan/exception.cpp \
-	      guichan/focushandler.cpp \
-	      guichan/font.cpp \
-	      guichan/graphics.cpp \
-	      guichan/gui.cpp \
-	      guichan/image.cpp \
-	      guichan/inputevent.cpp \
-	      guichan/key.cpp \
-	      guichan/keyevent.cpp \
-	      guichan/keyinput.cpp \
-	      guichan/mouseevent.cpp \
-	      guichan/mouseinput.cpp \
-	      guichan/rectangle.cpp \
-	      guichan/selectionevent.cpp \
-	      guichan/widget.cpp \
-	      guichan/widgets/button.cpp \
-	      guichan/widgets/checkbox.cpp \
-	      guichan/widgets/container.cpp \
-	      guichan/widgets/label.cpp \
-	      guichan/widgets/listbox.cpp \
-	      guichan/widgets/radiobutton.cpp \
-	      guichan/widgets/scrollarea.cpp \
-	      guichan/widgets/slider.cpp \
-	      guichan/widgets/textbox.cpp \
-	      guichan/widgets/textfield.cpp \
-	      guichan/widgets/window.cpp
-endif
+manaplus_SOURCES += events/actionevent.h \
+	      listeners/actionlistener.h \
+	      gui/base/basiccontainer.hpp \
+	      gui/cliprect.h \
+	      gui/color.h \
+	      listeners/deathlistener.h \
+	      events/event.h \
+	      listeners/focuslistener.h \
+	      render/graphics.h \
+	      gui/base/gui.hpp \
+	      events/inputguievent.h \
+	      input/key.h \
+	      events/keyevent.h \
+	      listeners/keylistener.h \
+	      gui/models/listmodel.h \
+	      gui/models/magicschoolmodel.h \
+	      events/mouseevent.h \
+	      listeners/mouselistener.h \
+	      gui/rect.h \
+	      events/selectionevent.h \
+	      listeners/selectionlistener.h \
+	      utils/sdlpixel.h \
+	      gui/widgets/widget.h \
+	      listeners/widgetlistener.h \
+	      gui/base/widgets/button.hpp \
+	      gui/base/widgets/checkbox.hpp \
+	      gui/base/widgets/container.hpp \
+	      gui/base/widgets/label.hpp \
+	      gui/base/widgets/listbox.hpp \
+	      gui/base/widgets/radiobutton.hpp \
+	      gui/base/widgets/scrollarea.hpp \
+	      gui/base/widgets/slider.hpp \
+	      gui/base/widgets/textbox.hpp \
+	      gui/base/widgets/textfield.hpp \
+	      gui/base/basiccontainer.cpp \
+	      gui/cliprect.cpp \
+	      gui/color.cpp \
+	      gui/base/gui.cpp \
+	      input/key.cpp \
+	      gui/rect.cpp \
+	      gui/widgets/widget.cpp \
+	      gui/base/widgets/button.cpp \
+	      gui/base/widgets/checkbox.cpp \
+	      gui/base/widgets/container.cpp \
+	      gui/base/widgets/label.cpp \
+	      gui/base/widgets/listbox.cpp \
+	      gui/base/widgets/radiobutton.cpp \
+	      gui/base/widgets/scrollarea.cpp \
+	      gui/base/widgets/slider.cpp \
+	      gui/base/widgets/textbox.cpp \
+	      gui/base/widgets/textfield.cpp
 
 manaplus_SOURCES += gui/widgets/avatarlistbox.cpp \
 	      gui/widgets/avatarlistbox.h \
+	      gui/models/avatarlistmodel.h \
+	      gui/models/beingslistmodel.h \
+	      gui/models/colorlistmodel.h \
 	      gui/widgets/tabs/battletab.cpp \
 	      gui/widgets/tabs/battletab.h \
 	      gui/widgets/browserbox.cpp \
@@ -259,8 +224,8 @@ manaplus_SOURCES += gui/widgets/avatarlistbox.cpp \
 	      gui/widgets/tabs/chattab.h \
 	      gui/widgets/checkbox.cpp \
 	      gui/widgets/checkbox.h \
-	      gui/widgets/colormodel.cpp \
-	      gui/widgets/colormodel.h \
+	      gui/models/colormodel.cpp \
+	      gui/models/colormodel.h \
 	      gui/widgets/colorpage.cpp \
 	      gui/widgets/colorpage.h \
 	      gui/widgets/container.cpp \
@@ -273,9 +238,13 @@ manaplus_SOURCES += gui/widgets/avatarlistbox.cpp \
 	      gui/widgets/emoteshortcutcontainer.h \
 	      gui/widgets/extendedlistbox.cpp \
 	      gui/widgets/extendedlistbox.h \
-	      gui/widgets/extendedlistmodel.h \
-	      gui/widgets/extendednamesmodel.cpp \
-	      gui/widgets/extendednamesmodel.h \
+	      gui/models/extendedlistmodel.h \
+	      gui/models/extendednamesmodel.cpp \
+	      gui/models/extendednamesmodel.h \
+	      gui/models/fontsmodel.h \
+	      gui/models/iconsmodel.h \
+	      gui/models/ignorechoiceslistmodel.h \
+	      gui/models/itemsmodel.h \
 	      gui/widgets/flowcontainer.cpp \
 	      gui/widgets/flowcontainer.h \
 	      gui/widgets/tabs/gmtab.cpp \
@@ -313,9 +282,11 @@ manaplus_SOURCES += gui/widgets/avatarlistbox.cpp \
 	      gui/widgets/linkhandler.h \
 	      gui/widgets/listbox.cpp \
 	      gui/widgets/listbox.h \
-	      gui/widgets/mouseevent.h \
-	      gui/widgets/namesmodel.cpp \
-	      gui/widgets/namesmodel.h \
+	      gui/models/namesmodel.cpp \
+	      gui/models/namesmodel.h \
+	      gui/models/playerrelationlistmodel.h \
+	      gui/models/questsmodel.h \
+	      gui/models/serverslistmodel.h \
 	      gui/widgets/passwordfield.cpp \
 	      gui/widgets/passwordfield.h \
 	      gui/widgets/playerbox.cpp \
@@ -342,8 +313,8 @@ manaplus_SOURCES += gui/widgets/avatarlistbox.cpp \
 	      gui/widgets/tabs/setuptabscroll.h \
 	      gui/widgets/setuptouchitem.cpp \
 	      gui/widgets/setuptouchitem.h \
-	      gui/widgets/shopitems.cpp \
-	      gui/widgets/shopitems.h \
+	      gui/models/shopitems.cpp \
+	      gui/models/shopitems.h \
 	      gui/widgets/shoplistbox.cpp \
 	      gui/widgets/shoplistbox.h \
 	      gui/widgets/shortcutcontainer.cpp \
@@ -352,8 +323,11 @@ manaplus_SOURCES += gui/widgets/avatarlistbox.cpp \
 	      gui/widgets/skilldata.h \
 	      gui/widgets/skillinfo.cpp \
 	      gui/widgets/skillinfo.h \
-	      gui/widgets/skillmodel.cpp \
-	      gui/widgets/skillmodel.h \
+	      gui/models/skillmodel.cpp \
+	      gui/models/skillmodel.h \
+	      gui/models/sortlistmodelbuy.h \
+	      gui/models/sortlistmodelinv.h \
+	      gui/models/soundsmodel.h \
 	      gui/widgets/slider.cpp \
 	      gui/widgets/slider.h \
 	      gui/widgets/sliderlist.cpp \
@@ -362,8 +336,16 @@ manaplus_SOURCES += gui/widgets/avatarlistbox.cpp \
 	      gui/widgets/tabs/tab.h \
 	      gui/widgets/tabbedarea.cpp \
 	      gui/widgets/tabbedarea.h \
-	      gui/widgets/tablemodel.cpp \
-	      gui/widgets/tablemodel.h \
+	      gui/models/tablemodel.cpp \
+	      gui/models/tablemodel.h \
+	      gui/models/targettypemodel.h \
+	      gui/models/touchactionmodel.cpp \
+	      gui/models/touchactionmodel.h \
+	      gui/models/typelistmodel.h \
+	      gui/models/updatetypemodel.h \
+	      gui/models/updatelistmodel.h \
+	      gui/models/worldlistmodel.h \
+	      gui/models/themesmodel.h \
 	      gui/widgets/tabstrip.cpp \
 	      gui/widgets/tabstrip.h \
 	      gui/widgets/textbox.cpp \
@@ -500,8 +482,8 @@ manaplus_SOURCES += gui/widgets/avatarlistbox.cpp \
 	      gui/widgets/tabs/setup_visual.cpp \
 	      gui/widgets/tabs/setup_visual.h \
 	      gui/setupactiondata.h \
-	      gui/sdlfont.cpp \
-	      gui/sdlfont.h \
+	      gui/font.cpp \
+	      gui/font.h \
 	      gui/windows/shopwindow.cpp \
 	      gui/windows/shopwindow.h \
 	      gui/windows/shortcutwindow.cpp \
@@ -642,6 +624,8 @@ manaplus_SOURCES += gui/widgets/avatarlistbox.cpp \
 	      resources/sdlmusic.h \
 	      resources/db/sounddb.cpp \
 	      resources/db/sounddb.h \
+	      resources/db/weaponsdb.cpp \
+	      resources/db/weaponsdb.h \
 	      resources/soundeffect.cpp \
 	      resources/soundeffect.h \
 	      resources/soundinfo.h \
@@ -706,6 +690,8 @@ manaplus_SOURCES += gui/widgets/avatarlistbox.cpp \
 	      utils/mutex.h \
 	      utils/xml.cpp \
 	      utils/xml.h \
+	      utils/xmlutils.cpp \
+	      utils/xmlutils.h \
 	      test/testlauncher.cpp \
 	      test/testlauncher.h \
 	      test/testmain.cpp \
@@ -716,7 +702,7 @@ manaplus_SOURCES += gui/widgets/avatarlistbox.cpp \
 	      being/actor.h \
 	      being/actorsprite.cpp \
 	      being/actorsprite.h \
-	      being/actorspritelistener.h \
+	      listeners/actorspritelistener.h \
 	      actormanager.cpp \
 	      actormanager.h \
 	      animatedsprite.cpp \
@@ -746,7 +732,7 @@ manaplus_SOURCES += gui/widgets/avatarlistbox.cpp \
 	      commands.h \
 	      being/compoundsprite.cpp \
 	      being/compoundsprite.h \
-	      configlistener.h \
+	      listeners/configlistener.h \
 	      configuration.cpp \
 	      configuration.h \
 	      debug.h \
@@ -754,8 +740,8 @@ manaplus_SOURCES += gui/widgets/avatarlistbox.cpp \
 	      defaults.h \
 	      depricatedevent.cpp \
 	      depricatedevent.h \
-	      depricatedlistener.cpp \
-	      depricatedlistener.h \
+	      listeners/depricatedlistener.cpp \
+	      listeners/depricatedlistener.h \
 	      dragdrop.h \
 	      dropshortcut.cpp \
 	      dropshortcut.h \
@@ -796,8 +782,7 @@ manaplus_SOURCES += gui/widgets/avatarlistbox.cpp \
 	      spellshortcut.h \
 	      textcommand.cpp \
 	      textcommand.h \
-	      input/inputevent.cpp \
-	      input/inputevent.h \
+	      events/inputevent.h \
 	      input/inputmanager.cpp \
 	      input/inputmanager.h \
 	      input/joystick.cpp \
@@ -806,9 +791,6 @@ manaplus_SOURCES += gui/widgets/avatarlistbox.cpp \
 	      input/keyboardconfig.h \
 	      input/keyboarddata.h \
 	      input/keydata.h \
-	      input/keyevent.cpp \
-	      input/keyevent.h \
-	      input/keyinput.cpp \
 	      input/keyinput.h \
 	      input/multitouchmanager.cpp \
 	      input/multitouchmanager.h \
@@ -829,8 +811,7 @@ manaplus_SOURCES += gui/widgets/avatarlistbox.cpp \
 	      render/mgl.h \
 	      render/mobileopenglgraphics.cpp \
 	      render/mobileopenglgraphics.h \
-	      mouseinput.cpp \
-	      mouseinput.h \
+	      input/mouseinput.h \
 	      navigationmanager.cpp \
 	      navigationmanager.h \
 	      render/normalopenglgraphics.cpp \
@@ -861,7 +842,7 @@ manaplus_SOURCES += gui/widgets/avatarlistbox.cpp \
 	      being/playerinfo.h \
 	      being/playerrelations.cpp \
 	      being/playerrelations.h \
-	      being/playerrelationslistener.h \
+	      listeners/playerrelationslistener.h \
 	      position.cpp \
 	      position.h \
 	      properties.h \
@@ -1058,6 +1039,7 @@ manaplus_SOURCES += \
 	      gui/widgets/browserbox_unittest.cc \
 	      utils/files_unittest.cc \
 	      utils/stringutils_unittest.cc \
+	      utils/xmlutils_unittest.cc \
 	      resources/dye_unittest.cc
 endif
 

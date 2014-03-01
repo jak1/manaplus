@@ -31,9 +31,8 @@
 #include "gui/popups/textpopup.h"
 
 #include "gui/windows/skilldialog.h"
-#ifdef MANASERV_SUPPORT
-#include "gui/specialswindow.h"
-#endif
+
+#include "gui/widgets/button.h"
 
 #include "utils/dtor.h"
 #include "utils/gettext.h"
@@ -44,9 +43,9 @@
 
 WindowMenu::WindowMenu(const Widget2 *const widget) :
     Container(widget),
-    gcn::ActionListener(),
-    gcn::SelectionListener(),
-    gcn::MouseListener(),
+    ActionListener(),
+    SelectionListener(),
+    MouseListener(),
     mSkin(Theme::instance() ? Theme::instance()->load("windowmenu.xml", "")
           : nullptr),
     mPadding(mSkin ? mSkin->getPadding() : 1),
@@ -109,15 +108,6 @@ WindowMenu::WindowMenu(const Widget2 *const widget) :
             _("Skills"), x, h, Input::KEY_WINDOW_SKILL);
     }
 
-#ifdef MANASERV_SUPPORT
-    if (Net::getNetworkType() == ServerInfo::MANASERV)
-    {
-        // TRANSLATORS: short button name for specials window.
-        addButton(N_("SPE"),
-            _("Specials"), x, h, Input::KEY_NO_VALUE);
-    }
-#endif
-
     // TRANSLATORS: short button name for social window.
     addButton(N_("SOC"),
     // TRANSLATORS: full button name
@@ -166,7 +156,7 @@ WindowMenu::WindowMenu(const Widget2 *const widget) :
 
     x += mPadding - mSpacing;
     if (mainGraphics)
-        setDimension(gcn::Rectangle(mainGraphics->mWidth - x, 0, x, h));
+        setDimension(Rect(mainGraphics->mWidth - x, 0, x, h));
 
     loadButtons();
 
@@ -213,7 +203,7 @@ WindowMenu::~WindowMenu()
     }
 }
 
-void WindowMenu::action(const gcn::ActionEvent &event)
+void WindowMenu::action(const ActionEvent &event)
 {
     const std::string &eventId = event.getId();
 
@@ -248,12 +238,12 @@ void WindowMenu::addButton(const char *const text,
         mButtonTexts.push_back(new ButtonText(description, key));
 }
 
-void WindowMenu::mousePressed(gcn::MouseEvent &event)
+void WindowMenu::mousePressed(MouseEvent &event)
 {
     if (!viewport)
         return;
 
-    if (!mSmallWindow && event.getButton() == gcn::MouseEvent::RIGHT)
+    if (!mSmallWindow && event.getButton() == MouseEvent::RIGHT)
     {
         Button *const btn = dynamic_cast<Button*>(event.getSource());
         if (!btn)
@@ -266,7 +256,7 @@ void WindowMenu::mousePressed(gcn::MouseEvent &event)
     }
 }
 
-void WindowMenu::mouseMoved(gcn::MouseEvent &event)
+void WindowMenu::mouseMoved(MouseEvent &event)
 {
     mHaveMouse = true;
 
@@ -291,7 +281,7 @@ void WindowMenu::mouseMoved(gcn::MouseEvent &event)
     const int x = event.getX();
     const int y = event.getY();
     const int key = btn->getTag();
-    const gcn::Rectangle &rect = mDimension;
+    const Rect &rect = mDimension;
     if (key != Input::KEY_NO_VALUE)
     {
         mTextPopup->show(x + rect.x, y + rect.y, btn->getDescription(),
@@ -305,7 +295,7 @@ void WindowMenu::mouseMoved(gcn::MouseEvent &event)
     }
 }
 
-void WindowMenu::mouseExited(gcn::MouseEvent& mouseEvent A_UNUSED)
+void WindowMenu::mouseExited(MouseEvent& mouseEvent A_UNUSED)
 {
     mHaveMouse = false;
     if (!mTextPopup)
@@ -348,7 +338,7 @@ void WindowMenu::updateButtons()
     }
     x += mPadding - mSpacing;
     if (mainGraphics)
-        setDimension(gcn::Rectangle(mainGraphics->mWidth - x, 0, x, h));
+        setDimension(Rect(mainGraphics->mWidth - x, 0, x, h));
 }
 
 void WindowMenu::loadButtons()
@@ -419,7 +409,7 @@ void WindowMenu::saveButtons() const
         config.deleteKey("windowmenu" + toString(f));
 }
 
-void WindowMenu::drawChildren(gcn::Graphics* graphics)
+void WindowMenu::drawChildren(Graphics* graphics)
 {
     if (mHaveMouse || !mAutoHide || (mAutoHide == 1
         && mainGraphics && (mSmallWindow || mainGraphics->mWidth > 800)))

@@ -24,66 +24,23 @@
 #define GUI_WINDOWS_SERVERDIALOG_H
 
 #include "gui/widgets/window.h"
-#include "gui/widgets/checkbox.h"
 
 #include "net/download.h"
 #include "net/serverinfo.h"
 
 #include "utils/mutex.h"
 
-#include <guichan/actionlistener.hpp>
-#include <guichan/keylistener.hpp>
-#include <guichan/listmodel.hpp>
-#include <guichan/selectionlistener.hpp>
+#include "listeners/actionlistener.h"
+#include "listeners/keylistener.h"
+#include "listeners/selectionlistener.h"
 
 #include <string>
-#include <vector>
 
 class Button;
+class CheckBox;
 class Label;
 class ListBox;
-class ServerDialog;
-
-/**
- * Server and Port List Model
- */
-class ServersListModel final : public gcn::ListModel
-{
-    public:
-        typedef std::pair<int, std::string> VersionString;
-
-        ServersListModel(ServerInfos *const servers,
-                         ServerDialog *const parent);
-
-        A_DELETE_COPY(ServersListModel)
-
-        /**
-         * Used to get number of line in the list
-         */
-        int getNumberOfElements() override final A_WARN_UNUSED;
-
-        /**
-         * Used to get an element from the list
-         */
-        std::string getElementAt(int elementIndex)
-                                 override final A_WARN_UNUSED;
-
-        /**
-         * Used to get the corresponding Server struct
-         */
-        const ServerInfo &getServer(const int elementIndex) const A_WARN_UNUSED
-        { return mServers->at(elementIndex); }
-
-        void setVersionString(const int index, const std::string &version);
-
-    private:
-        typedef std::vector<VersionString> VersionStrings;
-
-        ServerInfos *mServers;
-        VersionStrings mVersionStrings;
-        ServerDialog *mParent;
-};
-
+class ServersListModel;
 
 /**
  * The server choice dialog.
@@ -91,9 +48,9 @@ class ServersListModel final : public gcn::ListModel
  * \ingroup Interface
  */
 class ServerDialog final : public Window,
-                           public gcn::ActionListener,
-                           public gcn::KeyListener,
-                           public gcn::SelectionListener
+                           public ActionListener,
+                           public KeyListener,
+                           public SelectionListener
 {
     public:
         /**
@@ -115,16 +72,16 @@ class ServerDialog final : public Window,
         /**
          * Called when receiving actions from the widgets.
          */
-        void action(const gcn::ActionEvent &event) override final;
+        void action(const ActionEvent &event) override final;
 
-        void keyPressed(gcn::KeyEvent &keyEvent) override final;
+        void keyPressed(KeyEvent &keyEvent) override final;
 
         /**
          * Called when the selected value changed in the servers list box.
          */
-        void valueChanged(const gcn::SelectionEvent &event) override final;
+        void valueChanged(const SelectionEvent &event) override final;
 
-        void mouseClicked(gcn::MouseEvent &mouseEvent) override final;
+        void mouseClicked(MouseEvent &mouseEvent) override final;
 
         void logic() override final;
 

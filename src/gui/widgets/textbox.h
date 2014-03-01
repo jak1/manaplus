@@ -23,9 +23,7 @@
 #ifndef GUI_WIDGETS_TEXTBOX_H
 #define GUI_WIDGETS_TEXTBOX_H
 
-#include "gui/widgets/widget2.h"
-
-#include <guichan/widgets/textbox.hpp>
+#include "gui/base/widgets/textbox.hpp"
 
 #include "localconsts.h"
 
@@ -36,8 +34,7 @@
  *
  * \ingroup GUI
  */
-class TextBox final : public gcn::TextBox,
-                      public Widget2
+class TextBox final : public gcn::TextBox
 {
     public:
         /**
@@ -60,14 +57,14 @@ class TextBox final : public gcn::TextBox,
         int getMinWidth() const A_WARN_UNUSED
         { return mMinWidth; }
 
-        void keyPressed(gcn::KeyEvent& keyEvent) override final;
+        void keyPressed(KeyEvent& keyEvent) override final;
 
-        void draw(gcn::Graphics* graphics) override final;
+        void draw(Graphics* graphics) override final;
 
-        void setForegroundColor(const gcn::Color &color);
+        void setForegroundColor(const Color &color);
 
-        void setForegroundColorAll(const gcn::Color &color1,
-                                   const gcn::Color &color2);
+        void setForegroundColorAll(const Color &color1,
+                                   const Color &color2);
 
     private:
         int mMinWidth;

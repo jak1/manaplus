@@ -26,12 +26,13 @@
 
 #include "input/joystick.h"
 
+#include "gui/models/namesmodel.h"
+
 #include "gui/widgets/button.h"
 #include "gui/widgets/checkbox.h"
 #include "gui/widgets/dropdown.h"
 #include "gui/widgets/label.h"
 #include "gui/widgets/layouthelper.h"
-#include "gui/widgets/namesmodel.h"
 
 #include "utils/gettext.h"
 
@@ -93,7 +94,7 @@ Setup_Joystick::Setup_Joystick(const Widget2 *const widget) :
     place(0, 4, mCalibrateLabel);
     place(0, 5, mCalibrateButton);
 
-    setDimension(gcn::Rectangle(0, 0, 365, 75));
+    setDimension(Rect(0, 0, 365, 75));
 }
 
 Setup_Joystick::~Setup_Joystick()
@@ -102,9 +103,9 @@ Setup_Joystick::~Setup_Joystick()
     mNamesModel = nullptr;
 }
 
-void Setup_Joystick::action(const gcn::ActionEvent &event)
+void Setup_Joystick::action(const ActionEvent &event)
 {
-    const gcn::Widget *const source = event.getSource();
+    const Widget *const source = event.getSource();
     if (source == mJoystickEnabled)
     {
         setTempEnabled(mJoystickEnabled->isSelected());

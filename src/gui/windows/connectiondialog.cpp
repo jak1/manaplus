@@ -34,14 +34,14 @@
 ConnectionDialog::ConnectionDialog(const std::string &text,
                                    const State cancelState):
     Window("", false, nullptr, "connection.xml"),
-    gcn::ActionListener(),
+    ActionListener(),
     mCancelState(cancelState)
 {
     setTitleBarHeight(0);
     setMovable(false);
     setMinWidth(0);
 
-    ProgressIndicator *const progressIndicator = new ProgressIndicator;
+    ProgressIndicator *const progressIndicator = new ProgressIndicator(this);
     Label *const label = new Label(this, text);
     Button *const cancelButton = new Button(
         // TRANSLATORS: connection dialog button
@@ -60,13 +60,13 @@ void ConnectionDialog::postInit()
     setVisible(true);
 }
 
-void ConnectionDialog::action(const gcn::ActionEvent &)
+void ConnectionDialog::action(const ActionEvent &)
 {
     logger->log1("Cancel pressed");
     client->setState(mCancelState);
 }
 
-void ConnectionDialog::draw(gcn::Graphics *graphics)
+void ConnectionDialog::draw(Graphics *graphics)
 {
     BLOCK_START("ConnectionDialog::draw")
     // Don't draw the window background, only draw the children

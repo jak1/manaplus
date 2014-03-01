@@ -24,15 +24,16 @@
 
 #include "graphicsvertexes.h"
 
+#include "gui/gui.h"
+
 #include "debug.h"
 
 float ShortcutContainer::mAlpha = 1.0;
 
-ShortcutContainer::ShortcutContainer() :
-    gcn::Widget(),
-    Widget2(),
-    gcn::WidgetListener(),
-    gcn::MouseListener(),
+ShortcutContainer::ShortcutContainer(Widget2 *const widget) :
+    Widget(widget),
+    WidgetListener(),
+    MouseListener(),
     mBackgroundImg(nullptr),
     mMaxItems(0),
     mBoxWidth(1),
@@ -53,14 +54,14 @@ ShortcutContainer::~ShortcutContainer()
     mVertexes = nullptr;
 }
 
-void ShortcutContainer::widgetResized(const gcn::Event &event A_UNUSED)
+void ShortcutContainer::widgetResized(const Event &event A_UNUSED)
 {
     mGridWidth = mDimension.width / mBoxWidth;
 
     if (mGridWidth < 1)
         mGridWidth = 1;
 
-    mGridHeight = mMaxItems / mGridWidth;
+    mGridHeight = mMaxItems / static_cast<unsigned int>(mGridWidth);
 
     if (mMaxItems % mGridWidth != 0 || mGridHeight < 1)
         ++mGridHeight;
@@ -72,7 +73,7 @@ void ShortcutContainer::widgetResized(const gcn::Event &event A_UNUSED)
 int ShortcutContainer::getIndexFromGrid(const int pointX,
                                         const int pointY) const
 {
-    const gcn::Rectangle tRect = gcn::Rectangle(0, 0,
+    const Rect tRect = Rect(0, 0,
         mGridWidth * mBoxWidth, mGridHeight * mBoxHeight);
 
     int index = ((pointY / mBoxHeight) * mGridWidth) + pointX / mBoxWidth;
@@ -109,14 +110,14 @@ void ShortcutContainer::drawBackground(Graphics *g)
         {
             for (unsigned i = 0; i < mMaxItems; i ++)
             {
-                g->drawImage2(mBackgroundImg, (i % mGridWidth) * mBoxWidth,
+                g->drawImage(mBackgroundImg, (i % mGridWidth) * mBoxWidth,
                     (i / mGridWidth) * mBoxHeight);
             }
         }
     }
 }
 
-void ShortcutContainer::widgetMoved(const gcn::Event& event A_UNUSED)
+void ShortcutContainer::widgetMoved(const Event& event A_UNUSED)
 {
     mRedraw = true;
 }

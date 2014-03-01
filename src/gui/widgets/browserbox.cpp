@@ -25,8 +25,8 @@
 
 #include "input/inputmanager.h"
 
+#include "gui/font.h"
 #include "gui/gui.h"
-#include "gui/sdlfont.h"
 
 #include "gui/widgets/linkhandler.h"
 
@@ -37,9 +37,9 @@
 #include "utils/stringutils.h"
 #include "utils/timer.h"
 
-#include <guichan/graphics.hpp>
-#include <guichan/font.hpp>
-#include <guichan/cliprectangle.hpp>
+#include "gui/cliprect.h"
+
+#include "render/graphics.h"
 
 #include <algorithm>
 
@@ -52,9 +52,8 @@ BrowserBox::BrowserBox(const Widget2 *const widget,
                        const unsigned int mode,
                        const bool opaque,
                        const std::string &skin) :
-    gcn::Widget(),
-    Widget2(widget),
-    gcn::MouseListener(),
+    Widget(widget),
+    MouseListener(),
     mTextRows(),
     mTextRowLinksCount(),
     mLineParts(),
@@ -174,7 +173,7 @@ void BrowserBox::addRow(const std::string &row, const bool atTop)
     std::string tmp = row;
     std::string newRow;
     size_t idx1;
-    const gcn::Font *const font = getFont();
+    const Font *const font = getFont();
     int linksCount = 0;
 
     if (getWidth() < 0)
@@ -422,7 +421,7 @@ struct MouseOverLink
     int mX, mY;
 };
 
-void BrowserBox::mousePressed(gcn::MouseEvent &event)
+void BrowserBox::mousePressed(MouseEvent &event)
 {
     if (!mLinkHandler)
         return;
@@ -437,7 +436,7 @@ void BrowserBox::mousePressed(gcn::MouseEvent &event)
     }
 }
 
-void BrowserBox::mouseMoved(gcn::MouseEvent &event)
+void BrowserBox::mouseMoved(MouseEvent &event)
 {
     const LinkIterator i = std::find_if(mLinks.begin(), mLinks.end(),
         MouseOverLink(event.getX(), event.getY()));
@@ -446,13 +445,14 @@ void BrowserBox::mouseMoved(gcn::MouseEvent &event)
         ? static_cast<int>(i - mLinks.begin()) : -1;
 }
 
-void BrowserBox::draw(gcn::Graphics *graphics)
+void BrowserBox::draw(Graphics *graphics)
 {
     BLOCK_START("BrowserBox::draw")
-    const gcn::ClipRectangle &cr = graphics->getCurrentClipArea();
-    Graphics *const graphics2 = static_cast<Graphics *const>(graphics);
-    mYStart = cr.y - cr.yOffset;
-    const int yEnd = mYStart + cr.height;
+    const ClipRect *const cr = graphics->getCurrentClipArea();
+    if (!cr)
+        return;
+    mYStart = cr->y - cr->yOffset;
+    const int yEnd = mYStart + cr->height;
     if (mYStart < 0)
         mYStart = 0;
 
@@ -462,7 +462,7 @@ void BrowserBox::draw(gcn::Graphics *graphics)
     if (mOpaque)
     {
         graphics->setColor(mBackgroundColor);
-        graphics->fillRectangle(gcn::Rectangle(0, 0, getWidth(), getHeight()));
+        graphics->fillRectangle(Rect(0, 0, getWidth(), getHeight()));
     }
 
     if (mSelectedLink >= 0 && mSelectedLink
@@ -471,7 +471,7 @@ void BrowserBox::draw(gcn::Graphics *graphics)
         if ((mHighMode & BACKGROUND))
         {
             graphics->setColor(mHighlightColor);
-            graphics->fillRectangle(gcn::Rectangle(
+            graphics->fillRectangle(Rect(
                 mLinks[mSelectedLink].x1,
                 mLinks[mSelectedLink].y1,
                 mLinks[mSelectedLink].x2 - mLinks[mSelectedLink].x1,
@@ -489,7 +489,7 @@ void BrowserBox::draw(gcn::Graphics *graphics)
         }
     }
 
-    gcn::Font *const font = getFont();
+    Font *const font = getFont();
 
     FOR_EACH (LinePartCIter, i, mLineParts)
     {
@@ -500,7 +500,7 @@ void BrowserBox::draw(gcn::Graphics *graphics)
             break;
         if (!part.mType)
         {
-            graphics2->setColorAll(part.mColor, part.mColor2);
+            graphics->setColorAll(part.mColor, part.mColor2);
             if (part.mBold)
                 boldFont->drawString(graphics, part.mText, part.mX, part.mY);
             else
@@ -508,7 +508,7 @@ void BrowserBox::draw(gcn::Graphics *graphics)
         }
         else if (part.mImage)
         {
-            graphics2->drawImage2(part.mImage, part.mX, part.mY);
+            graphics->drawImage(part.mImage, part.mX, part.mY);
         }
     }
 
@@ -528,14 +528,14 @@ int BrowserBox::calcHeight()
     if (maxWidth < 0)
         return 1;
 
-    const gcn::Font *const font = getFont();
+    const Font *const font = getFont();
     const int fontHeight = font->getHeight() + 2 * mItemPadding;
     const int fontWidthMinus = font->getWidth("-");
     const char *const hyphen = "~";
     const int hyphenWidth = font->getWidth(hyphen);
 
-    gcn::Color selColor[2] = {mForegroundColor, mForegroundColor2};
-    const gcn::Color textColor[2] = {mForegroundColor, mForegroundColor2};
+    Color selColor[2] = {mForegroundColor, mForegroundColor2};
+    const Color textColor[2] = {mForegroundColor, mForegroundColor2};
     ResourceManager *const resman = ResourceManager::getInstance();
 
     mLineParts.clear();
@@ -581,7 +581,7 @@ int BrowserBox::calcHeight()
             continue;
         }
 
-        gcn::Color prevColor[2];
+        Color prevColor[2];
         prevColor[0] = selColor[0];
         prevColor[1] = selColor[1];
         bold = false;
@@ -621,7 +621,7 @@ int BrowserBox::calcHeight()
                     const signed char c = row.at(start + 2);
 
                     bool valid(false);
-                    const gcn::Color col[2] =
+                    const Color col[2] =
                     {
                         getThemeCharColor(c, valid),
                         getThemeCharColor(c | 0x80, valid)
@@ -897,8 +897,8 @@ std::string BrowserBox::getTextAtPos(const int x, const int y) const
     return str;
 }
 
-void BrowserBox::setForegroundColorAll(const gcn::Color &color1,
-                                       const gcn::Color &color2)
+void BrowserBox::setForegroundColorAll(const Color &color1,
+                                       const Color &color2)
 {
     mForegroundColor = color1;
     mForegroundColor2 = color2;

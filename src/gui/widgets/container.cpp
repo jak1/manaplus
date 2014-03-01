@@ -22,11 +22,12 @@
 
 #include "gui/widgets/container.h"
 
+#include "gui/gui.h"
+
 #include "debug.h"
 
 Container::Container(const Widget2 *const widget) :
-    gcn::Container(),
-    Widget2(widget)
+    gcn::Container(widget)
 {
     setOpaque(false);
 }
@@ -44,7 +45,7 @@ void Container::removeControls()
         delete mWidgets.front();
 }
 
-bool Container::safeRemove(gcn::Widget *const widget)
+bool Container::safeRemove(Widget *const widget)
 {
     for (WidgetListConstIterator iter = mWidgets.begin();
          iter != mWidgets.end(); ++iter)

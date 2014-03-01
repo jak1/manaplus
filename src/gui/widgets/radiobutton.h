@@ -23,9 +23,7 @@
 #ifndef GUI_WIDGETS_RADIOBUTTON_H
 #define GUI_WIDGETS_RADIOBUTTON_H
 
-#include "gui/widgets/widget2.h"
-
-#include <guichan/widgets/radiobutton.hpp>
+#include "gui/base/widgets/radiobutton.hpp"
 
 #include "localconsts.h"
 
@@ -34,8 +32,7 @@ class Skin;
 /**
  * Guichan based RadioButton with custom look
  */
-class RadioButton final : public gcn::RadioButton,
-                          public Widget2
+class RadioButton final : public gcn::RadioButton
 {
     public:
         /**
@@ -56,25 +53,25 @@ class RadioButton final : public gcn::RadioButton,
         /**
          * Draws the radiobutton, not the caption.
          */
-        void drawBox(gcn::Graphics* graphics) override final;
+        void drawBox(Graphics* graphics) override final;
 
         /**
          * Implementation of the draw methods.
          * Thus, avoiding the rhomb around the radio button.
          */
-        void draw(gcn::Graphics* graphics) override final;
+        void draw(Graphics* graphics) override final;
 
         /**
          * Called when the mouse enteres the widget area.
          */
-        void mouseEntered(gcn::MouseEvent& event) override final;
+        void mouseEntered(MouseEvent& event) override final;
 
         /**
          * Called when the mouse leaves the widget area.
          */
-        void mouseExited(gcn::MouseEvent& event) override final;
+        void mouseExited(MouseEvent& event) override final;
 
-        void keyPressed(gcn::KeyEvent& keyEvent) override final;
+        void keyPressed(KeyEvent& keyEvent) override final;
 
         void updateAlpha();
 

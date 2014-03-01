@@ -29,6 +29,7 @@
 #include "resources/iteminfo.h"
 
 class Icon;
+class Item;
 class Label;
 class TextBox;
 
@@ -60,7 +61,7 @@ class ItemPopup final : public Popup
 
         void setItem(const Item *const item, const bool showImage = false);
 
-        void mouseMoved(gcn::MouseEvent &mouseEvent) override final;
+        void mouseMoved(MouseEvent &mouseEvent) override final;
 
     private:
         Label *mItemName;

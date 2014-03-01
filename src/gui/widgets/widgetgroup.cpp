@@ -23,11 +23,12 @@
 #include "debug.h"
 
 WidgetGroup::WidgetGroup(const Widget2 *const widget,
-                         const std::string &group, const int height,
+                         const std::string &group,
+                         const int height,
                          const int spacing) :
     Container(widget),
-    gcn::WidgetListener(),
-    gcn::ActionListener(),
+    WidgetListener(),
+    ActionListener(),
     mSpacing(spacing),
     mCount(0),
     mGroup(group),
@@ -57,7 +58,7 @@ void WidgetGroup::addButton(const std::string &restrict text,
     }
 }
 
-void WidgetGroup::action(const gcn::ActionEvent &event)
+void WidgetGroup::action(const ActionEvent &event)
 {
     for (ActionListenerIterator iter = mActionListeners.begin();
          iter != mActionListeners.end(); ++iter)
@@ -66,7 +67,7 @@ void WidgetGroup::action(const gcn::ActionEvent &event)
     }
 }
 
-void WidgetGroup::add(gcn::Widget *const widget, const int spacing)
+void WidgetGroup::add(Widget *const widget, const int spacing)
 {
     if (!widget)
         return;
@@ -84,6 +85,6 @@ void WidgetGroup::clear()
     mCount = 0;
 }
 
-void WidgetGroup::widgetResized(const gcn::Event &event A_UNUSED)
+void WidgetGroup::widgetResized(const Event &event A_UNUSED)
 {
 }

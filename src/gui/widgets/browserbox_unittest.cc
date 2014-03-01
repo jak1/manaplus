@@ -22,7 +22,7 @@
 
 #include "client.h"
 
-#include "gui/sdlfont.h"
+#include "gui/font.h"
 #include "gui/theme.h"
 
 #include "gui/widgets/browserbox.h"
@@ -51,7 +51,7 @@ TEST(browserbox, test1)
     logger = new Logger();
     imageHelper = new SDLImageHelper();
     Theme *theme = Theme::instance();
-    gcn::Widget::setGlobalFont(new SDLFont("/usr/share/fonts/truetype/"
+    Widget::setGlobalFont(new Font("/usr/share/fonts/truetype/"
         "ttf-dejavu/DejaVuSans-Oblique.ttf", 18));
     BrowserBox *box = new BrowserBox(nullptr, BrowserBox::AUTO_WRAP, true, "");
     box->setWidth(100);

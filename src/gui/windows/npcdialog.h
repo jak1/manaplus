@@ -23,14 +23,15 @@
 #ifndef GUI_WINDOWS_NPCDIALOG_H
 #define GUI_WINDOWS_NPCDIALOG_H
 
-#include "configlistener.h"
+#include "listeners/configlistener.h"
 
-#include "gui/widgets/extendedlistmodel.h"
+#include "gui/models/extendedlistmodel.h"
+
 #include "gui/widgets/window.h"
 
 #include "utils/stringvector.h"
 
-#include <guichan/actionlistener.hpp>
+#include "listeners/actionlistener.h"
 
 #include <list>
 
@@ -45,7 +46,6 @@ class ItemContainer;
 class NpcDialog;
 class PlayerBox;
 class ScrollArea;
-class TextBox;
 class TextField;
 
 typedef std::map<int, NpcDialog*> NpcDialogs;
@@ -56,7 +56,7 @@ typedef std::map<int, NpcDialog*> NpcDialogs;
  * \ingroup Interface
  */
 class NpcDialog final : public Window,
-                        public gcn::ActionListener,
+                        public ActionListener,
                         public ExtendedListModel,
                         public ConfigListener
 {
@@ -77,7 +77,7 @@ class NpcDialog final : public Window,
         /**
          * Called when receiving actions from the widgets.
          */
-        void action(const gcn::ActionEvent &event) override final;
+        void action(const ActionEvent &event) override final;
 
         /**
         * Sets the text shows in the dialog.
@@ -210,7 +210,7 @@ class NpcDialog final : public Window,
 
         void clearRows();
 
-        void mousePressed(gcn::MouseEvent &event);
+        void mousePressed(MouseEvent &event);
 
         int isCloseState() const
         { return mActionState == NPC_ACTION_CLOSE; }

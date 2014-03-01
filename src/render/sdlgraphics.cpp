@@ -31,7 +31,9 @@
 
 #include "utils/sdlcheckutils.h"
 
-#include <guichan/sdl/sdlpixel.hpp>
+#include "utils/sdlpixel.h"
+
+#include "resources/image.h"
 
 #include "debug.h"
 
@@ -74,7 +76,7 @@ bool SDLGraphics::drawRescaledImage(const Image *const image,
     if (!tmpImage->mSDLSurface)
         return false;
 
-    const gcn::ClipRectangle &top = mClipStack.top();
+    const ClipRect &top = mClipStack.top();
     const SDL_Rect &bounds = image->mBounds;
 
     SDL_Rect srcRect =
@@ -101,8 +103,8 @@ bool SDLGraphics::drawRescaledImage(const Image *const image,
     return returnValue;
 }
 
-bool SDLGraphics::drawImage2(const Image *const image,
-                             int dstX, int dstY)
+bool SDLGraphics::drawImage(const Image *const image,
+                            int dstX, int dstY)
 {
     return drawImageInline(image, dstX, dstY);
 }
@@ -110,12 +112,12 @@ bool SDLGraphics::drawImage2(const Image *const image,
 bool SDLGraphics::drawImageInline(const Image *const image,
                                   int dstX, int dstY)
 {
-    FUNC_BLOCK("Graphics::drawImage2", 1)
+    FUNC_BLOCK("Graphics::drawImage", 1)
     // Check that preconditions for blitting are met.
     if (!mWindow || !image || !image->mSDLSurface)
         return false;
 
-    const gcn::ClipRectangle &top = mClipStack.top();
+    const ClipRect &top = mClipStack.top();
     const SDL_Rect &bounds = image->mBounds;
 
     SDL_Surface *const src = image->mSDLSurface;
@@ -203,7 +205,7 @@ void SDLGraphics::drawImageCached(const Image *const image,
     if (!mWindow || !image || !image->mSDLSurface)
         return;
 
-    const gcn::ClipRectangle &top = mClipStack.top();
+    const ClipRect &top = mClipStack.top();
     const SDL_Rect &bounds = image->mBounds;
 
     SDL_Surface *const src = image->mSDLSurface;
@@ -299,7 +301,7 @@ void SDLGraphics::drawPatternCached(const Image *const image,
     if (iw == 0 || ih == 0)
         return;
 
-    const gcn::ClipRectangle &top = mClipStack.top();
+    const ClipRect &top = mClipStack.top();
     const int xOffset = top.xOffset + x;
     const int yOffset = top.yOffset + y;
     const int srcX = bounds.x;
@@ -420,7 +422,7 @@ void SDLGraphics::drawPatternInline(const Image *const image,
     if (iw == 0 || ih == 0)
         return;
 
-    const gcn::ClipRectangle &top = mClipStack.top();
+    const ClipRect &top = mClipStack.top();
     const int xOffset = top.xOffset + x;
     const int yOffset = top.yOffset + y;
     const int srcX = bounds.x;
@@ -539,7 +541,7 @@ void SDLGraphics::drawRescaledPattern(const Image *const image,
     if (iw == 0 || ih == 0)
         return;
 
-    const gcn::ClipRectangle &top = mClipStack.top();
+    const ClipRect &top = mClipStack.top();
     const int xOffset = top.xOffset + x;
     const int yOffset = top.yOffset + y;
     const int srcX = bounds.x;
@@ -602,7 +604,7 @@ void SDLGraphics::calcPatternInline(ImageVertexes* const vert,
     if (iw == 0 || ih == 0)
         return;
 
-    const gcn::ClipRectangle &top = mClipStack.top();
+    const ClipRect &top = mClipStack.top();
     const int xOffset = top.xOffset + x;
     const int yOffset = top.yOffset + y;
     const int srcX = bounds.x;
@@ -686,7 +688,7 @@ void SDLGraphics::calcTileSDL(ImageVertexes *const vert, int x, int y) const
         return;
 
     const Image *const image = vert->image;
-    const gcn::ClipRectangle &top = mClipStack.top();
+    const ClipRect &top = mClipStack.top();
     const SDL_Rect &bounds = image->mBounds;
 
     DoubleRect *rect = new DoubleRect();
@@ -912,15 +914,15 @@ int SDLGraphics::SDL_FakeUpperBlit(const SDL_Surface *const src,
     return 0;
 }
 
-void SDLGraphics::fillRectangle(const gcn::Rectangle& rectangle)
+void SDLGraphics::fillRectangle(const Rect& rectangle)
 {
     FUNC_BLOCK("Graphics::fillRectangle", 1)
     if (mClipStack.empty())
         return;
 
-    const gcn::ClipRectangle& top = mClipStack.top();
+    const ClipRect& top = mClipStack.top();
 
-    gcn::Rectangle area = rectangle;
+    Rect area = rectangle;
     area.x += top.xOffset;
     area.y += top.yOffset;
 
@@ -963,7 +965,7 @@ void SDLGraphics::fillRectangle(const gcn::Rectangle& rectangle)
                     for (x = x1; x < x2; x++)
                     {
                         uint8_t *const p = p0 + x * 2;
-                        *reinterpret_cast<uint16_t *>(p) = gcn::SDLAlpha16(
+                        *reinterpret_cast<uint16_t *>(p) = SDLAlpha16(
                             static_cast<uint16_t>(pixel),
                             *reinterpret_cast<uint16_t *>(p),
                             static_cast<uint8_t>(mColor.a), mWindow->format);
@@ -1112,7 +1114,7 @@ void SDLGraphics::fillRectangle(const gcn::Rectangle& rectangle)
 
 void SDLGraphics::_beginDraw()
 {
-    pushClipArea(gcn::Rectangle(0, 0, mRect.w, mRect.h));
+    pushClipArea(Rect(0, 0, mRect.w, mRect.h));
 }
 
 void SDLGraphics::_endDraw()
@@ -1120,10 +1122,10 @@ void SDLGraphics::_endDraw()
     popClipArea();
 }
 
-bool SDLGraphics::pushClipArea(gcn::Rectangle area)
+bool SDLGraphics::pushClipArea(Rect area)
 {
-    const bool result = gcn::Graphics::pushClipArea(area);
-    const gcn::ClipRectangle &carea = mClipStack.top();
+    const bool result = Graphics::pushClipArea(area);
+    const ClipRect &carea = mClipStack.top();
     const SDL_Rect rect =
     {
         static_cast<int16_t>(carea.x),
@@ -1138,12 +1140,12 @@ bool SDLGraphics::pushClipArea(gcn::Rectangle area)
 
 void SDLGraphics::popClipArea()
 {
-    gcn::Graphics::popClipArea();
+    Graphics::popClipArea();
 
     if (mClipStack.empty())
         return;
 
-    const gcn::ClipRectangle &carea = mClipStack.top();
+    const ClipRect &carea = mClipStack.top();
     const SDL_Rect rect =
     {
         static_cast<int16_t>(carea.x),
@@ -1160,7 +1162,7 @@ void SDLGraphics::drawPoint(int x, int y)
     if (mClipStack.empty())
         return;
 
-    const gcn::ClipRectangle& top = mClipStack.top();
+    const ClipRect& top = mClipStack.top();
 
     x += top.xOffset;
     y += top.yOffset;
@@ -1179,7 +1181,7 @@ void SDLGraphics::drawHLine(int x1, int y, int x2)
     if (mClipStack.empty())
         return;
 
-    const gcn::ClipRectangle& top = mClipStack.top();
+    const ClipRect& top = mClipStack.top();
 
     const int xOffset = top.xOffset;
     x1 += xOffset;
@@ -1305,7 +1307,7 @@ void SDLGraphics::drawVLine(int x, int y1, int y2)
     if (mClipStack.empty())
         return;
 
-    const gcn::ClipRectangle& top = mClipStack.top();
+    const ClipRect& top = mClipStack.top();
 
     const int yOffset = top.yOffset;
     x += top.xOffset;
@@ -1435,7 +1437,7 @@ void SDLGraphics::drawVLine(int x, int y1, int y2)
     SDL_UnlockSurface(mWindow);
 }
 
-void SDLGraphics::drawRectangle(const gcn::Rectangle &rectangle)
+void SDLGraphics::drawRectangle(const Rect &rectangle)
 {
     const int x1 = rectangle.x;
     const int x2 = x1 + rectangle.width - 1;

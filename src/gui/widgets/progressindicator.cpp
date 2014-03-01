@@ -23,14 +23,15 @@
 
 #include "simpleanimation.h"
 
+#include "gui/gui.h"
+
 #include "resources/animation.h"
 #include "resources/imageset.h"
 
 #include "debug.h"
 
-ProgressIndicator::ProgressIndicator() :
-    gcn::Widget(),
-    Widget2(),
+ProgressIndicator::ProgressIndicator(Widget2 *const widget) :
+    Widget(widget),
     mIndicator(nullptr)
 {
     ImageSet *const images = Theme::getImageSetFromTheme(
@@ -65,7 +66,7 @@ void ProgressIndicator::logic()
     BLOCK_END("ProgressIndicator::logic")
 }
 
-void ProgressIndicator::draw(gcn::Graphics *graphics)
+void ProgressIndicator::draw(Graphics *graphics)
 {
     BLOCK_START("ProgressIndicator::draw")
     if (mIndicator)
@@ -73,7 +74,7 @@ void ProgressIndicator::draw(gcn::Graphics *graphics)
         // Draw the indicator centered on the widget
         const int x = (mDimension.width - 32) / 2;
         const int y = (mDimension.height - 32) / 2;
-        mIndicator->draw(static_cast<Graphics*>(graphics), x, y);
+        mIndicator->draw(graphics, x, y);
     }
     BLOCK_END("ProgressIndicator::draw")
 }

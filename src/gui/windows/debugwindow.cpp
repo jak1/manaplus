@@ -75,7 +75,7 @@ DebugWindow::DebugWindow() :
     // TRANSLATORS: debug window tab
     mTabs->addTab(std::string(_("Net")), mNetWidget);
 
-    mTabs->setDimension(gcn::Rectangle(0, 0, 600, 300));
+    mTabs->setDimension(Rect(0, 0, 600, 300));
 
     const int w = mDimension.width;
     const int h = mDimension.height;
@@ -129,7 +129,7 @@ void DebugWindow::slowLogic()
     BLOCK_END("DebugWindow::slowLogic")
 }
 
-void DebugWindow::draw(gcn::Graphics *g)
+void DebugWindow::draw(Graphics *g)
 {
     BLOCK_START("DebugWindow::draw")
     Window::draw(g);
@@ -139,8 +139,7 @@ void DebugWindow::draw(gcn::Graphics *g)
         const Being *const target = player_node->getTarget();
         if (target)
         {
-            Graphics *const g2 = static_cast<Graphics*>(g);
-            target->draw(g2, -target->getPixelX() + mapTileSize / 2
+            target->draw(g, -target->getPixelX() + mapTileSize / 2
                 + mDimension.width / 2, -target->getPixelY() + mapTileSize
                 + mDimension.height / 2);
         }
@@ -148,11 +147,11 @@ void DebugWindow::draw(gcn::Graphics *g)
     BLOCK_END("DebugWindow::draw")
 }
 
-void DebugWindow::widgetResized(const gcn::Event &event)
+void DebugWindow::widgetResized(const Event &event)
 {
     Window::widgetResized(event);
 
-    mTabs->setDimension(gcn::Rectangle(0, 0,
+    mTabs->setDimension(Rect(0, 0,
         mDimension.width, mDimension.height));
 }
 
@@ -268,7 +267,7 @@ MapDebugTab::MapDebugTab(const Widget2 *const widget) :
 #endif
     place.getCell().matchColWidth(0, 0);
     place = h.getPlacer(0, 1);
-    setDimension(gcn::Rectangle(0, 0, 600, 300));
+    setDimension(Rect(0, 0, 600, 300));
 }
 
 void MapDebugTab::logic()
@@ -413,7 +412,7 @@ TargetDebugTab::TargetDebugTab(const Widget2 *const widget) :
 
     place.getCell().matchColWidth(0, 0);
     place = h.getPlacer(0, 1);
-    setDimension(gcn::Rectangle(0, 0, 600, 300));
+    setDimension(Rect(0, 0, 600, 300));
 }
 
 void TargetDebugTab::logic()
@@ -532,7 +531,7 @@ NetDebugTab::NetDebugTab(const Widget2 *const widget) :
 
     place.getCell().matchColWidth(0, 0);
     place = h.getPlacer(0, 1);
-    setDimension(gcn::Rectangle(0, 0, 600, 300));
+    setDimension(Rect(0, 0, 600, 300));
 }
 
 void NetDebugTab::logic()

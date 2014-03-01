@@ -24,13 +24,16 @@
 
 #include "client.h"
 
+#include "events/keyevent.h"
+
 #include "input/keydata.h"
-#include "input/keyevent.h"
 
 #include "gui/widgets/button.h"
 #include "gui/widgets/layout.h"
 #include "gui/widgets/listbox.h"
 #include "gui/widgets/scrollarea.h"
+
+#include "gui/models/worldlistmodel.h"
 
 #include "net/loginhandler.h"
 #include "net/net.h"
@@ -41,49 +44,11 @@
 
 extern WorldInfo **server_info;
 
-/**
- * The list model for the server list.
- */
-class WorldListModel final : public gcn::ListModel
-{
-    public:
-        explicit WorldListModel(Worlds worlds) :
-            mWorlds(worlds)
-        {
-        }
-
-        A_DELETE_COPY(WorldListModel)
-
-        ~WorldListModel()
-        { }
-
-        int getNumberOfElements() override final
-        {
-            return static_cast<int>(mWorlds.size());
-        }
-
-        std::string getElementAt(int i) override final
-        {
-            const WorldInfo *const si = mWorlds[i];
-            if (si)
-            {
-                return std::string(si->name).append(" (").append(
-                    toString(si->online_users)).append(")");
-            }
-            else
-            {
-                return "???";
-            }
-        }
-    private:
-        Worlds mWorlds;
-};
-
 WorldSelectDialog::WorldSelectDialog(Worlds worlds):
     // TRANSLATORS: world select dialog name
     Window(_("Select World"), false, nullptr, "world.xml"),
-    gcn::ActionListener(),
-    gcn::KeyListener(),
+    ActionListener(),
+    KeyListener(),
     mWorldListModel(new WorldListModel(worlds)),
     mWorldList(new ListBox(this, mWorldListModel, "")),
     // TRANSLATORS: world dialog button
@@ -92,7 +57,7 @@ WorldSelectDialog::WorldSelectDialog(Worlds worlds):
     mChooseWorld(new Button(this, _("Choose World"), "world", this))
 {
     mWorldList->postInit();
-    ScrollArea *const worldsScroll = new ScrollArea(mWorldList,
+    ScrollArea *const worldsScroll = new ScrollArea(this, mWorldList,
         getOptionBool("showbackground"), "world_background.xml");
 
     worldsScroll->setHorizontalScrollPolicy(gcn::ScrollArea::SHOW_NEVER);
@@ -134,7 +99,7 @@ WorldSelectDialog::~WorldSelectDialog()
     mWorldListModel = nullptr;
 }
 
-void WorldSelectDialog::action(const gcn::ActionEvent &event)
+void WorldSelectDialog::action(const ActionEvent &event)
 {
     const std::string &eventId = event.getId();
     if (eventId == "world")
@@ -153,19 +118,18 @@ void WorldSelectDialog::action(const gcn::ActionEvent &event)
     }
 }
 
-void WorldSelectDialog::keyPressed(gcn::KeyEvent &keyEvent)
+void WorldSelectDialog::keyPressed(KeyEvent &keyEvent)
 {
-    const int actionId = static_cast<KeyEvent*>(
-        &keyEvent)->getActionId();
+    const int actionId = keyEvent.getActionId();
 
     if (actionId == static_cast<int>(Input::KEY_GUI_CANCEL))
     {
-        action(gcn::ActionEvent(nullptr,
+        action(ActionEvent(nullptr,
             mChangeLoginButton->getActionEventId()));
     }
     else if (actionId == static_cast<int>(Input::KEY_GUI_SELECT)
              || actionId == static_cast<int>(Input::KEY_GUI_SELECT2))
     {
-        action(gcn::ActionEvent(nullptr, mChooseWorld->getActionEventId()));
+        action(ActionEvent(nullptr, mChooseWorld->getActionEventId()));
     }
 }

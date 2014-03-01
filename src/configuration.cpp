@@ -22,8 +22,10 @@
 
 #include "configuration.h"
 
-#include "configlistener.h"
 #include "logger.h"
+#include "variabledata.h"
+
+#include "listeners/configlistener.h"
 
 #include "utils/paths.h"
 

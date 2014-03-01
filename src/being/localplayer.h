@@ -23,14 +23,14 @@
 #ifndef BEING_LOCALPLAYER_H
 #define BEING_LOCALPLAYER_H
 
-#include "depricatedlistener.h"
+#include "listeners/depricatedlistener.h"
 
-#include "being/actorspritelistener.h"
 #include "being/being.h"
 
 #include "gui/userpalette.h"
 
-#include <guichan/actionlistener.hpp>
+#include "listeners/actionlistener.h"
+#include "listeners/actorspritelistener.h"
 
 #include <vector>
 
@@ -41,10 +41,10 @@ class FloorItem;
 class Map;
 class OkDialog;
 
-class AwayListener final : public gcn::ActionListener
+class AwayListener final : public ActionListener
 {
     public:
-        void action(const gcn::ActionEvent &event) override final;
+        void action(const ActionEvent &event) override final;
 };
 
 /**

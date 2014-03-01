@@ -25,8 +25,12 @@
 #include "client.h"
 #include "configuration.h"
 
+#include "events/keyevent.h"
+
 #include "input/keydata.h"
-#include "input/keyevent.h"
+
+#include "gui/models/updatelistmodel.h"
+#include "gui/models/updatetypemodel.h"
 
 #include "gui/windows/confirmdialog.h"
 
@@ -53,17 +57,17 @@ std::string LoginDialog::savedPasswordKey("");
 
 namespace
 {
-    struct OpenUrlListener : public gcn::ActionListener
+    struct OpenUrlListener : public ActionListener
     {
         OpenUrlListener() :
-            gcn::ActionListener(),
+            ActionListener(),
             url()
         {
         }
 
         A_DELETE_COPY(OpenUrlListener)
 
-        void action(const gcn::ActionEvent &event) override final
+        void action(const ActionEvent &event) override final
         {
             if (event.getId() == "yes")
                 openBrowser(url);
@@ -73,78 +77,12 @@ namespace
     } urlListener;
 }  // namespace
 
-const char *UPDATE_TYPE_TEXT[3] =
-{
-    // TRANSLATORS: update type
-    N_("Normal"),
-    // TRANSLATORS: update type
-    N_("Auto Close"),
-    // TRANSLATORS: update type
-    N_("Skip"),
-};
-
-class UpdateTypeModel final : public gcn::ListModel
-{
-    public:
-        UpdateTypeModel()
-        { }
-
-        A_DELETE_COPY(UpdateTypeModel)
-
-        ~UpdateTypeModel()
-        { }
-
-        int getNumberOfElements() override final
-        {
-            return 3;
-        }
-
-        std::string getElementAt(int i) override final
-        {
-            if (i >= getNumberOfElements() || i < 0)
-                return "???";
-            return gettext(UPDATE_TYPE_TEXT[i]);
-        }
-};
-
-class UpdateListModel final : public gcn::ListModel
-{
-    public:
-        explicit UpdateListModel(LoginData *const data) :
-            gcn::ListModel(),
-            mLoginData(data)
-        {
-        }
-
-        A_DELETE_COPY(UpdateListModel)
-
-        ~UpdateListModel()
-        { }
-
-        int getNumberOfElements() override final
-        {
-            if (!mLoginData)
-                return 0;
-            return static_cast<int>(mLoginData->updateHosts.size());
-        }
-
-        std::string getElementAt(int i) override final
-        {
-            if (!mLoginData || i >= getNumberOfElements() || i < 0)
-                return "???";
-            return mLoginData->updateHosts[i];
-        }
-
-    protected:
-        LoginData *mLoginData;
-};
-
 LoginDialog::LoginDialog(LoginData *const data, std::string serverName,
                          std::string *const updateHost):
     // TRANSLATORS: login dialog name
     Window(_("Login"), false, nullptr, "login.xml"),
-    gcn::ActionListener(),
-    gcn::KeyListener(),
+    ActionListener(),
+    KeyListener(),
     mLoginData(data),
     mUserField(new TextField(this, mLoginData->username)),
     mPassField(new PasswordField(this, mLoginData->password)),
@@ -276,7 +214,7 @@ LoginDialog::~LoginDialog()
     mUpdateListModel = nullptr;
 }
 
-void LoginDialog::action(const gcn::ActionEvent &event)
+void LoginDialog::action(const ActionEvent &event)
 {
     const std::string &eventId = event.getId();
     if (eventId == "login" && canSubmit())
@@ -318,7 +256,7 @@ void LoginDialog::action(const gcn::ActionEvent &event)
     }
 }
 
-void LoginDialog::keyPressed(gcn::KeyEvent &keyEvent)
+void LoginDialog::keyPressed(KeyEvent &keyEvent)
 {
     if (keyEvent.isConsumed())
     {
@@ -326,16 +264,15 @@ void LoginDialog::keyPressed(gcn::KeyEvent &keyEvent)
         return;
     }
 
-    const int actionId = static_cast<KeyEvent*>(
-        &keyEvent)->getActionId();
+    const int actionId = keyEvent.getActionId();
     if (actionId == static_cast<int>(Input::KEY_GUI_CANCEL))
     {
-        action(gcn::ActionEvent(nullptr, mServerButton->getActionEventId()));
+        action(ActionEvent(nullptr, mServerButton->getActionEventId()));
     }
     else if (actionId == static_cast<int>(Input::KEY_GUI_SELECT)
              || actionId == static_cast<int>(Input::KEY_GUI_SELECT2))
     {
-        action(gcn::ActionEvent(nullptr, mLoginButton->getActionEventId()));
+        action(ActionEvent(nullptr, mLoginButton->getActionEventId()));
     }
     else
     {

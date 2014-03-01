@@ -33,7 +33,7 @@ EditDialog::EditDialog(const std::string &restrict title,
                        const std::string &restrict eventOk, const int width,
                        Window *const parent, const bool modal):
     Window(title, modal, parent, "edit.xml"),
-    gcn::ActionListener(),
+    ActionListener(),
     mEventOk(eventOk),
     mTextField(new TextField(this))
 {
@@ -65,7 +65,7 @@ void EditDialog::postInit()
     okButton->requestFocus();
 }
 
-void EditDialog::action(const gcn::ActionEvent &event)
+void EditDialog::action(const ActionEvent &event)
 {
     // Proxy button events to our listeners
     FOR_EACH (ActionListenerIterator, i, mActionListeners)

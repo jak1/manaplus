@@ -25,8 +25,8 @@
 
 #include "gui/widgets/window.h"
 
-#include <guichan/actionlistener.hpp>
-#include <guichan/selectionlistener.hpp>
+#include "listeners/actionlistener.h"
+#include "listeners/selectionlistener.h"
 
 #include <memory>
 
@@ -43,8 +43,8 @@ class TextField;
  * \ingroup Interface
  */
 class TradeWindow final : public Window,
-                          private gcn::ActionListener,
-                          private gcn::SelectionListener
+                          private ActionListener,
+                          private SelectionListener
 {
     public:
         /**
@@ -109,12 +109,12 @@ class TradeWindow final : public Window,
          * Updates the labels and makes sure only one item is selected in
          * either my inventory or partner inventory.
          */
-        void valueChanged(const gcn::SelectionEvent &event) override final;
+        void valueChanged(const SelectionEvent &event) override final;
 
         /**
          * Called when receiving actions from the widgets.
          */
-        void action(const gcn::ActionEvent &event) override final;
+        void action(const ActionEvent &event) override final;
 
         /**
          * Closes the Trade Window, as well as telling the server that the

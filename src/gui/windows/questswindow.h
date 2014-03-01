@@ -27,7 +27,7 @@
 
 #include "utils/xml.h"
 
-#include <guichan/actionlistener.hpp>
+#include "listeners/actionlistener.h"
 
 #include <map>
 #include <vector>
@@ -48,7 +48,7 @@ typedef std::map<int, const QuestEffect*> NpcQuestEffectMap;
 typedef NpcQuestEffectMap::const_iterator NpcQuestEffectMapCIter;
 
 class QuestsWindow final : public Window,
-                           public gcn::ActionListener
+                           public ActionListener
 {
     public:
         QuestsWindow();
@@ -57,7 +57,7 @@ class QuestsWindow final : public Window,
 
         ~QuestsWindow();
 
-        void action(const gcn::ActionEvent &event) override final;
+        void action(const ActionEvent &event) override final;
 
         void updateQuest(const int var, const int val);
 

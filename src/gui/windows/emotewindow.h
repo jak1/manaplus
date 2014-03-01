@@ -59,11 +59,11 @@ class EmoteWindow final : public Window
 
         void clearFont();
 
-        void addListeners(gcn::ActionListener *const listener);
+        void addListeners(ActionListener *const listener);
 
-        void widgetResized(const gcn::Event &event) override final;
+        void widgetResized(const Event &event) override final;
 
-        void widgetMoved(const gcn::Event &event) override final;
+        void widgetMoved(const Event &event) override final;
 
     private:
         TabbedArea *mTabs;

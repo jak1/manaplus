@@ -24,7 +24,7 @@
 
 #include "configuration.h"
 
-#include "gui/sdlfont.h"
+#include "gui/gui.h"
 
 #include "gui/windows/setupwindow.h"
 
@@ -48,10 +48,10 @@ static const int maxTip = 18;
 DidYouKnowWindow::DidYouKnowWindow() :
     // TRANSLATORS: did you know window name
     Window(_("Did You Know?"), false, nullptr, "didyouknow.xml"),
-    gcn::ActionListener(),
+    ActionListener(),
     mBrowserBox(new BrowserBox(this, BrowserBox::AUTO_SIZE, true,
         "browserbox.xml")),
-    mScrollArea(new ScrollArea(mBrowserBox,
+    mScrollArea(new ScrollArea(this, mBrowserBox,
         true, "didyouknow_background.xml")),
     // TRANSLATORS: did you know window button
     mButtonPrev(new Button(this, _("< Previous"), "prev", this)),
@@ -78,7 +78,8 @@ DidYouKnowWindow::DidYouKnowWindow() :
     Button *const okButton = new Button(this, _("Close"), "close", this);
 
     mBrowserBox->setLinkHandler(this);
-    mBrowserBox->setFont(gui->getHelpFont());
+    if (gui)
+        mBrowserBox->setFont(gui->getHelpFont());
     mBrowserBox->setProcessVersion(true);
     mBrowserBox->setEnableImages(true);
     mBrowserBox->setEnableKeys(true);
@@ -99,10 +100,10 @@ DidYouKnowWindow::DidYouKnowWindow() :
 
 void DidYouKnowWindow::postInit()
 {
-    widgetResized(gcn::Event(nullptr));
+    widgetResized(Event(nullptr));
 }
 
-void DidYouKnowWindow::action(const gcn::ActionEvent &event)
+void DidYouKnowWindow::action(const ActionEvent &event)
 {
     const std::string &eventId = event.getId();
     if (eventId == "close")
@@ -129,7 +130,7 @@ void DidYouKnowWindow::action(const gcn::ActionEvent &event)
 }
 
 void DidYouKnowWindow::handleLink(const std::string &link,
-                                  gcn::MouseEvent *event A_UNUSED)
+                                  MouseEvent *event A_UNUSED)
 {
     if (strStartWith(link, "http://") || strStartWith(link, "https://"))
         openBrowser(link);

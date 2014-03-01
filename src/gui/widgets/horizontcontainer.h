@@ -24,7 +24,7 @@
 
 #include "gui/widgets/container.h"
 
-#include <guichan/widgetlistener.hpp>
+#include "listeners/widgetlistener.h"
 
 #include "localconsts.h"
 
@@ -33,21 +33,23 @@
  *
  * This container places it's contents veritcally.
  */
-class HorizontContainer final : public Container, public gcn::WidgetListener
+class HorizontContainer final : public Container,
+                                public WidgetListener
 {
     public:
         HorizontContainer(const Widget2 *const widget,
-                          const int height, const int spacing);
+                          const int height,
+                          const int spacing);
 
         A_DELETE_COPY(HorizontContainer)
 
-        void add(gcn::Widget *widget) override final;
+        void add(Widget *widget) override final;
 
-        void add(gcn::Widget *const widget, const int spacing);
+        void add(Widget *const widget, const int spacing);
 
         void clear() override;
 
-        void widgetResized(const gcn::Event &event) override final;
+        void widgetResized(const Event &event) override final;
 
     protected:
         int mSpacing;

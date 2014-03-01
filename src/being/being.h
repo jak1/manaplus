@@ -23,11 +23,7 @@
 #ifndef BEING_BEING_H
 #define BEING_BEING_H
 
-#include "equipment.h"
-
 #include "resources/beinginfo.h"
-
-#include <guichan/color.hpp>
 
 #include <map>
 
@@ -45,6 +41,8 @@ static const int DEFAULT_BEING_HEIGHT = 32;
 
 class AnimatedSprite;
 class BeingCacheEntry;
+class Color;
+class Equipment;
 class FlashText;
 class Guild;
 class ItemInfo;
@@ -474,17 +472,13 @@ class Being : public ActorSprite, public ConfigListener
         }
 
         /**
-         * Sets the walk speed.
-         * in pixels per second for eAthena,
-         * in tiles per second for Manaserv.
+         * Sets the walk speed in pixels per second.
          */
         void setWalkSpeed(Vector speed)
         { mWalkSpeed = speed; mSpeed = speed.x; }
 
         /**
-         * Gets the walk speed.
-         * in pixels per second for eAthena,
-         * in tiles per second for Manaserv (0.1 precision).
+         * Gets the walk speed in pixels per second.
          */
         Vector getWalkSpeed() const A_WARN_UNUSED
         { return mWalkSpeed; }
@@ -967,7 +961,7 @@ class Being : public ActorSprite, public ConfigListener
          * Holds a text object when the being displays it's name, 0 otherwise
          */
         FlashText *mDispName;
-        const gcn::Color *mNameColor;
+        const Color *mNameColor;
 
         /** Engine-related infos about weapon. */
         const ItemInfo *mEquippedWeapon;
@@ -977,7 +971,7 @@ class Being : public ActorSprite, public ConfigListener
 
         Path mPath;
         Text *mText;
-        const gcn::Color *mTextColor;
+        const Color *mTextColor;
 
         Vector mDest;  /**< destination coordinates. */
 
@@ -1039,8 +1033,7 @@ class Being : public ActorSprite, public ConfigListener
 
         /**
          * Walk speed for x and y movement values.
-         * In pixels per second for eAthena,
-         * In pixels per ticks for Manaserv.
+         * In pixels per second.
          * @see MILLISECONDS_IN_A_TICK
          */
         Vector mWalkSpeed;

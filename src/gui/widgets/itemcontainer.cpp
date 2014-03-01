@@ -46,8 +46,8 @@
 
 #include "resources/image.h"
 
-#include <guichan/font.hpp>
-#include <guichan/selectionlistener.hpp>
+#include "gui/font.h"
+#include "listeners/selectionlistener.h"
 
 #include <algorithm>
 
@@ -158,11 +158,10 @@ namespace
 ItemContainer::ItemContainer(const Widget2 *const widget,
                              Inventory *const inventory,
                              const bool forceQuantity) :
-    gcn::Widget(),
-    Widget2(widget),
-    gcn::KeyListener(),
-    gcn::MouseListener(),
-    gcn::WidgetListener(),
+    Widget(widget),
+    KeyListener(),
+    MouseListener(),
+    WidgetListener(),
     mInventory(inventory),
     mSelImg(Theme::getImageFromThemeXml("item_selection.xml", "")),
     mProtectedImg(Theme::getImageFromTheme("lock.png")),
@@ -227,7 +226,7 @@ ItemContainer::~ItemContainer()
 void ItemContainer::logic()
 {
     BLOCK_START("ItemContainer::logic")
-    gcn::Widget::logic();
+    Widget::logic();
 
     if (!mInventory)
     {
@@ -245,14 +244,13 @@ void ItemContainer::logic()
     BLOCK_END("ItemContainer::logic")
 }
 
-void ItemContainer::draw(gcn::Graphics *graphics)
+void ItemContainer::draw(Graphics *graphics)
 {
     if (!mInventory || !mShowMatrix)
         return;
 
     BLOCK_START("ItemContainer::draw")
-    Graphics *const g = static_cast<Graphics *const>(graphics);
-    gcn::Font *const font = getFont();
+    Font *const font = getFont();
 
     for (int j = 0; j < mGridRows; j++)
     {
@@ -278,16 +276,18 @@ void ItemContainer::draw(gcn::Graphics *graphics)
                 if (mShowMatrix[itemIndex] == mSelectedIndex)
                 {
                     if (mSelImg)
-                        g->drawImage2(mSelImg, itemX, itemY);
+                        graphics->drawImage(mSelImg, itemX, itemY);
                 }
                 image->setAlpha(1.0F);  // ensure the image if fully drawn...
-                g->drawImage2(image, itemX + mPaddingItemX,
+                graphics->drawImage(image,
+                    itemX + mPaddingItemX,
                     itemY + mPaddingItemY);
                 if (mProtectedImg && PlayerInfo::isItemProtected(
                     item->getId()))
                 {
-                    g->drawImage2(mProtectedImg,
-                        itemX + mPaddingItemX, itemY + mPaddingItemY);
+                    graphics->drawImage(mProtectedImg,
+                        itemX + mPaddingItemX,
+                        itemY + mPaddingItemY);
                 }
             }
         }
@@ -324,11 +324,11 @@ void ItemContainer::draw(gcn::Graphics *graphics)
             }
 
             if (item->isEquipped())
-                g->setColorAll(mEquipedColor, mEquipedColor2);
+                graphics->setColorAll(mEquipedColor, mEquipedColor2);
             else
-                g->setColorAll(mUnEquipedColor, mUnEquipedColor2);
+                graphics->setColorAll(mUnEquipedColor, mUnEquipedColor2);
 
-            font->drawString(g, caption,
+            font->drawString(graphics, caption,
                 itemX + (mBoxWidth - font->getWidth(caption)) / 2,
                 itemY + mEquippedTextPadding);
         }
@@ -373,7 +373,7 @@ void ItemContainer::distributeValueChangedEvent()
     {
         if (*i)
         {
-            gcn::SelectionEvent event(this);
+            SelectionEvent event(this);
             (*i)->valueChanged(event);
         }
     }
@@ -385,15 +385,15 @@ void ItemContainer::hidePopup()
         mItemPopup->setVisible(false);
 }
 
-void ItemContainer::keyPressed(gcn::KeyEvent &event A_UNUSED)
+void ItemContainer::keyPressed(KeyEvent &event A_UNUSED)
 {
 }
 
-void ItemContainer::keyReleased(gcn::KeyEvent &event A_UNUSED)
+void ItemContainer::keyReleased(KeyEvent &event A_UNUSED)
 {
 }
 
-void ItemContainer::mousePressed(gcn::MouseEvent &event)
+void ItemContainer::mousePressed(MouseEvent &event)
 {
     if (!mInventory)
         return;
@@ -401,7 +401,7 @@ void ItemContainer::mousePressed(gcn::MouseEvent &event)
     const int button = event.getButton();
     mClicks = event.getClickCount();
 
-    if (button == gcn::MouseEvent::LEFT || button == gcn::MouseEvent::RIGHT)
+    if (button == MouseEvent::LEFT || button == MouseEvent::RIGHT)
     {
         const int index = getSlotIndex(event.getX(), event.getY());
         if (index == Inventory::NO_SLOT_INDEX)
@@ -467,13 +467,13 @@ void ItemContainer::mousePressed(gcn::MouseEvent &event)
     }
 }
 
-void ItemContainer::mouseDragged(gcn::MouseEvent &event A_UNUSED)
+void ItemContainer::mouseDragged(MouseEvent &event A_UNUSED)
 {
     if (mSelectionStatus != SEL_NONE)
         mSelectionStatus = SEL_DRAGGING;
 }
 
-void ItemContainer::mouseReleased(gcn::MouseEvent &event)
+void ItemContainer::mouseReleased(MouseEvent &event)
 {
     if (mClicks == 2)
         return;
@@ -593,7 +593,7 @@ void ItemContainer::mouseReleased(gcn::MouseEvent &event)
     }
 }
 
-void ItemContainer::mouseMoved(gcn::MouseEvent &event)
+void ItemContainer::mouseMoved(MouseEvent &event)
 {
     if (!mInventory)
         return;
@@ -612,12 +612,12 @@ void ItemContainer::mouseMoved(gcn::MouseEvent &event)
     }
 }
 
-void ItemContainer::mouseExited(gcn::MouseEvent &event A_UNUSED)
+void ItemContainer::mouseExited(MouseEvent &event A_UNUSED)
 {
     mItemPopup->setVisible(false);
 }
 
-void ItemContainer::widgetResized(const gcn::Event &event A_UNUSED)
+void ItemContainer::widgetResized(const Event &event A_UNUSED)
 {
     mGridColumns = std::max(1, mDimension.width / mBoxWidth);
     adjustHeight();

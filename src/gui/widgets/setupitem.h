@@ -21,14 +21,14 @@
 #ifndef GUI_WIDGETS_SETUPITEM_H
 #define GUI_WIDGETS_SETUPITEM_H
 
-#include "gui/widgets/button.h"
-#include "gui/widgets/tabs/setuptabscroll.h"
+#include "gui/widgets/widget2.h"
 
-#include <guichan/actionlistener.hpp>
+#include "listeners/actionlistener.h"
 
 #include <list>
 #include <vector>
 
+class Button;
 class CheckBox;
 class Configuration;
 class DropDown;
@@ -36,16 +36,13 @@ class EditDialog;
 class HorizontContainer;
 class IntTextField;
 class Label;
+class ListModel;
+class SetupTabScroll;
 class Slider;
 class SliderList;
 class TextField;
 
-namespace gcn
-{
-    class ListModel;
-}
-
-class SetupItem : public gcn::ActionListener,
+class SetupItem : public ActionListener,
                   public Widget2
 {
     public:
@@ -69,17 +66,17 @@ class SetupItem : public gcn::ActionListener,
 
         virtual void toWidget() = 0;
 
-        void setWidget(gcn::Widget *widget)
+        void setWidget(Widget *widget)
         { mWidget = widget; }
 
-        gcn::Widget *getWidget() const A_WARN_UNUSED
+        Widget *getWidget() const A_WARN_UNUSED
         { return mWidget; }
 
         Configuration *getConfig() const A_WARN_UNUSED;
 
         virtual std::string getActionEventId() const A_WARN_UNUSED;
 
-        virtual void action(const gcn::ActionEvent &event) override;
+        virtual void action(const ActionEvent &event) override;
 
         virtual void action();
 
@@ -94,11 +91,11 @@ class SetupItem : public gcn::ActionListener,
         bool isMainConfig() const A_WARN_UNUSED
         { return mMainConfig; }
 
-        void fixFirstItemSize(gcn::Widget *const widget);
+        void fixFirstItemSize(Widget *const widget);
 
         virtual void rereadValue();
 
-        void setValue(const std::string str)
+        void setValue(const std::string &str)
         { mValue = str; }
 
         std::string getValue() const
@@ -137,9 +134,9 @@ class SetupItem : public gcn::ActionListener,
 
         std::string mDefault;
 
-        gcn::Widget *mWidget;
+        Widget *mWidget;
 
-        std::list<gcn::Widget*> mTempWidgets;
+        std::list<Widget*> mTempWidgets;
 
         int mValueType;
 
@@ -210,7 +207,7 @@ class SetupItemTextField final : public SetupItem
 
         void toWidget() override final;
 
-        void action(const gcn::ActionEvent &event) override final;
+        void action(const ActionEvent &event) override final;
 
         void apply(const std::string &eventName) override final;
 
@@ -265,7 +262,7 @@ class SetupItemIntTextField final : public SetupItem
 
         void toWidget() override final;
 
-        void action(const gcn::ActionEvent &event) override final;
+        void action(const ActionEvent &event) override final;
 
         void apply(const std::string &eventName) override final;
 
@@ -297,7 +294,7 @@ class SetupItemLabel final : public SetupItem
 
         void toWidget() override final;
 
-        void action(const gcn::ActionEvent &event) override final;
+        void action(const ActionEvent &event) override final;
 
         void apply(const std::string &eventName) override final;
 
@@ -314,7 +311,7 @@ class SetupItemDropDown final : public SetupItem
                           const std::string &restrict keyName,
                           SetupTabScroll *restrict const parent,
                           const std::string &restrict eventName,
-                          gcn::ListModel *restrict const model,
+                          ListModel *restrict const model,
                           const int width, const bool mainConfig = true);
 
         SetupItemDropDown(const std::string &restrict text,
@@ -322,7 +319,7 @@ class SetupItemDropDown final : public SetupItem
                           const std::string &restrict keyName,
                           SetupTabScroll *restrict const parent,
                           const std::string &restrict eventName,
-                          gcn::ListModel *restrict const model,
+                          ListModel *restrict const model,
                           const int width,
                           const std::string &restrict def,
                           const bool mainConfig = true);
@@ -340,7 +337,7 @@ class SetupItemDropDown final : public SetupItem
     protected:
         HorizontContainer *mHorizont;
         Label *mLabel;
-        gcn::ListModel *mModel;
+        ListModel *mModel;
         DropDown *mDropDown;
         int mWidth;
 };
@@ -377,7 +374,7 @@ class SetupItemSlider final : public SetupItem
 
         void toWidget() override final;
 
-        void action(const gcn::ActionEvent &event) override final;
+        void action(const ActionEvent &event) override final;
 
         void apply(const std::string &eventName) override final;
 
@@ -433,7 +430,7 @@ class SetupItemSlider2 final : public SetupItem
 
         void toWidget() override final;
 
-        void action(const gcn::ActionEvent &event) override final;
+        void action(const ActionEvent &event) override final;
 
         void apply(const std::string &eventName) override final;
 
@@ -470,7 +467,7 @@ class SetupItemSliderList : public SetupItem
 
         void toWidget() override;
 
-        virtual void action(const gcn::ActionEvent &event) override;
+        virtual void action(const ActionEvent &event) override;
 
         void apply(const std::string &eventName) override final;
 
@@ -482,7 +479,7 @@ class SetupItemSliderList : public SetupItem
                             const std::string &restrict keyName,
                             SetupTabScroll *restrict const parent,
                             const std::string &restrict eventName,
-                            gcn::ListModel *restrict const model,
+                            ListModel *restrict const model,
                             const int width = 150, const bool onTheFly = false,
                             const bool mainConfig = true);
 
@@ -491,7 +488,7 @@ class SetupItemSliderList : public SetupItem
                             const std::string &restrict keyName,
                             SetupTabScroll *restrict const parent,
                             const std::string &restrict eventName,
-                            gcn::ListModel *restrict const model,
+                            ListModel *restrict const model,
                             const std::string &restrict def,
                             const int width = 150,
                             const bool onTheFly = false,
@@ -500,7 +497,7 @@ class SetupItemSliderList : public SetupItem
         HorizontContainer *mHorizont;
         Label *mLabel;
         SliderList *mSlider;
-        gcn::ListModel *mModel;
+        ListModel *mModel;
         int mWidth;
         bool mOnTheFly;
 };
@@ -513,14 +510,14 @@ class SetupItemSound final : public SetupItemSliderList
                        const std::string &restrict keyName,
                        SetupTabScroll *restrict const parent,
                        const std::string &restrict eventName,
-                       gcn::ListModel *restrict const model,
+                       ListModel *restrict const model,
                        const int width = 150,
                        const bool onTheFly = false,
                        const bool mainConfig = true);
 
         A_DELETE_COPY(SetupItemSound)
 
-        void action(const gcn::ActionEvent &event) override final;
+        void action(const ActionEvent &event) override final;
 
         void addMoreControls() override final;
 
@@ -536,7 +533,7 @@ class SetupItemSliderInt final : public SetupItemSliderList
                            const std::string &restrict keyName,
                            SetupTabScroll *restrict const parent,
                            const std::string &restrict eventName,
-                           gcn::ListModel *restrict const model,
+                           ListModel *restrict const model,
                            const int min,
                            const int width = 150,
                            const bool onTheFly = false,

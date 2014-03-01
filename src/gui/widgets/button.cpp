@@ -25,12 +25,17 @@
 #include "client.h"
 #include "graphicsvertexes.h"
 
-#include "input/keydata.h"
-#include "input/keyevent.h"
+#include "events/keyevent.h"
 
+#include "input/keydata.h"
+
+#include "resources/image.h"
 #include "resources/imageset.h"
 
-#include <guichan/font.hpp>
+#include "gui/font.h"
+#include "gui/gui.h"
+
+#include "gui/rect.h"
 
 #include "debug.h"
 
@@ -48,9 +53,8 @@ static std::string const data[Button::BUTTON_COUNT] =
 Skin *Button::button[BUTTON_COUNT];
 
 Button::Button(const Widget2 *const widget) :
-    gcn::Button(),
-    Widget2(widget),
-    gcn::WidgetListener(),
+    gcn::Button(widget),
+    WidgetListener(),
     mDescription(),
     mVertexes2(new ImageCollection),
     mEnabledColor(getThemeColor(Theme::BUTTON)),
@@ -81,10 +85,9 @@ Button::Button(const Widget2 *const widget) :
 Button::Button(const Widget2 *const widget,
                const std::string &restrict caption,
                const std::string &restrict actionEventId,
-               gcn::ActionListener *const listener) :
-    gcn::Button(caption),
-    Widget2(widget),
-    gcn::WidgetListener(),
+               ActionListener *const listener) :
+    gcn::Button(widget, caption),
+    WidgetListener(),
     mDescription(),
     mVertexes2(new ImageCollection),
     mEnabledColor(getThemeColor(Theme::BUTTON)),
@@ -121,10 +124,9 @@ Button::Button(const Widget2 *const widget,
                const std::string &restrict imageName,
                const int imageWidth, const int imageHeight,
                const std::string &restrict actionEventId,
-               gcn::ActionListener *const listener) :
-    gcn::Button(caption),
-    Widget2(widget),
-    gcn::WidgetListener(),
+               ActionListener *const listener) :
+    gcn::Button(widget, caption),
+    WidgetListener(),
     mDescription(),
     mVertexes2(new ImageCollection),
     mEnabledColor(getThemeColor(Theme::BUTTON)),
@@ -161,10 +163,9 @@ Button::Button(const Widget2 *const widget,
                const std::string &restrict imageName,
                const int imageWidth, const int imageHeight,
                const std::string &restrict actionEventId,
-               gcn::ActionListener *const listener) :
-    gcn::Button(),
-    Widget2(widget),
-    gcn::WidgetListener(),
+               ActionListener *const listener) :
+    gcn::Button(widget),
+    WidgetListener(),
     mDescription(),
     mVertexes2(new ImageCollection),
     mEnabledColor(getThemeColor(Theme::BUTTON)),
@@ -201,10 +202,9 @@ Button::Button(const Widget2 *const widget,
                const std::string &restrict caption,
                const std::string &restrict imageName,
                const std::string &restrict actionEventId,
-               gcn::ActionListener *const listener) :
-    gcn::Button(caption),
-    Widget2(widget),
-    gcn::WidgetListener(),
+               ActionListener *const listener) :
+    gcn::Button(widget, caption),
+    WidgetListener(),
     mDescription(),
     mVertexes2(new ImageCollection),
     mEnabledColor(getThemeColor(Theme::BUTTON)),
@@ -350,7 +350,7 @@ void Button::updateAlpha()
     }
 }
 
-void Button::draw(gcn::Graphics *graphics)
+void Button::draw(Graphics *graphics)
 {
     BLOCK_START("Button::draw")
     int mode;
@@ -373,8 +373,6 @@ void Button::draw(gcn::Graphics *graphics)
 
     updateAlpha();
 
-    Graphics *const g2 = static_cast<Graphics *const>(graphics);
-
     bool recalc = false;
     if (mRedraw)
     {
@@ -384,7 +382,7 @@ void Button::draw(gcn::Graphics *graphics)
     {
         // because we don't know where parent windows was moved,
         // need recalc vertexes
-        gcn::ClipRectangle &rect = g2->getTopClip();
+        ClipRect &rect = graphics->getTopClip();
         if (rect.xOffset != mXOffset || rect.yOffset != mYOffset)
         {
             recalc = true;
@@ -396,7 +394,7 @@ void Button::draw(gcn::Graphics *graphics)
             recalc = true;
             mMode = mode;
         }
-        else if (g2->getRedraw())
+        else if (graphics->getRedraw())
         {
             recalc = true;
         }
@@ -408,26 +406,26 @@ void Button::draw(gcn::Graphics *graphics)
     switch (mode)
     {
         case BUTTON_DISABLED:
-            g2->setColorAll(mDisabledColor, mDisabledColor2);
+            graphics->setColorAll(mDisabledColor, mDisabledColor2);
             break;
         case BUTTON_PRESSED:
-            g2->setColorAll(mPressedColor, mPressedColor2);
+            graphics->setColorAll(mPressedColor, mPressedColor2);
             break;
         case BUTTON_HIGHLIGHTED:
-            g2->setColorAll(mHighlightedColor, mHighlightedColor2);
+            graphics->setColorAll(mHighlightedColor, mHighlightedColor2);
             break;
         default:
-            g2->setColorAll(mEnabledColor, mEnabledColor2);
+            graphics->setColorAll(mEnabledColor, mEnabledColor2);
             break;
     }
 
     int imageX = 0;
     int imageY = 0;
     int textX = 0;
-    const gcn::Rectangle &rect = mDimension;
+    const Rect &rect = mDimension;
     const int width = rect.width;
     const int height = rect.height;
-    gcn::Font *const font = getFont();
+    Font *const font = getFont();
     int textY = height / 2 - font->getHeight() / 2;
     if (mImages)
         imageY = height / 2 - mImageHeight / 2;
@@ -437,7 +435,7 @@ void Button::draw(gcn::Graphics *graphics)
     switch (mAlignment)
     {
         default:
-        case gcn::Graphics::LEFT:
+        case Graphics::LEFT:
         {
             if (mImages)
             {
@@ -450,7 +448,7 @@ void Button::draw(gcn::Graphics *graphics)
             }
             break;
         }
-        case gcn::Graphics::CENTER:
+        case Graphics::CENTER:
         {
             const int width1 = font->getWidth(mCaption);
             if (mImages)
@@ -465,7 +463,7 @@ void Button::draw(gcn::Graphics *graphics)
             }
             break;
         }
-        case gcn::Graphics::RIGHT:
+        case Graphics::RIGHT:
         {
             const int width1 = font->getWidth(mCaption);
             textX = width - width1 - padding;
@@ -481,39 +479,39 @@ void Button::draw(gcn::Graphics *graphics)
             mRedraw = false;
             mMode = mode;
             mVertexes2->clear();
-            g2->calcWindow(mVertexes2, 0, 0, width, height,
+            graphics->calcWindow(mVertexes2,
+                0, 0,
+                width, height,
                 skin->getBorder());
 
             if (mImages)
             {
                 if (isPressed())
                 {
-                    g2->calcTileCollection(mVertexes2, mImages[mode],
+                    graphics->calcTileCollection(mVertexes2,
+                        mImages[mode],
                         imageX + 1, imageY + 1);
                 }
                 else
                 {
-                    g2->calcTileCollection(mVertexes2,
-                        mImages[mode], imageX, imageY);
+                    graphics->calcTileCollection(mVertexes2,
+                        mImages[mode],
+                        imageX, imageY);
                 }
             }
         }
-        g2->drawTileCollection(mVertexes2);
+        graphics->drawTileCollection(mVertexes2);
     }
     else
     {
-        g2->drawImageRect(0, 0, width, height, skin->getBorder());
+        graphics->drawImageRect(0, 0, width, height, skin->getBorder());
 
         if (mImages)
         {
             if (isPressed())
-            {
-                g2->drawImage2(mImages[mode], imageX + 1, imageY + 1);
-            }
+                graphics->drawImage(mImages[mode], imageX + 1, imageY + 1);
             else
-            {
-                g2->drawImage2(mImages[mode], imageX, imageY);
-            }
+                graphics->drawImage(mImages[mode], imageX, imageY);
         }
     }
 
@@ -522,13 +520,13 @@ void Button::draw(gcn::Graphics *graphics)
         textX ++;
         textY ++;
     }
-    font->drawString(g2, mCaption, textX, textY);
+    font->drawString(graphics, mCaption, textX, textY);
     BLOCK_END("Button::draw")
 }
 
-void Button::mouseReleased(gcn::MouseEvent& mouseEvent)
+void Button::mouseReleased(MouseEvent& mouseEvent)
 {
-    if (mouseEvent.getButton() == gcn::MouseEvent::LEFT)
+    if (mouseEvent.getButton() == MouseEvent::LEFT)
     {
         if (mStick)
             mPressed = !mPressed;
@@ -548,19 +546,19 @@ void Button::mouseReleased(gcn::MouseEvent& mouseEvent)
     }
 }
 
-void Button::widgetResized(const gcn::Event &event A_UNUSED)
+void Button::widgetResized(const Event &event A_UNUSED)
 {
     mRedraw = true;
 }
 
-void Button::widgetMoved(const gcn::Event &event A_UNUSED)
+void Button::widgetMoved(const Event &event A_UNUSED)
 {
     mRedraw = true;
 }
 
 void Button::adjustSize()
 {
-    const gcn::Font *const font = getFont();
+    const Font *const font = getFont();
     const Skin *const skin = button[BUTTON_STANDARD];
     if (!skin)
         return;
@@ -591,9 +589,9 @@ void Button::setCaption(const std::string& caption)
     mCaption = caption;
 }
 
-void Button::keyPressed(gcn::KeyEvent& keyEvent)
+void Button::keyPressed(KeyEvent& keyEvent)
 {
-    const int action = static_cast<KeyEvent*>(&keyEvent)->getActionId();
+    const int action = keyEvent.getActionId();
 
     if (action == Input::KEY_GUI_SELECT)
     {
@@ -602,9 +600,9 @@ void Button::keyPressed(gcn::KeyEvent& keyEvent)
     }
 }
 
-void Button::keyReleased(gcn::KeyEvent& keyEvent)
+void Button::keyReleased(KeyEvent& keyEvent)
 {
-    const int action = static_cast<KeyEvent*>(&keyEvent)->getActionId();
+    const int action = keyEvent.getActionId();
 
     if (action == Input::KEY_GUI_SELECT && mKeyPressed)
     {

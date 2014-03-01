@@ -26,8 +26,9 @@
 #include "configuration.h"
 #include "units.h"
 
+#include "events/keyevent.h"
+
 #include "input/keydata.h"
-#include "input/keyevent.h"
 
 #include "gui/windows/charcreatedialog.h"
 #include "gui/windows/confirmdialog.h"
@@ -43,6 +44,7 @@
 
 #include "net/logindata.h"
 #include "net/loginhandler.h"
+#include "net/net.h"
 
 #include "utils/gettext.h"
 
@@ -70,7 +72,7 @@ class CharDeleteConfirm final : public ConfirmDialog
 
         A_DELETE_COPY(CharDeleteConfirm)
 
-        void action(const gcn::ActionEvent &event)
+        void action(const ActionEvent &event)
         {
             if (event.getId() == "yes" && mMaster)
                 mMaster->askPasswordForDeletion(mIndex);
@@ -88,8 +90,8 @@ CharSelectDialog::CharSelectDialog(LoginData *const data):
     Window(strprintf(_("Account %s (last login time %s)"),
         data->username.c_str(), data->lastLogin.c_str()),
         false, nullptr, "char.xml"),
-    gcn::ActionListener(),
-    gcn::KeyListener(),
+    ActionListener(),
+    KeyListener(),
     mLoginData(data),
     // TRANSLATORS: char select dialog. button.
     mSwitchLoginButton(new Button(this, _("Switch Login"), "switch", this)),
@@ -205,10 +207,10 @@ void CharSelectDialog::postInit()
     requestFocus();
 }
 
-void CharSelectDialog::action(const gcn::ActionEvent &event)
+void CharSelectDialog::action(const ActionEvent &event)
 {
     // Check if a button of a character was pressed
-    const gcn::Widget *const sourceParent = event.getSource()->getParent();
+    const Widget *const sourceParent = event.getSource()->getParent();
     int selected = -1;
     for (unsigned int i = 0, sz = static_cast<unsigned int>(
          mCharacterEntries.size()); i < sz; ++i)
@@ -315,14 +317,14 @@ void CharSelectDialog::use(const int selected)
     }
 }
 
-void CharSelectDialog::keyPressed(gcn::KeyEvent &keyEvent)
+void CharSelectDialog::keyPressed(KeyEvent &keyEvent)
 {
-    const int actionId = static_cast<KeyEvent*>(&keyEvent)->getActionId();
+    const int actionId = keyEvent.getActionId();
     switch (actionId)
     {
         case Input::KEY_GUI_CANCEL:
             keyEvent.consume();
-            action(gcn::ActionEvent(mSwitchLoginButton,
+            action(ActionEvent(mSwitchLoginButton,
                 mSwitchLoginButton->getActionEventId()));
             break;
 
@@ -471,15 +473,7 @@ void CharSelectDialog::setCharacters(const Net::Characters &characters)
 
         Net::Character *const character = *i;
 
-        // Slots Number start at 1 for Manaserv, so we offset them by one.
-#ifdef MANASERV_SUPPORT
-        int characterSlot = character->slot;
-        if (Net::getNetworkType() == ServerInfo::MANASERV && characterSlot > 0)
-            --characterSlot;
-#else
         const int characterSlot = character->slot;
-#endif
-
         if (characterSlot >= static_cast<int>(mCharacterEntries.size()))
         {
             logger->log("Warning: slot out of range: %d", character->slot);
@@ -563,7 +557,7 @@ void CharSelectDialog::close()
     Window::close();
 }
 
-void CharSelectDialog::widgetResized(const gcn::Event &event)
+void CharSelectDialog::widgetResized(const Event &event)
 {
     Window::widgetResized(event);
     if (mCharacterView)

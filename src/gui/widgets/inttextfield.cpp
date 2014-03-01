@@ -26,15 +26,19 @@
 #include "gui/sdlinput.h"
 #endif
 
+#include "events/keyevent.h"
+
 #include "input/keydata.h"
-#include "input/keyevent.h"
 
 #include "utils/stringutils.h"
 #include "debug.h"
 
-IntTextField::IntTextField(const Widget2 *const widget, const int def,
-                           const int min, const int max,
-                           const bool enabled, const int width) :
+IntTextField::IntTextField(const Widget2 *const widget,
+                           const int def,
+                           const int min,
+                           const int max,
+                           const bool enabled,
+                           const int width) :
     TextField(widget, toString(def)),
     mMin(0),
     mMax(0),
@@ -49,9 +53,9 @@ IntTextField::IntTextField(const Widget2 *const widget, const int def,
         setWidth(width);
 }
 
-void IntTextField::keyPressed(gcn::KeyEvent &event)
+void IntTextField::keyPressed(KeyEvent &event)
 {
-    const int action = static_cast<KeyEvent*>(&event)->getActionId();
+    const int action = event.getActionId();
 
     if (action == Input::KEY_GUI_DELETE || action == Input::KEY_GUI_BACKSPACE)
     {
@@ -67,7 +71,7 @@ void IntTextField::keyPressed(gcn::KeyEvent &event)
     if (val != Key::TEXTINPUT)
         return;
 
-    const std::string str = static_cast<KeyEvent*>(&event)->getText();
+    const std::string str = event.getText();
     if (str.empty())
         return;
     const size_t sz = str.size();

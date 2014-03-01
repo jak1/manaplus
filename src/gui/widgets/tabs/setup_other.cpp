@@ -22,8 +22,9 @@
 
 #include "gui/widgets/tabs/setup_other.h"
 
+#include "gui/models/namesmodel.h"
+
 #include "gui/widgets/layouthelper.h"
-#include "gui/widgets/namesmodel.h"
 #include "gui/widgets/setupitem.h"
 #include "gui/widgets/scrollarea.h"
 
@@ -390,7 +391,7 @@ Setup_Other::Setup_Other(const Widget2 *const widget) :
     new SetupItemDropDown(_("Screen density override"), "",
         "screenDensity", this, "screenDensityEvent", mDensityList, 100);
 
-    setDimension(gcn::Rectangle(0, 0, 550, 350));
+    setDimension(Rect(0, 0, 550, 350));
 }
 
 Setup_Other::~Setup_Other()

@@ -38,7 +38,7 @@ class DropShortcutContainer final : public ShortcutContainer
         /**
          * Constructor. Initializes the graphic.
          */
-        DropShortcutContainer();
+        explicit DropShortcutContainer(Widget2 *const widget);
 
         A_DELETE_COPY(DropShortcutContainer)
 
@@ -50,28 +50,28 @@ class DropShortcutContainer final : public ShortcutContainer
         /**
          * Draws the items.
          */
-        void draw(gcn::Graphics *graphics) override final;
+        void draw(Graphics *graphics) override final;
 
         /**
          * Handles mouse when dragged.
          */
-        void mouseDragged(gcn::MouseEvent &event) override final;
+        void mouseDragged(MouseEvent &event) override final;
 
         /**
          * Handles mouse when pressed.
          */
-        void mousePressed(gcn::MouseEvent &event) override final;
+        void mousePressed(MouseEvent &event) override final;
 
         /**
          * Handles mouse release.
          */
-        void mouseReleased(gcn::MouseEvent &event) override final;
+        void mouseReleased(MouseEvent &event) override final;
 
-        void widgetHidden(const gcn::Event &event) override final;
+        void widgetHidden(const Event &event) override final;
 
-        void mouseExited(gcn::MouseEvent &event) override final;
+        void mouseExited(MouseEvent &event) override final;
 
-        void mouseMoved(gcn::MouseEvent &event) override final;
+        void mouseMoved(MouseEvent &event) override final;
 
         void setWidget2(const Widget2 *const widget) override final;
 
@@ -79,10 +79,10 @@ class DropShortcutContainer final : public ShortcutContainer
         bool mItemClicked;
 
         ItemPopup *mItemPopup;
-        gcn::Color mEquipedColor;
-        gcn::Color mEquipedColor2;
-        gcn::Color mUnEquipedColor;
-        gcn::Color mUnEquipedColor2;
+        Color mEquipedColor;
+        Color mEquipedColor2;
+        Color mUnEquipedColor;
+        Color mUnEquipedColor2;
 };
 
 #endif  // GUI_WIDGETS_DROPSHORTCUTCONTAINER_H

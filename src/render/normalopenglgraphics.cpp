@@ -286,8 +286,8 @@ static inline void drawRescaledQuad(const Image *const image,
     }
 }
 
-bool NormalOpenGLGraphics::drawImage2(const Image *const image,
-                                      int dstX, int dstY)
+bool NormalOpenGLGraphics::drawImage(const Image *const image,
+                                     int dstX, int dstY)
 {
     return drawImageInline(image, dstX, dstY);
 }
@@ -295,7 +295,7 @@ bool NormalOpenGLGraphics::drawImage2(const Image *const image,
 bool NormalOpenGLGraphics::drawImageInline(const Image *const image,
                                            int dstX, int dstY)
 {
-    FUNC_BLOCK("Graphics::drawImage2", 1)
+    FUNC_BLOCK("Graphics::drawImage", 1)
     if (!image)
         return false;
 
@@ -1145,7 +1145,7 @@ void NormalOpenGLGraphics::_beginDraw()
 #endif
 #endif
 
-    pushClipArea(gcn::Rectangle(0, 0, w, h));
+    pushClipArea(Rect(0, 0, w, h));
 }
 
 void NormalOpenGLGraphics::_endDraw()
@@ -1211,21 +1211,21 @@ SDL_Surface* NormalOpenGLGraphics::getScreenshot()
     return screenshot;
 }
 
-bool NormalOpenGLGraphics::pushClipArea(gcn::Rectangle area)
+bool NormalOpenGLGraphics::pushClipArea(Rect area)
 {
     int transX = 0;
     int transY = 0;
 
     if (!mClipStack.empty())
     {
-        const gcn::ClipRectangle &clipArea = mClipStack.top();
+        const ClipRect &clipArea = mClipStack.top();
         transX = -clipArea.xOffset;
         transY = -clipArea.yOffset;
     }
 
-    const bool result = gcn::Graphics::pushClipArea(area);
+    const bool result = Graphics::pushClipArea(area);
 
-    const gcn::ClipRectangle &clipArea = mClipStack.top();
+    const ClipRect &clipArea = mClipStack.top();
     transX += clipArea.xOffset;
     transY += clipArea.yOffset;
 
@@ -1247,16 +1247,16 @@ void NormalOpenGLGraphics::popClipArea()
     if (mClipStack.empty())
         return;
 
-    const gcn::ClipRectangle &clipArea1 = mClipStack.top();
+    const ClipRect &clipArea1 = mClipStack.top();
     int transX = -clipArea1.xOffset;
     int transY = -clipArea1.yOffset;
 
-    gcn::Graphics::popClipArea();
+    Graphics::popClipArea();
 
     if (mClipStack.empty())
         return;
 
-    const gcn::ClipRectangle &clipArea = mClipStack.top();
+    const ClipRect &clipArea = mClipStack.top();
     transX += clipArea.xOffset;
     transY += clipArea.yOffset;
     if (transX || transY)
@@ -1297,12 +1297,12 @@ void NormalOpenGLGraphics::drawLine(int x1, int y1, int x2, int y2)
     drawLineArrayf(4);
 }
 
-void NormalOpenGLGraphics::drawRectangle(const gcn::Rectangle& rect)
+void NormalOpenGLGraphics::drawRectangle(const Rect& rect)
 {
     drawRectangle(rect, false);
 }
 
-void NormalOpenGLGraphics::fillRectangle(const gcn::Rectangle& rect)
+void NormalOpenGLGraphics::fillRectangle(const Rect& rect)
 {
     drawRectangle(rect, true);
 }
@@ -1347,7 +1347,7 @@ void NormalOpenGLGraphics::setTexturingAndBlending(const bool enable)
     }
 }
 
-void NormalOpenGLGraphics::drawRectangle(const gcn::Rectangle& rect,
+void NormalOpenGLGraphics::drawRectangle(const Rect& rect,
                                          const bool filled)
 {
     BLOCK_START("Graphics::drawRectangle")

@@ -20,18 +20,17 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "mouseinput.h"
-
 #include "gui/gui.h"
 
 #include "gui/focushandler.h"
+#include "gui/font.h"
 #include "gui/palette.h"
-#include "gui/sdlfont.h"
 #include "gui/sdlinput.h"
 #include "gui/theme.h"
 #include "gui/viewport.h"
 
-#include "gui/widgets/mouseevent.h"
+#include "events/mouseevent.h"
+
 #include "gui/widgets/window.h"
 
 #include "client.h"
@@ -39,9 +38,13 @@
 #include "dragdrop.h"
 #include "touchmanager.h"
 
+#include "events/keyevent.h"
+
+#include "listeners/focuslistener.h"
+
 #include "input/keydata.h"
-#include "input/keyevent.h"
 #include "input/keyinput.h"
+#include "input/mouseinput.h"
 
 #include "resources/cursor.h"
 #include "resources/image.h"
@@ -51,8 +54,6 @@
 #include "utils/langs.h"
 #include "utils/timer.h"
 
-#include <guichan/exception.hpp>
-
 #include "debug.h"
 
 // Guichan stuff
@@ -60,7 +61,7 @@ Gui *gui = nullptr;
 SDLInput *guiInput = nullptr;
 
 // Bolded font
-SDLFont *boldFont = nullptr;
+Font *boldFont = nullptr;
 
 class GuiConfigListener final : public ConfigListener
 {
@@ -160,16 +161,7 @@ void Gui::postInit(Graphics *const graphics)
     if (fontFile.empty())
         fontFile = branding.getStringValue("font");
 
-    try
-    {
-        mGuiFont = new SDLFont(fontFile, fontSize);
-    }
-    catch (const gcn::Exception &e)
-    {
-        logger->error(std::string("Unable to load '").append(fontFile)
-                      .append("': ").append(e.getMessage()));
-    }
-
+    mGuiFont = new Font(fontFile, fontSize);
 
     // Set particle font
     fontFile = config.getValue("particleFont", "");
@@ -188,65 +180,28 @@ void Gui::postInit(Graphics *const graphics)
     if (fontFile.empty())
         fontFile = branding.getStringValue("particleFont");
 
-    try
-    {
-        mInfoParticleFont = new SDLFont(
-            fontFile, fontSize, TTF_STYLE_BOLD);
-    }
-    catch (const gcn::Exception &e)
-    {
-        logger->error(std::string("Unable to load '").append(fontFile)
-                      .append("': ").append(e.getMessage()));
-    }
-
+    mInfoParticleFont = new Font(fontFile, fontSize, TTF_STYLE_BOLD);
 
     // Set bold font
     fontFile = config.getValue("boldFont", "");
     if (fontFile.empty())
         fontFile = branding.getStringValue("boldFont");
 
-    try
-    {
-        boldFont = new SDLFont(fontFile, fontSize);
-    }
-    catch (const gcn::Exception &e)
-    {
-        logger->error(std::string("Unable to load '").append(fontFile)
-                      .append("': ").append(e.getMessage()));
-    }
-
+    boldFont = new Font(fontFile, fontSize);
 
     // Set help font
     fontFile = config.getValue("helpFont", "");
     if (fontFile.empty())
         fontFile = branding.getStringValue("helpFont");
 
-    try
-    {
-        mHelpFont = new SDLFont(fontFile, fontSize);
-    }
-    catch (const gcn::Exception &e)
-    {
-        logger->error(std::string("Unable to load '").append(fontFile)
-                      .append("': ").append(e.getMessage()));
-    }
-
+    mHelpFont = new Font(fontFile, fontSize);
 
     // Set secure font
     fontFile = config.getValue("secureFont", "");
     if (fontFile.empty())
         fontFile = branding.getStringValue("secureFont");
 
-    try
-    {
-        mSecureFont = new SDLFont(fontFile, fontSize);
-    }
-    catch (const gcn::Exception &e)
-    {
-        logger->error(std::string("Unable to load '").append(fontFile)
-                      .append("': ").append(e.getMessage()));
-    }
-
+    mSecureFont = new Font(fontFile, fontSize);
 
     // Set npc font
     const int npcFontSize = config.getIntValue("npcfontSize");
@@ -266,17 +221,9 @@ void Gui::postInit(Graphics *const graphics)
     if (fontFile.empty())
         fontFile = branding.getStringValue("npcFont");
 
-    try
-    {
-        mNpcFont = new SDLFont(fontFile, npcFontSize);
-    }
-    catch (const gcn::Exception &e)
-    {
-        logger->error(std::string("Unable to load '").append(fontFile)
-                      .append("': ").append(e.getMessage()));
-    }
+    mNpcFont = new Font(fontFile, npcFontSize);
 
-    gcn::Widget::setGlobalFont(mGuiFont);
+    Widget::setGlobalFont(mGuiFont);
 
     // Initialize mouse cursor and listen for changes to the option
     setUseCustomCursor(config.getBoolValue("customcursor"));
@@ -473,7 +420,7 @@ bool Gui::handleKeyInput2()
             // change focus.
             if (!keyEventConsumed && mTabbing && keyInput.getActionId()
                 == static_cast<int>(Input::KEY_GUI_TAB)
-                && keyInput.getType() == gcn::KeyInput::PRESSED)
+                && keyInput.getType() == KeyInput::PRESSED)
             {
                 if (keyInput.isShiftPressed())
                     mFocusHandler->tabPrevious();
@@ -499,13 +446,12 @@ void Gui::draw()
     if ((client->getMouseFocused() || button & SDL_BUTTON(1))
         && mMouseCursors && mCustomCursor && mMouseCursorAlpha > 0.0F)
     {
-        Graphics *g2 = static_cast<Graphics*>(mGraphics);
         const Image *const image = dragDrop.getItemImage();
         if (image)
         {
             const int posX = mouseX - (image->mBounds.w / 2);
             const int posY = mouseY - (image->mBounds.h / 2);
-            g2->drawImage2(image, posX, posY);
+            mGraphics->drawImage(image, posX, posY);
         }
         if (mGuiFont)
         {
@@ -514,8 +460,8 @@ void Gui::draw()
             {
                 const int posX = mouseX - mGuiFont->getWidth(str) / 2;
                 const int posY = mouseY + (image ? image->mBounds.h / 2 : 0);
-                g2->setColorAll(mForegroundColor, mForegroundColor2);
-                mGuiFont->drawString(g2, str, posX, posY);
+                mGraphics->setColorAll(mForegroundColor, mForegroundColor2);
+                mGuiFont->drawString(mGraphics, str, posX, posY);
             }
         }
 
@@ -523,7 +469,7 @@ void Gui::draw()
         if (mouseCursor)
         {
             mouseCursor->setAlpha(mMouseCursorAlpha);
-            g2->drawImage2(mouseCursor, mouseX - 15, mouseY - 17);
+            mGraphics->drawImage(mouseCursor, mouseX - 15, mouseY - 17);
         }
     }
 
@@ -579,20 +525,20 @@ void Gui::setUseCustomCursor(const bool customCursor)
     }
 }
 
-void Gui::handleMouseMoved(const gcn::MouseInput &mouseInput)
+void Gui::handleMouseMoved(const MouseInput &mouseInput)
 {
     gcn::Gui::handleMouseMoved(mouseInput);
     mMouseInactivityTimer = 0;
 }
 
-void Gui::handleMousePressed(const gcn::MouseInput &mouseInput)
+void Gui::handleMousePressed(const MouseInput &mouseInput)
 {
     const int x = mouseInput.getX();
     const int y = mouseInput.getY();
     const unsigned int button = mouseInput.getButton();
     const int timeStamp = mouseInput.getTimeStamp();
 
-    gcn::Widget *sourceWidget = getMouseEventSource(x, y);
+    Widget *sourceWidget = getMouseEventSource(x, y);
 
     if (mFocusHandler->getDraggedWidget())
         sourceWidget = mFocusHandler->getDraggedWidget();
@@ -655,14 +601,14 @@ void Gui::updateFonts()
     mNpcFont->loadFont(fontFile, npcFontSize);
 }
 
-void Gui::distributeMouseEvent(gcn::Widget* source, int type, int button,
+void Gui::distributeMouseEvent(Widget* source, int type, int button,
                                int x, int y, bool force,
                                bool toSourceOnly)
 {
     if (!source || !mFocusHandler)
         return;
 
-    gcn::Widget* widget = source;
+    Widget* widget = source;
 
     if (!force && mFocusHandler->getModalFocused() != nullptr
         && !widget->isModalFocused())
@@ -680,12 +626,12 @@ void Gui::distributeMouseEvent(gcn::Widget* source, int type, int button,
         mAltPressed, mMetaPressed, type, button,
         x, y, mClickCount);
 
-    gcn::Widget* parent = source;
+    Widget* parent = source;
     while (parent)
     {
         // If the widget has been removed due to input
         // cancel the distribution.
-        if (!gcn::Widget::widgetExists(widget))
+        if (!Widget::widgetExists(widget))
             break;
 
         parent = widget->getParent();
@@ -698,42 +644,42 @@ void Gui::distributeMouseEvent(gcn::Widget* source, int type, int button,
             mouseEvent.setX(x - widgetX);
             mouseEvent.setY(y - widgetY);
 
-            std::list<gcn::MouseListener*> mouseListeners
+            std::list<MouseListener*> mouseListeners
                 = widget->_getMouseListeners();
 
             // Send the event to all mouse listeners of the widget.
-            for (std::list<gcn::MouseListener*>::const_iterator
+            for (std::list<MouseListener*>::const_iterator
                  it = mouseListeners.begin();
                  it != mouseListeners.end(); ++ it)
             {
                 switch (mouseEvent.getType())
                 {
-                    case gcn::MouseEvent::ENTERED:
+                    case MouseEvent::ENTERED:
                         (*it)->mouseEntered(mouseEvent);
                         break;
-                    case gcn::MouseEvent::EXITED:
+                    case MouseEvent::EXITED:
                         (*it)->mouseExited(mouseEvent);
                         break;
-                    case gcn::MouseEvent::MOVED:
+                    case MouseEvent::MOVED:
                         (*it)->mouseMoved(mouseEvent);
                         break;
-                    case gcn::MouseEvent::PRESSED:
+                    case MouseEvent::PRESSED:
                         (*it)->mousePressed(mouseEvent);
                         break;
-                    case gcn::MouseEvent::RELEASED:
+                    case MouseEvent::RELEASED:
                     case 100:  // manual hack for release on target after drag
                         (*it)->mouseReleased(mouseEvent);
                         break;
-                    case gcn::MouseEvent::WHEEL_MOVED_UP:
+                    case MouseEvent::WHEEL_MOVED_UP:
                         (*it)->mouseWheelMovedUp(mouseEvent);
                         break;
-                    case gcn::MouseEvent::WHEEL_MOVED_DOWN:
+                    case MouseEvent::WHEEL_MOVED_DOWN:
                         (*it)->mouseWheelMovedDown(mouseEvent);
                         break;
-                    case gcn::MouseEvent::DRAGGED:
+                    case MouseEvent::DRAGGED:
                         (*it)->mouseDragged(mouseEvent);
                         break;
-                    case gcn::MouseEvent::CLICKED:
+                    case MouseEvent::CLICKED:
                         (*it)->mouseClicked(mouseEvent);
                         break;
                     default:
@@ -745,11 +691,11 @@ void Gui::distributeMouseEvent(gcn::Widget* source, int type, int button,
                 break;
         }
 
-        const gcn::Widget *const swap = widget;
+        const Widget *const swap = widget;
         widget = parent;
         parent = swap->getParent();
 
-        if (type == gcn::MouseEvent::RELEASED)
+        if (type == MouseEvent::RELEASED)
             dragDrop.clear();
 
         // If a non modal focused widget has been reach
@@ -794,7 +740,7 @@ MouseEvent *Gui::createMouseEvent(Window *const widget)
         mouseX - x, mouseY - y, mClickCount);
 }
 
-void Gui::getAbsolutePosition(gcn::Widget *restrict widget,
+void Gui::getAbsolutePosition(Widget *restrict widget,
                               int &restrict x, int &restrict y)
 {
     x = 0;
@@ -836,32 +782,31 @@ void Gui::handleMouseInput()
 #endif
         switch (mouseInput.getType())
         {
-            case gcn::MouseInput::PRESSED:
+            case MouseInput::PRESSED:
                 handleMousePressed(mouseInput);
                 break;
-            case gcn::MouseInput::RELEASED:
+            case MouseInput::RELEASED:
                 handleMouseReleased(mouseInput);
                 break;
-            case gcn::MouseInput::MOVED:
+            case MouseInput::MOVED:
                 handleMouseMoved(mouseInput);
                 break;
-            case gcn::MouseInput::WHEEL_MOVED_DOWN:
+            case MouseInput::WHEEL_MOVED_DOWN:
                 handleMouseWheelMovedDown(mouseInput);
                 break;
-            case gcn::MouseInput::WHEEL_MOVED_UP:
+            case MouseInput::WHEEL_MOVED_UP:
                 handleMouseWheelMovedUp(mouseInput);
                 break;
             default:
-                throw GCN_EXCEPTION("Unknown mouse input type.");
                 break;
         }
     }
     BLOCK_END("Gui::handleMouseInput")
 }
 
-void Gui::handleMouseReleased(const gcn::MouseInput &mouseInput)
+void Gui::handleMouseReleased(const MouseInput &mouseInput)
 {
-    gcn::Widget *sourceWidget = getMouseEventSource(
+    Widget *sourceWidget = getMouseEventSource(
         mouseInput.getX(), mouseInput.getY());
 
     int sourceWidgetX, sourceWidgetY;
@@ -870,7 +815,7 @@ void Gui::handleMouseReleased(const gcn::MouseInput &mouseInput)
         if (sourceWidget != mFocusHandler->getLastWidgetPressed())
             mFocusHandler->setLastWidgetPressed(nullptr);
 
-        gcn::Widget *oldWidget = sourceWidget;
+        Widget *oldWidget = sourceWidget;
         sourceWidget = mFocusHandler->getDraggedWidget();
         if (oldWidget != sourceWidget)
         {
@@ -911,17 +856,17 @@ void Gui::handleMouseReleased(const gcn::MouseInput &mouseInput)
         mFocusHandler->setDraggedWidget(nullptr);
 }
 
-void Gui::addGlobalFocusListener(gcn::FocusListener* focusListener)
+void Gui::addGlobalFocusListener(FocusListener* focusListener)
 {
     mFocusListeners.push_back(focusListener);
 }
 
-void Gui::removeGlobalFocusListener(gcn::FocusListener* focusListener)
+void Gui::removeGlobalFocusListener(FocusListener* focusListener)
 {
     mFocusListeners.remove(focusListener);
 }
 
-void Gui::distributeGlobalFocusGainedEvent(const gcn::Event &focusEvent)
+void Gui::distributeGlobalFocusGainedEvent(const Event &focusEvent)
 {
     for (FocusListenerIterator iter = mFocusListeners.begin();
          iter != mFocusListeners.end();
@@ -931,7 +876,7 @@ void Gui::distributeGlobalFocusGainedEvent(const gcn::Event &focusEvent)
     }
 }
 
-void Gui::removeDragged(gcn::Widget *widget)
+void Gui::removeDragged(Widget *widget)
 {
     if (!mFocusHandler)
         return;

@@ -20,6 +20,49 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/*      _______   __   __   __   ______   __   __   _______   __   __
+ *     / _____/\ / /\ / /\ / /\ / ____/\ / /\ / /\ / ___  /\ /  |\/ /\
+ *    / /\____\// / // / // / // /\___\// /_// / // /\_/ / // , |/ / /
+ *   / / /__   / / // / // / // / /    / ___  / // ___  / // /| ' / /
+ *  / /_// /\ / /_// / // / // /_/_   / / // / // /\_/ / // / |  / /
+ * /______/ //______/ //_/ //_____/\ /_/ //_/ //_/ //_/ //_/ /|_/ /
+ * \______\/ \______\/ \_\/ \_____\/ \_\/ \_\/ \_\/ \_\/ \_\/ \_\/
+ *
+ * Copyright (c) 2004 - 2008 Olof Naessén and Per Larsson
+ *
+ *
+ * Per Larsson a.k.a finalman
+ * Olof Naessén a.k.a jansem/yakslem
+ *
+ * Visit: http://guichan.sourceforge.net
+ *
+ * License: (BSD)
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in
+ *    the documentation and/or other materials provided with the
+ *    distribution.
+ * 3. Neither the name of Guichan nor the names of its contributors may
+ *    be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+ * TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
 #ifdef USE_SDL2
 
 #include "render/sdl2graphics.h"
@@ -31,12 +74,13 @@
 #include "graphicsvertexes.h"
 #include "logger.h"
 
+#include "resources/image.h"
 #include "resources/imagehelper.h"
 #include "resources/sdl2imagehelper.h"
 
 #include "utils/sdlcheckutils.h"
 
-#include <guichan/sdl/sdlpixel.hpp>
+#include "utils/sdlpixel.h"
 
 #include "debug.h"
 
@@ -92,7 +136,7 @@ bool SDLGraphics::drawRescaledImage(const Image *const image,
     if (!image->mTexture)
         return false;
 
-    const gcn::ClipRectangle &top = mClipStack.top();
+    const ClipRect &top = mClipStack.top();
     const SDL_Rect &bounds = image->mBounds;
     const SDL_Rect srcRect =
     {
@@ -113,8 +157,8 @@ bool SDLGraphics::drawRescaledImage(const Image *const image,
         &srcRect, &dstRect) < 0);
 }
 
-bool SDLGraphics::drawImage2(const Image *const image,
-                             int dstX, int dstY)
+bool SDLGraphics::drawImage(const Image *const image,
+                            int dstX, int dstY)
 {
     return drawImageInline(image, dstX, dstY);
 }
@@ -122,12 +166,12 @@ bool SDLGraphics::drawImage2(const Image *const image,
 bool SDLGraphics::drawImageInline(const Image *const image,
                                   int dstX, int dstY)
 {
-    FUNC_BLOCK("Graphics::drawImage2", 1)
+    FUNC_BLOCK("Graphics::drawImage", 1)
     // Check that preconditions for blitting are met.
     if (!mWindow || !image || !image->mTexture)
         return false;
 
-    const gcn::ClipRectangle &top = mClipStack.top();
+    const ClipRect &top = mClipStack.top();
     if (!top.width || !top.height)
         return false;
 
@@ -159,7 +203,7 @@ void SDLGraphics::drawImageCached(const Image *const image,
     if (!mWindow || !image || !image->mTexture)
         return;
 
-    const gcn::ClipRectangle &top = mClipStack.top();
+    const ClipRect &top = mClipStack.top();
     if (!top.width || !top.height)
         return;
 
@@ -194,7 +238,7 @@ void SDLGraphics::drawPatternCached(const Image *const image,
     if (!image->mTexture)
         return;
 
-    const gcn::ClipRectangle &top = mClipStack.top();
+    const ClipRect &top = mClipStack.top();
     if (!top.width || !top.height)
         return;
 
@@ -252,7 +296,7 @@ void SDLGraphics::drawPatternInline(const Image *const image,
     if (!image->mTexture)
         return;
 
-    const gcn::ClipRectangle &top = mClipStack.top();
+    const ClipRect &top = mClipStack.top();
     if (!top.width || !top.height)
         return;
 
@@ -303,7 +347,7 @@ void SDLGraphics::drawRescaledPattern(const Image *const image,
     if (scaledHeight == 0 || scaledWidth == 0)
         return;
 
-    const gcn::ClipRectangle &top = mClipStack.top();
+    const ClipRect &top = mClipStack.top();
     if (!top.width || !top.height)
         return;
 
@@ -363,7 +407,7 @@ void SDLGraphics::calcPatternInline(ImageVertexes* const vert,
     if (!vert || !mWindow || !image || !image->mTexture)
         return;
 
-    const gcn::ClipRectangle &top = mClipStack.top();
+    const ClipRect &top = mClipStack.top();
     if (!top.width || !top.height)
         return;
 
@@ -448,7 +492,7 @@ void SDLGraphics::calcTileSDL(ImageVertexes *const vert, int x, int y) const
     if (!vert || !vert->image || !vert->image->mTexture)
         return;
 
-    const gcn::ClipRectangle &top = mClipStack.top();
+    const ClipRect &top = mClipStack.top();
     if (!top.width || !top.height)
         return;
 
@@ -594,9 +638,9 @@ void SDLGraphics::calcWindow(ImageCollection *const vertCol,
     calcImageRect(vert, x, y, w, h, imgRect);
 }
 
-void SDLGraphics::fillRectangle(const gcn::Rectangle &rectangle)
+void SDLGraphics::fillRectangle(const Rect &rectangle)
 {
-    const gcn::ClipRectangle &top = mClipStack.top();
+    const ClipRect &top = mClipStack.top();
     const SDL_Rect rect =
     {
         static_cast<int32_t>(rectangle.x + top.xOffset),
@@ -611,7 +655,7 @@ void SDLGraphics::fillRectangle(const gcn::Rectangle &rectangle)
 
 void SDLGraphics::_beginDraw()
 {
-    pushClipArea(gcn::Rectangle(0, 0, mRect.w, mRect.h));
+    pushClipArea(Rect(0, 0, mRect.w, mRect.h));
 }
 
 void SDLGraphics::_endDraw()
@@ -619,11 +663,11 @@ void SDLGraphics::_endDraw()
     popClipArea();
 }
 
-bool SDLGraphics::pushClipArea(gcn::Rectangle area)
+bool SDLGraphics::pushClipArea(Rect area)
 {
-    const bool result = gcn::Graphics::pushClipArea(area);
+    const bool result = Graphics::pushClipArea(area);
 
-    const gcn::ClipRectangle &carea = mClipStack.top();
+    const ClipRect &carea = mClipStack.top();
     const SDL_Rect rect =
     {
         static_cast<int32_t>(carea.x),
@@ -637,12 +681,12 @@ bool SDLGraphics::pushClipArea(gcn::Rectangle area)
 
 void SDLGraphics::popClipArea()
 {
-    gcn::Graphics::popClipArea();
+    Graphics::popClipArea();
 
     if (mClipStack.empty())
         return;
 
-    const gcn::ClipRectangle &carea = mClipStack.top();
+    const ClipRect &carea = mClipStack.top();
     const SDL_Rect rect =
     {
         static_cast<int32_t>(carea.x),
@@ -659,7 +703,7 @@ void SDLGraphics::drawPoint(int x, int y)
     if (mClipStack.empty())
         return;
 
-    const gcn::ClipRectangle &top = mClipStack.top();
+    const ClipRect &top = mClipStack.top();
 
     x += top.xOffset;
     y += top.yOffset;
@@ -678,9 +722,9 @@ void SDLGraphics::drawPoint(int x, int y)
 }
 
 
-void SDLGraphics::drawRectangle(const gcn::Rectangle &rectangle)
+void SDLGraphics::drawRectangle(const Rect &rectangle)
 {
-    const gcn::ClipRectangle &top = mClipStack.top();
+    const ClipRect &top = mClipStack.top();
 
     SDL_SetRenderDrawColor(mRenderer, mColor.r, mColor.g, mColor.b, mColor.a);
 
@@ -702,7 +746,7 @@ void SDLGraphics::drawRectangle(const gcn::Rectangle &rectangle)
 
 void SDLGraphics::drawLine(int x1, int y1, int x2, int y2)
 {
-    const gcn::ClipRectangle &top = mClipStack.top();
+    const ClipRect &top = mClipStack.top();
 
     SDL_SetRenderDrawColor(mRenderer, mColor.r, mColor.g, mColor.b, mColor.a);
 

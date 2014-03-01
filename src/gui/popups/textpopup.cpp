@@ -25,7 +25,7 @@
 
 #include "gui/widgets/label.h"
 
-#include <guichan/font.hpp>
+#include "gui/font.h"
 
 #include "debug.h"
 
@@ -86,7 +86,7 @@ void TextPopup::show(const int x, const int y, const std::string &str1,
     setHeight(pad2 + mText[0]->getFont()->getHeight() * cnt);
     const int distance = 20;
 
-    const gcn::Rectangle &rect = mDimension;
+    const Rect &rect = mDimension;
     int posX = std::max(0, x - rect.width / 2);
     int posY = y + distance;
 
@@ -100,7 +100,7 @@ void TextPopup::show(const int x, const int y, const std::string &str1,
     requestMoveToTop();
 }
 
-void TextPopup::mouseMoved(gcn::MouseEvent &event)
+void TextPopup::mouseMoved(MouseEvent &event)
 {
     Popup::mouseMoved(event);
 

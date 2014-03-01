@@ -29,14 +29,14 @@ class ColorPage final : public ListBox
 {
     public:
         ColorPage(const Widget2 *const widget,
-                  gcn::ListModel *const listModel,
+                  ListModel *const listModel,
                   const std::string &skin);
 
         A_DELETE_COPY(ColorPage)
 
         ~ColorPage();
 
-        void draw(gcn::Graphics *graphics) override final;
+        void draw(Graphics *graphics) override final;
 
         void resetAction();
 

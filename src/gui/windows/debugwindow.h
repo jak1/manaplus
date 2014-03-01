@@ -41,7 +41,7 @@ class DebugTab : public Container
         }
 
         void resize(const int x, const int y)
-        { setDimension(gcn::Rectangle(0, 0, x, y)); }
+        { setDimension(Rect(0, 0, x, y)); }
 
     protected:
         explicit DebugTab(const Widget2 *const widget) :
@@ -147,11 +147,11 @@ class DebugWindow final : public Window
          */
         void slowLogic();
 
-        void draw(gcn::Graphics *g) override final;
+        void draw(Graphics *g) override final;
 
         void setPing(int pingTime);
 
-        void widgetResized(const gcn::Event &event) override final;
+        void widgetResized(const Event &event) override final;
 
 #ifdef USE_PROFILER
         void logicChildren();

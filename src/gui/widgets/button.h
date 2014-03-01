@@ -23,10 +23,8 @@
 #ifndef GUI_WIDGETS_BUTTON_H
 #define GUI_WIDGETS_BUTTON_H
 
-#include "gui/widgets/widget2.h"
-
-#include <guichan/widgets/button.hpp>
-#include <guichan/widgetlistener.hpp>
+#include "gui/base/widgets/button.hpp"
+#include "listeners/widgetlistener.h"
 
 #include "localconsts.h"
 
@@ -43,8 +41,7 @@ const std::string BUTTON_PLAY = "buttonplay.png";
  * \ingroup GUI
  */
 class Button final : public gcn::Button,
-                     public Widget2,
-                     public gcn::WidgetListener
+                     public WidgetListener
 {
     public:
         /**
@@ -59,7 +56,7 @@ class Button final : public gcn::Button,
         Button(const Widget2 *const widget,
                const std::string &restrict caption,
                const std::string &restrict actionEventId,
-               gcn::ActionListener *const listener);
+               ActionListener *const listener);
 
         /**
          * Constructor, sets the caption of the button to the given string and
@@ -70,7 +67,7 @@ class Button final : public gcn::Button,
                const std::string &restrict imageName,
                const int imageWidth, const int imageHeight,
                const std::string &actionEventId,
-               gcn::ActionListener *const listener);
+               ActionListener *const listener);
 
         /**
          * Constructor, sets the caption of the button to the given string and
@@ -80,7 +77,7 @@ class Button final : public gcn::Button,
                const std::string &restrict imageName,
                const int imageWidth, const int imageHeight,
                const std::string &restrict actionEventId,
-               gcn::ActionListener *const listener);
+               ActionListener *const listener);
 
         /**
          * Constructor, sets the caption of the button to the given string and
@@ -90,7 +87,7 @@ class Button final : public gcn::Button,
                const std::string &restrict imageName,
                const std::string &restrict caption,
                const std::string &restrict actionEventId,
-               gcn::ActionListener *const listener);
+               ActionListener *const listener);
 
         A_DELETE_COPY(Button)
 
@@ -102,14 +99,14 @@ class Button final : public gcn::Button,
         /**
          * Draws the button.
          */
-        void draw(gcn::Graphics *graphics) override final;
+        void draw(Graphics *graphics) override final;
 
         /**
          * Update the alpha value to the button components.
          */
         static void updateAlpha();
 
-        void mouseReleased(gcn::MouseEvent& mouseEvent) override final;
+        void mouseReleased(MouseEvent& mouseEvent) override final;
 
         void setDescription(std::string text)
         { mDescription = text; }
@@ -132,9 +129,9 @@ class Button final : public gcn::Button,
         void setPressed(bool b)
         { mPressed = b; }
 
-        void widgetResized(const gcn::Event &event) override final;
+        void widgetResized(const Event &event) override final;
 
-        void widgetMoved(const gcn::Event &event) override final;
+        void widgetMoved(const Event &event) override final;
 
         void loadImage(const std::string &imageName);
 
@@ -144,9 +141,9 @@ class Button final : public gcn::Button,
 
         void setCaption(const std::string& caption);
 
-        void keyPressed(gcn::KeyEvent &keyEvent) override final;
+        void keyPressed(KeyEvent &keyEvent) override final;
 
-        void keyReleased(gcn::KeyEvent &keyEvent) override final;
+        void keyReleased(KeyEvent &keyEvent) override final;
 
         bool isPressed2() const A_WARN_UNUSED;
 
@@ -168,14 +165,14 @@ class Button final : public gcn::Button,
 
         std::string mDescription;
         ImageCollection *mVertexes2;
-        gcn::Color mEnabledColor;
-        gcn::Color mEnabledColor2;
-        gcn::Color mDisabledColor;
-        gcn::Color mDisabledColor2;
-        gcn::Color mHighlightedColor;
-        gcn::Color mHighlightedColor2;
-        gcn::Color mPressedColor;
-        gcn::Color mPressedColor2;
+        Color mEnabledColor;
+        Color mEnabledColor2;
+        Color mDisabledColor;
+        Color mDisabledColor2;
+        Color mHighlightedColor;
+        Color mHighlightedColor2;
+        Color mPressedColor;
+        Color mPressedColor2;
         Image **mImages;
         ImageSet *mImageSet;
         unsigned mClickCount;

@@ -27,18 +27,16 @@
 
 #include "gui/widgets/tabs/setuptab.h"
 
+#include "listeners/playerrelationslistener.h"
+
 class Button;
 class CheckBox;
 class DropDown;
 class GuiTable;
+class ListModel;
 class PlayerTableModel;
 class ScrollArea;
 class StaticTableModel;
-
-namespace gcn
-{
-    class ListModel;
-}
 
 class Setup_Relations final : public SetupTab,
                               public PlayerRelationsListener
@@ -56,7 +54,7 @@ public:
 
     void reset();
 
-    void action(const gcn::ActionEvent &event) override final;
+    void action(const ActionEvent &event) override final;
 
     void updatedPlayer(const std::string &name);
 
@@ -76,7 +74,7 @@ private:
 
     Button *mDeleteButton;
 
-    gcn::ListModel *mIgnoreActionChoicesModel;
+    ListModel *mIgnoreActionChoicesModel;
     DropDown *mIgnoreActionChoicesBox;
 };
 

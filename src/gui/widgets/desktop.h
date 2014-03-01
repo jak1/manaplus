@@ -24,7 +24,7 @@
 
 #include "gui/widgets/container.h"
 
-#include <guichan/widgetlistener.hpp>
+#include "listeners/widgetlistener.h"
 
 #include "localconsts.h"
 
@@ -45,7 +45,8 @@ class Skin;
  *
  * \ingroup GUI
  */
-class Desktop final : public Container, private gcn::WidgetListener
+class Desktop final : public Container,
+                      private WidgetListener
 {
     public:
         explicit Desktop(const Widget2 *const widget);
@@ -59,9 +60,9 @@ class Desktop final : public Container, private gcn::WidgetListener
          */
         void reloadWallpaper();
 
-        void widgetResized(const gcn::Event &event) override final;
+        void widgetResized(const Event &event) override final;
 
-        void draw(gcn::Graphics *graphics) override final;
+        void draw(Graphics *graphics) override final;
 
         void postInit();
 
@@ -71,8 +72,8 @@ class Desktop final : public Container, private gcn::WidgetListener
         Image *mWallpaper;
         Label *mVersionLabel;
         Skin *mSkin;
-        gcn::Color mBackgroundColor;
-        gcn::Color mBackgroundGrayColor;
+        Color mBackgroundColor;
+        Color mBackgroundGrayColor;
         bool mShowBackground;
 };
 

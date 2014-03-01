@@ -27,23 +27,23 @@
 
 #include "being/playerinfo.h"
 
+#include "gui/font.h"
 #include "gui/viewport.h"
 
 #include "gui/popups/itempopup.h"
 
-#include "gui/widgets/shopitems.h"
+#include "gui/models/shopitems.h"
 
 #include "resources/image.h"
 
-#include <guichan/font.hpp>
-#include <guichan/listmodel.hpp>
+#include "gui/models/listmodel.h"
 
 #include "debug.h"
 
 const int ITEM_ICON_SIZE = 32;
 
 ShopListBox::ShopListBox(const Widget2 *const widget,
-                         gcn::ListModel *const listModel) :
+                         ListModel *const listModel) :
     ListBox(widget, listModel, "shoplistbox.xml"),
     mPlayerMoney(0),
     mShopItems(nullptr),
@@ -60,7 +60,7 @@ ShopListBox::ShopListBox(const Widget2 *const widget,
 }
 
 ShopListBox::ShopListBox(const Widget2 *const widget,
-                         gcn::ListModel *const listModel,
+                         ListModel *const listModel,
                          ShopItems *const shopListModel) :
     ListBox(widget, listModel, "shoplistbox.xml"),
     mPlayerMoney(0),
@@ -82,7 +82,7 @@ void ShopListBox::setPlayersMoney(const int money)
     mPlayerMoney = money;
 }
 
-void ShopListBox::draw(gcn::Graphics *gcnGraphics)
+void ShopListBox::draw(Graphics *graphics)
 {
     BLOCK_START("ShopListBox::draw")
     if (!mListModel || !mShopItems)
@@ -95,8 +95,7 @@ void ShopListBox::draw(gcn::Graphics *gcnGraphics)
         mAlpha = client->getGuiAlpha();
 
     const int alpha = static_cast<int>(mAlpha * 255.0F);
-    Graphics *graphics = static_cast<Graphics*>(gcnGraphics);
-    gcn::Font *const font = getFont();
+    Font *const font = getFont();
 
     const int sz = mListModel->getNumberOfElements();
     const int fontHeigh = getFont()->getHeight();
@@ -107,8 +106,8 @@ void ShopListBox::draw(gcn::Graphics *gcnGraphics)
          ++i, y += mRowHeight)
     {
         bool needDraw(false);
-        gcn::Color temp;
-        gcn::Color* backgroundColor = &mBackgroundColor;
+        Color temp;
+        Color* backgroundColor = &mBackgroundColor;
 
         ShopItem *const item = mShopItems->at(i);
         if (item && ((mShopItems && mPlayerMoney < item->getPrice()
@@ -145,7 +144,7 @@ void ShopListBox::draw(gcn::Graphics *gcnGraphics)
         if (needDraw)
         {
             graphics->setColor(*backgroundColor);
-            graphics->fillRectangle(gcn::Rectangle(mPadding, y + mPadding,
+            graphics->fillRectangle(Rect(mPadding, y + mPadding,
                 width, mRowHeight));
         }
 
@@ -155,7 +154,7 @@ void ShopListBox::draw(gcn::Graphics *gcnGraphics)
             if (icon)
             {
                 icon->setAlpha(1.0F);
-                graphics->drawImage2(icon, mPadding, y + mPadding);
+                graphics->drawImage(icon, mPadding, y + mPadding);
             }
         }
         if (mSelected == i)
@@ -190,7 +189,7 @@ void ShopListBox::setPriceCheck(const bool check)
     mPriceCheck = check;
 }
 
-void ShopListBox::mouseMoved(gcn::MouseEvent &event)
+void ShopListBox::mouseMoved(MouseEvent &event)
 {
     if (!mItemPopup || !mRowHeight)
         return;
@@ -222,10 +221,10 @@ void ShopListBox::mouseMoved(gcn::MouseEvent &event)
     }
 }
 
-void ShopListBox::mouseReleased(gcn::MouseEvent& mouseEvent)
+void ShopListBox::mouseReleased(MouseEvent& mouseEvent)
 {
     ListBox::mouseReleased(mouseEvent);
-    if (mouseEvent.getButton() == gcn::MouseEvent::RIGHT)
+    if (mouseEvent.getButton() == MouseEvent::RIGHT)
     {
         setSelected(std::max(0, getSelectionByMouse(mouseEvent.getY())));
 
@@ -237,7 +236,7 @@ void ShopListBox::mouseReleased(gcn::MouseEvent& mouseEvent)
     }
 }
 
-void ShopListBox::mouseExited(gcn::MouseEvent& mouseEvent A_UNUSED)
+void ShopListBox::mouseExited(MouseEvent& mouseEvent A_UNUSED)
 {
     if (!mItemPopup)
         return;

@@ -27,6 +27,10 @@
 
 #include "input/keyboardconfig.h"
 
+#include "gui/models/iconsmodel.h"
+#include "gui/models/magicschoolmodel.h"
+#include "gui/models/targettypemodel.h"
+
 #include "gui/widgets/button.h"
 #include "gui/widgets/dropdown.h"
 #include "gui/widgets/inttextfield.h"
@@ -36,131 +40,12 @@
 
 #include "utils/gettext.h"
 
-#include "resources/iteminfo.h"
-
-#include "resources/db/itemdb.h"
-
 #include "debug.h"
-
-class IconsModal final : public gcn::ListModel
-{
-public:
-    IconsModal() :
-        mStrings()
-    {
-        const std::map<int, ItemInfo*> &items = ItemDB::getItemInfos();
-        std::list<std::string> tempStrings;
-
-        for (std::map<int, ItemInfo*>::const_iterator
-             i = items.begin(), i_end = items.end();
-             i != i_end; ++i)
-        {
-            if (i->first < 0)
-                continue;
-
-            const ItemInfo &info = (*i->second);
-            const std::string name = info.getName();
-            if (name != "unnamed" && !info.getName().empty()
-                && info.getName() != "unnamed")
-            {
-                tempStrings.push_back(name);
-            }
-        }
-        tempStrings.sort();
-        mStrings.push_back("");
-        FOR_EACH (std::list<std::string>::const_iterator, i, tempStrings)
-            mStrings.push_back(*i);
-    }
-
-    A_DELETE_COPY(IconsModal)
-
-    ~IconsModal()
-    { }
-
-    int getNumberOfElements() override final
-    {
-        return static_cast<int>(mStrings.size());
-    }
-
-    std::string getElementAt(int i) override final
-    {
-        if (i < 0 || i >= getNumberOfElements())
-            return "???";
-        return mStrings.at(i);
-    }
-private:
-    StringVect mStrings;
-};
-
-
-const char *TARGET_TYPE_TEXT[3] =
-{
-    // TRANSLATORS: target type
-    N_("No Target"),
-    // TRANSLATORS: target type
-    N_("Allow Target"),
-    // TRANSLATORS: target type
-    N_("Need Target"),
-};
-
-const char *MAGIC_SCHOOL_TEXT[6] =
-{
-    // TRANSLATORS: magic school
-    N_("General Magic"),
-    // TRANSLATORS: magic school
-    N_("Life Magic"),
-    // TRANSLATORS: magic school
-    N_("War Magic"),
-    // TRANSLATORS: magic school
-    N_("Transmute Magic"),
-    // TRANSLATORS: magic school
-    N_("Nature Magic"),
-    // TRANSLATORS: magic school
-    N_("Astral Magic")
-};
-
-class TargetTypeModel final : public gcn::ListModel
-{
-public:
-    ~TargetTypeModel()
-    { }
-
-    int getNumberOfElements() override final
-    {
-        return 3;
-    }
-
-    std::string getElementAt(int i) override final
-    {
-        if (i >= getNumberOfElements() || i < 0)
-            return "???";
-        return TARGET_TYPE_TEXT[i];
-    }
-};
-
-class MagicSchoolModel final : public gcn::ListModel
-{
-public:
-    ~MagicSchoolModel()
-    { }
-
-    int getNumberOfElements() override final
-    {
-        return 6;
-    }
-
-    std::string getElementAt(int i) override final
-    {
-        if (i >= getNumberOfElements() || i < 0)
-            return "???";
-        return MAGIC_SCHOOL_TEXT[i];
-    }
-};
 
 TextCommandEditor::TextCommandEditor(TextCommand *const command) :
     // TRANSLATORS: command editor name
     Window(_("Command Editor"), false, nullptr, "commandeditor.xml"),
-    gcn::ActionListener(),
+    ActionListener(),
     mIsMagicCommand(command->getCommandType() == TEXT_COMMAND_MAGIC),
     mCommand(command),
     // TRANSLATORS: command editor button
@@ -180,10 +65,10 @@ TextCommandEditor::TextCommandEditor(TextCommand *const command) :
     // TRANSLATORS: command editor label
     mTypeLabel(new Label(this, _("Target Type:"))),
     mTypeDropDown(new DropDown(this, mTargetTypeModel)),
-    mIconsModal(new IconsModal),
+    mIconsModel(new IconsModel),
     // TRANSLATORS: command editor label
     mIconLabel(new Label(this, _("Icon:"))),
-    mIconDropDown(new DropDown(this, mIconsModal)),
+    mIconDropDown(new DropDown(this, mIconsModel)),
     // TRANSLATORS: command editor label
     mManaLabel(new Label(this, _("Mana:"))),
     mManaField(new IntTextField(this, 0)),
@@ -306,15 +191,15 @@ void TextCommandEditor::postInit()
 
 TextCommandEditor::~TextCommandEditor()
 {
-    delete mIconsModal;
-    mIconsModal = nullptr;
+    delete mIconsModel;
+    mIconsModel = nullptr;
     delete mTargetTypeModel;
     mTargetTypeModel = nullptr;
     delete mMagicSchoolModel;
     mMagicSchoolModel = nullptr;
 }
 
-void TextCommandEditor::action(const gcn::ActionEvent &event)
+void TextCommandEditor::action(const ActionEvent &event)
 {
     const std::string &eventId = event.getId();
     if (eventId == "magic")

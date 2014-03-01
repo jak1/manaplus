@@ -58,7 +58,7 @@ class SDL2SoftwareGraphics final : public Graphics
 
         void _endDraw();
 
-        bool pushClipArea(gcn::Rectangle rect);
+        bool pushClipArea(Rect rect);
 
         void popClipArea();
 
@@ -120,9 +120,9 @@ class SDL2SoftwareGraphics final : public Graphics
                         const int w, const int h,
                         const ImageRect &imgRect) override final;
 
-        void fillRectangle(const gcn::Rectangle &rect) override final;
+        void fillRectangle(const Rect &rect) override final;
 
-        void drawRectangle(const gcn::Rectangle &rect) override final;
+        void drawRectangle(const Rect &rect) override final;
 
         void drawPoint(int x, int y) override final;
 
@@ -141,8 +141,8 @@ class SDL2SoftwareGraphics final : public Graphics
 
         bool resizeScreen(const int width, const int height) override final;
 
-        bool drawImage2(const Image *const image,
-                        int dstX, int dstY) override final;
+        bool drawImage(const Image *const image,
+                       int dstX, int dstY) override final;
 
         void drawImageCached(const Image *const image,
                              int x, int y) override final;
@@ -173,7 +173,7 @@ class SDL2SoftwareGraphics final : public Graphics
         uint32_t mRendererFlags;
         SDL_Surface *mSurface;
         uint32_t mOldPixel;
-        int mOldAlpha;
+        unsigned int mOldAlpha;
 
     private:
         void inline calcImageRect(ImageVertexes *const vert,

@@ -30,8 +30,8 @@
 
 #include "utils/mutex.h"
 
-#include <guichan/actionlistener.hpp>
-#include <guichan/keylistener.hpp>
+#include "listeners/actionlistener.h"
+#include "listeners/keylistener.h"
 
 #include <string>
 #include <vector>
@@ -69,9 +69,9 @@ struct UpdateFile final
  * \ingroup GUI
  */
 class UpdaterWindow final : public Window,
-                            public gcn::ActionListener,
+                            public ActionListener,
                             public LinkHandler,
-                            public gcn::KeyListener
+                            public KeyListener
 {
  public:
     /**
@@ -119,14 +119,14 @@ class UpdaterWindow final : public Window,
 
     void loadPatch();
 
-    void action(const gcn::ActionEvent &event) override final;
+    void action(const ActionEvent &event) override final;
 
-    void keyPressed(gcn::KeyEvent &keyEvent) override final;
+    void keyPressed(KeyEvent &keyEvent) override final;
 
     void logic() override final;
 
     void handleLink(const std::string &link,
-                    gcn::MouseEvent *event A_UNUSED) override final;
+                    MouseEvent *event A_UNUSED) override final;
 
     void loadFile(std::string file);
 

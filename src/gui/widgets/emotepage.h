@@ -21,18 +21,16 @@
 #ifndef GUI_WIDGETS_EMOTEPAGE_H
 #define GUI_WIDGETS_EMOTEPAGE_H
 
-#include "gui/widgets/widget2.h"
+#include "listeners/mouselistener.h"
+#include "listeners/widgetlistener.h"
 
-#include <guichan/mouselistener.hpp>
-#include <guichan/widget.hpp>
-#include <guichan/widgetlistener.hpp>
+#include "gui/widgets/widget.h"
 
 #include "localconsts.h"
 
-class EmotePage final : public gcn::Widget,
-                        public Widget2,
-                        public gcn::MouseListener,
-                        public gcn::WidgetListener
+class EmotePage final : public Widget,
+                        public MouseListener,
+                        public WidgetListener
 {
     public:
         explicit EmotePage(const Widget2 *const widget);
@@ -41,15 +39,15 @@ class EmotePage final : public gcn::Widget,
 
         ~EmotePage();
 
-        void draw(gcn::Graphics *graphics) override final;
+        void draw(Graphics *graphics) override final;
 
-        void mousePressed(gcn::MouseEvent &mouseEvent) override final;
+        void mousePressed(MouseEvent &mouseEvent) override final;
 
         int getIndexFromGrid(const int x, const int y) const;
 
-        void widgetResized(const gcn::Event &event A_UNUSED) override final;
+        void widgetResized(const Event &event A_UNUSED) override final;
 
-        void widgetMoved(const gcn::Event &event A_UNUSED) override final;
+        void widgetMoved(const Event &event A_UNUSED) override final;
 
         void resetAction();
 

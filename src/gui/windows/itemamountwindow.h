@@ -25,8 +25,8 @@
 
 #include "gui/widgets/window.h"
 
-#include <guichan/keylistener.hpp>
-#include <guichan/actionlistener.hpp>
+#include "listeners/actionlistener.h"
+#include "listeners/keylistener.h"
 
 class DropDown;
 class Icon;
@@ -43,8 +43,8 @@ class Slider;
  * \ingroup Interface
  */
 class ItemAmountWindow final : public Window,
-                               public gcn::ActionListener,
-                               public gcn::KeyListener
+                               public ActionListener,
+                               public KeyListener
 {
     public:
         enum Usage
@@ -65,7 +65,7 @@ class ItemAmountWindow final : public Window,
         /**
          * Called when receiving actions from widget.
          */
-        void action(const gcn::ActionEvent &event) override final;
+        void action(const ActionEvent &event) override final;
 
         /**
          * Sets default amount value.
@@ -73,16 +73,16 @@ class ItemAmountWindow final : public Window,
         void resetAmount();
 
         // MouseListener
-        void mouseMoved(gcn::MouseEvent &event) override final;
+        void mouseMoved(MouseEvent &event) override final;
 
-        void mouseExited(gcn::MouseEvent &event) override final;
+        void mouseExited(MouseEvent &event) override final;
 
         /**
          * Schedules the Item Amount window for deletion.
          */
         void close();
 
-        void keyReleased(gcn::KeyEvent &keyEvent) override final;
+        void keyReleased(KeyEvent &keyEvent) override final;
 
         /**
          * Creates the dialog, or bypass it if there aren't enough items.

@@ -31,9 +31,9 @@
 #include "being/playerinfo.h"
 #include "being/playerrelations.h"
 
-#include "input/inputevent.h"
 #include "input/inputmanager.h"
 
+#include "gui/gui.h"
 #include "gui/sdlinput.h"
 #include "gui/viewport.h"
 
@@ -44,7 +44,6 @@
 #include "gui/windows/questswindow.h"
 #include "gui/windows/quitdialog.h"
 #include "gui/windows/whoisonline.h"
-
 #include "gui/windows/botcheckerwindow.h"
 #include "gui/windows/buyselldialog.h"
 #include "gui/windows/chatwindow.h"
@@ -219,7 +218,7 @@ impHandler0(mouseClick)
 
     int mouseX, mouseY;
     Gui::getMouseState(&mouseX, &mouseY);
-    guiInput->simulateMouseClick(mouseX, mouseY, gcn::MouseEvent::RIGHT);
+    guiInput->simulateMouseClick(mouseX, mouseY, MouseEvent::RIGHT);
     return true;
 }
 
@@ -234,12 +233,12 @@ impHandler0(ok)
     // Close the config window, cancelling changes if opened
     else if (setupWindow && setupWindow->isWindowVisible())
     {
-        setupWindow->action(gcn::ActionEvent(nullptr, "cancel"));
+        setupWindow->action(ActionEvent(nullptr, "cancel"));
         return true;
     }
     else if (NpcDialog *const dialog = NpcDialog::getActive())
     {
-        dialog->action(gcn::ActionEvent(nullptr, "ok"));
+        dialog->action(ActionEvent(nullptr, "ok"));
         return true;
     }
     return false;

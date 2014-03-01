@@ -23,11 +23,11 @@
 #ifndef GUI_BOTCHECKERWINDOW_H
 #define GUI_BOTCHECKERWINDOW_H
 
-#include "configlistener.h"
+#include "listeners/configlistener.h"
 
 #include "gui/widgets/window.h"
 
-#include <guichan/actionlistener.hpp>
+#include "listeners/actionlistener.h"
 
 struct BOTCHK final
 {
@@ -43,7 +43,7 @@ class UsersTableModel;
 class StaticTableModel;
 
 class BotCheckerWindow final : public Window,
-                               public gcn::ActionListener,
+                               public ActionListener,
                                public ConfigListener
 {
     public:
@@ -61,7 +61,7 @@ class BotCheckerWindow final : public Window,
          */
         ~BotCheckerWindow();
 
-        void action(const gcn::ActionEvent &event) override final;
+        void action(const ActionEvent &event) override final;
 
         void update();
 
@@ -86,7 +86,7 @@ class BotCheckerWindow final : public Window,
         Button *mIncButton;
         int mLastUpdateTime;
         bool mNeedUpdate;
-        bool mEnabled;
+        bool mBotcheckerEnabled;
 };
 
 extern BotCheckerWindow *botCheckerWindow;

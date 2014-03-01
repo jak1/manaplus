@@ -23,9 +23,7 @@
 #ifndef GUI_WIDGETS_PLAYERBOX_H
 #define GUI_WIDGETS_PLAYERBOX_H
 
-#include "gui/widgets/widget2.h"
-
-#include <guichan/widgets/scrollarea.hpp>
+#include "gui/base/widgets/scrollarea.hpp"
 
 #include "localconsts.h"
 
@@ -37,18 +35,20 @@ class Skin;
  *
  * \ingroup GUI
  */
-class PlayerBox final : public Widget2,
-                        public gcn::ScrollArea
+class PlayerBox final : public gcn::ScrollArea
 {
     public:
         /**
          * Constructor. Takes the initial player character that this box should
          * display, which defaults to <code>NULL</code>.
          */
-        explicit PlayerBox(Being *const being, const std::string &skin = "",
+        explicit PlayerBox(Widget2 *const widget,
+                           Being *const being,
+                           const std::string &skin = "",
                            const std::string &selectedSkin = "");
 
-        explicit PlayerBox(const std::string &skin = "",
+        explicit PlayerBox(Widget2 *const widget,
+                           const std::string &skin = "",
                            const std::string &selectedSkin = "");
 
         A_DELETE_COPY(PlayerBox)
@@ -71,12 +71,12 @@ class PlayerBox final : public Widget2,
         /**
          * Draws the scroll area.
          */
-        void draw(gcn::Graphics *graphics) override final;
+        void draw(Graphics *graphics) override final;
 
         /**
          * Draws the background and border of the scroll area.
          */
-        void drawFrame(gcn::Graphics *graphics) override final;
+        void drawFrame(Graphics *graphics) override final;
 
         Being *getBeing() A_WARN_UNUSED
         { return mBeing; }
@@ -84,7 +84,7 @@ class PlayerBox final : public Widget2,
         void setSelected(bool b)
         { mSelected = b; }
 
-        void mouseReleased(gcn::MouseEvent& event) override final;
+        void mouseReleased(MouseEvent& event) override final;
 
     private:
         Being *mBeing;

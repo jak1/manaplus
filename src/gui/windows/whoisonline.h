@@ -23,14 +23,14 @@
 #ifndef GUI_WINDOWS_WHOISONLINE_H
 #define GUI_WINDOWS_WHOISONLINE_H
 
-#include "configlistener.h"
+#include "listeners/configlistener.h"
 
 #include "gui/widgets/linkhandler.h"
 #include "gui/widgets/window.h"
 
 #include <set>
 
-#include <guichan/actionlistener.hpp>
+#include "listeners/actionlistener.h"
 
 class BrowserBox;
 class Button;
@@ -102,7 +102,7 @@ class OnlinePlayer final
  */
 class WhoIsOnline final : public Window,
                           public LinkHandler,
-                          public gcn::ActionListener,
+                          public ActionListener,
                           public ConfigListener
 {
 public:
@@ -128,15 +128,15 @@ public:
     void loadList(std::vector<OnlinePlayer*> &list);
 
     void handleLink(const std::string& link,
-                    gcn::MouseEvent *event) override final;
+                    MouseEvent *event) override final;
 
     void logic() override final;
 
     void slowLogic();
 
-    void action(const gcn::ActionEvent &event) override final;
+    void action(const ActionEvent &event) override final;
 
-    void widgetResized(const gcn::Event &event) override final;
+    void widgetResized(const Event &event) override final;
 
     const std::set<OnlinePlayer*> &getOnlinePlayers() const A_WARN_UNUSED
     { return mOnlinePlayers; }

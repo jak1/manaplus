@@ -28,7 +28,7 @@
 #include "gui/widgets/window.h"
 #include "gui/widgets/textfield.h"
 
-#include <guichan/actionlistener.hpp>
+#include "listeners/actionlistener.h"
 
 #define ACTION_EDIT_OK "edit ok"
 
@@ -37,7 +37,8 @@
  *
  * \ingroup GUI
  */
-class EditDialog final : public Window, public gcn::ActionListener
+class EditDialog final : public Window,
+                         public ActionListener
 {
     public:
         /**
@@ -58,7 +59,7 @@ class EditDialog final : public Window, public gcn::ActionListener
         /**
          * Called when receiving actions from the widgets.
          */
-        void action(const gcn::ActionEvent &event) override final;
+        void action(const ActionEvent &event) override final;
 
         std::string getMsg() const A_WARN_UNUSED
         { return mTextField->getText(); }

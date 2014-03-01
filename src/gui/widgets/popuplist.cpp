@@ -29,15 +29,15 @@
 #include "debug.h"
 
 PopupList::PopupList(DropDown *const widget,
-                     gcn::ListModel *const listModel,
+                     ListModel *const listModel,
                      bool extended, bool modal):
     Popup("PopupList", "popuplist.xml"),
-    gcn::FocusListener(),
+    FocusListener(),
     mListModel(listModel),
     mListBox(extended ? new ExtendedListBox(
         widget, listModel, "extendedlistbox.xml", 0) :
         new ListBox(widget, listModel, "popuplistbox.xml")),
-    mScrollArea(new ScrollArea(mListBox, false)),
+    mScrollArea(new ScrollArea(this, mListBox, false)),
     mDropDown(widget),
     mPressedIndex(-2),
     mModal(modal)
@@ -90,7 +90,7 @@ void PopupList::show(int x, int y)
         requestModalFocus();
 }
 
-void PopupList::widgetResized(const gcn::Event &event)
+void PopupList::widgetResized(const Event &event)
 {
     Popup::widgetResized(event);
     adjustSize();
@@ -112,7 +112,7 @@ int PopupList::getSelected() const
     return mListBox->getSelected();
 }
 
-void PopupList::setListModel(gcn::ListModel *const model)
+void PopupList::setListModel(ListModel *const model)
 {
     if (mListBox)
         mListBox->setListModel(model);
@@ -129,13 +129,13 @@ void PopupList::adjustSize()
     mListBox->setWidth(width);
 }
 
-void PopupList::mousePressed(gcn::MouseEvent& mouseEvent)
+void PopupList::mousePressed(MouseEvent& mouseEvent)
 {
     mPressedIndex = mListBox->getSelectionByMouse(
         mouseEvent.getY() + mPadding);
 }
 
-void PopupList::mouseReleased(gcn::MouseEvent& mouseEvent)
+void PopupList::mouseReleased(MouseEvent& mouseEvent)
 {
     if (mPressedIndex != mListBox->getSelectionByMouse(
         mouseEvent.getY() + mPadding))
@@ -154,9 +154,9 @@ void PopupList::mouseReleased(gcn::MouseEvent& mouseEvent)
         releaseModalFocus();
 }
 
-void PopupList::focusGained(const gcn::Event& event)
+void PopupList::focusGained(const Event& event)
 {
-    const gcn::Widget *const source = event.getSource();
+    const Widget *const source = event.getSource();
     if (!mVisible || source == this || source == mListBox
         || source == mScrollArea || source == mDropDown)
     {
@@ -170,7 +170,7 @@ void PopupList::focusGained(const gcn::Event& event)
         releaseModalFocus();
 }
 
-void PopupList::focusLost(const gcn::Event& event A_UNUSED)
+void PopupList::focusLost(const Event& event A_UNUSED)
 {
     if (mDropDown)
         mDropDown->updateSelection();

@@ -28,7 +28,6 @@
 #include "input/keyboardconfig.h"
 #include "input/keyboarddata.h"
 #include "being/localplayer.h"
-#include "being/playerinfo.h"
 #ifdef USE_SDL2
 #include "input/multitouchmanager.h"
 #endif
@@ -47,18 +46,18 @@
 #include "gui/windows/setupwindow.h"
 #include "gui/windows/textdialog.h"
 #include "gui/windows/tradewindow.h"
-#include "gui/windows/quitdialog.h"
 
 #include "utils/timer.h"
 
-#include <guichan/exception.hpp>
-#include <guichan/focushandler.hpp>
+#include "gui/focushandler.h"
 
 #include <algorithm>
 
 #include "debug.h"
 
 InputManager inputManager;
+
+class QuitDialog;
 
 extern QuitDialog *quitDialog;
 
@@ -549,18 +548,10 @@ bool InputManager::handleEvent(const SDL_Event &event)
             if (quitDialog || TextDialog::isActive() ||
                 NpcPostDialog::isActive())
             {
-                try
-                {
-                    if (guiInput)
-                        guiInput->pushInput(event);
-                    if (gui)
-                        gui->handleInput();
-                }
-                catch(const gcn::Exception &e)
-                {
-                    const char *const err = e.getMessage().c_str();
-                    logger->log("Warning: guichan input exception: %s", err);
-                }
+                if (guiInput)
+                    guiInput->pushInput(event);
+                if (gui)
+                    gui->handleInput();
                 return true;
             }
             break;
@@ -605,16 +596,8 @@ bool InputManager::handleEvent(const SDL_Event &event)
             break;
     }
 
-    try
-    {
-        if (guiInput)
-            guiInput->pushInput(event);
-    }
-    catch(const gcn::Exception &e)
-    {
-        const char *const err = e.getMessage().c_str();
-        logger->log("Warning: guichan input exception: %s", err);
-    }
+    if (guiInput)
+        guiInput->pushInput(event);
     if (gui)
     {
         const bool res = gui->handleInput();

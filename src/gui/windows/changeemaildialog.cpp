@@ -45,7 +45,7 @@
 ChangeEmailDialog::ChangeEmailDialog(LoginData *const data):
     // TRANSLATORS: change email dialog header
     Window(_("Change Email Address"), true, nullptr, "changeemail.xml"),
-    gcn::ActionListener(),
+    ActionListener(),
     mFirstEmailField(new TextField(this)),
     mSecondEmailField(new TextField(this)),
     // TRANSLATORS: button in change email dialog
@@ -109,7 +109,7 @@ ChangeEmailDialog::~ChangeEmailDialog()
     mWrongDataNoticeListener = nullptr;
 }
 
-void ChangeEmailDialog::action(const gcn::ActionEvent &event)
+void ChangeEmailDialog::action(const ActionEvent &event)
 {
     const std::string &eventId = event.getId();
     if (eventId == "cancel")

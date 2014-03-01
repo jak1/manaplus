@@ -25,8 +25,8 @@
 
 #include "gui/widgets/window.h"
 
-#include <guichan/actionlistener.hpp>
-#include <guichan/selectionlistener.hpp>
+#include "listeners/actionlistener.h"
+#include "listeners/selectionlistener.h"
 
 class Button;
 class Item;
@@ -42,8 +42,8 @@ class Slider;
  * \ingroup Interface
  */
 class SellDialog final : public Window,
-                         private gcn::ActionListener,
-                         private gcn::SelectionListener
+                         private ActionListener,
+                         private SelectionListener
 {
     public:
         /**
@@ -80,14 +80,14 @@ class SellDialog final : public Window,
         /**
          * Called when receiving actions from the widgets.
          */
-        void action(const gcn::ActionEvent &event) override final;
+        void action(const ActionEvent &event) override final;
 
         /**
          * Updates labels according to selected item.
          *
          * @see SelectionListener::selectionChanged
          */
-        void valueChanged(const gcn::SelectionEvent &event) override final;
+        void valueChanged(const SelectionEvent &event) override final;
 
         /**
          * Gives Player's Money amount

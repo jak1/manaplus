@@ -31,7 +31,8 @@
 #include "being/playerinfo.h"
 #include "being/playerrelations.h"
 
-#include "gui/sdlfont.h"
+#include "gui/font.h"
+#include "gui/gui.h"
 
 #include "gui/windows/inventorywindow.h"
 #include "gui/windows/itemamountwindow.h"
@@ -51,8 +52,6 @@
 
 #include "utils/gettext.h"
 
-#include <guichan/font.hpp>
-
 #include "debug.h"
 
 // TRANSLATORS: trade window button
@@ -67,8 +66,8 @@
 TradeWindow::TradeWindow():
     // TRANSLATORS: trade window caption
     Window(_("Trade: You"), false, nullptr, "trade.xml"),
-    gcn::ActionListener(),
-    gcn::SelectionListener(),
+    ActionListener(),
+    SelectionListener(),
     mMyInventory(new Inventory(Inventory::TRADE)),
     mPartnerInventory(new Inventory(Inventory::TRADE)),
     mMyItemContainer(new ItemContainer(this, mMyInventory.get())),
@@ -102,7 +101,7 @@ TradeWindow::TradeWindow():
     if (setupWindow)
         setupWindow->registerWindowForReset(this);
 
-    const gcn::Font *const fnt = mOkButton->getFont();
+    const Font *const fnt = mOkButton->getFont();
     int width = std::max(fnt->getWidth(CAPTION_PROPOSE),
         fnt->getWidth(CAPTION_CONFIRMED));
     width = std::max(width, fnt->getWidth(CAPTION_ACCEPT));
@@ -112,13 +111,14 @@ TradeWindow::TradeWindow():
 
     mMyItemContainer->addSelectionListener(this);
 
-    ScrollArea *const myScroll = new ScrollArea(mMyItemContainer,
+    ScrollArea *const myScroll = new ScrollArea(this, mMyItemContainer,
         true, "trade_background.xml");
     myScroll->setHorizontalScrollPolicy(ScrollArea::SHOW_NEVER);
 
     mPartnerItemContainer->addSelectionListener(this);
 
-    ScrollArea *const partnerScroll = new ScrollArea(mPartnerItemContainer,
+    ScrollArea *const partnerScroll = new ScrollArea(this,
+        mPartnerItemContainer,
         true, "trade_background.xml");
     partnerScroll->setHorizontalScrollPolicy(ScrollArea::SHOW_NEVER);
 
@@ -130,8 +130,7 @@ TradeWindow::TradeWindow():
     place(1, 0, mMoneyLabel);
     place(0, 1, myScroll).setPadding(3);
     place(1, 1, partnerScroll).setPadding(3);
-    ContainerPlacer placer;
-    placer = getPlacer(0, 0);
+    ContainerPlacer placer = getPlacer(0, 0);
     placer(0, 0, moneyLabel2);
     placer(1, 0, mMoneyField, 2);
     placer(3, 0, mMoneyChangeButton).setHAlign(LayoutCell::LEFT);
@@ -268,7 +267,7 @@ void TradeWindow::tradeItem(const Item *const item, const int quantity,
     Net::getTradeHandler()->addItem(item, quantity);
 }
 
-void TradeWindow::valueChanged(const gcn::SelectionEvent &event)
+void TradeWindow::valueChanged(const SelectionEvent &event)
 {
     if (!mMyItemContainer || !mPartnerItemContainer)
         return;
@@ -318,7 +317,7 @@ void TradeWindow::setStatus(const Status s)
     mOkButton->setEnabled((s != PROPOSING && s != ACCEPTED));
 }
 
-void TradeWindow::action(const gcn::ActionEvent &event)
+void TradeWindow::action(const ActionEvent &event)
 {
     if (!inventoryWindow)
         return;

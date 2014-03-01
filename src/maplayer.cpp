@@ -33,10 +33,11 @@
 
 #include "render/graphics.h"
 
+#include "resources/image.h"
 #include "resources/resourcemanager.h"
 
+#include "gui/font.h"
 #include "gui/gui.h"
-#include "gui/sdlfont.h"
 
 #include "utils/dtor.h"
 
@@ -139,7 +140,7 @@ void MapLayer::draw(Graphics *const graphics,
 
                     if (!c)
                     {
-                        graphics->drawImage2(img, px, py);
+                        graphics->drawImage(img, px, py);
                     }
                     else
                     {
@@ -455,7 +456,7 @@ void MapLayer::drawFringe(Graphics *const graphics, int startX, int startY,
 
                         if (!c)
                         {
-                            graphics->drawImage2(img, px, py);
+                            graphics->drawImage(img, px, py);
                         }
                         else
                         {
@@ -537,10 +538,10 @@ void MapLayer::drawFringe(Graphics *const graphics, int startX, int startY,
             {
                 graphics->setColor(userPalette->getColorWithAlpha(
                     UserPalette::ATTACK_RANGE));
-                graphics->fillRectangle(gcn::Rectangle(x, y, w, h));
+                graphics->fillRectangle(Rect(x, y, w, h));
                 graphics->setColor(userPalette->getColorWithAlpha(
                     UserPalette::ATTACK_RANGE_BORDER));
-                graphics->drawRectangle(gcn::Rectangle(x, y, w, h));
+                graphics->drawRectangle(Rect(x, y, w, h));
             }
         }
     }
@@ -797,7 +798,7 @@ void MapItem::draw(Graphics *const graphics, const int x, const int y,
 {
     BLOCK_START("MapItem::draw")
     if (mImage)
-        graphics->drawImage2(mImage, x, y);
+        graphics->drawImage(mImage, x, y);
 
     switch (mType)
     {
@@ -805,17 +806,17 @@ void MapItem::draw(Graphics *const graphics, const int x, const int y,
         case CROSS:
             graphics->setColor(userPalette->getColorWithAlpha(
                                UserPalette::ROAD_POINT));
-            graphics->fillRectangle(gcn::Rectangle(x + dx / 3, y + dy / 3,
+            graphics->fillRectangle(Rect(x + dx / 3, y + dy / 3,
                                     dx / 3, dy / 3));
             break;
         case HOME:
         {
             graphics->setColor(userPalette->getColorWithAlpha(
                                UserPalette::HOME_PLACE));
-            graphics->fillRectangle(gcn::Rectangle(x, y, dx, dy));
+            graphics->fillRectangle(Rect(x, y, dx, dy));
             graphics->setColor(userPalette->getColorWithAlpha(
                                UserPalette::HOME_PLACE_BORDER));
-            graphics->drawRectangle(gcn::Rectangle(x, y, dx, dy));
+            graphics->drawRectangle(Rect(x, y, dx, dy));
             break;
         }
         default:
@@ -823,7 +824,7 @@ void MapItem::draw(Graphics *const graphics, const int x, const int y,
     }
     if (!mName.empty() && mType != PORTAL && mType != EMPTY)
     {
-        gcn::Font *const font = gui->getFont();
+        Font *const font = gui->getFont();
         if (font)
         {
             graphics->setColor(userPalette->getColor(UserPalette::BEING));

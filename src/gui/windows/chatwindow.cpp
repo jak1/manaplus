@@ -35,12 +35,15 @@
 #include "being/playerinfo.h"
 #include "being/playerrelations.h"
 
-#include "input/inputmanager.h"
-#include "input/keyevent.h"
+#include "events/keyevent.h"
 
-#include "gui/sdlfont.h"
-#include "gui/sdlinput.h"
+#include "input/inputmanager.h"
+
+#include "gui/focushandler.h"
+#include "gui/gui.h"
 #include "gui/viewport.h"
+
+#include "gui/models/colorlistmodel.h"
 
 #include "gui/windows/emotewindow.h"
 #include "gui/windows/setupwindow.h"
@@ -67,8 +70,6 @@
 #include "utils/gettext.h"
 
 #include "resources/resourcemanager.h"
-
-#include <guichan/focushandler.hpp>
 
 #include <sstream>
 
@@ -97,7 +98,7 @@ class ChatInput final : public TextField
          * Called if the chat input loses focus. It will set itself to
          * invisible as result.
          */
-        void focusLost(const gcn::Event &event)
+        void focusLost(const Event &event)
         {
             TextField::focusLost(event);
             if (mFocusGaining || !config.getBoolValue("protectChatFocus"))
@@ -145,65 +146,13 @@ class ChatInput final : public TextField
         bool mFocusGaining;
 };
 
-const char *COLOR_NAME[14] =
-{
-    // TRANSLATORS: chat color
-    N_("default"),
-    // TRANSLATORS: chat color
-    N_("black"),
-    // TRANSLATORS: chat color
-    N_("red"),
-    // TRANSLATORS: chat color
-    N_("green"),
-    // TRANSLATORS: chat color
-    N_("blue"),
-    // TRANSLATORS: chat color
-    N_("gold"),
-    // TRANSLATORS: chat color
-    N_("yellow"),
-    // TRANSLATORS: chat color
-    N_("pink"),
-    // TRANSLATORS: chat color
-    N_("purple"),
-    // TRANSLATORS: chat color
-    N_("grey"),
-    // TRANSLATORS: chat color
-    N_("brown"),
-    // TRANSLATORS: chat color
-    N_("rainbow 1"),
-    // TRANSLATORS: chat color
-    N_("rainbow 2"),
-    // TRANSLATORS: chat color
-    N_("rainbow 3"),
-};
-
-
-class ColorListModel final : public gcn::ListModel
-{
-public:
-    ~ColorListModel()
-    { }
-
-    int getNumberOfElements()
-    {
-        return 14;
-    }
-
-    std::string getElementAt(int i)
-    {
-        if (i >= getNumberOfElements() || i < 0)
-            return "???";
-        return gettext(COLOR_NAME[i]);
-    }
-};
-
 static const char *const ACTION_COLOR_PICKER = "color picker";
 
 ChatWindow::ChatWindow():
     // TRANSLATORS: chat window name
     Window(_("Chat"), false, nullptr, "chat.xml"),
-    gcn::ActionListener(),
-    gcn::KeyListener(),
+    ActionListener(),
+    KeyListener(),
     mItemLinkHandler(new ItemLinkHandler),
     mChatTabs(new TabbedArea(this)),
     mChatInput(new ChatInput(this)),
@@ -378,7 +327,7 @@ void ChatWindow::updateTabsMargin()
 
 void ChatWindow::adjustTabSize()
 {
-    const gcn::Rectangle area = getChildrenArea();
+    const Rect area = getChildrenArea();
 
     const int aw = area.width;
     const int ah = area.height;
@@ -425,7 +374,7 @@ void ChatWindow::adjustTabSize()
     const ChatTab *const tab = getFocused();
     if (tab)
     {
-        gcn::Widget *const content = tab->mScrollArea;
+        Widget *const content = tab->mScrollArea;
         if (content)
         {
             const int contentFrame2 = 2 * content->getFrameSize();
@@ -441,7 +390,7 @@ void ChatWindow::adjustTabSize()
     mChatTabs->adjustSize();
 }
 
-void ChatWindow::widgetResized(const gcn::Event &event)
+void ChatWindow::widgetResized(const Event &event)
 {
     Window::widgetResized(event);
 
@@ -514,7 +463,7 @@ void ChatWindow::defaultTab()
         mChatTabs->setSelectedTabByIndex(static_cast<unsigned>(0));
 }
 
-void ChatWindow::action(const gcn::ActionEvent &event)
+void ChatWindow::action(const ActionEvent &event)
 {
     const std::string &eventId = event.getId();
     if (eventId == "chatinput")
@@ -770,12 +719,12 @@ void ChatWindow::scroll(const int amount) const
         tab->scroll(amount);
 }
 
-void ChatWindow::mousePressed(gcn::MouseEvent &event)
+void ChatWindow::mousePressed(MouseEvent &event)
 {
     if (event.isConsumed())
         return;
 
-    if (event.getButton() == gcn::MouseEvent::RIGHT)
+    if (event.getButton() == MouseEvent::RIGHT)
     {
         if (viewport)
         {
@@ -804,7 +753,7 @@ void ChatWindow::mousePressed(gcn::MouseEvent &event)
     if (event.isConsumed())
         return;
 
-    if (event.getButton() == gcn::MouseEvent::LEFT)
+    if (event.getButton() == MouseEvent::LEFT)
     {
         const ChatTab *const tab = getFocused();
         if (tab)
@@ -815,7 +764,7 @@ void ChatWindow::mousePressed(gcn::MouseEvent &event)
     mDragOffsetY = event.getY();
 }
 
-void ChatWindow::mouseDragged(gcn::MouseEvent &event)
+void ChatWindow::mouseDragged(MouseEvent &event)
 {
     Window::mouseDragged(event);
 
@@ -836,10 +785,10 @@ void ChatWindow::mouseDragged(gcn::MouseEvent &event)
     temp = str; \
     break
 
-void ChatWindow::keyPressed(gcn::KeyEvent &event)
+void ChatWindow::keyPressed(KeyEvent &event)
 {
     const int key = event.getKey().getValue();
-    const int actionId = static_cast<KeyEvent*>(&event)->getActionId();
+    const int actionId = event.getActionId();
     if (actionId == static_cast<int>(Input::KEY_GUI_DOWN))
     {
         if (mCurHist != mHistory.end())
@@ -1884,25 +1833,25 @@ void ChatWindow::optionChanged(const std::string &name)
         parseGlobalsFilter();
 }
 
-void ChatWindow::mouseMoved(gcn::MouseEvent &event)
+void ChatWindow::mouseMoved(MouseEvent &event)
 {
     mHaveMouse = true;
     Window::mouseMoved(event);
 }
 
-void ChatWindow::mouseEntered(gcn::MouseEvent& mouseEvent)
+void ChatWindow::mouseEntered(MouseEvent& mouseEvent)
 {
     mHaveMouse = true;
     Window::mouseEntered(mouseEvent);
 }
 
-void ChatWindow::mouseExited(gcn::MouseEvent& mouseEvent)
+void ChatWindow::mouseExited(MouseEvent& mouseEvent)
 {
     updateVisibility();
     Window::mouseExited(mouseEvent);
 }
 
-void ChatWindow::draw(gcn::Graphics* graphics)
+void ChatWindow::draw(Graphics* graphics)
 {
     BLOCK_START("ChatWindow::draw")
     if (!mAutoHide || mHaveMouse)

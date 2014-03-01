@@ -26,6 +26,9 @@
 
 #include "being/localplayer.h"
 
+#include "gui/models/ignorechoiceslistmodel.h"
+#include "gui/models/playerrelationlistmodel.h"
+
 #include "gui/widgets/button.h"
 #include "gui/widgets/checkbox.h"
 #include "gui/widgets/dropdown.h"
@@ -58,43 +61,6 @@ static const char *const table_titles[COLUMNS_NR] =
     N_("Name"),
     // TRANSLATORS: relations table header
     N_("Relation")
-};
-
-static const char *const RELATION_NAMES[PlayerRelation::RELATIONS_NR] =
-{
-    // TRANSLATORS: relation type
-    N_("Neutral"),
-    // TRANSLATORS: relation type
-    N_("Friend"),
-    // TRANSLATORS: relation type
-    N_("Disregarded"),
-    // TRANSLATORS: relation type
-    N_("Ignored"),
-    // TRANSLATORS: relation type
-    N_("Erased"),
-    // TRANSLATORS: relation type
-    N_("Blacklisted"),
-    // TRANSLATORS: relation type
-    N_("Enemy")
-};
-
-class PlayerRelationListModel final : public gcn::ListModel
-{
-public:
-    ~PlayerRelationListModel()
-    { }
-
-    int getNumberOfElements() override final
-    {
-        return PlayerRelation::RELATIONS_NR;
-    }
-
-    std::string getElementAt(int i) override final
-    {
-        if (i >= getNumberOfElements() || i < 0)
-            return "";
-        return gettext(RELATION_NAMES[i]);
-    }
 };
 
 class PlayerTableModel final : public Widget2, public TableModel
@@ -165,7 +131,7 @@ public:
              player_names->size()); r < sz; ++r)
         {
             const std::string name = (*player_names)[r];
-            gcn::Widget *const widget = new Label(this, name);
+            Widget *const widget = new Label(this, name);
             mWidgets.push_back(widget);
 
             DropDown *const choicebox = new DropDown(this, mListModel);
@@ -186,7 +152,7 @@ public:
     }
 
 
-    gcn::Widget *getElementAt(int row, int column) const override final
+    Widget *getElementAt(int row, int column) const override final
     {
         return mWidgets[WIDGET_AT(row, column)];
     }
@@ -209,33 +175,8 @@ public:
 
 protected:
     StringVect *mPlayers;
-    std::vector<gcn::Widget *> mWidgets;
+    std::vector<Widget *> mWidgets;
     PlayerRelationListModel *mListModel;
-};
-
-/**
- * Class for choosing one of the various `what to do when ignoring a player' options
- */
-class IgnoreChoicesListModel final : public gcn::ListModel
-{
-public:
-    ~IgnoreChoicesListModel()
-    { }
-
-    int getNumberOfElements() override final
-    {
-        return static_cast<int>(player_relations.getPlayerIgnoreStrategies()
-                                ->size());
-    }
-
-    std::string getElementAt(int i) override final
-    {
-        if (i >= getNumberOfElements() || i < 0)
-            return "???";
-
-        return (*player_relations.getPlayerIgnoreStrategies())
-            [i]->mDescription;
-    }
 };
 
 static const std::string ACTION_DELETE("delete");
@@ -249,7 +190,7 @@ Setup_Relations::Setup_Relations(const Widget2 *const widget) :
     mPlayerTableModel(new PlayerTableModel(this)),
     mPlayerTable(new GuiTable(this, mPlayerTableModel)),
     mPlayerTitleTable(new GuiTable(this, mPlayerTableTitleModel)),
-    mPlayerScrollArea(new ScrollArea(mPlayerTable)),
+    mPlayerScrollArea(new ScrollArea(this, mPlayerTable)),
     // TRANSLATORS: relation dialog button
     mDefaultTrading(new CheckBox(this, _("Allow trading"),
         player_relations.getDefault() & PlayerRelation::TRADE)),
@@ -319,7 +260,7 @@ Setup_Relations::Setup_Relations(const Widget2 *const widget) :
 
     player_relations.addListener(this);
 
-    setDimension(gcn::Rectangle(0, 0, 500, 350));
+    setDimension(Rect(0, 0, 500, 350));
 }
 
 Setup_Relations::~Setup_Relations()
@@ -370,7 +311,7 @@ void Setup_Relations::cancel()
 {
 }
 
-void Setup_Relations::action(const gcn::ActionEvent &event)
+void Setup_Relations::action(const ActionEvent &event)
 {
     const std::string &eventId = event.getId();
     if (eventId == ACTION_TABLE)

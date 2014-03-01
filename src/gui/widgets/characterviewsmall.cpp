@@ -24,6 +24,8 @@
 #include "gui/widgets/characterdisplay.h"
 #include "gui/widgets/label.h"
 
+#include "utils/stringutils.h"
+
 #include "debug.h"
 
 CharacterViewSmall::CharacterViewSmall(CharSelectDialog *const widget,
@@ -98,7 +100,7 @@ void CharacterViewSmall::resize()
     mNumber->setPosition(10, y2);
 }
 
-void CharacterViewSmall::action(const gcn::ActionEvent &event)
+void CharacterViewSmall::action(const ActionEvent &event)
 {
     const std::string &eventId = event.getId();
     if (eventId == "next")

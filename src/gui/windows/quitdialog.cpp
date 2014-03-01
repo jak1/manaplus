@@ -28,8 +28,9 @@
 #include "soundconsts.h"
 #include "soundmanager.h"
 
+#include "events/keyevent.h"
+
 #include "input/keydata.h"
-#include "input/keyevent.h"
 
 #include "gui/viewport.h"
 
@@ -49,8 +50,8 @@
 QuitDialog::QuitDialog(QuitDialog **const pointerToMe):
     // TRANSLATORS: quit dialog name
     Window(_("Quit"), true, nullptr, "quit.xml"),
-    gcn::ActionListener(),
-    gcn::KeyListener(),
+    ActionListener(),
+    KeyListener(),
     mOptions(),
     // TRANSLATORS: quit dialog button
     mLogoutQuit(new RadioButton(this, _("Quit"), "quitdialog")),
@@ -147,7 +148,7 @@ void QuitDialog::placeOption(ContainerPlacer &placer,
     mOptions.push_back(option);
 }
 
-void QuitDialog::action(const gcn::ActionEvent &event)
+void QuitDialog::action(const ActionEvent &event)
 {
     soundManager.playGuiSound(SOUND_HIDE_WINDOW);
     if (event.getId() == "ok")
@@ -202,20 +203,19 @@ void QuitDialog::action(const gcn::ActionEvent &event)
     scheduleDelete();
 }
 
-void QuitDialog::keyPressed(gcn::KeyEvent &keyEvent)
+void QuitDialog::keyPressed(KeyEvent &keyEvent)
 {
-    const int actionId = static_cast<KeyEvent*>(&keyEvent)->getActionId();
+    const int actionId = keyEvent.getActionId();
     int dir = 0;
 
     switch (actionId)
     {
         case Input::KEY_GUI_SELECT:
         case Input::KEY_GUI_SELECT2:
-            action(gcn::ActionEvent(nullptr, mOkButton->getActionEventId()));
+            action(ActionEvent(nullptr, mOkButton->getActionEventId()));
             break;
         case Input::KEY_GUI_CANCEL:
-            action(gcn::ActionEvent(nullptr,
-                mCancelButton->getActionEventId()));
+            action(ActionEvent(nullptr, mCancelButton->getActionEventId()));
             break;
         case Input::KEY_GUI_UP:
             dir = -1;

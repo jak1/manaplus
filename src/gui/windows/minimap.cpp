@@ -213,7 +213,7 @@ void Minimap::setMap(const Map *const map)
             setHeight(height);
         }
 
-        const gcn::Rectangle &rect = mDimension;
+        const Rect &rect = mDimension;
         setDefaultSize(rect.x, rect.y, rect.width, rect.height);
         resetToDefaultSize();
 
@@ -233,7 +233,7 @@ void Minimap::toggle()
     mShow = isWindowVisible();
 }
 
-void Minimap::draw(gcn::Graphics *graphics)
+void Minimap::draw(Graphics *graphics)
 {
     BLOCK_START("Minimap::draw")
     Window::draw(graphics);
@@ -244,9 +244,7 @@ void Minimap::draw(gcn::Graphics *graphics)
         return;
     }
 
-    Graphics *const graph = static_cast<Graphics*>(graphics);
-
-    const gcn::Rectangle a = getChildrenArea();
+    const Rect a = getChildrenArea();
 
     graphics->pushClipArea(a);
 
@@ -286,7 +284,7 @@ void Minimap::draw(gcn::Graphics *graphics)
                 mMapOriginY = 0;
         }
 
-        graph->drawImage2(mMapImage, mMapOriginX, mMapOriginY);
+        graphics->drawImage(mMapImage, mMapOriginX, mMapOriginY);
     }
 
     const ActorSprites &actors = actorManager->getAll();
@@ -348,7 +346,7 @@ void Minimap::draw(gcn::Graphics *graphics)
                 dotSize - 1) * mWidthProportion);
         const Vector &pos = being->getPosition();
 
-        graphics->fillRectangle(gcn::Rectangle(
+        graphics->fillRectangle(Rect(
             static_cast<float>(pos.x * mWidthProportion) / 32
             + mMapOriginX - offsetWidth,
             static_cast<float>(pos.y * mHeightProportion) / 32
@@ -386,7 +384,7 @@ void Minimap::draw(gcn::Graphics *graphics)
                         const int offsetWidth = static_cast<int>(
                             mWidthProportion);
 
-                        graphics->fillRectangle(gcn::Rectangle(
+                        graphics->fillRectangle(Rect(
                             static_cast<int>(member->getX()
                             * mWidthProportion) + mMapOriginX - offsetWidth,
                             static_cast<int>(member->getY()
@@ -401,8 +399,8 @@ void Minimap::draw(gcn::Graphics *graphics)
 
     const Vector &pos = player_node->getPosition();
 
-    const int gw = graph->getWidth();
-    const int gh = graph->getHeight();
+    const int gw = graphics->getWidth();
+    const int gh = graphics->getHeight();
     int x = static_cast<float>((pos.x - (gw / 2)
         + viewport->getCameraRelativeX())
         * mWidthProportion) / 32 + mMapOriginX;
@@ -431,19 +429,19 @@ void Minimap::draw(gcn::Graphics *graphics)
     }
 
     graphics->setColor(userPalette->getColor(UserPalette::PC));
-    graphics->drawRectangle(gcn::Rectangle(x, y, w, h));
+    graphics->drawRectangle(Rect(x, y, w, h));
     graphics->popClipArea();
     BLOCK_END("Minimap::draw")
 }
 
-void Minimap::mouseReleased(gcn::MouseEvent &event)
+void Minimap::mouseReleased(MouseEvent &event)
 {
     Window::mouseReleased(event);
 
     if (!player_node || !viewport)
         return;
 
-    if (event.getButton() == gcn::MouseEvent::LEFT)
+    if (event.getButton() == MouseEvent::LEFT)
     {
         int x = event.getX();
         int y = event.getY();
@@ -451,7 +449,7 @@ void Minimap::mouseReleased(gcn::MouseEvent &event)
 
         player_node->navigateTo(x, y);
     }
-    else if (event.getButton() == gcn::MouseEvent::RIGHT)
+    else if (event.getButton() == MouseEvent::RIGHT)
     {
         int x = event.getX();
         int y = event.getY();
@@ -460,16 +458,16 @@ void Minimap::mouseReleased(gcn::MouseEvent &event)
     }
 }
 
-void Minimap::mouseMoved(gcn::MouseEvent &event)
+void Minimap::mouseMoved(MouseEvent &event)
 {
     Window::mouseMoved(event);
     const int x = event.getX();
     const int y = event.getY();
-    const gcn::Rectangle &rect = mDimension;
+    const Rect &rect = mDimension;
     mTextPopup->show(x + rect.x, y + rect.y, mCaption);
 }
 
-void Minimap::mouseExited(gcn::MouseEvent &event)
+void Minimap::mouseExited(MouseEvent &event)
 {
     Window::mouseExited(event);
     mTextPopup->hide();
@@ -477,7 +475,7 @@ void Minimap::mouseExited(gcn::MouseEvent &event)
 
 void Minimap::screenToMap(int &x, int &y)
 {
-    const gcn::Rectangle a = getChildrenArea();
+    const Rect a = getChildrenArea();
     x = (x - a.x - mMapOriginX + mWidthProportion) / mWidthProportion;
     y = (y - a.y - mMapOriginY + mHeightProportion) / mHeightProportion;
 }

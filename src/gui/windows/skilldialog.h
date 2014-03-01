@@ -25,7 +25,7 @@
 
 #include "gui/widgets/window.h"
 
-#include <guichan/actionlistener.hpp>
+#include "listeners/actionlistener.h"
 
 const int SKILL_MIN_ID = 200000;
 const unsigned int SKILL_VAR_MIN_ID = 1000000;
@@ -43,7 +43,8 @@ struct SkillInfo;
  *
  * \ingroup Interface
  */
-class SkillDialog final : public Window, public gcn::ActionListener
+class SkillDialog final : public Window,
+                          public ActionListener
 {
     public:
         SkillDialog();
@@ -57,7 +58,7 @@ class SkillDialog final : public Window, public gcn::ActionListener
         /**
          * Called when receiving actions from widget.
          */
-        void action(const gcn::ActionEvent &event) override final;
+        void action(const ActionEvent &event) override final;
 
         /**
          * Update the given skill's display
@@ -87,7 +88,7 @@ class SkillDialog final : public Window, public gcn::ActionListener
         bool hasSkills() const A_WARN_UNUSED
         { return !mSkills.empty(); }
 
-        void widgetResized(const gcn::Event &event) override final;
+        void widgetResized(const Event &event) override final;
 
         void useItem(const int itemId) const;
 

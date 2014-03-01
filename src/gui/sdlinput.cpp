@@ -75,11 +75,11 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "gui/sdlinput.h"
-
 #include "sdlshared.h"
 
 #include "input/inputmanager.h"
+
+#include "gui/sdlinput.h"
 
 #include "render/graphics.h"
 
@@ -90,8 +90,6 @@
 #include <SDL_keyboard.h>
 #include <SDL_timer.h>
 
-#include <guichan/exception.hpp>
-
 SDLInput::SDLInput() :
     mKeyInputQueue(),
     mMouseInputQueue(),
@@ -100,7 +98,7 @@ SDLInput::SDLInput() :
 {
 }
 
-bool SDLInput::isKeyQueueEmpty()
+bool SDLInput::isKeyQueueEmpty() const
 {
     return mKeyInputQueue.empty();
 }
@@ -108,9 +106,7 @@ bool SDLInput::isKeyQueueEmpty()
 KeyInput SDLInput::dequeueKeyInput2()
 {
     if (mKeyInputQueue.empty())
-    {
-        throw GCN_EXCEPTION("The queue is empty.");
-    }
+        return KeyInput();
 
     KeyInput keyInput = mKeyInputQueue.front();
     mKeyInputQueue.pop();
@@ -118,17 +114,17 @@ KeyInput SDLInput::dequeueKeyInput2()
     return keyInput;
 }
 
-bool SDLInput::isMouseQueueEmpty()
+bool SDLInput::isMouseQueueEmpty() const
 {
     return mMouseInputQueue.empty();
 }
 
-gcn::MouseInput SDLInput::dequeueMouseInput()
+MouseInput SDLInput::dequeueMouseInput()
 {
-    gcn::MouseInput mouseInput;
+    MouseInput mouseInput;
 
     if (mMouseInputQueue.empty())
-        throw GCN_EXCEPTION("The queue is empty.");
+        return MouseInput();
 
     mouseInput = mMouseInputQueue.front();
     mMouseInputQueue.pop();
@@ -141,7 +137,7 @@ MouseInput SDLInput::dequeueMouseInput2()
     MouseInput mouseInput;
 
     if (mMouseInputQueue.empty())
-        throw GCN_EXCEPTION("The queue is empty.");
+        return MouseInput();
 
     mouseInput = mMouseInputQueue.front();
     mMouseInputQueue.pop();
@@ -158,7 +154,7 @@ void SDLInput::pushInput(const SDL_Event &event)
     {
         case SDL_KEYDOWN:
         {
-            keyInput.setType(gcn::KeyInput::PRESSED);
+            keyInput.setType(KeyInput::PRESSED);
             convertKeyEventToKey(event, keyInput);
             mKeyInputQueue.push(keyInput);
             break;
@@ -166,7 +162,7 @@ void SDLInput::pushInput(const SDL_Event &event)
 
         case SDL_KEYUP:
         {
-            keyInput.setType(gcn::KeyInput::RELEASED);
+            keyInput.setType(KeyInput::RELEASED);
             convertKeyEventToKey(event, keyInput);
             mKeyInputQueue.push(keyInput);
             break;
@@ -174,8 +170,8 @@ void SDLInput::pushInput(const SDL_Event &event)
 
 #ifdef USE_SDL2
         case SDL_TEXTINPUT:
-            keyInput.setType(gcn::KeyInput::PRESSED);
-            keyInput.setKey(gcn::Key(Key::TEXTINPUT));
+            keyInput.setType(KeyInput::PRESSED);
+            keyInput.setKey(Key(Key::TEXTINPUT));
             keyInput.setText(event.text.text);
             mKeyInputQueue.push(keyInput);
             break;
@@ -193,9 +189,9 @@ void SDLInput::pushInput(const SDL_Event &event)
 #endif
                 mouseInput.setButton(-1);
                 if (y > 0)
-                    mouseInput.setType(gcn::MouseInput::WHEEL_MOVED_UP);
+                    mouseInput.setType(MouseInput::WHEEL_MOVED_UP);
                 else
-                    mouseInput.setType(gcn::MouseInput::WHEEL_MOVED_DOWN);
+                    mouseInput.setType(MouseInput::WHEEL_MOVED_DOWN);
                 mouseInput.setTimeStamp(SDL_GetTicks());
                 mMouseInputQueue.push(mouseInput);
             }
@@ -231,12 +227,12 @@ void SDLInput::pushInput(const SDL_Event &event)
 
 #ifndef USE_SDL2
             if (event.button.button == SDL_BUTTON_WHEELDOWN)
-                mouseInput.setType(gcn::MouseInput::WHEEL_MOVED_DOWN);
+                mouseInput.setType(MouseInput::WHEEL_MOVED_DOWN);
             else if (event.button.button == SDL_BUTTON_WHEELUP)
-                mouseInput.setType(gcn::MouseInput::WHEEL_MOVED_UP);
+                mouseInput.setType(MouseInput::WHEEL_MOVED_UP);
             else
 #endif
-                mouseInput.setType(gcn::MouseInput::PRESSED);
+                mouseInput.setType(MouseInput::PRESSED);
             mouseInput.setTimeStamp(SDL_GetTicks());
             mMouseInputQueue.push(mouseInput);
             break;
@@ -258,7 +254,7 @@ void SDLInput::pushInput(const SDL_Event &event)
 #endif
 #endif
             mouseInput.setButton(convertMouseButton(event.button.button));
-            mouseInput.setType(gcn::MouseInput::RELEASED);
+            mouseInput.setType(MouseInput::RELEASED);
             mouseInput.setTimeStamp(SDL_GetTicks());
             mMouseInputQueue.push(mouseInput);
             break;
@@ -278,8 +274,8 @@ void SDLInput::pushInput(const SDL_Event &event)
                 event.motion.realy / scale);
 #endif
 #endif
-            mouseInput.setButton(gcn::MouseInput::EMPTY);
-            mouseInput.setType(gcn::MouseInput::MOVED);
+            mouseInput.setButton(MouseInput::EMPTY);
+            mouseInput.setType(MouseInput::MOVED);
             mouseInput.setTimeStamp(SDL_GetTicks());
             mMouseInputQueue.push(mouseInput);
             break;
@@ -299,8 +295,8 @@ void SDLInput::pushInput(const SDL_Event &event)
                 {
                     mouseInput.setX(-1);
                     mouseInput.setY(-1);
-                    mouseInput.setButton(gcn::MouseInput::EMPTY);
-                    mouseInput.setType(gcn::MouseInput::MOVED);
+                    mouseInput.setButton(MouseInput::EMPTY);
+                    mouseInput.setType(MouseInput::MOVED);
                     mMouseInputQueue.push(mouseInput);
                 }
             }
@@ -319,7 +315,7 @@ void SDLInput::pushInput(const SDL_Event &event)
 
 void SDLInput::convertKeyEventToKey(const SDL_Event &event, KeyInput &keyInput)
 {
-    keyInput.setKey(gcn::Key(convertKeyCharacter(event)));
+    keyInput.setKey(Key(convertKeyCharacter(event)));
     keyInput.setShiftPressed(event.key.keysym.mod & KMOD_SHIFT);
     keyInput.setControlPressed(event.key.keysym.mod & KMOD_CTRL);
     keyInput.setAltPressed(event.key.keysym.mod & KMOD_ALT);
@@ -342,11 +338,11 @@ int SDLInput::convertMouseButton(const int button)
     switch (button)
     {
       case SDL_BUTTON_LEFT:
-          return gcn::MouseInput::LEFT;
+          return MouseInput::LEFT;
       case SDL_BUTTON_RIGHT:
-          return gcn::MouseInput::RIGHT;
+          return MouseInput::RIGHT;
       case SDL_BUTTON_MIDDLE:
-          return gcn::MouseInput::MIDDLE;
+          return MouseInput::MIDDLE;
       default:
           // We have an unknown mouse type which is ignored.
           return button;
@@ -573,10 +569,10 @@ void SDLInput::simulateMouseClick(const int x, const int y,
     mouseInput.setY(y);
     mouseInput.setReal(x, y);
     mouseInput.setButton(button);
-    mouseInput.setType(gcn::MouseInput::PRESSED);
+    mouseInput.setType(MouseInput::PRESSED);
     mouseInput.setTimeStamp(SDL_GetTicks());
     mMouseInputQueue.push(mouseInput);
-    mouseInput.setType(gcn::MouseInput::RELEASED);
+    mouseInput.setType(MouseInput::RELEASED);
     mouseInput.setTimeStamp(SDL_GetTicks());
     mMouseInputQueue.push(mouseInput);
 }

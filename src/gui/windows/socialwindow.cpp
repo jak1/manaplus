@@ -33,6 +33,8 @@
 
 #include "input/keyboardconfig.h"
 
+#include "gui/models/beingslistmodel.h"
+
 #include "gui/windows/confirmdialog.h"
 #include "gui/windows/okdialog.h"
 #include "gui/windows/setupwindow.h"
@@ -41,6 +43,7 @@
 
 #include "gui/windows/outfitwindow.h"
 
+#include "gui/widgets/avatarlistbox.h"
 #include "gui/widgets/button.h"
 #include "gui/widgets/browserbox.h"
 #include "gui/widgets/label.h"
@@ -115,6 +118,11 @@ public:
     virtual void selectIndex(const unsigned num A_UNUSED)
     { }
 
+    virtual void buildCounter(const int online A_UNUSED = 0,
+                              const int total A_UNUSED = 0)
+    {
+    }
+
 protected:
     friend class SocialWindow;
 
@@ -157,11 +165,6 @@ protected:
             socialWindow->setCounter(this, mCounterString);
     }
 
-    virtual void buildCounter(const int online A_UNUSED = 0,
-                              const int total A_UNUSED = 0)
-    {
-    }
-
     TextDialog *mInviteDialog;
     ConfirmDialog *mConfirmDialog;
     ScrollArea *mScroll;
@@ -169,13 +172,14 @@ protected:
     std::string mCounterString;
 };
 
-class SocialGuildTab final : public SocialTab, public gcn::ActionListener
+class SocialGuildTab final : public SocialTab, public ActionListener
 {
 public:
     SocialGuildTab(const Widget2 *const widget,
-                   Guild *const guild, const bool showBackground) :
+                   Guild *const guild,
+                   const bool showBackground) :
         SocialTab(widget),
-        gcn::ActionListener(),
+        ActionListener(),
         mGuild(guild)
     {
         // TRANSLATORS: tab in social window
@@ -191,7 +195,7 @@ public:
 
         mList = new AvatarListBox(this, guild);
         mList->postInit();
-        mScroll = new ScrollArea(mList, showBackground,
+        mScroll = new ScrollArea(this, mList, showBackground,
             "social_background.xml");
 
         mScroll->setHorizontalScrollPolicy(gcn::ScrollArea::SHOW_AUTO);
@@ -208,7 +212,7 @@ public:
         mScroll = nullptr;
     }
 
-    void action(const gcn::ActionEvent &event) override final
+    void action(const ActionEvent &event) override final
     {
         const std::string &eventId = event.getId();
         if (eventId == "do invite")
@@ -305,13 +309,14 @@ private:
     Guild *mGuild;
 };
 
-class SocialGuildTab2 final : public SocialTab, public gcn::ActionListener
+class SocialGuildTab2 final : public SocialTab, public ActionListener
 {
 public:
-    SocialGuildTab2(const Widget2 *const widget, Guild *const guild,
+    SocialGuildTab2(const Widget2 *const widget,
+                    Guild *const guild,
                     const bool showBackground) :
         SocialTab(widget),
-        gcn::ActionListener()
+        ActionListener()
     {
         // TRANSLATORS: tab in social window
         setCaption(_("Guild"));
@@ -326,7 +331,7 @@ public:
 
         mList = new AvatarListBox(this, guild);
         mList->postInit();
-        mScroll = new ScrollArea(mList, showBackground,
+        mScroll = new ScrollArea(this, mList, showBackground,
             "social_background.xml");
 
         mScroll->setHorizontalScrollPolicy(gcn::ScrollArea::SHOW_AUTO);
@@ -343,7 +348,7 @@ public:
         mScroll = nullptr;
     }
 
-    void action(const gcn::ActionEvent &event A_UNUSED) override final
+    void action(const ActionEvent &event A_UNUSED) override final
     {
     }
 
@@ -372,13 +377,14 @@ public:
     }
 };
 
-class SocialPartyTab final : public SocialTab, public gcn::ActionListener
+class SocialPartyTab final : public SocialTab, public ActionListener
 {
 public:
     SocialPartyTab(const Widget2 *const widget,
-                   Party *const party, const bool showBackground) :
+                   Party *const party,
+                   const bool showBackground) :
         SocialTab(widget),
-        gcn::ActionListener(),
+        ActionListener(),
         mParty(party)
     {
         // TRANSLATORS: tab in social window
@@ -394,7 +400,7 @@ public:
 
         mList = new AvatarListBox(this, party);
         mList->postInit();
-        mScroll = new ScrollArea(mList, showBackground,
+        mScroll = new ScrollArea(this, mList, showBackground,
             "social_background.xml");
 
         mScroll->setHorizontalScrollPolicy(gcn::ScrollArea::SHOW_AUTO);
@@ -411,7 +417,7 @@ public:
         mScroll = nullptr;
     }
 
-    void action(const gcn::ActionEvent &event) override final
+    void action(const ActionEvent &event) override final
     {
         const std::string &eventId = event.getId();
         if (eventId == "do invite")
@@ -499,52 +505,18 @@ private:
     Party *mParty;
 };
 
-class BeingsListModal final : public AvatarListModel
-{
-public:
-    BeingsListModal() :
-        AvatarListModel(),
-        mMembers()
-    {
-    }
-
-    A_DELETE_COPY(BeingsListModal)
-
-    ~BeingsListModal()
-    {
-        delete_all(mMembers);
-        mMembers.clear();
-    }
-
-    std::vector<Avatar*> *getMembers()
-    {
-        return &mMembers;
-    }
-
-    Avatar *getAvatarAt(int index) override final
-    {
-        return mMembers[index];
-    }
-
-    int getNumberOfElements() override final
-    {
-        return static_cast<int>(mMembers.size());
-    }
-
-    std::vector<Avatar*> mMembers;
-};
-
 class SocialPlayersTab final : public SocialTab
 {
 public:
     SocialPlayersTab(const Widget2 *const widget,
-                     std::string name, const bool showBackground) :
+                     std::string name,
+                     const bool showBackground) :
         SocialTab(widget),
-        mBeings(new BeingsListModal)
+        mBeings(new BeingsListModel)
     {
         mList = new AvatarListBox(this, mBeings);
         mList->postInit();
-        mScroll = new ScrollArea(mList, showBackground,
+        mScroll = new ScrollArea(this, mList, showBackground,
             "social_background.xml");
 
         mScroll->setHorizontalScrollPolicy(gcn::ScrollArea::SHOW_AUTO);
@@ -696,7 +668,7 @@ public:
     }
 
 private:
-    BeingsListModal *mBeings;
+    BeingsListModel *mBeings;
 };
 
 
@@ -706,11 +678,11 @@ public:
     SocialNavigationTab(const Widget2 *const widget,
                         const bool showBackground) :
         SocialTab(widget),
-        mBeings(new BeingsListModal)
+        mBeings(new BeingsListModel)
     {
         mList = new AvatarListBox(this, mBeings);
         mList->postInit();
-        mScroll = new ScrollArea(mList, showBackground,
+        mScroll = new ScrollArea(this, mList, showBackground,
             "social_background.xml");
 
         mScroll->setHorizontalScrollPolicy(gcn::ScrollArea::SHOW_AUTO);
@@ -973,7 +945,7 @@ public:
     }
 
 private:
-    BeingsListModal *mBeings;
+    BeingsListModel *mBeings;
 };
 
 
@@ -1035,11 +1007,11 @@ public:
     SocialAttackTab(const Widget2 *const widget,
                     const bool showBackground) :
         SocialTab(widget),
-        mBeings(new BeingsListModal)
+        mBeings(new BeingsListModel)
     {
         mList = new AvatarListBox(this, mBeings);
         mList->postInit();
-        mScroll = new ScrollArea(mList, showBackground,
+        mScroll = new ScrollArea(this, mList, showBackground,
             "social_background.xml");
 
         mScroll->setHorizontalScrollPolicy(gcn::ScrollArea::SHOW_AUTO);
@@ -1073,7 +1045,7 @@ public:
     }
 
 private:
-    BeingsListModal *mBeings;
+    BeingsListModel *mBeings;
 };
 
 class SocialPickupTab final : public SocialTab
@@ -1082,11 +1054,11 @@ public:
     SocialPickupTab(const Widget2 *const widget,
                     const bool showBackground) :
         SocialTab(widget),
-        mBeings(new BeingsListModal)
+        mBeings(new BeingsListModel)
     {
         mList = new AvatarListBox(this, mBeings);
         mList->postInit();
-        mScroll = new ScrollArea(mList, showBackground,
+        mScroll = new ScrollArea(this, mList, showBackground,
             "social_background.xml");
 
         mScroll->setHorizontalScrollPolicy(gcn::ScrollArea::SHOW_AUTO);
@@ -1118,7 +1090,7 @@ public:
     }
 
 private:
-    BeingsListModal *mBeings;
+    BeingsListModel *mBeings;
 };
 
 
@@ -1126,13 +1098,14 @@ class SocialFriendsTab final : public SocialTab
 {
 public:
     SocialFriendsTab(const Widget2 *const widget,
-                     std::string name, const bool showBackground) :
+                     std::string name,
+                     const bool showBackground) :
         SocialTab(widget),
-        mBeings(new BeingsListModal)
+        mBeings(new BeingsListModel)
     {
         mList = new AvatarListBox(this, mBeings);
         mList->postInit();
-        mScroll = new ScrollArea(mList, showBackground,
+        mScroll = new ScrollArea(this, mList, showBackground,
             "social_background.xml");
 
         mScroll->setHorizontalScrollPolicy(gcn::ScrollArea::SHOW_AUTO);
@@ -1208,7 +1181,7 @@ public:
     }
 
 private:
-    BeingsListModal *mBeings;
+    BeingsListModel *mBeings;
 };
 
 
@@ -1242,7 +1215,7 @@ public:
     A_DELETE_COPY(CreatePopup)
 
     void handleLink(const std::string &link,
-                    gcn::MouseEvent *event A_UNUSED) override final
+                    MouseEvent *event A_UNUSED) override final
     {
         if (link == "guild" && socialWindow)
         {
@@ -1256,7 +1229,7 @@ public:
         setVisible(false);
     }
 
-    void show(gcn::Widget *parent)
+    void show(Widget *parent)
     {
         if (!parent)
             return;
@@ -1276,7 +1249,7 @@ private:
 SocialWindow::SocialWindow() :
     // TRANSLATORS: social window name
     Window(_("Social"), false, nullptr, "social.xml"),
-    gcn::ActionListener(),
+    ActionListener(),
     PlayerRelationsListener(),
     mGuildInvited(0),
     mGuildAcceptDialog(nullptr),
@@ -1336,7 +1309,7 @@ void SocialWindow::postInit()
     place(0, 1, mCountLabel);
     place(0, 2, mTabs, 4, 4);
 
-    widgetResized(gcn::Event(nullptr));
+    widgetResized(Event(nullptr));
 
     loadWindowState();
 
@@ -1482,7 +1455,7 @@ bool SocialWindow::removeTab(Party *const party)
     return true;
 }
 
-void SocialWindow::action(const gcn::ActionEvent &event)
+void SocialWindow::action(const ActionEvent &event)
 {
     const std::string &eventId = event.getId();
 
@@ -1744,7 +1717,6 @@ void SocialWindow::slowLogic()
     const unsigned int nowTime = cur_time;
     if (mNeedUpdate && nowTime - mLastUpdateTime > 1)
     {
-        logger->log("soc update");
         mPlayers->updateList();
         mFriends->updateList();
         mNeedUpdate = false;
@@ -1863,7 +1835,7 @@ void SocialWindow::updateParty()
     }
 }
 
-void SocialWindow::widgetResized(const gcn::Event &event)
+void SocialWindow::widgetResized(const Event &event)
 {
     Window::widgetResized(event);
     if (mTabs)

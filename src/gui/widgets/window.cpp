@@ -20,6 +20,49 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/*      _______   __   __   __   ______   __   __   _______   __   __
+ *     / _____/\ / /\ / /\ / /\ / ____/\ / /\ / /\ / ___  /\ /  |\/ /\
+ *    / /\____\// / // / // / // /\___\// /_// / // /\_/ / // , |/ / /
+ *   / / /__   / / // / // / // / /    / ___  / // ___  / // /| ' / /
+ *  / /_// /\ / /_// / // / // /_/_   / / // / // /\_/ / // / |  / /
+ * /______/ //______/ //_/ //_____/\ /_/ //_/ //_/ //_/ //_/ /|_/ /
+ * \______\/ \______\/ \_\/ \_____\/ \_\/ \_\/ \_\/ \_\/ \_\/ \_\/
+ *
+ * Copyright (c) 2004 - 2008 Olof Naessén and Per Larsson
+ *
+ *
+ * Per Larsson a.k.a finalman
+ * Olof Naessén a.k.a jansem/yakslem
+ *
+ * Visit: http://guichan.sourceforge.net
+ *
+ * License: (BSD)
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in
+ *    the documentation and/or other materials provided with the
+ *    distribution.
+ * 3. Neither the name of Guichan nor the names of its contributors may
+ *    be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+ * TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
 #include "gui/widgets/window.h"
 
 #include "client.h"
@@ -29,6 +72,8 @@
 #include "soundconsts.h"
 #include "soundmanager.h"
 
+#include "gui/focushandler.h"
+#include "gui/font.h"
 #include "gui/gui.h"
 #include "gui/viewport.h"
 
@@ -36,10 +81,6 @@
 
 #include "resources/cursor.h"
 #include "resources/image.h"
-
-#include <guichan/exception.hpp>
-#include <guichan/focushandler.hpp>
-#include <guichan/font.hpp>
 
 #include "debug.h"
 
@@ -50,9 +91,17 @@ int Window::mouseResize = 0;
 
 Window::Window(const std::string &caption, const bool modal,
                Window *const parent, std::string skin) :
-    gcn::Window(caption),
-    Widget2(),
-    gcn::WidgetListener(),
+    gcn::Container(nullptr),
+    MouseListener(),
+    WidgetListener(),
+    mCaption(caption),
+    mAlignment(Graphics::CENTER),
+    mPadding(2),
+    mTitleBarHeight(16),
+    mMovable(true),
+    mDragOffsetX(0),
+    mDragOffsetY(0),
+    mMoved(false),
     mSkin(nullptr),
     mDefaultX(0),
     mDefaultY(0),
@@ -74,7 +123,7 @@ Window::Window(const std::string &caption, const bool modal,
     mVertexes(new ImageCollection),
     mCaptionOffsetX(7),
     mCaptionOffsetY(5),
-    mCaptionAlign(gcn::Graphics::LEFT),
+    mCaptionAlign(Graphics::LEFT),
     mTitlePadding(4),
     mGripPadding(2),
     mResizeHandles(-1),
@@ -92,15 +141,10 @@ Window::Window(const std::string &caption, const bool modal,
 {
     logger->log("Window::Window(\"%s\")", caption.c_str());
 
-#ifndef USE_INTERNALGUICHAN
-    mDragOffsetX = 0;
-    mDragOffsetY = 0;
-#endif
-
-    if (!windowContainer)
-        throw GCN_EXCEPTION("Window::Window(): no windowContainer set");
-
     windowInstances++;
+
+//    mFrameSize = 1;
+    addMouseListener(this);
 
     setFrameSize(0);
     setPadding(3);
@@ -119,7 +163,7 @@ Window::Window(const std::string &caption, const bool modal,
         {
             setPadding(mSkin->getPadding());
             if (getOptionBool("titlebarBold"))
-                mCaptionFont = reinterpret_cast<gcn::Font*>(boldFont);
+                mCaptionFont = boldFont;
             mTitlePadding = mSkin->getTitlePadding();
             mGripPadding = getOption("resizePadding");
             mCaptionOffsetX = getOption("captionoffsetx");
@@ -128,12 +172,12 @@ Window::Window(const std::string &caption, const bool modal,
             mCaptionOffsetY = getOption("captionoffsety");
             if (!mCaptionOffsetY)
                 mCaptionOffsetY = 5;
-            mCaptionAlign = static_cast<gcn::Graphics::Alignment>(
+            mCaptionAlign = static_cast<Graphics::Alignment>(
                 getOption("captionalign"));
-            if (mCaptionAlign < gcn::Graphics::LEFT
-                || mCaptionAlign > gcn::Graphics::RIGHT)
+            if (mCaptionAlign < Graphics::LEFT
+                || mCaptionAlign > Graphics::RIGHT)
             {
-                mCaptionAlign = gcn::Graphics::LEFT;
+                mCaptionAlign = Graphics::LEFT;
             }
             setTitleBarHeight(getOption("titlebarHeight"));
             if (!mTitleBarHeight)
@@ -147,7 +191,8 @@ Window::Window(const std::string &caption, const bool modal,
     }
 
     // Add this window to the window container
-    windowContainer->add(this);
+    if (windowContainer)
+        windowContainer->add(this);
 
     if (mModal)
     {
@@ -208,13 +253,12 @@ void Window::setWindowContainer(WindowContainer *const wc)
     windowContainer = wc;
 }
 
-void Window::draw(gcn::Graphics *graphics)
+void Window::draw(Graphics *graphics)
 {
     if (!mSkin)
         return;
 
     BLOCK_START("Window::draw")
-    Graphics *const g = static_cast<Graphics*>(graphics);
     bool update = false;
 
     if (isBatchDrawRenders(openGLMode))
@@ -230,8 +274,11 @@ void Window::draw(gcn::Graphics *graphics)
             mRedraw = false;
             update = true;
             mVertexes->clear();
-            g->calcWindow(mVertexes, 0, 0, mDimension.width,
-                mDimension.height, mSkin->getBorder());
+            graphics->calcWindow(mVertexes,
+                0, 0,
+                mDimension.width,
+                mDimension.height,
+                mSkin->getBorder());
 
             // Draw Close Button
             if (mCloseWindowButton)
@@ -240,8 +287,10 @@ void Window::draw(gcn::Graphics *graphics)
                     mResizeHandles == CLOSE);
                 if (button)
                 {
-                    g->calcTileCollection(mVertexes, button,
-                        mCloseRect.x, mCloseRect.y);
+                    graphics->calcTileCollection(mVertexes,
+                        button,
+                        mCloseRect.x,
+                        mCloseRect.y);
                 }
             }
             // Draw Sticky Button
@@ -250,27 +299,33 @@ void Window::draw(gcn::Graphics *graphics)
                 const Image *const button = mSkin->getStickyImage(mSticky);
                 if (button)
                 {
-                    g->calcTileCollection(mVertexes, button,
-                        mStickyRect.x, mStickyRect.y);
+                    graphics->calcTileCollection(mVertexes,
+                        button,
+                        mStickyRect.x,
+                        mStickyRect.y);
                 }
             }
 
             if (mGrip)
             {
-                g->calcTileCollection(mVertexes, mGrip,
-                    mGripRect.x, mGripRect.y);
+                graphics->calcTileCollection(mVertexes,
+                    mGrip,
+                    mGripRect.x,
+                    mGripRect.y);
             }
         }
         else
         {
             mLastRedraw = false;
         }
-        g->drawTileCollection(mVertexes);
+        graphics->drawTileCollection(mVertexes);
     }
     else
     {
-        g->drawImageRect(0, 0, mDimension.width,
-            mDimension.height, mSkin->getBorder());
+        graphics->drawImageRect(0, 0,
+            mDimension.width,
+            mDimension.height,
+            mSkin->getBorder());
 
         // Draw Close Button
         if (mCloseWindowButton)
@@ -278,24 +333,24 @@ void Window::draw(gcn::Graphics *graphics)
             const Image *const button = mSkin->getCloseImage(
                 mResizeHandles == CLOSE);
             if (button)
-                g->drawImage2(button, mCloseRect.x, mCloseRect.y);
+                graphics->drawImage(button, mCloseRect.x, mCloseRect.y);
         }
         // Draw Sticky Button
         if (mStickyButton)
         {
             const Image *const button = mSkin->getStickyImage(mSticky);
             if (button)
-                g->drawImage2(button, mStickyRect.x, mStickyRect.y);
+                graphics->drawImage(button, mStickyRect.x, mStickyRect.y);
         }
 
         if (mGrip)
-            g->drawImage2(mGrip, mGripRect.x, mGripRect.y);
+            graphics->drawImage(mGrip, mGripRect.x, mGripRect.y);
     }
 
     // Draw title
     if (mShowTitle)
     {
-        g->setColorAll(mForegroundColor, mForegroundColor2);
+        graphics->setColorAll(mForegroundColor, mForegroundColor2);
         int x;
         switch (mCaptionAlign)
         {
@@ -310,14 +365,14 @@ void Window::draw(gcn::Graphics *graphics)
                 x = mCaptionOffsetX - mCaptionFont->getWidth(mCaption);
                 break;
         }
-        mCaptionFont->drawString(g, mCaption, x, mCaptionOffsetY);
+        mCaptionFont->drawString(graphics, mCaption, x, mCaptionOffsetY);
     }
 
     if (update)
     {
-        g->setRedraw(update);
+        graphics->setRedraw(update);
         drawChildren(graphics);
-        g->setRedraw(false);
+        graphics->setRedraw(false);
     }
     else
     {
@@ -343,7 +398,7 @@ void Window::setContentSize(int width, int height)
     setSize(width, height);
 }
 
-void Window::setLocationRelativeTo(const gcn::Widget *const widget)
+void Window::setLocationRelativeTo(const Widget *const widget)
 {
     if (!widget)
         return;
@@ -360,7 +415,7 @@ void Window::setLocationRelativeTo(const gcn::Widget *const widget)
         - mDimension.height) / 2 - y));
 }
 
-void Window::setLocationHorisontallyRelativeTo(const gcn::Widget *const widget)
+void Window::setLocationHorisontallyRelativeTo(const Widget *const widget)
 {
     if (!widget)
         return;
@@ -485,9 +540,9 @@ void Window::setResizable(const bool r)
     }
 }
 
-void Window::widgetResized(const gcn::Event &event A_UNUSED)
+void Window::widgetResized(const Event &event A_UNUSED)
 {
-    const gcn::Rectangle area = getChildrenArea();
+    const Rect area = getChildrenArea();
 
     if (mGrip)
     {
@@ -549,12 +604,12 @@ void Window::widgetResized(const gcn::Event &event A_UNUSED)
     mRedraw = true;
 }
 
-void Window::widgetMoved(const gcn::Event& event A_UNUSED)
+void Window::widgetMoved(const Event& event A_UNUSED)
 {
     mRedraw = true;
 }
 
-void Window::widgetHidden(const gcn::Event &event A_UNUSED)
+void Window::widgetHidden(const Event &event A_UNUSED)
 {
     if (gui)
         gui->setCursorType(Cursor::CURSOR_POINTER);
@@ -608,25 +663,21 @@ void Window::setVisible(const bool visible, const bool forceSticky)
 
     // Check if the window is off screen...
     if (visible)
-    {
         ensureOnScreen();
-    }
     else
-    {
         mResizeHandles = 0;
-    }
 
     if (mStickyButtonLock)
-        gcn::Window::setVisible(visible);
+        gcn::Container::setVisible(visible);
     else
-        gcn::Window::setVisible((!forceSticky && mSticky) || visible);
+        gcn::Container::setVisible((!forceSticky && mSticky) || visible);
     if (visible)
     {
         if (mPlayVisibleSound)
             soundManager.playGuiSound(SOUND_SHOW_WINDOW);
         if (gui)
         {
-            gcn::MouseEvent *const event = reinterpret_cast<gcn::MouseEvent*>(
+            MouseEvent *const event = reinterpret_cast<MouseEvent*>(
                 gui->createMouseEvent(this));
             if (event)
             {
@@ -653,12 +704,19 @@ void Window::scheduleDelete()
     windowContainer->scheduleDelete(this);
 }
 
-void Window::mousePressed(gcn::MouseEvent &event)
+void Window::mousePressed(MouseEvent &event)
 {
-    // Let Guichan move window to top and figure out title bar drag
-    gcn::Window::mousePressed(event);
+    if (event.getSource() == this)
+    {
+        if (getParent())
+            getParent()->moveToTop(this);
 
-    if (event.getButton() == gcn::MouseEvent::LEFT)
+        mDragOffsetX = event.getX();
+        mDragOffsetY = event.getY();
+        mMoved = event.getY() <= static_cast<int>(mTitleBarHeight);
+    }
+
+    if (event.getButton() == MouseEvent::LEFT)
     {
         const int x = event.getX();
         const int y = event.getY();
@@ -696,7 +754,7 @@ void Window::close()
     setVisible(false);
 }
 
-void Window::mouseReleased(gcn::MouseEvent &event A_UNUSED)
+void Window::mouseReleased(MouseEvent &event A_UNUSED)
 {
     if (mGrip && mouseResize)
     {
@@ -705,22 +763,21 @@ void Window::mouseReleased(gcn::MouseEvent &event A_UNUSED)
             gui->setCursorType(Cursor::CURSOR_POINTER);
     }
 
-    // This should be the responsibility of Guichan (and is from 0.8.0 on)
     mMoved = false;
 }
 
-void Window::mouseEntered(gcn::MouseEvent &event)
+void Window::mouseEntered(MouseEvent &event)
 {
     updateResizeHandler(event);
 }
 
-void Window::mouseExited(gcn::MouseEvent &event A_UNUSED)
+void Window::mouseExited(MouseEvent &event A_UNUSED)
 {
     if (mGrip && !mouseResize && gui)
         gui->setCursorType(Cursor::CURSOR_POINTER);
 }
 
-void Window::updateResizeHandler(gcn::MouseEvent &event)
+void Window::updateResizeHandler(MouseEvent &event)
 {
     if (!gui)
         return;
@@ -755,7 +812,7 @@ void Window::updateResizeHandler(gcn::MouseEvent &event)
     }
 }
 
-void Window::mouseMoved(gcn::MouseEvent &event)
+void Window::mouseMoved(MouseEvent &event)
 {
     updateResizeHandler(event);
     if (viewport)
@@ -767,12 +824,20 @@ bool Window::canMove() const
     return !mStickyButtonLock || !mSticky;
 }
 
-void Window::mouseDragged(gcn::MouseEvent &event)
+void Window::mouseDragged(MouseEvent &event)
 {
     if (canMove())
     {
-        // Let Guichan handle title bar drag
-        gcn::Window::mouseDragged(event);
+        if (!event.isConsumed() && event.getSource() == this)
+        {
+            if (isMovable() && mMoved)
+            {
+                setPosition(event.getX() - mDragOffsetX + getX(),
+                    event.getY() - mDragOffsetY + getY());
+            }
+
+            event.consume();
+        }
     }
     else
     {
@@ -794,7 +859,7 @@ void Window::mouseDragged(gcn::MouseEvent &event)
     {
         const int dx = event.getX() - mDragOffsetX;
         const int dy = event.getY() - mDragOffsetY;
-        gcn::Rectangle newDim = getDimension();
+        Rect newDim = getDimension();
 
         if (mouseResize & (TOP | BOTTOM))
         {
@@ -1080,10 +1145,10 @@ void Window::adjustSizeToScreen()
     if (mDimension.height > screenHeight)
         mDimension.height = screenHeight;
     if (oldWidth != mDimension.width || oldHeight != mDimension.height)
-        widgetResized(gcn::Event(this));
+        widgetResized(Event(this));
 }
 
-int Window::getResizeHandles(const gcn::MouseEvent &event)
+int Window::getResizeHandles(const MouseEvent &event)
 {
     if (event.getX() < 0 || event.getY() < 0)
         return 0;
@@ -1120,7 +1185,7 @@ int Window::getResizeHandles(const gcn::MouseEvent &event)
     return resizeHandles;
 }
 
-bool Window::isResizeAllowed(const gcn::MouseEvent &event) const
+bool Window::isResizeAllowed(const MouseEvent &event) const
 {
     const int y = event.getY();
 
@@ -1165,7 +1230,7 @@ void Window::clearLayout()
     }
 }
 
-LayoutCell &Window::place(const int x, const int y, gcn::Widget *const wg,
+LayoutCell &Window::place(const int x, const int y, Widget *const wg,
                           const int w, const int h)
 {
     add(wg);
@@ -1192,7 +1257,7 @@ void Window::redraw()
 {
     if (mLayout)
     {
-        const gcn::Rectangle area = getChildrenArea();
+        const Rect area = getChildrenArea();
         int w = area.width;
         int h = area.height;
         mLayout->reflow(w, h);
@@ -1228,12 +1293,12 @@ void Window::ensureOnScreen()
         mDimension.y = 0;
 }
 
-gcn::Rectangle Window::getWindowArea() const
+Rect Window::getWindowArea() const
 {
-    return gcn::Rectangle(mPadding,
-                          mPadding,
-                          mDimension.width - mPadding * 2,
-                          mDimension.height - mPadding * 2);
+    return Rect(mPadding,
+        mPadding,
+        mDimension.width - mPadding * 2,
+        mDimension.height - mPadding * 2);
 }
 
 int Window::getOption(const std::string &name, const int def) const
@@ -1253,6 +1318,37 @@ bool Window::getOptionBool(const std::string &name, const bool def) const
     if (mSkin)
         return mSkin->getOption(name, def) != 0;
     return def;
+}
+
+Rect Window::getChildrenArea()
+{
+    return Rect(mPadding,
+        mTitleBarHeight,
+        mDimension.width - mPadding * 2,
+        mDimension.height - mPadding - mTitleBarHeight);
+}
+
+void Window::resizeToContent()
+{
+    int w = 0;
+    int h = 0;
+    for (WidgetListConstIterator it = mWidgets.begin();
+          it != mWidgets.end(); ++ it)
+    {
+        const Widget *const widget = *it;
+        const int x = widget->getX();
+        const int y = widget->getY();
+        const int width = widget->getWidth();
+        const int height = widget->getHeight();
+        if (x + width > w)
+            w = x + width;
+
+        if (y + height > h)
+            h = y + height;
+    }
+
+    setSize(w + 2 * mPadding,
+        h + mPadding + mTitleBarHeight);
 }
 
 #ifdef USE_PROFILER

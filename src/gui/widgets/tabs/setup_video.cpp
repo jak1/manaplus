@@ -46,7 +46,7 @@
 
 #include "test/testmain.h"
 
-#include <guichan/listmodel.hpp>
+#include "gui/models/listmodel.h"
 
 #include <algorithm>
 
@@ -54,7 +54,7 @@
 
 extern Graphics *mainGraphics;
 
-class ModeListModel final : public gcn::ListModel
+class ModeListModel final : public ListModel
 {
     public:
         ModeListModel();
@@ -159,7 +159,7 @@ int ModeListModel::getIndexOf(const std::string &widthXHeightMode)
     return -1;
 }
 
-class OpenGLListModel final : public gcn::ListModel
+class OpenGLListModel final : public ListModel
 {
 public:
     ~OpenGLListModel()
@@ -178,7 +178,7 @@ public:
 
 Setup_Video::Setup_Video(const Widget2 *const widget) :
     SetupTab(widget),
-    gcn::KeyListener(),
+    KeyListener(),
     mFullScreenEnabled(config.getBoolValue("screen")),
     mOpenGLEnabled(intToRenderType(config.getIntValue("opengl"))),
     mFps(config.getIntValue("fpslimit")),
@@ -191,9 +191,9 @@ Setup_Video::Setup_Video(const Widget2 *const widget) :
     mOpenGLDropDown(new DropDown(widget, mOpenGLListModel)),
     // TRANSLATORS: video settings checkbox
     mFpsCheckBox(new CheckBox(this, _("FPS limit:"))),
-    mFpsSlider(new Slider(2, 160)),
+    mFpsSlider(new Slider(this, 2, 160)),
     mFpsLabel(new Label(this)),
-    mAltFpsSlider(new Slider(2, 160)),
+    mAltFpsSlider(new Slider(this, 2, 160)),
     // TRANSLATORS: video settings label
     mAltFpsLabel(new Label(this, _("Alt FPS limit: "))),
 #if !defined(ANDROID) && !defined(__APPLE__)
@@ -224,7 +224,7 @@ Setup_Video::Setup_Video(const Widget2 *const widget) :
     // TRANSLATORS: video settings tab name
     setName(_("Video"));
 
-    ScrollArea *const scrollArea = new ScrollArea(mModeList,
+    ScrollArea *const scrollArea = new ScrollArea(this, mModeList,
         true, "setup_video_background.xml");
     scrollArea->setWidth(150);
     scrollArea->setHorizontalScrollPolicy(gcn::ScrollArea::SHOW_NEVER);
@@ -304,7 +304,7 @@ Setup_Video::Setup_Video(const Widget2 *const widget) :
     if (config.getIntValue("screenwidth") >= 730)
         width += 100;
 
-    setDimension(gcn::Rectangle(0, 0, width, 300));
+    setDimension(Rect(0, 0, width, 300));
 }
 
 Setup_Video::~Setup_Video()
@@ -445,7 +445,7 @@ void Setup_Video::cancel()
     config.setValue("noframe", mNoFrame);
 }
 
-void Setup_Video::action(const gcn::ActionEvent &event)
+void Setup_Video::action(const ActionEvent &event)
 {
     const std::string &id = event.getId();
 

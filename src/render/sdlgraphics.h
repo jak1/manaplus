@@ -58,7 +58,7 @@ class SDLGraphics final : public Graphics
 
         void _endDraw() override final;
 
-        bool pushClipArea(gcn::Rectangle rect) override final;
+        bool pushClipArea(Rect rect) override final;
 
         void popClipArea() override final;
 
@@ -120,9 +120,9 @@ class SDLGraphics final : public Graphics
                         const int w, const int h,
                         const ImageRect &imgRect) override final;
 
-        void fillRectangle(const gcn::Rectangle &rect) override final;
+        void fillRectangle(const Rect &rect) override final;
 
-        void drawRectangle(const gcn::Rectangle &rect) override final;
+        void drawRectangle(const Rect &rect) override final;
 
         void drawPoint(int x, int y) override final;
 
@@ -136,8 +136,8 @@ class SDLGraphics final : public Graphics
                           const bool resize,
                           const bool noFrame) override final;
 
-        bool drawImage2(const Image *const image,
-                        int dstX, int dstY) override final;
+        bool drawImage(const Image *const image,
+                       int dstX, int dstY) override final;
 
         void drawImageCached(const Image *const image,
                              int x, int y) override final;
@@ -166,7 +166,7 @@ class SDLGraphics final : public Graphics
         void drawVLine(int x, int y1, int y2);
 
         uint32_t mOldPixel;
-        int mOldAlpha;
+        unsigned int mOldAlpha;
 
     private:
         void inline calcImageRect(ImageVertexes *const vert,

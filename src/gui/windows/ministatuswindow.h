@@ -24,7 +24,8 @@
 #define GUI_WINDOWS_MINISTATUSWINDOW_H
 
 #include "inventory.h"
-#include "depricatedlistener.h"
+
+#include "listeners/depricatedlistener.h"
 
 #include "gui/widgets/popup.h"
 
@@ -68,13 +69,13 @@ class MiniStatusWindow final : public Popup,
 
         void logic() override final;
 
-        void draw(gcn::Graphics *graphics) override final;
+        void draw(Graphics *graphics) override final;
 
-        void mouseMoved(gcn::MouseEvent &mouseEvent) override final;
+        void mouseMoved(MouseEvent &mouseEvent) override final;
 
-        void mousePressed(gcn::MouseEvent &event) override final;
+        void mousePressed(MouseEvent &event) override final;
 
-        void mouseExited(gcn::MouseEvent &event) override final;
+        void mouseExited(MouseEvent &event) override final;
 
         void showBar(const std::string &name, const bool visible);
 
@@ -87,7 +88,7 @@ class MiniStatusWindow final : public Popup,
         std::vector <ProgressBar*> &getBars() A_WARN_UNUSED
         { return mBars; }
 
-        gcn::Rectangle getChildrenArea() override final A_WARN_UNUSED;
+        Rect getChildrenArea() override final A_WARN_UNUSED;
 
 #ifdef USE_PROFILER
         void logicChildren();

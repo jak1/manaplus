@@ -27,14 +27,15 @@
 
 #include "gui/widgets/window.h"
 
-#include <guichan/actionlistener.hpp>
+#include "listeners/actionlistener.h"
 
 /**
  * The connection dialog.
  *
  * \ingroup Interface
  */
-class ConnectionDialog final : public Window, private gcn::ActionListener
+class ConnectionDialog final : public Window,
+                               private ActionListener
 {
     public:
         /**
@@ -55,9 +56,9 @@ class ConnectionDialog final : public Window, private gcn::ActionListener
          * Called when the user presses Cancel. Restores the global state to
          * the previous one.
          */
-        void action(const gcn::ActionEvent &) override;
+        void action(const ActionEvent &) override;
 
-        void draw(gcn::Graphics *graphics) override;
+        void draw(Graphics *graphics) override;
 
     private:
         State mCancelState;

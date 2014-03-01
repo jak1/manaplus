@@ -24,6 +24,7 @@
 
 #include "chatlogger.h"
 #include "client.h"
+#include "commands.h"
 #include "commandhandler.h"
 #include "configuration.h"
 #include "soundconsts.h"
@@ -50,12 +51,13 @@
 
 static const unsigned int MAX_WORD_SIZE = 50;
 
-ChatTab::ChatTab(const Widget2 *const widget, const std::string &name,
+ChatTab::ChatTab(const Widget2 *const widget,
+                 const std::string &name,
                  const std::string &channel) :
     Tab(widget),
     mTextOutput(new BrowserBox(this, BrowserBox::AUTO_WRAP, true,
        "browserbox.xml")),
-    mScrollArea(new ScrollArea(mTextOutput, false)),
+    mScrollArea(new ScrollArea(this, mTextOutput, false)),
     mChannelName(channel),
     mAllowHightlight(true),
     mRemoveNames(false),
@@ -405,7 +407,7 @@ void ChatTab::chatInput(const std::string &message)
 void ChatTab::scroll(const int amount)
 {
     const int range = mScrollArea->getHeight() / 8 * amount;
-    gcn::Rectangle scr;
+    Rect scr;
     scr.y = mScrollArea->getVerticalScrollAmount() + range;
     scr.height = abs(range);
     mTextOutput->showPart(scr);

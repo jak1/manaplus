@@ -21,7 +21,8 @@
 
 #include "gui/widgets/tabs/setup_colors.h"
 
-#include "gui/sdlfont.h"
+#include "gui/font.h"
+#include "gui/gui.h"
 #include "gui/userpalette.h"
 
 #include "gui/widgets/browserbox.h"
@@ -47,34 +48,35 @@ const char *const Setup_Colors::rawmsg =
 
 Setup_Colors::Setup_Colors(const Widget2 *const widget) :
     SetupTab(widget),
-    gcn::SelectionListener(),
+    SelectionListener(),
     mColorBox(new ListBox(this, userPalette, "")),
-    mScroll(new ScrollArea(mColorBox, true, "setup_colors_background.xml")),
+    mScroll(new ScrollArea(this, mColorBox,
+        true, "setup_colors_background.xml")),
     mPreview(new BrowserBox(this, BrowserBox::AUTO_WRAP, true,
         "browserbox.xml")),
     mTextPreview(new TextPreview(this, gettext(rawmsg))),
-    mPreviewBox(new ScrollArea(mPreview, true,
+    mPreviewBox(new ScrollArea(this, mPreview, true,
         "setup_colors_preview_background.xml")),
     mSelected(-1),
     // TRANSLATORS: colors tab. label.
     mGradTypeLabel(new Label(this, _("Type:"))),
-    mGradTypeSlider(new Slider(0, 3)),
+    mGradTypeSlider(new Slider(this, 0, 3)),
     mGradTypeText(new Label(this)),
     // TRANSLATORS: colors tab. label.
     mGradDelayLabel(new Label(this, _("Delay:"))),
-    mGradDelaySlider(new Slider(20, 100)),
+    mGradDelaySlider(new Slider(this, 20, 100)),
     mGradDelayText(new TextField(this)),
     // TRANSLATORS: colors tab. label.
     mRedLabel(new Label(this, _("Red:"))),
-    mRedSlider(new Slider(0, 255)),
+    mRedSlider(new Slider(this, 0, 255)),
     mRedText(new TextField(this)),
     // TRANSLATORS: colors tab. label.
     mGreenLabel(new Label(this, _("Green:"))),
-    mGreenSlider(new Slider(0, 255)),
+    mGreenSlider(new Slider(this, 0, 255)),
     mGreenText(new TextField(this)),
     // TRANSLATORS: colors tab. label.
     mBlueLabel(new Label(this, _("Blue:"))),
-    mBlueSlider(new Slider(0, 255)),
+    mBlueSlider(new Slider(this, 0, 255)),
     mBlueText(new TextField(this))
 {
     mColorBox->postInit();
@@ -101,7 +103,7 @@ Setup_Colors::Setup_Colors(const Widget2 *const widget) :
     // TRANSLATORS: color type
     std::string longText = _("Static");
 
-    const gcn::Font *const font = getFont();
+    const Font *const font = getFont();
     if (getFont()->getWidth(_("Pulse")) > font->getWidth(longText))
     {
         // TRANSLATORS: color type
@@ -190,7 +192,7 @@ Setup_Colors::Setup_Colors(const Widget2 *const widget) :
 
     mGradTypeText->setCaption("");
 
-    setDimension(gcn::Rectangle(0, 0, 365, 350));
+    setDimension(Rect(0, 0, 365, 350));
 }
 
 Setup_Colors::~Setup_Colors()
@@ -207,7 +209,7 @@ Setup_Colors::~Setup_Colors()
     }
 }
 
-void Setup_Colors::action(const gcn::ActionEvent &event)
+void Setup_Colors::action(const ActionEvent &event)
 {
     const std::string &eventId = event.getId();
     if (eventId == "slider_grad")
@@ -244,14 +246,14 @@ void Setup_Colors::action(const gcn::ActionEvent &event)
     }
 }
 
-void Setup_Colors::valueChanged(const gcn::SelectionEvent &event A_UNUSED)
+void Setup_Colors::valueChanged(const SelectionEvent &event A_UNUSED)
 {
     if (!userPalette)
         return;
 
     mSelected = mColorBox->getSelected();
     const int type = userPalette->getColorTypeAt(mSelected);
-    const gcn::Color *col = &userPalette->getColor(type);
+    const Color *col = &userPalette->getColor(type);
     const Palette::GradientType grad = userPalette->getGradientType(type);
     const int delay = userPalette->getGradientDelay(type);
 
@@ -381,7 +383,7 @@ void Setup_Colors::cancel()
 
     userPalette->rollback();
     const int type = userPalette->getColorTypeAt(mSelected);
-    const gcn::Color *const col = &userPalette->getColor(type);
+    const Color *const col = &userPalette->getColor(type);
     mGradTypeSlider->setValue2(userPalette->getGradientType(type));
     const int delay = userPalette->getGradientDelay(type);
     setEntry(mGradDelaySlider, mGradDelayText, delay);
@@ -442,7 +444,7 @@ void Setup_Colors::updateColor()
     }
     else if (grad == Palette::PULSE)
     {
-        userPalette->setTestColor(type, gcn::Color(
+        userPalette->setTestColor(type, Color(
                 static_cast<int>(mRedSlider->getValue()),
                 static_cast<int>(mGreenSlider->getValue()),
                 static_cast<int>(mBlueSlider->getValue())));

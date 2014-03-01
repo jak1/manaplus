@@ -23,9 +23,8 @@
 #ifndef GUI_WINDOWS_KILLSTATS_H
 #define GUI_WINDOWS_KILLSTATS_H
 
-#include <guichan/actionlistener.hpp>
-
-#include "depricatedlistener.h"
+#include "listeners/actionlistener.h"
+#include "listeners/depricatedlistener.h"
 
 #include "gui/widgets/window.h"
 
@@ -33,7 +32,7 @@ class Label;
 class Button;
 
 class KillStats final : public Window,
-                        private gcn::ActionListener,
+                        private ActionListener,
                         public DepricatedListener
 {
     public:
@@ -52,7 +51,7 @@ class KillStats final : public Window,
         /**
          * Stuff.
          */
-        void action(const gcn::ActionEvent &event) override final;
+        void action(const ActionEvent &event) override final;
 
         void gainXp(int Xp);
 

@@ -24,6 +24,8 @@
 
 #include "logger.h"
 
+#include "gui/base/widgets/container.hpp"
+
 #include <cassert>
 
 #include "debug.h"
@@ -34,7 +36,7 @@ ContainerPlacer ContainerPlacer::at(const int x, const int y)
 }
 
 LayoutCell &ContainerPlacer::operator()
-    (const int x, const int y, gcn::Widget *const wg, const int w, const int h)
+    (const int x, const int y, Widget *const wg, const int w, const int h)
 {
     mContainer->add(wg);
     return mCell->place(wg, x, y, w, h);
@@ -78,7 +80,7 @@ void LayoutCell::reflow(int nx, int ny, int nw, int nh)
     if (mType == ARRAY)
         mArray->reflow(nx, ny, nw, nh);
     else
-        mWidget->setDimension(gcn::Rectangle(nx, ny, nw, nh));
+        mWidget->setDimension(Rect(nx, ny, nw, nh));
 }
 
 void LayoutCell::computeSizes()
@@ -201,7 +203,7 @@ void LayoutArray::extend(const int x, const int y, const int w, const int h)
     cell.mExtent[1] = h;
 }
 
-LayoutCell &LayoutArray::place(gcn::Widget *const widget, const int x,
+LayoutCell &LayoutArray::place(Widget *const widget, const int x,
                                const int y, const int w, const int h)
 {
     LayoutCell &cell = at(x, y, w, h);

@@ -24,6 +24,8 @@
 
 #include "units.h"
 
+#include "gui/gui.h"
+
 #include "gui/windows/charselectdialog.h"
 
 #include "gui/popups/textpopup.h"
@@ -32,16 +34,15 @@
 #include "gui/widgets/layouthelper.h"
 
 #include "utils/gettext.h"
-
-#include <SDL_mouse.h>
+#include "utils/stringutils.h"
 
 #include "debug.h"
 
 CharacterDisplay::CharacterDisplay(const Widget2 *const widget,
                                    CharSelectDialog *const charSelectDialog) :
     Container(widget),
-    gcn::MouseListener(),
-    gcn::WidgetListener(),
+    MouseListener(),
+    WidgetListener(),
     mCharacter(nullptr),
     mPlayerBox(new PlayerBox(nullptr)),
     mName(new Label(this, "wwwwwwwwwwwwwwwwwwwwwwww")),
@@ -110,17 +111,17 @@ void CharacterDisplay::update()
     distributeResizedEvent();
 }
 
-void CharacterDisplay::widgetHidden(const gcn::Event &event A_UNUSED)
+void CharacterDisplay::widgetHidden(const Event &event A_UNUSED)
 {
     mPopup->setVisible(false);
 }
 
-void CharacterDisplay::mouseExited(gcn::MouseEvent &event A_UNUSED)
+void CharacterDisplay::mouseExited(MouseEvent &event A_UNUSED)
 {
     mPopup->setVisible(false);
 }
 
-void CharacterDisplay::mouseMoved(gcn::MouseEvent &event A_UNUSED)
+void CharacterDisplay::mouseMoved(MouseEvent &event A_UNUSED)
 {
     if (!gui)
         return;
@@ -142,7 +143,7 @@ void CharacterDisplay::mouseMoved(gcn::MouseEvent &event A_UNUSED)
     }
 }
 
-void CharacterDisplay::mousePressed(gcn::MouseEvent &event)
+void CharacterDisplay::mousePressed(MouseEvent &event)
 {
     if (event.getClickCount() == 2)
         distributeActionEvent();

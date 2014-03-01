@@ -33,6 +33,7 @@
 
 #include "input/inputmanager.h"
 
+#include "gui/font.h"
 #include "gui/viewport.h"
 
 #include "gui/popups/itempopup.h"
@@ -45,12 +46,11 @@
 
 #include "resources/image.h"
 
-#include <guichan/font.hpp>
-
 #include "debug.h"
 
-ItemShortcutContainer::ItemShortcutContainer(const unsigned number) :
-    ShortcutContainer(),
+ItemShortcutContainer::ItemShortcutContainer(Widget2 *const widget,
+                                             const unsigned number) :
+    ShortcutContainer(widget),
     mItemClicked(false),
     mNumber(number),
     mItemPopup(new ItemPopup),
@@ -112,7 +112,7 @@ void ItemShortcutContainer::setWidget2(const Widget2 *const widget)
     mForegroundColor2 = getThemeColor(Theme::TEXT_OUTLINE);
 }
 
-void ItemShortcutContainer::draw(gcn::Graphics *graphics)
+void ItemShortcutContainer::draw(Graphics *graphics)
 {
     BLOCK_START("ItemShortcutContainer::draw")
     const ItemShortcut *const selShortcut = itemShortcut[mNumber];
@@ -129,9 +129,8 @@ void ItemShortcutContainer::draw(gcn::Graphics *graphics)
         mAlpha = client->getGuiAlpha();
     }
 
-    Graphics *const g = static_cast<Graphics*>(graphics);
-    gcn::Font *const font = getFont();
-    drawBackground(g);
+    Font *const font = getFont();
+    drawBackground(graphics);
 
     const Inventory *const inv = PlayerInfo::getInventory();
     if (!inv)
@@ -149,8 +148,8 @@ void ItemShortcutContainer::draw(gcn::Graphics *graphics)
         // Draw item keyboard shortcut.
         const std::string key = inputManager.getKeyValueString(
             Input::KEY_SHORTCUT_1 + i);
-        g->setColorAll(mForegroundColor, mForegroundColor);
-        font->drawString(g, key, itemX + 2, itemY + 2);
+        graphics->setColorAll(mForegroundColor, mForegroundColor);
+        font->drawString(graphics, key, itemX + 2, itemY + 2);
 
         const int itemId = selShortcut->getItem(i);
         const unsigned char itemColor = selShortcut->getItemColor(i);
@@ -175,12 +174,17 @@ void ItemShortcutContainer::draw(gcn::Graphics *graphics)
                     caption = "Eq.";
 
                     image->setAlpha(1.0F);
-                    g->drawImage2(image, itemX, itemY);
+                    graphics->drawImage(image, itemX, itemY);
                     if (item->isEquipped())
-                        g->setColorAll(mEquipedColor, mEquipedColor2);
+                    {
+                        graphics->setColorAll(mEquipedColor, mEquipedColor2);
+                    }
                     else
-                        g->setColorAll(mUnEquipedColor, mUnEquipedColor2);
-                    font->drawString(g, caption,
+                    {
+                        graphics->setColorAll(mUnEquipedColor,
+                            mUnEquipedColor2);
+                    }
+                    font->drawString(graphics, caption,
                         itemX + (mBoxWidth - font->getWidth(caption)) / 2,
                         itemY + mBoxHeight - 14);
                 }
@@ -199,11 +203,11 @@ void ItemShortcutContainer::draw(gcn::Graphics *graphics)
                     if (image)
                     {
                         image->setAlpha(1.0F);
-                        g->drawImage2(image, itemX, itemY);
+                        graphics->drawImage(image, itemX, itemY);
                     }
                 }
 
-                font->drawString(g, spell->getSymbol(),
+                font->drawString(graphics, spell->getSymbol(),
                     itemX + 2, itemY + mBoxHeight / 2);
             }
         }
@@ -218,10 +222,10 @@ void ItemShortcutContainer::draw(gcn::Graphics *graphics)
                 if (image)
                 {
                     image->setAlpha(1.0F);
-                    g->drawImage2(image, itemX, itemY);
+                    graphics->drawImage(image, itemX, itemY);
                 }
 
-                font->drawString(g, skill->data->shortName, itemX + 2,
+                font->drawString(graphics, skill->data->shortName, itemX + 2,
                     itemY + mBoxHeight / 2);
             }
         }
@@ -229,13 +233,13 @@ void ItemShortcutContainer::draw(gcn::Graphics *graphics)
     BLOCK_END("ItemShortcutContainer::draw")
 }
 
-void ItemShortcutContainer::mouseDragged(gcn::MouseEvent &event)
+void ItemShortcutContainer::mouseDragged(MouseEvent &event)
 {
     ItemShortcut *const selShortcut = itemShortcut[mNumber];
     if (!selShortcut)
         return;
 
-    if (event.getButton() == gcn::MouseEvent::LEFT)
+    if (event.getButton() == MouseEvent::LEFT)
     {
         if (dragDrop.isEmpty() && mItemClicked)
         {
@@ -317,7 +321,7 @@ void ItemShortcutContainer::mouseDragged(gcn::MouseEvent &event)
     }
 }
 
-void ItemShortcutContainer::mousePressed(gcn::MouseEvent &event)
+void ItemShortcutContainer::mousePressed(MouseEvent &event)
 {
     ItemShortcut *const selShortcut = itemShortcut[mNumber];
     if (!selShortcut)
@@ -328,7 +332,7 @@ void ItemShortcutContainer::mousePressed(gcn::MouseEvent &event)
     if (index == -1)
         return;
 
-    if (event.getButton() == gcn::MouseEvent::LEFT)
+    if (event.getButton() == MouseEvent::LEFT)
     {
         // Stores the selected item if theirs one.
         if (selShortcut->isItemSelected() && inventoryWindow &&
@@ -346,7 +350,7 @@ void ItemShortcutContainer::mousePressed(gcn::MouseEvent &event)
             mItemClicked = true;
         }
     }
-    else if (event.getButton() == gcn::MouseEvent::RIGHT)
+    else if (event.getButton() == MouseEvent::RIGHT)
     {
         if (viewport && selShortcut)
         {
@@ -356,13 +360,13 @@ void ItemShortcutContainer::mousePressed(gcn::MouseEvent &event)
     }
 }
 
-void ItemShortcutContainer::mouseReleased(gcn::MouseEvent &event)
+void ItemShortcutContainer::mouseReleased(MouseEvent &event)
 {
     ItemShortcut *const selShortcut = itemShortcut[mNumber];
     if (!selShortcut)
         return;
 
-    if (event.getButton() == gcn::MouseEvent::LEFT)
+    if (event.getButton() == MouseEvent::LEFT)
     {
         if (selShortcut->isItemSelected())
             selShortcut->setItemSelected(-1);
@@ -398,7 +402,7 @@ void ItemShortcutContainer::mouseReleased(gcn::MouseEvent &event)
     }
 }
 
-void ItemShortcutContainer::mouseMoved(gcn::MouseEvent &event)
+void ItemShortcutContainer::mouseMoved(MouseEvent &event)
 {
     const ItemShortcut *const selShortcut = itemShortcut[mNumber];
     if (!selShortcut)
@@ -455,7 +459,7 @@ void ItemShortcutContainer::mouseMoved(gcn::MouseEvent &event)
 }
 
 // Hide ItemTooltip
-void ItemShortcutContainer::mouseExited(gcn::MouseEvent &event A_UNUSED)
+void ItemShortcutContainer::mouseExited(MouseEvent &event A_UNUSED)
 {
     if (mItemPopup)
         mItemPopup->setVisible(false);
@@ -463,7 +467,7 @@ void ItemShortcutContainer::mouseExited(gcn::MouseEvent &event A_UNUSED)
         mSpellPopup->setVisible(false);
 }
 
-void ItemShortcutContainer::widgetHidden(const gcn::Event &event A_UNUSED)
+void ItemShortcutContainer::widgetHidden(const Event &event A_UNUSED)
 {
     if (mItemPopup)
         mItemPopup->setVisible(false);

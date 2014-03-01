@@ -30,7 +30,7 @@
 
 #include "utils/gettext.h"
 
-#include <guichan/font.hpp>
+#include "gui/font.h"
 
 #include "debug.h"
 
@@ -41,7 +41,7 @@ TextDialog::TextDialog(const std::string &restrict title,
                        Window *const parent,
                        const bool isPassword):
     Window(title, true, parent, "textdialog.xml"),
-    gcn::ActionListener(),
+    ActionListener(),
     mTextField(nullptr),
     mPasswordField(nullptr),
     // TRANSLATORS: text dialog button
@@ -68,7 +68,7 @@ TextDialog::TextDialog(const std::string &restrict title,
     place(2, 2, mOkButton);
     place(3, 2, cancelButton);
 
-    const gcn::Font *const font = getFont();
+    const Font *const font = getFont();
     if (font)
     {
         int width = font->getWidth(title);
@@ -104,7 +104,7 @@ TextDialog::~TextDialog()
     instances--;
 }
 
-void TextDialog::action(const gcn::ActionEvent &event)
+void TextDialog::action(const ActionEvent &event)
 {
     if (event.getId() == "CANCEL")
         setActionEventId("~" + getActionEventId());

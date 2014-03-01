@@ -23,10 +23,9 @@
 #ifndef GUI_WIDGETS_SCROLLAREA_H
 #define GUI_WIDGETS_SCROLLAREA_H
 
-#include "gui/widgets/widget2.h"
+#include "gui/base/widgets/scrollarea.hpp"
 
-#include <guichan/widgets/scrollarea.hpp>
-#include <guichan/widgetlistener.hpp>
+#include "listeners/widgetlistener.h"
 
 #include "localconsts.h"
 
@@ -43,25 +42,18 @@ class ImageCollection;
  * \ingroup GUI
  */
 class ScrollArea final : public gcn::ScrollArea,
-                         public Widget2,
-                         public gcn::WidgetListener
+                         public WidgetListener
 {
     public:
-        /**
-         * Constructor that takes no content. Needed for use with the DropDown
-         * class.
-         */
-        explicit ScrollArea(const bool opaque = true,
-                            const std::string &skin = "");
-
         /**
          * Constructor.
          *
          * @param content the initial content to show in the scroll area
          */
-        explicit ScrollArea(gcn::Widget *const widget,
-                            const bool opaque = true,
-                            const std::string &skin = "");
+        ScrollArea(Widget2 *const widget2,
+                   Widget *const widget,
+                   const bool opaque = true,
+                   const std::string &skin = "");
 
         A_DELETE_COPY(ScrollArea)
 
@@ -84,12 +76,12 @@ class ScrollArea final : public gcn::ScrollArea,
         /**
          * Draws the scroll area.
          */
-        void draw(gcn::Graphics *graphics) override final;
+        void draw(Graphics *graphics) override final;
 
         /**
          * Draws the background and border of the scroll area.
          */
-        void drawFrame(gcn::Graphics *graphics) override final;
+        void drawFrame(Graphics *graphics) override final;
 
         /**
          * Sets whether the widget should draw its background or not.
@@ -105,43 +97,43 @@ class ScrollArea final : public gcn::ScrollArea,
         /**
          * Called when the mouse moves in the widget area.
          */
-        void mouseMoved(gcn::MouseEvent& event) override final;
+        void mouseMoved(MouseEvent& event) override final;
 
         /**
          * Called when the mouse enteres the widget area.
          */
-        void mouseEntered(gcn::MouseEvent& event) override final;
+        void mouseEntered(MouseEvent& event) override final;
 
         /**
          * Called when the mouse leaves the widget area.
          */
-        void mouseExited(gcn::MouseEvent& event) override final;
+        void mouseExited(MouseEvent& event) override final;
 
-        void mousePressed(gcn::MouseEvent& event) override final;
+        void mousePressed(MouseEvent& event) override final;
 
-        void mouseReleased(gcn::MouseEvent& event) override final;
+        void mouseReleased(MouseEvent& event) override final;
 
-        void mouseDragged(gcn::MouseEvent &event) override final;
+        void mouseDragged(MouseEvent &event) override final;
 
-        void widgetResized(const gcn::Event &event) override final;
+        void widgetResized(const Event &event) override final;
 
-        void widgetMoved(const gcn::Event &event) override final;
+        void widgetMoved(const Event &event) override final;
 
-        gcn::Rectangle getVerticalBarDimension() const;
+        Rect getVerticalBarDimension() const;
 
-        gcn::Rectangle getHorizontalBarDimension() const;
+        Rect getHorizontalBarDimension() const;
 
-        gcn::Rectangle getVerticalMarkerDimension();
+        Rect getVerticalMarkerDimension();
 
-        gcn::Rectangle getHorizontalMarkerDimension();
+        Rect getHorizontalMarkerDimension();
 
-        gcn::Rectangle getUpButtonDimension() const;
+        Rect getUpButtonDimension() const;
 
-        gcn::Rectangle getDownButtonDimension() const;
+        Rect getDownButtonDimension() const;
 
-        gcn::Rectangle getLeftButtonDimension() const;
+        Rect getLeftButtonDimension() const;
 
-        gcn::Rectangle getRightButtonDimension() const;
+        Rect getRightButtonDimension() const;
 
     protected:
         enum BUTTON_DIR
@@ -158,19 +150,19 @@ class ScrollArea final : public gcn::ScrollArea,
          */
         void init(std::string skinName);
 
-        void drawButton(gcn::Graphics *const graphics, const BUTTON_DIR dir);
-        void calcButton(gcn::Graphics *const graphics, const BUTTON_DIR dir);
-        void drawVBar(gcn::Graphics *const graphics) override final;
-        void drawHBar(gcn::Graphics *const graphics) override final;
-        void drawVMarker(gcn::Graphics *const graphics) override final;
-        void drawHMarker(gcn::Graphics *const graphics) override final;
+        void drawButton(Graphics *const graphics, const BUTTON_DIR dir);
+        void calcButton(Graphics *const graphics, const BUTTON_DIR dir);
+        void drawVBar(Graphics *const graphics) override final;
+        void drawHBar(Graphics *const graphics) override final;
+        void drawVMarker(Graphics *const graphics) override final;
+        void drawHMarker(Graphics *const graphics) override final;
 
-        void calcVBar(gcn::Graphics *const graphics);
-        void calcHBar(gcn::Graphics *const graphics);
-        void calcVMarker(gcn::Graphics *const graphics);
-        void calcHMarker(gcn::Graphics *const graphics);
+        void calcVBar(Graphics *const graphics);
+        void calcHBar(Graphics *const graphics);
+        void calcVMarker(Graphics *const graphics);
+        void calcHMarker(Graphics *const graphics);
 
-        void updateCalcFlag(gcn::Graphics *const graphics);
+        void updateCalcFlag(Graphics *const graphics);
 
         static int instances;
         static float mAlpha;

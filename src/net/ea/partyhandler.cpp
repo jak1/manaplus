@@ -25,10 +25,15 @@
 #include "configuration.h"
 #include "notifications.h"
 #include "notifymanager.h"
+#include "party.h"
 
 #include "being/localplayer.h"
 
 #include "gui/windows/socialwindow.h"
+
+#include "net/messagein.h"
+
+#include "net/ea/gui/partytab.h"
 
 #include "debug.h"
 
@@ -55,7 +60,7 @@ void PartyHandler::join(const int partyId A_UNUSED) const
 {
 }
 
-void PartyHandler::reload() const
+void PartyHandler::reload()
 {
     taParty = Party::getParty(1);
 }

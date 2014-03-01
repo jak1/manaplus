@@ -20,29 +20,74 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/*      _______   __   __   __   ______   __   __   _______   __   __
+ *     / _____/\ / /\ / /\ / /\ / ____/\ / /\ / /\ / ___  /\ /  |\/ /\
+ *    / /\____\// / // / // / // /\___\// /_// / // /\_/ / // , |/ / /
+ *   / / /__   / / // / // / // / /    / ___  / // ___  / // /| ' / /
+ *  / /_// /\ / /_// / // / // /_/_   / / // / // /\_/ / // / |  / /
+ * /______/ //______/ //_/ //_____/\ /_/ //_/ //_/ //_/ //_/ /|_/ /
+ * \______\/ \______\/ \_\/ \_____\/ \_\/ \_\/ \_\/ \_\/ \_\/ \_\/
+ *
+ * Copyright (c) 2004 - 2008 Olof Naessén and Per Larsson
+ *
+ *
+ * Per Larsson a.k.a finalman
+ * Olof Naessén a.k.a jansem/yakslem
+ *
+ * Visit: http://guichan.sourceforge.net
+ *
+ * License: (BSD)
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in
+ *    the documentation and/or other materials provided with the
+ *    distribution.
+ * 3. Neither the name of Guichan nor the names of its contributors may
+ *    be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+ * TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
 #include "gui/widgets/tabbedarea.h"
 
+#include "events/keyevent.h"
+
 #include "input/keydata.h"
-#include "input/keyevent.h"
+
+#include "gui/gui.h"
 
 #include "gui/widgets/button.h"
 #include "gui/widgets/scrollarea.h"
 #include "gui/widgets/tabs/tab.h"
 
-#include <guichan/widgets/container.hpp>
+#include "gui/base/widgets/container.hpp"
 
 #include "debug.h"
 
 TabbedArea::TabbedArea(const Widget2 *const widget) :
-    Widget2(widget),
-    gcn::ActionListener(),
-    gcn::BasicContainer(),
-    gcn::KeyListener(),
-    gcn::MouseListener(),
-    gcn::WidgetListener(),
+    ActionListener(),
+    gcn::BasicContainer(widget),
+    KeyListener(),
+    MouseListener(),
+    WidgetListener(),
     mSelectedTab(nullptr),
-    mTabContainer(new gcn::Container()),
-    mWidgetContainer(new gcn::Container()),
+    mTabContainer(new gcn::Container(widget)),
+    mWidgetContainer(new gcn::Container(widget)),
     mTabsToDelete(),
     mTabs(),
     mTabsWidth(0),
@@ -72,7 +117,7 @@ TabbedArea::TabbedArea(const Widget2 *const widget) :
 
 void TabbedArea::postInit()
 {
-    widgetResized(gcn::Event(nullptr));
+    widgetResized(Event(nullptr));
 }
 
 TabbedArea::~TabbedArea()
@@ -139,7 +184,7 @@ Tab *TabbedArea::getTab(const std::string &name) const
     return nullptr;
 }
 
-void TabbedArea::draw(gcn::Graphics *graphics)
+void TabbedArea::draw(Graphics *graphics)
 {
     BLOCK_START("TabbedArea::draw")
     if (mTabs.empty())
@@ -152,7 +197,7 @@ void TabbedArea::draw(gcn::Graphics *graphics)
     BLOCK_END("TabbedArea::draw")
 }
 
-gcn::Widget *TabbedArea::getWidget(const std::string &name) const
+Widget *TabbedArea::getWidget(const std::string &name) const
 {
     TabContainer::const_iterator itr = mTabs.begin();
     const TabContainer::const_iterator itr_end = mTabs.end();
@@ -167,7 +212,7 @@ gcn::Widget *TabbedArea::getWidget(const std::string &name) const
     return nullptr;
 }
 
-gcn::Widget *TabbedArea::getCurrentWidget() const
+Widget *TabbedArea::getCurrentWidget() const
 {
     const Tab *const tab = getSelectedTab();
 
@@ -178,7 +223,7 @@ gcn::Widget *TabbedArea::getCurrentWidget() const
 }
 
 void TabbedArea::addTab(Tab *const tab,
-                        gcn::Widget *const widget)
+                        Widget *const widget)
 {
     if (!tab || !widget)
         return;
@@ -187,7 +232,7 @@ void TabbedArea::addTab(Tab *const tab,
     tab->addActionListener(this);
 
     mTabContainer->add(tab);
-    mTabs.push_back(std::pair<Tab*, gcn::Widget*>(tab, widget));
+    mTabs.push_back(std::pair<Tab*, Widget*>(tab, widget));
 
     if (!mSelectedTab)
         setSelectedTab(tab);
@@ -203,14 +248,14 @@ void TabbedArea::addTab(Tab *const tab,
     updateArrowEnableState();
 }
 
-void TabbedArea::adjustWidget(gcn::Widget *const widget) const
+void TabbedArea::adjustWidget(Widget *const widget) const
 {
     const int frameSize = 2 * mFrameSize;
     widget->setSize(getWidth() - frameSize,
         getHeight() - frameSize - mTabContainer->getHeight());
 }
 
-void TabbedArea::addTab(const std::string &caption, gcn::Widget *const widget)
+void TabbedArea::addTab(const std::string &caption, Widget *const widget)
 {
     Tab *const tab = new Tab(this);
     tab->setCaption(caption);
@@ -219,7 +264,7 @@ void TabbedArea::addTab(const std::string &caption, gcn::Widget *const widget)
     addTab(tab, widget);
 }
 
-void TabbedArea::addTab(Image *const image, gcn::Widget *const widget)
+void TabbedArea::addTab(Image *const image, Widget *const widget)
 {
     Tab *const tab = new Tab(this);
     tab->setImage(image);
@@ -323,14 +368,14 @@ void TabbedArea::logic()
     BLOCK_END("TabbedArea::logic")
 }
 
-void TabbedArea::mousePressed(gcn::MouseEvent &mouseEvent)
+void TabbedArea::mousePressed(MouseEvent &mouseEvent)
 {
     if (mouseEvent.isConsumed())
         return;
 
-    if (mouseEvent.getButton() == gcn::MouseEvent::LEFT)
+    if (mouseEvent.getButton() == MouseEvent::LEFT)
     {
-        gcn::Widget *const widget = mTabContainer->getWidgetAt(
+        Widget *const widget = mTabContainer->getWidgetAt(
             mouseEvent.getX(), mouseEvent.getY());
         Tab *const tab = dynamic_cast<Tab *const>(widget);
 
@@ -365,7 +410,7 @@ void TabbedArea::setSelectedTab(Tab *const tab)
     if (newTab)
         newTab->setCurrent();
 
-    widgetResized(gcn::Event(nullptr));
+    widgetResized(Event(nullptr));
 }
 
 int TabbedArea::getSelectedTabIndex() const
@@ -392,7 +437,7 @@ void TabbedArea::setSelectedTabByName(const std::string &name)
     }
 }
 
-void TabbedArea::widgetResized(const gcn::Event &event A_UNUSED)
+void TabbedArea::widgetResized(const Event &event A_UNUSED)
 {
     adjustSize();
 
@@ -404,7 +449,7 @@ void TabbedArea::widgetResized(const gcn::Event &event A_UNUSED)
     const int height = h1 - frameSize
         - mWidgetContainer->getY() - widgetFrameSize;
 
-    gcn::Widget *const w = getCurrentWidget();
+    Widget *const w = getCurrentWidget();
     if (w)
     {
         ScrollArea *const scr = dynamic_cast<ScrollArea *const>(w);
@@ -412,7 +457,7 @@ void TabbedArea::widgetResized(const gcn::Event &event A_UNUSED)
         {
             if (mFollowDownScroll && height != 0)
             {
-                const gcn::Rectangle &rect = w->getDimension();
+                const Rect &rect = w->getDimension();
                 if (rect.height != 0 && rect.height > height + 2)
                 {
                     if (scr->getVerticalScrollAmount()
@@ -500,7 +545,7 @@ void TabbedArea::adjustSize()
 
     mWidgetContainer->setPosition(0, maxTabHeight);
     mWidgetContainer->setSize(width, height - maxTabHeight);
-    gcn::Widget *const w = getCurrentWidget();
+    Widget *const w = getCurrentWidget();
     if (w)
     {
         const int wFrameSize = w->getFrameSize();
@@ -558,9 +603,9 @@ void TabbedArea::adjustTabPositions()
     }
 }
 
-void TabbedArea::action(const gcn::ActionEvent& actionEvent)
+void TabbedArea::action(const ActionEvent& actionEvent)
 {
-    gcn::Widget *const source = actionEvent.getSource();
+    Widget *const source = actionEvent.getSource();
     Tab *const tab = dynamic_cast<Tab *const>(source);
 
     if (tab)
@@ -632,7 +677,7 @@ Tab *TabbedArea::getTabByIndex(const int index) const
     return static_cast<Tab*>(mTabs[index].first);
 }
 
-gcn::Widget *TabbedArea::getWidgetByIndex(const int index) const
+Widget *TabbedArea::getWidgetByIndex(const int index) const
 {
     if (index < 0 || index >= static_cast<int>(mTabs.size()))
         return nullptr;
@@ -649,7 +694,7 @@ void TabbedArea::removeAll(const bool del)
     {
         const int idx = getNumberOfTabs() - 1;
         Tab *tab = mTabs[idx].first;
-        gcn::Widget *widget = mTabs[idx].second;
+        Widget *widget = mTabs[idx].second;
         removeTab(tab);
         if (del)
         {
@@ -661,34 +706,34 @@ void TabbedArea::removeAll(const bool del)
 
 void TabbedArea::setWidth(int width)
 {
-    gcn::Widget::setWidth(width);
+    Widget::setWidth(width);
     adjustSize();
 }
 
 void TabbedArea::setHeight(int height)
 {
-    gcn::Widget::setHeight(height);
+    Widget::setHeight(height);
     adjustSize();
 }
 
 void TabbedArea::setSize(int width, int height)
 {
-    gcn::Widget::setSize(width, height);
+    Widget::setSize(width, height);
     adjustSize();
 }
 
-void TabbedArea::setDimension(const gcn::Rectangle &dimension)
+void TabbedArea::setDimension(const Rect &dimension)
 {
-    gcn::Widget::setDimension(dimension);
+    Widget::setDimension(dimension);
     adjustSize();
 }
 
-void TabbedArea::keyPressed(gcn::KeyEvent& keyEvent)
+void TabbedArea::keyPressed(KeyEvent& keyEvent)
 {
     if (mBlockSwitching || keyEvent.isConsumed() || !isFocused())
         return;
 
-    const int actionId = static_cast<KeyEvent*>(&keyEvent)->getActionId();
+    const int actionId = keyEvent.getActionId();
 
     if (actionId == Input::KEY_GUI_LEFT)
     {
@@ -716,7 +761,7 @@ void TabbedArea::keyPressed(gcn::KeyEvent& keyEvent)
     }
 }
 
-void TabbedArea::death(const gcn::Event &event)
+void TabbedArea::death(const Event &event)
 {
     Tab *const tab = dynamic_cast<Tab*>(event.getSource());
 

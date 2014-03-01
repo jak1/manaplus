@@ -32,6 +32,7 @@
 #include "being/localplayer.h"
 #include "being/playerinfo.h"
 
+#include "gui/font.h"
 #include "gui/viewport.h"
 
 #include "gui/popups/itempopup.h"
@@ -46,8 +47,6 @@
 #include "utils/dtor.h"
 #include "utils/gettext.h"
 
-#include <guichan/font.hpp>
-
 #include "debug.h"
 
 static const int BOX_COUNT = 13;
@@ -57,10 +56,11 @@ EquipmentWindow::EquipmentWindow(Equipment *const equipment,
                                  const bool foring):
     // TRANSLATORS: equipment window name
     Window(_("Equipment"), false, nullptr, "equipment.xml"),
-    gcn::ActionListener(),
+    ActionListener(),
     mEquipment(equipment),
     mItemPopup(new ItemPopup),
-    mPlayerBox(new PlayerBox("equipment_playerbox.xml",
+    mPlayerBox(new PlayerBox(this,
+        "equipment_playerbox.xml",
         "equipment_selectedplayerbox.xml")),
     // TRANSLATORS: equipment window button
     mUnequip(new Button(this, _("Unequip"), "unequip", this)),
@@ -92,7 +92,7 @@ EquipmentWindow::EquipmentWindow(Equipment *const equipment,
         mBoxSize = 36;
 
     // Control that shows the Player
-    mPlayerBox->setDimension(gcn::Rectangle(50, 80, 74, 168));
+    mPlayerBox->setDimension(Rect(50, 80, 74, 168));
     mPlayerBox->setPlayer(being);
 
     if (foring)
@@ -116,7 +116,7 @@ EquipmentWindow::EquipmentWindow(Equipment *const equipment,
 
 void EquipmentWindow::postInit()
 {
-    const gcn::Rectangle &area = getChildrenArea();
+    const Rect &area = getChildrenArea();
     mUnequip->setPosition(area.width  - mUnequip->getWidth() - mButtonPadding,
         area.height - mUnequip->getHeight() - mButtonPadding);
     mUnequip->setEnabled(false);
@@ -156,15 +156,14 @@ EquipmentWindow::~EquipmentWindow()
     mVertexes = nullptr;
 }
 
-void EquipmentWindow::draw(gcn::Graphics *graphics)
+void EquipmentWindow::draw(Graphics *graphics)
 {
     BLOCK_START("EquipmentWindow::draw")
     // Draw window graphics
     Window::draw(graphics);
-    Graphics *const g = static_cast<Graphics*>(graphics);
 
     int i = 0;
-    gcn::Font *const font = getFont();
+    Font *const font = getFont();
     const int fontHeight = font->getHeight();
 
     if (isBatchDrawRenders(openGLMode))
@@ -179,17 +178,19 @@ void EquipmentWindow::draw(gcn::Graphics *graphics)
                     continue;
                 if (i == mSelected)
                 {
-                    g->calcTileCollection(mVertexes,
-                        mSlotHighlightedBackground, box->x, box->y);
+                    graphics->calcTileCollection(mVertexes,
+                        mSlotHighlightedBackground,
+                        box->x, box->y);
                 }
                 else
                 {
-                    g->calcTileCollection(mVertexes, mSlotBackground,
+                    graphics->calcTileCollection(mVertexes,
+                        mSlotBackground,
                         box->x, box->y);
                 }
             }
         }
-        g->drawTileCollection(mVertexes);
+        graphics->drawTileCollection(mVertexes);
     }
     else
     {
@@ -200,9 +201,14 @@ void EquipmentWindow::draw(gcn::Graphics *graphics)
             if (!box)
                 continue;
             if (i == mSelected)
-                g->drawImage2(mSlotHighlightedBackground, box->x, box->y);
+            {
+                graphics->drawImage(mSlotHighlightedBackground,
+                    box->x, box->y);
+            }
             else
-                g->drawImage2(mSlotBackground, box->x, box->y);
+            {
+                graphics->drawImage(mSlotBackground, box->x, box->y);
+            }
         }
     }
 
@@ -228,13 +234,14 @@ void EquipmentWindow::draw(gcn::Graphics *graphics)
             {
                 image->setAlpha(1.0F);  // Ensure the image is drawn
                                         // with maximum opacity
-                g->drawImage2(image, box->x + mItemPadding,
+                graphics->drawImage(image, box->x + mItemPadding,
                     box->y + mItemPadding);
                 if (i == EQUIP_PROJECTILE_SLOT)
                 {
-                    g->setColorAll(mLabelsColor, mLabelsColor2);
+                    graphics->setColorAll(mLabelsColor, mLabelsColor2);
                     const std::string str = toString(item->getQuantity());
-                    font->drawString(g, str,
+                    font->drawString(graphics,
+                        str,
                         box->x + (mBoxSize - font->getWidth(str)) / 2,
                         box->y - fontHeight);
                 }
@@ -242,14 +249,15 @@ void EquipmentWindow::draw(gcn::Graphics *graphics)
         }
         else if (box->image)
         {
-            g->drawImage2(box->image, box->x + mItemPadding,
+            graphics->drawImage(box->image,
+                box->x + mItemPadding,
                 box->y + mItemPadding);
         }
     }
     BLOCK_END("EquipmentWindow::draw")
 }
 
-void EquipmentWindow::action(const gcn::ActionEvent &event)
+void EquipmentWindow::action(const ActionEvent &event)
 {
     if (!mEquipment)
         return;
@@ -275,7 +283,7 @@ Item *EquipmentWindow::getItem(const int x, const int y) const
         const EquipmentBox *const box = *it;
         if (!box)
             continue;
-        const gcn::Rectangle tRect(box->x, box->y, mBoxSize, mBoxSize);
+        const Rect tRect(box->x, box->y, mBoxSize, mBoxSize);
 
         if (tRect.isPointInRect(x, y))
             return mEquipment->getEquipment(i);
@@ -283,7 +291,7 @@ Item *EquipmentWindow::getItem(const int x, const int y) const
     return nullptr;
 }
 
-void EquipmentWindow::mousePressed(gcn::MouseEvent& mouseEvent)
+void EquipmentWindow::mousePressed(MouseEvent& mouseEvent)
 {
     if (!mEquipment)
     {
@@ -294,7 +302,7 @@ void EquipmentWindow::mousePressed(gcn::MouseEvent& mouseEvent)
     const int x = mouseEvent.getX();
     const int y = mouseEvent.getY();
 
-    if (mouseEvent.getButton() == gcn::MouseEvent::LEFT)
+    if (mouseEvent.getButton() == MouseEvent::LEFT)
     {
         if (mForing)
         {
@@ -313,7 +321,7 @@ void EquipmentWindow::mousePressed(gcn::MouseEvent& mouseEvent)
             if (!box)
                 continue;
             const Item *const item = mEquipment->getEquipment(i);
-            const gcn::Rectangle tRect(box->x, box->y, mBoxSize, mBoxSize);
+            const Rect tRect(box->x, box->y, mBoxSize, mBoxSize);
 
             if (tRect.isPointInRect(x, y))
             {
@@ -329,7 +337,7 @@ void EquipmentWindow::mousePressed(gcn::MouseEvent& mouseEvent)
                 return;
         }
     }
-    else if (mouseEvent.getButton() == gcn::MouseEvent::RIGHT)
+    else if (mouseEvent.getButton() == MouseEvent::RIGHT)
     {
         if (Item *const item = getItem(x, y))
         {
@@ -354,7 +362,7 @@ void EquipmentWindow::mousePressed(gcn::MouseEvent& mouseEvent)
     Window::mousePressed(mouseEvent);
 }
 
-void EquipmentWindow::mouseReleased(gcn::MouseEvent &mouseEvent)
+void EquipmentWindow::mouseReleased(MouseEvent &mouseEvent)
 {
     Window::mouseReleased(mouseEvent);
     const DragDropSource src = dragDrop.getSource();
@@ -394,7 +402,7 @@ void EquipmentWindow::mouseReleased(gcn::MouseEvent &mouseEvent)
                 const EquipmentBox *const box = *it;
                 if (!box)
                     continue;
-                const gcn::Rectangle tRect(box->x, box->y, mBoxSize, mBoxSize);
+                const Rect tRect(box->x, box->y, mBoxSize, mBoxSize);
 
                 if (tRect.isPointInRect(x, y))
                     return;
@@ -409,7 +417,7 @@ void EquipmentWindow::mouseReleased(gcn::MouseEvent &mouseEvent)
 }
 
 // Show ItemTooltip
-void EquipmentWindow::mouseMoved(gcn::MouseEvent &event)
+void EquipmentWindow::mouseMoved(MouseEvent &event)
 {
     Window::mouseMoved(event);
 
@@ -433,7 +441,7 @@ void EquipmentWindow::mouseMoved(gcn::MouseEvent &event)
 }
 
 // Hide ItemTooltip
-void EquipmentWindow::mouseExited(gcn::MouseEvent &event A_UNUSED)
+void EquipmentWindow::mouseExited(MouseEvent &event A_UNUSED)
 {
     if (mItemPopup)
         mItemPopup->setVisible(false);
@@ -506,7 +514,7 @@ void EquipmentWindow::fillBoxes()
 
 void EquipmentWindow::loadPlayerBox(const XmlNodePtr playerBoxNode)
 {
-    mPlayerBox->setDimension(gcn::Rectangle(
+    mPlayerBox->setDimension(Rect(
         XML::getProperty(playerBoxNode, "x", 50),
         XML::getProperty(playerBoxNode, "y", 80),
         XML::getProperty(playerBoxNode, "width", 74),

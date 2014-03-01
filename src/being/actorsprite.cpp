@@ -21,14 +21,18 @@
 
 #include "being/actorsprite.h"
 
+#include "animatedsprite.h"
 #include "configuration.h"
 #include "imagesprite.h"
 #include "statuseffect.h"
 
-#include "being/actorspritelistener.h"
 #include "being/localplayer.h"
 
 #include "gui/theme.h"
+
+#include "listeners/actorspritelistener.h"
+
+#include "particle/particle.h"
 
 #include "resources/resourcemanager.h"
 

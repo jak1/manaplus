@@ -25,8 +25,9 @@
 #include "client.h"
 #include "configuration.h"
 
+#include "events/keyevent.h"
+
 #include "input/keydata.h"
-#include "input/keyevent.h"
 
 #include "gui/widgets/browserbox.h"
 #include "gui/widgets/button.h"
@@ -156,8 +157,8 @@ UpdaterWindow::UpdaterWindow(const std::string &restrict updateHost,
                              const int updateType):
     // TRANSLATORS: updater window name
     Window(_("Updating..."), false, nullptr, "update.xml"),
-    gcn::ActionListener(),
-    gcn::KeyListener(),
+    ActionListener(),
+    KeyListener(),
     mDownloadStatus(UPDATE_NEWS),
     mUpdateHost(updateHost),
     mUpdatesDir(updatesDir),
@@ -189,7 +190,8 @@ UpdaterWindow::UpdaterWindow(const std::string &restrict updateHost,
                  "updateprogressbar.xml", "updateprogressbar_fill.xml")),
     mBrowserBox(new BrowserBox(this, BrowserBox::AUTO_SIZE, true,
         "browserbox.xml")),
-    mScrollArea(new ScrollArea(mBrowserBox, true, "update_background.xml")),
+    mScrollArea(new ScrollArea(this, mBrowserBox,
+        true, "update_background.xml")),
     mUpdateServerPath(mUpdateHost)
 {
     setWindowName("UpdaterWindow");
@@ -270,7 +272,7 @@ void UpdaterWindow::enable()
         client->setState(STATE_LOAD_DATA);
 }
 
-void UpdaterWindow::action(const gcn::ActionEvent &event)
+void UpdaterWindow::action(const ActionEvent &event)
 {
     const std::string &eventId = event.getId();
     if (eventId == "cancel")
@@ -290,12 +292,12 @@ void UpdaterWindow::action(const gcn::ActionEvent &event)
     }
 }
 
-void UpdaterWindow::keyPressed(gcn::KeyEvent &keyEvent)
+void UpdaterWindow::keyPressed(KeyEvent &keyEvent)
 {
-    const int actionId = static_cast<KeyEvent*>(&keyEvent)->getActionId();
+    const int actionId = keyEvent.getActionId();
     if (actionId == static_cast<int>(Input::KEY_GUI_CANCEL))
     {
-        action(gcn::ActionEvent(nullptr, mCancelButton->getActionEventId()));
+        action(ActionEvent(nullptr, mCancelButton->getActionEventId()));
         client->setState(STATE_LOGIN);
     }
     else if (actionId == static_cast<int>(Input::KEY_GUI_SELECT)
@@ -304,12 +306,11 @@ void UpdaterWindow::keyPressed(gcn::KeyEvent &keyEvent)
         if (mDownloadStatus == UPDATE_COMPLETE ||
             mDownloadStatus == UPDATE_ERROR)
         {
-            action(gcn::ActionEvent(nullptr, mPlayButton->getActionEventId()));
+            action(ActionEvent(nullptr, mPlayButton->getActionEventId()));
         }
         else
         {
-            action(gcn::ActionEvent(nullptr,
-                mCancelButton->getActionEventId()));
+            action(ActionEvent(nullptr, mCancelButton->getActionEventId()));
         }
     }
 }
@@ -971,7 +972,7 @@ unsigned long UpdaterWindow::getFileHash(const std::string &filePath)
 }
 
 void UpdaterWindow::handleLink(const std::string &link,
-                               gcn::MouseEvent *event A_UNUSED)
+                               MouseEvent *event A_UNUSED)
 {
     if (strStartWith(link, "http://") || strStartWith(link, "https://"))
         openBrowser(link);

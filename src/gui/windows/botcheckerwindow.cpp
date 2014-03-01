@@ -101,7 +101,7 @@ public:
         freeWidgets();
         mPlayers.clear();
         if (actorManager && botCheckerWindow
-            && botCheckerWindow->mEnabled)
+            && botCheckerWindow->mBotcheckerEnabled)
         {
             std::set<ActorSprite*> beings = actorManager->getAll();
             FOR_EACH (ActorSprites::iterator, i, beings)
@@ -125,7 +125,7 @@ public:
                 continue;
 
             const Being *const player = mPlayers.at(r);
-            gcn::Widget *widget = new Label(this, player->getName());
+            Widget *widget = new Label(this, player->getName());
 
             mWidgets.push_back(widget);
 
@@ -235,14 +235,14 @@ public:
     {
     }
 
-    gcn::Widget *getElementAt(const int row, const int column) const
+    Widget *getElementAt(const int row, const int column) const
     {
         return mWidgets[WIDGET_AT(row, column)];
     }
 
     void freeWidgets()
     {
-        for (std::vector<gcn::Widget *>::const_iterator it = mWidgets.begin();
+        for (std::vector<Widget *>::const_iterator it = mWidgets.begin();
              it != mWidgets.end(); ++it)
         {
             delete *it;
@@ -253,17 +253,17 @@ public:
 
 protected:
     std::vector<Being*> mPlayers;
-    std::vector<gcn::Widget*> mWidgets;
+    std::vector<Widget*> mWidgets;
 };
 
 
 BotCheckerWindow::BotCheckerWindow():
     // TRANSLATORS: bot checker window header
     Window(_("Bot Checker"), false, nullptr, "botchecker.xml"),
-    gcn::ActionListener(),
+    ActionListener(),
     mTableModel(new UsersTableModel(this)),
     mTable(new GuiTable(this, mTableModel)),
-    playersScrollArea(new ScrollArea(mTable, true,
+    playersScrollArea(new ScrollArea(this, mTable, true,
         "bochecker_background.xml")),
     mPlayerTableTitleModel(new StaticTableModel(1, COLUMNS_NR)),
     mPlayerTitleTable(new GuiTable(this, mPlayerTableTitleModel)),
@@ -271,7 +271,7 @@ BotCheckerWindow::BotCheckerWindow():
     mIncButton(new Button(this, _("Reset"), "reset", this)),
     mLastUpdateTime(0),
     mNeedUpdate(false),
-    mEnabled(false)
+    mBotcheckerEnabled(false)
 {
     const int w = 500;
     const int h = 250;
@@ -346,7 +346,7 @@ BotCheckerWindow::BotCheckerWindow():
     enableVisibleSound(true);
 
     config.addListener("enableBotCheker", this);
-    mEnabled = config.getBoolValue("enableBotCheker");
+    mBotcheckerEnabled = config.getBoolValue("enableBotCheker");
 }
 
 BotCheckerWindow::~BotCheckerWindow()
@@ -358,7 +358,7 @@ BotCheckerWindow::~BotCheckerWindow()
 void BotCheckerWindow::slowLogic()
 {
     BLOCK_START("BotCheckerWindow::slowLogic")
-    if (mEnabled && mTableModel)
+    if (mBotcheckerEnabled && mTableModel)
     {
         const unsigned int nowTime = cur_time;
         if (nowTime - mLastUpdateTime > 5 && mNeedUpdate)
@@ -377,7 +377,7 @@ void BotCheckerWindow::slowLogic()
     BLOCK_END("BotCheckerWindow::slowLogic")
 }
 
-void BotCheckerWindow::action(const gcn::ActionEvent &event)
+void BotCheckerWindow::action(const ActionEvent &event)
 {
     if (event.getId() == "reset")
     {
@@ -417,7 +417,7 @@ void BotCheckerWindow::reset()
 void BotCheckerWindow::optionChanged(const std::string &name)
 {
     if (name == "enableBotCheker")
-        mEnabled = config.getBoolValue("enableBotCheker");
+        mBotcheckerEnabled = config.getBoolValue("enableBotCheker");
 }
 
 #ifdef USE_PROFILER

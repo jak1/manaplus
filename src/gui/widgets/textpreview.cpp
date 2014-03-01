@@ -24,8 +24,8 @@
 
 #include "client.h"
 
+#include "gui/font.h"
 #include "gui/gui.h"
-#include "gui/sdlfont.h"
 
 #include "debug.h"
 
@@ -35,8 +35,7 @@ Skin *TextPreview::mSkin = nullptr;
 
 TextPreview::TextPreview(const Widget2 *const widget,
                          const std::string &text) :
-    gcn::Widget(),
-    Widget2(widget),
+    Widget(widget),
     mFont(gui->getFont()),
     mText(text),
     mTextColor(&getThemeColor(Theme::TEXT)),
@@ -79,49 +78,47 @@ TextPreview::~TextPreview()
     }
 }
 
-void TextPreview::draw(gcn::Graphics* graphics)
+void TextPreview::draw(Graphics* graphics)
 {
+    if (!mFont)
+        return;
+
     BLOCK_START("TextPreview::draw")
     if (client->getGuiAlpha() != mAlpha)
         mAlpha = client->getGuiAlpha();
-    Graphics *const g = static_cast<Graphics*>(graphics);
 
     const int intAlpha = static_cast<int>(mAlpha * 255.0F);
     const int alpha = mTextAlpha ? intAlpha : 255;
 
     if (mOpaque)
     {
-        g->setColor(gcn::Color(static_cast<int>(mBGColor->r),
+        graphics->setColor(Color(static_cast<int>(mBGColor->r),
                     static_cast<int>(mBGColor->g),
                     static_cast<int>(mBGColor->b),
                     static_cast<int>(mAlpha * 255.0F)));
-        g->fillRectangle(gcn::Rectangle(0, 0,
+        graphics->fillRectangle(Rect(0, 0,
             mDimension.width, mDimension.height));
     }
 
     if (mTextBGColor)
     {
-        const SDLFont *const font = dynamic_cast<SDLFont*>(mFont);
-        if (font)
-        {
-            const int x = font->getWidth(mText) + 1
-                + 2 * ((mOutline || mShadow) ? 1 :0);
-            const int y = font->getHeight() + 1
-                + 2 * ((mOutline || mShadow) ? 1 : 0);
-            g->setColor(gcn::Color(static_cast<int>(mTextBGColor->r),
-                static_cast<int>(mTextBGColor->g),
-                static_cast<int>(mTextBGColor->b),
-                intAlpha));
-            g->fillRectangle(gcn::Rectangle(mPadding, mPadding, x, y));
-        }
+        const int x = mFont->getWidth(mText) + 1
+            + 2 * ((mOutline || mShadow) ? 1 :0);
+        const int y = mFont->getHeight() + 1
+            + 2 * ((mOutline || mShadow) ? 1 : 0);
+        graphics->setColor(Color(static_cast<int>(mTextBGColor->r),
+            static_cast<int>(mTextBGColor->g),
+            static_cast<int>(mTextBGColor->b),
+            intAlpha));
+        graphics->fillRectangle(Rect(mPadding, mPadding, x, y));
     }
 
-    g->setColorAll(gcn::Color(mTextColor->r, mTextColor->g, mTextColor->b,
-        alpha), gcn::Color(mTextColor2->r, mTextColor2->g, mTextColor2->b,
-        alpha));
+    graphics->setColorAll(Color(mTextColor->r,
+        mTextColor->g, mTextColor->b, alpha),
+        Color(mTextColor2->r, mTextColor2->g, mTextColor2->b, alpha));
 
     if (mOutline && mTextColor != mTextColor2)
-        g->setColor2(Theme::getThemeColor(Theme::OUTLINE));
+        graphics->setColor2(Theme::getThemeColor(Theme::OUTLINE));
 
     mFont->drawString(graphics, mText, mPadding + 1, mPadding + 1);
     BLOCK_END("TextPreview::draw")

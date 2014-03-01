@@ -26,8 +26,8 @@
 
 #include "gui/widgets/container.h"
 
-#include <guichan/mouselistener.hpp>
-#include <guichan/widgetlistener.hpp>
+#include "listeners/mouselistener.h"
+#include "listeners/widgetlistener.h"
 
 class ImageCollection;
 class Skin;
@@ -45,8 +45,9 @@ class WindowContainer;
  *
  * \ingroup GUI
  */
-class Popup : public Container, public gcn::MouseListener,
-              public gcn::WidgetListener
+class Popup : public Container,
+              public MouseListener,
+              public WidgetListener
 {
     public:
         /**
@@ -75,7 +76,7 @@ class Popup : public Container, public gcn::MouseListener,
         /**
          * Draws the popup.
          */
-        void draw(gcn::Graphics *graphics) override;
+        void draw(Graphics *graphics) override;
 
         /**
          * Sets the size of this popup.
@@ -85,9 +86,9 @@ class Popup : public Container, public gcn::MouseListener,
         /**
          * Sets the location relative to the given widget.
          */
-        void setLocationRelativeTo(const gcn::Widget *const widget);
+        void setLocationRelativeTo(const Widget *const widget);
 
-        void mouseMoved(gcn::MouseEvent &event) override;
+        void mouseMoved(MouseEvent &event) override;
 
         /**
          * Sets the minimum width of the popup.
@@ -151,7 +152,7 @@ class Popup : public Container, public gcn::MouseListener,
 
         // Inherited from BasicContainer
 
-        virtual gcn::Rectangle getChildrenArea() override;
+        virtual Rect getChildrenArea() override;
 
         /**
          * Sets the location to display the popup. Tries to horizontally center
@@ -163,9 +164,9 @@ class Popup : public Container, public gcn::MouseListener,
 
         void hide();
 
-        void widgetResized(const gcn::Event &event) override;
+        void widgetResized(const Event &event) override;
 
-        void widgetMoved(const gcn::Event &event) override final;
+        void widgetMoved(const Event &event) override final;
 
         bool isPopupVisible() const
         { return mVisible; }

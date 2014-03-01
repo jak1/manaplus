@@ -24,7 +24,7 @@
 
 #include "gui/widgets/container.h"
 
-#include <guichan/widgetlistener.hpp>
+#include "listeners/widgetlistener.h"
 
 #include "localconsts.h"
 
@@ -34,14 +34,15 @@
  * \ingroup GUI
  */
 class FlowContainer final : public Container,
-                            public gcn::WidgetListener
+                            public WidgetListener
 {
     public:
         /**
          * Constructor. Initializes the shortcut container.
          */
         FlowContainer(const Widget2 *const widget,
-                      const int boxWidth, const int boxHeight);
+                      const int boxWidth,
+                      const int boxHeight);
 
         A_DELETE_COPY(FlowContainer)
 
@@ -55,7 +56,7 @@ class FlowContainer final : public Container,
          * Invoked when a widget changes its size. This is used to determine
          * the new height of the container.
          */
-        void widgetResized(const gcn::Event &event) override final;
+        void widgetResized(const Event &event) override final;
 
         int getBoxWidth() const A_WARN_UNUSED
         { return mBoxWidth; }
@@ -63,7 +64,7 @@ class FlowContainer final : public Container,
         int getBoxHeight() const A_WARN_UNUSED
         { return mBoxHeight; }
 
-        void add(gcn::Widget *widget) override final;
+        void add(Widget *widget) override final;
 
     private:
         int mBoxWidth;

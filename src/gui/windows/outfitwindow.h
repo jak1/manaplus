@@ -25,7 +25,7 @@
 
 #include "gui/widgets/window.h"
 
-#include <guichan/actionlistener.hpp>
+#include "listeners/actionlistener.h"
 
 const unsigned int OUTFITS_COUNT = 100;
 const unsigned int OUTFIT_ITEM_COUNT = 16;
@@ -35,7 +35,7 @@ class CheckBox;
 class Label;
 
 class OutfitWindow final : public Window,
-                           private gcn::ActionListener
+                           private ActionListener
 {
     public:
         /**
@@ -50,15 +50,15 @@ class OutfitWindow final : public Window,
          */
         ~OutfitWindow();
 
-        void action(const gcn::ActionEvent &event) override final;
+        void action(const ActionEvent &event) override final;
 
-        void draw(gcn::Graphics *graphics) override final;
+        void draw(Graphics *graphics) override final;
 
-        void mousePressed(gcn::MouseEvent &event) override final;
+        void mousePressed(MouseEvent &event) override final;
 
-        void mouseDragged(gcn::MouseEvent &event) override final;
+        void mouseDragged(MouseEvent &event) override final;
 
-        void mouseReleased(gcn::MouseEvent &event) override final;
+        void mouseReleased(MouseEvent &event) override final;
 
         void load(const bool oldConfig = false);
 
@@ -115,8 +115,8 @@ class OutfitWindow final : public Window,
         int mItems[OUTFITS_COUNT + 1][OUTFIT_ITEM_COUNT];
         int mAwayOutfit;
 
-        gcn::Color mBorderColor;
-        gcn::Color mBackgroundColor;
+        Color mBorderColor;
+        Color mBackgroundColor;
         unsigned char mItemColors[OUTFITS_COUNT + 1][OUTFIT_ITEM_COUNT];
         bool mItemClicked;
         bool mItemsUnequip[OUTFITS_COUNT];

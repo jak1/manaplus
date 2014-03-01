@@ -23,6 +23,7 @@
 #include "gui/popups/popupmenu.h"
 
 #include "actormanager.h"
+#include "commands.h"
 #include "commandhandler.h"
 #include "configuration.h"
 #include "dropshortcut.h"
@@ -56,6 +57,7 @@
 
 #include "gui/viewport.h"
 
+#include "gui/widgets/button.h"
 #include "gui/widgets/browserbox.h"
 #include "gui/widgets/tabs/chattab.h"
 #include "gui/widgets/progressbar.h"
@@ -79,7 +81,7 @@
 #include "utils/gettext.h"
 #include "utils/process.h"
 
-#include <guichan/listmodel.hpp>
+#include "gui/models/listmodel.h"
 
 #include "debug.h"
 
@@ -118,7 +120,7 @@ PopupMenu::PopupMenu() :
     mPlayerListener.setNick("");
     mPlayerListener.setDialog(nullptr);
     mPlayerListener.setType(static_cast<int>(Being::UNKNOWN));
-    mScrollArea = new ScrollArea(mBrowserBox, false);
+    mScrollArea = new ScrollArea(this, mBrowserBox, false);
     mScrollArea->setVerticalScrollPolicy(ScrollArea::SHOW_AUTO);
 }
 
@@ -839,7 +841,7 @@ void PopupMenu::showChangePos(const int x, const int y)
 }
 
 void PopupMenu::handleLink(const std::string &link,
-                           gcn::MouseEvent *event A_UNUSED)
+                           MouseEvent *event A_UNUSED)
 {
     Being *being = nullptr;
     if (actorManager)
@@ -2683,7 +2685,7 @@ void PopupMenu::addPickupFilter(const std::string &name)
 }
 
 void PopupMenu::showPopup(const int x, const int y,
-                          gcn::ListModel *const model)
+                          ListModel *const model)
 {
     if (!model)
         return;
@@ -2838,7 +2840,7 @@ void PopupMenu::showGMPopup()
 }
 
 RenameListener::RenameListener() :
-    gcn::ActionListener(),
+    ActionListener(),
     mMapItemX(0),
     mMapItemY(0),
     mDialog(nullptr)
@@ -2859,7 +2861,7 @@ void RenameListener::setMapItem(MapItem *const mapItem)
     }
 }
 
-void RenameListener::action(const gcn::ActionEvent &event)
+void RenameListener::action(const ActionEvent &event)
 {
     if (event.getId() == "ok" && viewport && mDialog)
     {
@@ -2893,7 +2895,7 @@ PlayerListener::PlayerListener() :
 {
 }
 
-void PlayerListener::action(const gcn::ActionEvent &event)
+void PlayerListener::action(const ActionEvent &event)
 {
     if (event.getId() == "ok" && !mNick.empty() && mDialog)
     {

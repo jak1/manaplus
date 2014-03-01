@@ -27,11 +27,16 @@
 #include "configuration.h"
 #include "main.h"
 
+#include "events/keyevent.h"
+
 #include "input/keydata.h"
-#include "input/keyevent.h"
 
-#include "gui/sdlfont.h"
+#include "gui/font.h"
+#include "gui/gui.h"
 
+#include "gui/models/serverslistmodel.h"
+
+#include "gui/widgets/checkbox.h"
 #include "gui/windows/editserverdialog.h"
 #include "gui/windows/logindialog.h"
 
@@ -43,8 +48,6 @@
 
 #include "utils/gettext.h"
 #include "utils/langs.h"
-
-#include <guichan/font.hpp>
 
 #include <string>
 
@@ -60,18 +63,9 @@ static std::string serverTypeToString(const ServerInfo::Type type)
             return "TmwAthena";
         case ServerInfo::EVOL:
             return "Evol";
+        case ServerInfo::EATHENA:
 #ifdef EATHENA_SUPPORT
-        case ServerInfo::EATHENA:
             return "eAthena";
-#endif
-#ifdef MANASERV_SUPPORT
-        case ServerInfo::MANASERV:
-            return "ManaServ";
-#else
-        case ServerInfo::MANASERV:
-#endif
-#ifndef EATHENA_SUPPORT
-        case ServerInfo::EATHENA:
 #endif
         default:
         case ServerInfo::UNKNOWN:
@@ -87,60 +81,11 @@ static uint16_t defaultPortForServerType(const ServerInfo::Type type)
         case ServerInfo::EATHENA:
 #ifdef EATHENA_SUPPORT
             return 6900;
-#else
-            return 6901;
 #endif
         case ServerInfo::UNKNOWN:
         case ServerInfo::TMWATHENA:
         case ServerInfo::EVOL:
-#ifdef MANASERV_SUPPORT
             return 6901;
-        case ServerInfo::MANASERV:
-            return 9601;
-#else
-        case ServerInfo::MANASERV:
-            return 6901;
-#endif
-    }
-}
-
-ServersListModel::ServersListModel(ServerInfos *const servers,
-                                   ServerDialog *const parent) :
-        mServers(servers),
-        mVersionStrings(servers->size(), VersionString(0, "")),
-        mParent(parent)
-{
-}
-
-int ServersListModel::getNumberOfElements()
-{
-    MutexLocker lock = mParent->lock();
-    return static_cast<int>(mServers->size());
-}
-
-std::string ServersListModel::getElementAt(int elementIndex)
-{
-    MutexLocker lock = mParent->lock();
-    const ServerInfo &server = mServers->at(elementIndex);
-    std::string myServer;
-    myServer.append(server.hostname);
-    return myServer;
-}
-
-void ServersListModel::setVersionString(const int index,
-                                        const std::string &version)
-{
-    if (index < 0 || index >= static_cast<int>(mVersionStrings.size()))
-        return;
-
-    if (version.empty())
-    {
-        mVersionStrings[index] = VersionString(0, "");
-    }
-    else
-    {
-        mVersionStrings[index] = VersionString(
-            gui->getFont()->getWidth(version), version);
     }
 }
 
@@ -157,19 +102,18 @@ public:
         mHighlightColor = getThemeColor(Theme::HIGHLIGHT);
     }
 
-    void draw(gcn::Graphics *graphics) override final
+    void draw(Graphics *graphics) override final
     {
         if (!mListModel)
             return;
 
         ServersListModel *const model = static_cast<ServersListModel *const>(
             mListModel);
-        Graphics *const g = static_cast<Graphics*>(graphics);
 
         updateAlpha();
 
         mHighlightColor.a = static_cast<int>(mAlpha * 255.0F);
-        g->setColor(mHighlightColor);
+        graphics->setColor(mHighlightColor);
 
         const int height = getRowHeight();
         mNotSupportedColor.a = static_cast<int>(mAlpha * 255.0F);
@@ -177,13 +121,13 @@ public:
         // Draw filled rectangle around the selected list element
         if (mSelected >= 0)
         {
-            graphics->fillRectangle(gcn::Rectangle(mPadding,
+            graphics->fillRectangle(Rect(mPadding,
                 height * mSelected + mPadding, getWidth() - 2 * mPadding,
                 height));
         }
 
-        gcn::Font *const font1 = boldFont;
-        gcn::Font *const font2 = getFont();
+        Font *const font1 = boldFont;
+        Font *const font2 = getFont();
         const int fontHeight = font1->getHeight();
         const int pad1 = fontHeight + mPadding;
         const int pad2 = height / 4 + mPadding;
@@ -196,12 +140,12 @@ public:
 
             if (mSelected == i)
             {
-                g->setColorAll(mForegroundSelectedColor,
+                graphics->setColorAll(mForegroundSelectedColor,
                     mForegroundSelectedColor2);
             }
             else
             {
-                g->setColorAll(mForegroundColor, mForegroundColor2);
+                graphics->setColorAll(mForegroundColor, mForegroundColor2);
             }
 
             int top;
@@ -224,7 +168,7 @@ public:
 
             if (info.version.first > 0)
             {
-                g->setColorAll(mNotSupportedColor, mNotSupportedColor2);
+                graphics->setColorAll(mNotSupportedColor, mNotSupportedColor2);
                 font2->drawString(graphics, info.version.second,
                     width - info.version.first - mPadding, top);
             }
@@ -236,8 +180,8 @@ public:
         return 2 * getFont()->getHeight() + 5;
     }
 private:
-    gcn::Color mNotSupportedColor;
-    gcn::Color mNotSupportedColor2;
+    Color mNotSupportedColor;
+    Color mNotSupportedColor2;
 };
 
 
@@ -245,9 +189,9 @@ ServerDialog::ServerDialog(ServerInfo *const serverInfo,
                            const std::string &dir) :
     // TRANSLATORS: servers dialog name
     Window(_("Choose Your Server"), false, nullptr, "server.xml"),
-    gcn::ActionListener(),
-    gcn::KeyListener(),
-    gcn::SelectionListener(),
+    ActionListener(),
+    KeyListener(),
+    SelectionListener(),
     mMutex(),
     mDescription(new Label(this, std::string())),
     // TRANSLATORS: servers dialog button
@@ -294,7 +238,7 @@ ServerDialog::ServerDialog(ServerInfo *const serverInfo,
 
     mServersList->addMouseListener(this);
 
-    ScrollArea *const usedScroll = new ScrollArea(mServersList,
+    ScrollArea *const usedScroll = new ScrollArea(this, mServersList,
         getOptionBool("showbackground"), "server_background.xml");
     usedScroll->setHorizontalScrollPolicy(gcn::ScrollArea::SHOW_NEVER);
 
@@ -405,7 +349,7 @@ void ServerDialog::connectToSelectedServer()
     client->setState(STATE_CONNECT_SERVER);
 }
 
-void ServerDialog::action(const gcn::ActionEvent &event)
+void ServerDialog::action(const ActionEvent &event)
 {
     const std::string &eventId = event.getId();
     if (eventId == "connect")
@@ -445,9 +389,9 @@ void ServerDialog::action(const gcn::ActionEvent &event)
     }
 }
 
-void ServerDialog::keyPressed(gcn::KeyEvent &keyEvent)
+void ServerDialog::keyPressed(KeyEvent &keyEvent)
 {
-    switch (static_cast<KeyEvent*>(&keyEvent)->getActionId())
+    switch (keyEvent.getActionId())
     {
         case Input::KEY_GUI_CANCEL:
             keyEvent.consume();
@@ -457,7 +401,7 @@ void ServerDialog::keyPressed(gcn::KeyEvent &keyEvent)
         case Input::KEY_GUI_SELECT:
         case Input::KEY_GUI_SELECT2:
             keyEvent.consume();
-            action(gcn::ActionEvent(nullptr,
+            action(ActionEvent(nullptr,
                 mConnectButton->getActionEventId()));
             return;
 
@@ -495,7 +439,7 @@ void ServerDialog::keyPressed(gcn::KeyEvent &keyEvent)
         mServersList->keyPressed(keyEvent);
 }
 
-void ServerDialog::valueChanged(const gcn::SelectionEvent &)
+void ServerDialog::valueChanged(const SelectionEvent &)
 {
     const int index = mServersList->getSelected();
     if (index == -1)
@@ -506,13 +450,13 @@ void ServerDialog::valueChanged(const gcn::SelectionEvent &)
     mDeleteButton->setEnabled(true);
 }
 
-void ServerDialog::mouseClicked(gcn::MouseEvent &mouseEvent)
+void ServerDialog::mouseClicked(MouseEvent &mouseEvent)
 {
     if (mouseEvent.getClickCount() == 2 &&
         mouseEvent.getSource() == mServersList)
     {
-        action(gcn::ActionEvent(mConnectButton,
-                                mConnectButton->getActionEventId()));
+        action(ActionEvent(mConnectButton,
+            mConnectButton->getActionEventId()));
     }
 }
 
@@ -644,7 +588,7 @@ void ServerDialog::loadServers(const bool addNew)
             version = strprintf(_("requires v%s"), version.c_str());
         }
 
-        const gcn::Font *const font = gui->getFont();
+        const Font *const font = gui->getFont();
 
         for_each_xml_child_node(subNode, serverNode)
         {

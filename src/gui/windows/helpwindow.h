@@ -26,7 +26,7 @@
 #include "gui/widgets/linkhandler.h"
 #include "gui/widgets/window.h"
 
-#include <guichan/actionlistener.hpp>
+#include "listeners/actionlistener.h"
 
 #include "localconsts.h"
 
@@ -44,8 +44,9 @@ typedef std::map<std::string, HelpNames> HelpTagsMap;
 /**
  * The help window.
  */
-class HelpWindow final : public Window, public LinkHandler,
-                         public gcn::ActionListener
+class HelpWindow final : public Window,
+                         public LinkHandler,
+                         public ActionListener
 {
     public:
         /**
@@ -58,13 +59,13 @@ class HelpWindow final : public Window, public LinkHandler,
         /**
          * Called when receiving actions from the widgets.
          */
-        void action(const gcn::ActionEvent &event) override final;
+        void action(const ActionEvent &event) override final;
 
         /**
          * Handles link action.
          */
         void handleLink(const std::string &link,
-                        gcn::MouseEvent *event A_UNUSED) override final;
+                        MouseEvent *event A_UNUSED) override final;
 
         /**
          * Loads help in the dialog.

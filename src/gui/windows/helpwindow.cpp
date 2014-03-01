@@ -24,7 +24,7 @@
 
 #include "configuration.h"
 
-#include "gui/sdlfont.h"
+#include "gui/gui.h"
 
 #include "gui/windows/didyouknowwindow.h"
 #include "gui/windows/setupwindow.h"
@@ -48,12 +48,13 @@
 HelpWindow::HelpWindow() :
     // TRANSLATORS: help window name
     Window(_("Help"), false, nullptr, "help.xml"),
-    gcn::ActionListener(),
+    ActionListener(),
     // TRANSLATORS: help window. button.
     mDYKButton(new Button(this, _("Did you know..."), "DYK", this)),
     mBrowserBox(new BrowserBox(this, BrowserBox::AUTO_SIZE, true,
         "browserbox.xml")),
-    mScrollArea(new ScrollArea(mBrowserBox, true, "help_background.xml")),
+    mScrollArea(new ScrollArea(this, mBrowserBox,
+        true, "help_background.xml")),
     mTagFileMap()
 {
     setMinWidth(300);
@@ -72,7 +73,8 @@ HelpWindow::HelpWindow() :
     mBrowserBox->setOpaque(false);
 
     mBrowserBox->setLinkHandler(this);
-    mBrowserBox->setFont(gui->getHelpFont());
+    if (gui)
+        mBrowserBox->setFont(gui->getHelpFont());
     mBrowserBox->setProcessVersion(true);
     mBrowserBox->setEnableImages(true);
     mBrowserBox->setEnableKeys(true);
@@ -87,10 +89,10 @@ HelpWindow::HelpWindow() :
     loadWindowState();
     loadTags();
     enableVisibleSound(true);
-    widgetResized(gcn::Event(nullptr));
+    widgetResized(Event(nullptr));
 }
 
-void HelpWindow::action(const gcn::ActionEvent &event)
+void HelpWindow::action(const ActionEvent &event)
 {
     if (event.getId() == "DYK")
     {
@@ -104,7 +106,7 @@ void HelpWindow::action(const gcn::ActionEvent &event)
 }
 
 void HelpWindow::handleLink(const std::string &link,
-                            gcn::MouseEvent *event A_UNUSED)
+                            MouseEvent *event A_UNUSED)
 {
     if (!strStartWith(link, "http://") && !strStartWith(link, "https://"))
     {

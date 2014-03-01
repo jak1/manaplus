@@ -21,7 +21,8 @@
 
 #include "gui/widgets/label.h"
 
-#include <guichan/font.hpp>
+#include "gui/font.h"
+#include "gui/gui.h"
 
 #include "debug.h"
 
@@ -29,16 +30,15 @@ Skin *Label::mSkin = nullptr;
 int Label::mInstances = 0;
 
 Label::Label(const Widget2 *const widget) :
-    gcn::Label(),
-    Widget2(widget),
+    gcn::Label(widget),
     mPadding(0)
 {
     init();
 }
 
-Label::Label(const Widget2 *const widget, const std::string &caption) :
-    gcn::Label(caption),
-    Widget2(widget),
+Label::Label(const Widget2 *const widget,
+             const std::string &caption) :
+    gcn::Label(widget, caption),
     mPadding(0)
 {
     init();
@@ -76,13 +76,13 @@ void Label::init()
         mPadding = 0;
 }
 
-void Label::draw(gcn::Graphics* graphics)
+void Label::draw(Graphics* graphics)
 {
     BLOCK_START("Label::draw")
     int textX;
-    const gcn::Rectangle &rect = mDimension;
+    const Rect &rect = mDimension;
     const int textY = rect.height / 2 - getFont()->getHeight() / 2;
-    gcn::Font *const font = getFont();
+    Font *const font = getFont();
 
     switch (mAlignment)
     {
@@ -101,28 +101,27 @@ void Label::draw(gcn::Graphics* graphics)
             break;
     }
 
-    static_cast<Graphics*>(graphics)->setColorAll(
-        mForegroundColor, mForegroundColor2);
+    graphics->setColorAll(mForegroundColor, mForegroundColor2);
     font->drawString(graphics, mCaption, textX, textY);
     BLOCK_END("Label::draw")
 }
 
 void Label::adjustSize()
 {
-    const gcn::Font *const font = getFont();
+    const Font *const font = getFont();
     const int pad2 = 2 * mPadding;
     setWidth(font->getWidth(mCaption) + pad2);
     setHeight(font->getHeight() + pad2);
 }
 
-void Label::setForegroundColor(const gcn::Color &color)
+void Label::setForegroundColor(const Color &color)
 {
     mForegroundColor = color;
     mForegroundColor2 = color;
 }
 
-void Label::setForegroundColorAll(const gcn::Color &color1,
-                                  const gcn::Color &color2)
+void Label::setForegroundColorAll(const Color &color1,
+                                  const Color &color2)
 {
     mForegroundColor = color1;
     mForegroundColor2 = color2;
@@ -130,7 +129,7 @@ void Label::setForegroundColorAll(const gcn::Color &color1,
 
 void Label::resizeTo(const int maxSize, const int minSize)
 {
-    const gcn::Font *const font = getFont();
+    const Font *const font = getFont();
     const int pad2 = 2 * mPadding;
     setHeight(font->getHeight() + pad2);
 

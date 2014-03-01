@@ -27,12 +27,13 @@
 #include "gui/windows/selldialog.h"
 #include "gui/windows/tradewindow.h"
 
+#include "gui/models/shopitems.h"
+
 #include "gui/widgets/button.h"
 #include "gui/widgets/checkbox.h"
 #include "gui/widgets/label.h"
 #include "gui/widgets/layout.h"
 #include "gui/widgets/scrollarea.h"
-#include "gui/widgets/shopitems.h"
 #include "gui/widgets/shoplistbox.h"
 
 #include "gui/widgets/tabs/chattab.h"
@@ -71,17 +72,17 @@ ShopWindow::DialogList ShopWindow::instances;
 ShopWindow::ShopWindow():
     // TRANSLATORS: shop window name
     Window(_("Personal Shop"), false, nullptr, "shop.xml"),
-    gcn::ActionListener(),
-    gcn::SelectionListener(),
+    ActionListener(),
+    SelectionListener(),
     // TRANSLATORS: shop window button
     mCloseButton(new Button(this, _("Close"), "close", this)),
     mBuyShopItems(new ShopItems),
     mSellShopItems(new ShopItems),
     mBuyShopItemList(new ShopListBox(this, mBuyShopItems, mBuyShopItems)),
     mSellShopItemList(new ShopListBox(this, mSellShopItems, mSellShopItems)),
-    mBuyScrollArea(new ScrollArea(mBuyShopItemList,
+    mBuyScrollArea(new ScrollArea(this, mBuyShopItemList,
         getOptionBool("showbuybackground"), "shop_buy_background.xml")),
-    mSellScrollArea(new ScrollArea(mSellShopItemList,
+    mSellScrollArea(new ScrollArea(this, mSellShopItemList,
         getOptionBool("showsellbackground"), "shop_sell_background.xml")),
     // TRANSLATORS: shop window label
     mBuyLabel(new Label(this, _("Buy items"))),
@@ -205,7 +206,7 @@ ShopWindow::~ShopWindow()
     instances.remove(this);
 }
 
-void ShopWindow::action(const gcn::ActionEvent &event)
+void ShopWindow::action(const ActionEvent &event)
 {
     const std::string &eventId = event.getId();
     if (eventId == "close")
@@ -307,7 +308,7 @@ void ShopWindow::startTrade()
     mTradeNick.clear();
 }
 
-void ShopWindow::valueChanged(const gcn::SelectionEvent &event A_UNUSED)
+void ShopWindow::valueChanged(const SelectionEvent &event A_UNUSED)
 {
     updateButtonsAndLabels();
 }

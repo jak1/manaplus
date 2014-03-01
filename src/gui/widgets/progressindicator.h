@@ -22,9 +22,7 @@
 #ifndef GUI_WIDGETS_PROGRESSINDICATOR_H
 #define GUI_WIDGETS_PROGRESSINDICATOR_H
 
-#include "gui/widgets/widget2.h"
-
-#include <guichan/widget.hpp>
+#include "gui/widgets/widget.h"
 
 #include "localconsts.h"
 
@@ -34,11 +32,10 @@ class SimpleAnimation;
  * A widget that indicates progress. Suitable to use instead of a progress bar
  * in cases where it is unknown how long something is going to take.
  */
-class ProgressIndicator final : public gcn::Widget,
-                                public Widget2
+class ProgressIndicator final : public Widget
 {
     public:
-        ProgressIndicator();
+        explicit ProgressIndicator(Widget2 *const widget);
 
         A_DELETE_COPY(ProgressIndicator)
 
@@ -46,7 +43,7 @@ class ProgressIndicator final : public gcn::Widget,
 
         void logic() override final;
 
-        void draw(gcn::Graphics *graphics) override final;
+        void draw(Graphics *graphics) override final;
 
     private:
         SimpleAnimation *mIndicator;

@@ -47,7 +47,7 @@ ELSEIF (CMAKE_SYSTEM_NAME STREQUAL Linux)
     SET(EXTRA_LIBRARIES rt)
 ENDIF()
 
-SET(FLAGS "${FLAGS} -DUSE_MUMBLE -DUSE_INTERNALGUICHAN")
+SET(FLAGS "${FLAGS} -DUSE_MUMBLE")
 
 IF (WITH_OPENGL)
     FIND_PACKAGE(OpenGL REQUIRED)
@@ -62,7 +62,6 @@ IF (USE_X11)
 ENDIF (USE_X11)
 
 INCLUDE_DIRECTORIES(
-    "guichan/include"
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${SDL_INCLUDE_DIR}
     ${SDLIMAGE_INCLUDE_DIR}
@@ -108,6 +107,9 @@ MARK_AS_ADVANCED(SDL_LIBRARY)
 SET(SRCS
     gui/widgets/avatarlistbox.cpp
     gui/widgets/avatarlistbox.h
+    gui/models/avatarlistmodel.h
+    gui/models/beingslistmodel.h
+    gui/models/colorlistmodel.h
     gui/widgets/tabs/battletab.cpp
     gui/widgets/tabs/battletab.h
     gui/widgets/browserbox.cpp
@@ -125,8 +127,8 @@ SET(SRCS
     gui/widgets/tabs/chattab.h
     gui/widgets/checkbox.cpp
     gui/widgets/checkbox.h
-    gui/widgets/colormodel.cpp
-    gui/widgets/colormodel.h
+    gui/models/colormodel.cpp
+    gui/models/colormodel.h
     gui/widgets/colorpage.cpp
     gui/widgets/colorpage.h
     gui/widgets/container.cpp
@@ -139,9 +141,13 @@ SET(SRCS
     gui/widgets/emoteshortcutcontainer.h
     gui/widgets/extendedlistbox.cpp
     gui/widgets/extendedlistbox.h
-    gui/widgets/extendedlistmodel.h
-    gui/widgets/extendednamesmodel.cpp
-    gui/widgets/extendednamesmodel.h
+    gui/models/extendedlistmodel.h
+    gui/models/extendednamesmodel.cpp
+    gui/models/extendednamesmodel.h
+    gui/models/fontsmodel.h
+    gui/models/iconsmodel.h
+    gui/models/ignorechoiceslistmodel.h
+    gui/models/itemsmodel.h
     gui/widgets/flowcontainer.cpp
     gui/widgets/flowcontainer.h
     gui/widgets/tabs/gmtab.cpp
@@ -177,9 +183,11 @@ SET(SRCS
     gui/widgets/linkhandler.h
     gui/widgets/listbox.cpp
     gui/widgets/listbox.h
-    gui/widgets/mouseevent.h
-    gui/widgets/namesmodel.cpp
-    gui/widgets/namesmodel.h
+    gui/models/namesmodel.cpp
+    gui/models/namesmodel.h
+    gui/models/playerrelationlistmodel.h
+    gui/models/questsmodel.h
+    gui/models/serverslistmodel.h
     gui/widgets/passwordfield.cpp
     gui/widgets/passwordfield.h
     gui/widgets/playerbox.cpp
@@ -206,8 +214,8 @@ SET(SRCS
     gui/widgets/tabs/setuptabscroll.h
     gui/widgets/setuptouchitem.cpp
     gui/widgets/setuptouchitem.h
-    gui/widgets/shopitems.cpp
-    gui/widgets/shopitems.h
+    gui/models/shopitems.cpp
+    gui/models/shopitems.h
     gui/widgets/shoplistbox.cpp
     gui/widgets/shoplistbox.h
     gui/widgets/shortcutcontainer.cpp
@@ -216,8 +224,11 @@ SET(SRCS
     gui/widgets/skilldata.h
     gui/widgets/skillinfo.cpp
     gui/widgets/skillinfo.h
-    gui/widgets/skillmodel.cpp
-    gui/widgets/skillmodel.h
+    gui/models/skillmodel.cpp
+    gui/models/skillmodel.h
+    gui/models/sortlistmodelbuy.h
+    gui/models/sortlistmodelinv.h
+    gui/models/soundsmodel.h
     gui/widgets/slider.cpp
     gui/widgets/slider.h
     gui/widgets/sliderlist.cpp
@@ -228,8 +239,16 @@ SET(SRCS
     gui/widgets/tabbedarea.h
     gui/widgets/guitable.cpp
     gui/widgets/guitable.h
-    gui/widgets/tablemodel.cpp
-    gui/widgets/tablemodel.h
+    gui/models/tablemodel.cpp
+    gui/models/tablemodel.h
+    gui/models/targettypemodel.h
+    gui/models/touchactionmodel.cpp
+    gui/models/touchactionmodel.h
+    gui/models/typelistmodel.h
+    gui/models/updatetypemodel.h
+    gui/models/updatelistmodel.h
+    gui/models/worldlistmodel.h
+    gui/models/themesmodel.h
     gui/widgets/tabstrip.cpp
     gui/widgets/tabstrip.h
     gui/widgets/textbox.cpp
@@ -366,8 +385,8 @@ SET(SRCS
     gui/widgets/tabs/setup_visual.cpp
     gui/widgets/tabs/setup_visual.h
     gui/setupactiondata.h
-    gui/sdlfont.cpp
-    gui/sdlfont.h
+    gui/font.cpp
+    gui/font.h
     gui/windows/shopwindow.cpp
     gui/windows/shopwindow.h
     gui/windows/shortcutwindow.cpp
@@ -506,6 +525,8 @@ SET(SRCS
     resources/sdlmusic.h
     resources/db/sounddb.cpp
     resources/db/sounddb.h
+    resources/db/weaponsdb.cpp
+    resources/db/weaponsdb.h
     resources/soundeffect.cpp
     resources/soundeffect.h
     resources/soundinfo.h
@@ -568,6 +589,8 @@ SET(SRCS
     utils/mkdir.h
     utils/xml.cpp
     utils/xml.h
+    utils/xmlutils.cpp
+    utils/xmlutils.h
     test/testlauncher.cpp
     test/testlauncher.h
     test/testmain.cpp
@@ -578,7 +601,7 @@ SET(SRCS
     being/actor.h
     being/actorsprite.cpp
     being/actorsprite.h
-    being/actorspritelistener.h
+    listeners/actorspritelistener.h
     actormanager.cpp
     actormanager.h
     animatedsprite.cpp
@@ -608,7 +631,7 @@ SET(SRCS
     commands.h
     being/compoundsprite.cpp
     being/compoundsprite.h
-    configlistener.h
+    listeners/configlistener.h
     configuration.cpp
     configuration.h
     debug.h
@@ -616,8 +639,8 @@ SET(SRCS
     defaults.h
     depricatedevent.cpp
     depricatedevent.h
-    depricatedlistener.cpp
-    depricatedlistener.h
+    listeners/depricatedlistener.cpp
+    listeners/depricatedlistener.h
     dragdrop.h
     effectmanager.cpp
     effectmanager.h
@@ -660,17 +683,13 @@ SET(SRCS
     textcommand.h
     input/inputmanager.cpp
     input/inputmanager.h
-    input/inputevent.cpp
-    input/inputevent.h
+    events/inputevent.h
     input/joystick.cpp
     input/joystick.h
     input/keyboardconfig.cpp
     input/keyboardconfig.h
     input/keyboarddata.h
     input/keydata.h
-    input/keyevent.cpp
-    input/keyevent.h
-    input/keyinput.cpp
     input/keyinput.h
     input/multitouchmanager.cpp
     input/multitouchmanager.h
@@ -691,8 +710,7 @@ SET(SRCS
     render/mgl.h
     render/mobileopenglgraphics.cpp
     render/mobileopenglgraphics.h
-    mouseinput.cpp
-    mouseinput.h
+    input/mouseinput.h
     mumblemanager.cpp
     mumblemanager.h
     navigationmanager.cpp
@@ -725,7 +743,7 @@ SET(SRCS
     being/playerinfo.h
     being/playerrelations.cpp
     being/playerrelations.h
-    being/playerrelationslistener.h
+    listeners/playerrelationslistener.h
     position.cpp
     position.h
     properties.h
@@ -770,81 +788,56 @@ SET(SRCS
     vector.h
     walklayer.cpp
     walklayer.h
-    )
-
-SET(SRCS_GUICHAN
-    guichan/include/guichan/actionevent.hpp
-    guichan/include/guichan/actionlistener.hpp
-    guichan/include/guichan/basiccontainer.hpp
-    guichan/include/guichan/cliprectangle.hpp
-    guichan/include/guichan/color.hpp
-    guichan/include/guichan/deathlistener.hpp
-    guichan/include/guichan/event.hpp
-    guichan/include/guichan/exception.hpp
-    guichan/include/guichan/focushandler.hpp
-    guichan/include/guichan/focuslistener.hpp
-    guichan/include/guichan/font.hpp
-    guichan/include/guichan/graphics.hpp
-    guichan/include/guichan/gui.hpp
-    guichan/include/guichan/image.hpp
-    guichan/include/guichan/input.hpp
-    guichan/include/guichan/inputevent.hpp
-    guichan/include/guichan/key.hpp
-    guichan/include/guichan/keyevent.hpp
-    guichan/include/guichan/keyinput.hpp
-    guichan/include/guichan/keylistener.hpp
-    guichan/include/guichan/listmodel.hpp
-    guichan/include/guichan/mouseevent.hpp
-    guichan/include/guichan/mouseinput.hpp
-    guichan/include/guichan/mouselistener.hpp
-    guichan/include/guichan/rectangle.hpp
-    guichan/include/guichan/selectionevent.hpp
-    guichan/include/guichan/selectionlistener.hpp
-    guichan/include/guichan/sdl/sdlpixel.hpp
-    guichan/include/guichan/widget.hpp
-    guichan/include/guichan/widgetlistener.hpp
-    guichan/include/guichan/widgets/button.hpp
-    guichan/include/guichan/widgets/checkbox.hpp
-    guichan/include/guichan/widgets/container.hpp
-    guichan/include/guichan/widgets/label.hpp
-    guichan/include/guichan/widgets/listbox.hpp
-    guichan/include/guichan/widgets/radiobutton.hpp
-    guichan/include/guichan/widgets/scrollarea.hpp
-    guichan/include/guichan/widgets/slider.hpp
-    guichan/include/guichan/widgets/textbox.hpp
-    guichan/include/guichan/widgets/textfield.hpp
-    guichan/include/guichan/widgets/window.hpp
-    guichan/actionevent.cpp
-    guichan/basiccontainer.cpp
-    guichan/cliprectangle.cpp
-    guichan/color.cpp
-    guichan/event.cpp
-    guichan/exception.cpp
-    guichan/focushandler.cpp
-    guichan/font.cpp
-    guichan/graphics.cpp
-    guichan/gui.cpp
-    guichan/image.cpp
-    guichan/inputevent.cpp
-    guichan/key.cpp
-    guichan/keyevent.cpp
-    guichan/keyinput.cpp
-    guichan/mouseevent.cpp
-    guichan/mouseinput.cpp
-    guichan/rectangle.cpp
-    guichan/selectionevent.cpp
-    guichan/widget.cpp
-    guichan/widgets/button.cpp
-    guichan/widgets/checkbox.cpp
-    guichan/widgets/container.cpp
-    guichan/widgets/label.cpp
-    guichan/widgets/listbox.cpp
-    guichan/widgets/radiobutton.cpp
-    guichan/widgets/scrollarea.cpp
-    guichan/widgets/slider.cpp
-    guichan/widgets/textbox.cpp
-    guichan/widgets/textfield.cpp
-    guichan/widgets/window.cpp
+    events/actionevent.h
+    listeners/actionlistener.h
+    gui/base/basiccontainer.hpp
+    gui/cliprect.h
+    gui/color.h
+    listeners/deathlistener.h
+    events/event.h
+    listeners/focuslistener.h
+    gui/base/gui.hpp
+    events/inputguievent.h
+    input/key.h
+    events/keyevent.h
+    listeners/keylistener.h
+    gui/models/listmodel.h
+    gui/models/magicschoolmodel.h
+    events/mouseevent.h
+    listeners/mouselistener.h
+    gui/rect.h
+    events/selectionevent.h
+    listeners/selectionlistener.h
+    utils/sdlpixel.h
+    gui/widgets/widget.h
+    listeners/widgetlistener.h
+    gui/base/widgets/button.hpp
+    gui/base/widgets/checkbox.hpp
+    gui/base/widgets/container.hpp
+    gui/base/widgets/label.hpp
+    gui/base/widgets/listbox.hpp
+    gui/base/widgets/radiobutton.hpp
+    gui/base/widgets/scrollarea.hpp
+    gui/base/widgets/slider.hpp
+    gui/base/widgets/textbox.hpp
+    gui/base/widgets/textfield.hpp
+    gui/base/basiccontainer.cpp
+    gui/cliprect.cpp
+    gui/color.cpp
+    gui/base/gui.cpp
+    input/key.cpp
+    gui/rect.cpp
+    gui/widgets/widget.cpp
+    gui/base/widgets/button.cpp
+    gui/base/widgets/checkbox.cpp
+    gui/base/widgets/container.cpp
+    gui/base/widgets/label.cpp
+    gui/base/widgets/listbox.cpp
+    gui/base/widgets/radiobutton.cpp
+    gui/base/widgets/scrollarea.cpp
+    gui/base/widgets/slider.cpp
+    gui/base/widgets/textbox.cpp
+    gui/base/widgets/textfield.cpp
     )
 
 SET(SRCS_EVOL
@@ -1000,9 +993,9 @@ ENDIF ()
 SET (PROGRAMS manaplus)
 
 IF (ENABLE_EATHENA)
-    ADD_EXECUTABLE(manaplus WIN32 ${SRCS_GUICHAN} ${SRCS} ${SRCS_EATHENA} ${SRCS_TMWA} ${SRCS_EVOL})
+    ADD_EXECUTABLE(manaplus WIN32 ${SRCS} ${SRCS_EATHENA} ${SRCS_TMWA} ${SRCS_EVOL})
 ELSE(ENABLE_EATHENA)
-    ADD_EXECUTABLE(manaplus WIN32 ${SRCS_GUICHAN} ${SRCS} ${SRCS_TMWA} ${SRCS_EVOL})
+    ADD_EXECUTABLE(manaplus WIN32 ${SRCS} ${SRCS_TMWA} ${SRCS_EVOL})
 ENDIF(ENABLE_EATHENA)
 
 TARGET_LINK_LIBRARIES(manaplus

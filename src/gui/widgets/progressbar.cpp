@@ -25,23 +25,23 @@
 #include "client.h"
 #include "graphicsvertexes.h"
 
+#include "gui/font.h"
 #include "gui/gui.h"
-#include "gui/sdlfont.h"
-
-#include <guichan/font.hpp>
 
 #include "debug.h"
 
 int ProgressBar::mInstances = 0;
 float ProgressBar::mAlpha = 1.0;
 
-ProgressBar::ProgressBar(const Widget2 *const widget, float progress,
-                         const int width, const int height,
+ProgressBar::ProgressBar(const Widget2 *const widget,
+                         float progress,
+                         const int width,
+                         const int height,
                          const int backColor,
-                         const std::string &skin, const std::string &skinFill):
-    gcn::Widget(),
-    Widget2(widget),
-    gcn::WidgetListener(),
+                         const std::string &skin,
+                         const std::string &skinFill):
+    Widget(widget),
+    WidgetListener(),
     mFillRect(),
     mSkin(nullptr),
     mProgress(progress),
@@ -146,12 +146,12 @@ void ProgressBar::updateAlpha()
     mAlpha = alpha;
 }
 
-void ProgressBar::draw(gcn::Graphics *graphics)
+void ProgressBar::draw(Graphics *graphics)
 {
     BLOCK_START("ProgressBar::draw")
     updateAlpha();
     mBackgroundColor.a = static_cast<int>(mAlpha * 255);
-    render(static_cast<Graphics*>(graphics));
+    render(graphics);
     BLOCK_END("ProgressBar::draw")
 }
 
@@ -184,7 +184,7 @@ void ProgressBar::setProgressPalette(const int progressPalette)
     }
 }
 
-void ProgressBar::setBackgroundColor(const gcn::Color &color)
+void ProgressBar::setBackgroundColor(const Color &color)
 {
     mRedraw = true;
     mBackgroundColorToGo = color;
@@ -193,7 +193,7 @@ void ProgressBar::setBackgroundColor(const gcn::Color &color)
         mBackgroundColor = color;
 }
 
-void ProgressBar::setColor(const gcn::Color &color1, const gcn::Color &color2)
+void ProgressBar::setColor(const Color &color1, const Color &color2)
 {
     mForegroundColor = color1;
     mForegroundColor2 = color2;
@@ -261,7 +261,7 @@ void ProgressBar::render(Graphics *graphics)
         {
             if (width > maxWidth)
                 width = maxWidth;
-            graphics->fillRectangle(gcn::Rectangle(mFillPadding, mFillPadding,
+            graphics->fillRectangle(Rect(mFillPadding, mFillPadding,
                 width, mDimension.height - pad));
         }
     }
@@ -269,9 +269,9 @@ void ProgressBar::render(Graphics *graphics)
     // The label
     if (!mText.empty())
     {
-        const gcn::Color oldColor = graphics->getColor();
+        const Color oldColor = graphics->getColor();
 
-        gcn::Font *const font = gui->getFont();
+        Font *const font = gui->getFont();
         const int textX = mDimension.width / 2;
         const int textY = (mDimension.height - font->getHeight()) / 2;
 
@@ -283,12 +283,12 @@ void ProgressBar::render(Graphics *graphics)
     }
 }
 
-void ProgressBar::widgetResized(const gcn::Event &event A_UNUSED)
+void ProgressBar::widgetResized(const Event &event A_UNUSED)
 {
     mRedraw = true;
 }
 
-void ProgressBar::widgetMoved(const gcn::Event &event A_UNUSED)
+void ProgressBar::widgetMoved(const Event &event A_UNUSED)
 {
     mRedraw = true;
 }

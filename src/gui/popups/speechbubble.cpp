@@ -23,14 +23,12 @@
 
 #include "gui/popups/speechbubble.h"
 
-#include "gui/sdlfont.h"
+#include "gui/font.h"
+#include "gui/gui.h"
 #include "gui/viewport.h"
 
 #include "gui/widgets/browserbox.h"
 #include "gui/widgets/label.h"
-#include "gui/widgets/textbox.h"
-
-#include <guichan/font.hpp>
 
 #include "debug.h"
 
@@ -59,8 +57,8 @@ void SpeechBubble::postInit()
 }
 
 void SpeechBubble::setCaption(const std::string &name,
-                              const gcn::Color *const color1,
-                              const gcn::Color *const color2)
+                              const Color *const color1,
+                              const Color *const color2)
 {
     mCaption->setCaption(name);
     mCaption->adjustSize();

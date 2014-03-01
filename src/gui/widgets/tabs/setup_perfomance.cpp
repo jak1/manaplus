@@ -22,8 +22,9 @@
 
 #include "gui/widgets/tabs/setup_perfomance.h"
 
+#include "gui/models/namesmodel.h"
+
 #include "gui/widgets/layouthelper.h"
-#include "gui/widgets/namesmodel.h"
 #include "gui/widgets/scrollarea.h"
 #include "gui/widgets/setupitem.h"
 
@@ -153,7 +154,7 @@ Setup_Perfomance::Setup_Perfomance(const Widget2 *const widget) :
         "", "uselonglivesounds", this,
         "uselonglivesoundsEvent");
 
-    setDimension(gcn::Rectangle(0, 0, 550, 350));
+    setDimension(Rect(0, 0, 550, 350));
 }
 
 Setup_Perfomance::~Setup_Perfomance()

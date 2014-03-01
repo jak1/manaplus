@@ -25,6 +25,10 @@
 #include "client.h"
 #include "graphicsvertexes.h"
 
+#include "gui/gui.h"
+
+#include "resources/image.h"
+
 #include "debug.h"
 
 int ScrollArea::instances = 0;
@@ -45,31 +49,12 @@ static std::string const buttonFiles[2] =
     "scrollbuttons_pressed.xml"
 };
 
-ScrollArea::ScrollArea(const bool opaque, const std::string &skin) :
-    gcn::ScrollArea(),
-    gcn::WidgetListener(),
-    mX(0),
-    mY(0),
-    mClickX(0),
-    mClickY(0),
-    mVertexes(new ImageCollection),
-    mVertexes2(new ImageCollection),
-    mXOffset(0),
-    mYOffset(0),
-    mDrawWidth(0),
-    mDrawHeight(0),
-    mHasMouse(false),
-    mRedraw(true)
-{
-    mOpaque = opaque;
-    addWidgetListener(this);
-    init(skin);
-}
-
-ScrollArea::ScrollArea(gcn::Widget *const widget, const bool opaque,
+ScrollArea::ScrollArea(Widget2 *const widget2,
+                       Widget *const widget,
+                       const bool opaque,
                        const std::string &skin) :
-    gcn::ScrollArea(widget),
-    gcn::WidgetListener(),
+    gcn::ScrollArea(widget2, widget),
+    WidgetListener(),
     mX(0),
     mY(0),
     mClickX(0),
@@ -194,7 +179,7 @@ void ScrollArea::logic()
     }
 
     gcn::ScrollArea::logic();
-    gcn::Widget *const content = getContent();
+    Widget *const content = getContent();
 
     // When no scrollbar in a certain direction, adapt content size to match
     // the content dimension exactly.
@@ -248,7 +233,7 @@ void ScrollArea::updateAlpha()
     }
 }
 
-void ScrollArea::draw(gcn::Graphics *graphics)
+void ScrollArea::draw(Graphics *graphics)
 {
     BLOCK_START("ScrollArea::draw")
     if (mVBarVisible || mHBarVisible)
@@ -282,8 +267,7 @@ void ScrollArea::draw(gcn::Graphics *graphics)
                     calcHMarker(graphics);
                 }
             }
-            static_cast<Graphics *const>(graphics)->drawTileCollection(
-                mVertexes);
+            graphics->drawTileCollection(mVertexes);
         }
         else
         {
@@ -315,11 +299,10 @@ void ScrollArea::draw(gcn::Graphics *graphics)
 
     if (mRedraw)
     {
-        Graphics *g = static_cast<Graphics *const>(graphics);
-        const bool redraw = g->getRedraw();
-        g->setRedraw(true);
+        const bool redraw = graphics->getRedraw();
+        graphics->setRedraw(true);
         drawChildren(graphics);
-        g->setRedraw(redraw);
+        graphics->setRedraw(redraw);
     }
     else
     {
@@ -329,14 +312,13 @@ void ScrollArea::draw(gcn::Graphics *graphics)
     BLOCK_END("ScrollArea::draw")
 }
 
-void ScrollArea::updateCalcFlag(gcn::Graphics *const graphics)
+void ScrollArea::updateCalcFlag(Graphics *const graphics)
 {
     if (!mRedraw)
     {
         // because we don't know where parent windows was moved,
         // need recalc vertexes
-        const gcn::ClipRectangle &rect = static_cast<Graphics*>(
-            graphics)->getTopClip();
+        const ClipRect &rect = graphics->getTopClip();
         if (rect.xOffset != mXOffset || rect.yOffset != mYOffset)
         {
             mRedraw = true;
@@ -349,14 +331,14 @@ void ScrollArea::updateCalcFlag(gcn::Graphics *const graphics)
             mDrawWidth = rect.width;
             mDrawHeight = rect.height;
         }
-        else if (static_cast<Graphics*>(graphics)->getRedraw())
+        else if (graphics->getRedraw())
         {
             mRedraw = true;
         }
     }
 }
 
-void ScrollArea::drawFrame(gcn::Graphics *graphics)
+void ScrollArea::drawFrame(Graphics *graphics)
 {
     BLOCK_START("ScrollArea::drawFrame")
     if (mOpaque)
@@ -372,15 +354,18 @@ void ScrollArea::drawFrame(gcn::Graphics *graphics)
             if (mRedraw)
             {
                 mVertexes2->clear();
-                static_cast<Graphics*>(graphics)->calcWindow(
-                    mVertexes2, 0, 0, w, h, background);
+                graphics->calcWindow(mVertexes2,
+                    0, 0,
+                    w, h,
+                    background);
             }
-            static_cast<Graphics*>(graphics)->drawTileCollection(mVertexes2);
+            graphics->drawTileCollection(mVertexes2);
         }
         else
         {
-            static_cast<Graphics*>(graphics)->drawImageRect(
-                0, 0, w, h, background);
+            graphics->drawImageRect(0, 0,
+                w, h,
+                background);
         }
     }
     BLOCK_END("ScrollArea::drawFrame")
@@ -392,11 +377,11 @@ void ScrollArea::setOpaque(bool opaque)
     setFrameSize(mOpaque ? 2 : 0);
 }
 
-void ScrollArea::drawButton(gcn::Graphics *const graphics,
+void ScrollArea::drawButton(Graphics *const graphics,
                             const BUTTON_DIR dir)
 {
     int state = 0;
-    gcn::Rectangle dim;
+    Rect dim;
 
     switch (dir)
     {
@@ -424,17 +409,14 @@ void ScrollArea::drawButton(gcn::Graphics *const graphics,
     }
 
     if (buttons[dir][state])
-    {
-        static_cast<Graphics*>(graphics)->drawImage2(
-            buttons[dir][state], dim.x, dim.y);
-    }
+        graphics->drawImage(buttons[dir][state], dim.x, dim.y);
 }
 
-void ScrollArea::calcButton(gcn::Graphics *const graphics,
+void ScrollArea::calcButton(Graphics *const graphics,
                             const BUTTON_DIR dir)
 {
     int state = 0;
-    gcn::Rectangle dim;
+    Rect dim;
 
     switch (dir)
     {
@@ -468,187 +450,213 @@ void ScrollArea::calcButton(gcn::Graphics *const graphics,
     }
 }
 
-void ScrollArea::drawVBar(gcn::Graphics *const graphics)
+void ScrollArea::drawVBar(Graphics *const graphics)
 {
-    const gcn::Rectangle &dim = getVerticalBarDimension();
-    Graphics *const g = static_cast<Graphics*>(graphics);
+    const Rect &dim = getVerticalBarDimension();
 
     if (vBackground.grid[4])
     {
-        g->drawPattern(vBackground.grid[4],
+        graphics->drawPattern(vBackground.grid[4],
             dim.x, dim.y, dim.width, dim.height);
     }
     if (vBackground.grid[1])
     {
-        g->drawPattern(vBackground.grid[1],
-            dim.x, dim.y, dim.width, vBackground.grid[1]->getHeight());
+        graphics->drawPattern(vBackground.grid[1],
+            dim.x, dim.y,
+            dim.width, vBackground.grid[1]->getHeight());
     }
     if (vBackground.grid[7])
     {
-        g->drawPattern(vBackground.grid[7],
+        graphics->drawPattern(vBackground.grid[7],
             dim.x, dim.height - vBackground.grid[7]->getHeight() + dim.y,
             dim.width, vBackground.grid[7]->getHeight());
     }
 }
 
-void ScrollArea::calcVBar(gcn::Graphics *const graphics)
+void ScrollArea::calcVBar(Graphics *const graphics)
 {
-    const gcn::Rectangle &dim = getVerticalBarDimension();
-    Graphics *const g = static_cast<Graphics *const>(graphics);
+    const Rect &dim = getVerticalBarDimension();
 
     if (vBackground.grid[4])
     {
-        g->calcPattern(mVertexes, vBackground.grid[4],
-            dim.x, dim.y, dim.width, dim.height);
+        graphics->calcPattern(mVertexes,
+            vBackground.grid[4],
+            dim.x, dim.y,
+            dim.width, dim.height);
     }
     if (vBackground.grid[1])
     {
-        g->calcPattern(mVertexes, vBackground.grid[1],
-            dim.x, dim.y, dim.width, vBackground.grid[1]->getHeight());
+        graphics->calcPattern(mVertexes,
+            vBackground.grid[1],
+            dim.x, dim.y,
+            dim.width, vBackground.grid[1]->getHeight());
     }
     if (vBackground.grid[7])
     {
-        g->calcPattern(mVertexes, vBackground.grid[7],
+        graphics->calcPattern(mVertexes,
+            vBackground.grid[7],
             dim.x, dim.height - vBackground.grid[7]->getHeight() + dim.y,
             dim.width, vBackground.grid[7]->getHeight());
     }
 }
 
-void ScrollArea::drawHBar(gcn::Graphics *const graphics)
+void ScrollArea::drawHBar(Graphics *const graphics)
 {
-    const gcn::Rectangle &dim = getHorizontalBarDimension();
-    Graphics *const g = static_cast<Graphics*>(graphics);
+    const Rect &dim = getHorizontalBarDimension();
 
     if (hBackground.grid[4])
     {
-        g->drawPattern(hBackground.grid[4],
-            dim.x, dim.y, dim.width, dim.height);
+        graphics->drawPattern(hBackground.grid[4],
+            dim.x, dim.y,
+            dim.width, dim.height);
     }
 
     if (hBackground.grid[3])
     {
-        g->drawPattern(hBackground.grid[3],
-            dim.x, dim.y, hBackground.grid[3]->getWidth(), dim.height);
+        graphics->drawPattern(hBackground.grid[3],
+            dim.x, dim.y,
+            hBackground.grid[3]->getWidth(), dim.height);
     }
 
     if (hBackground.grid[5])
     {
-        g->drawPattern(hBackground.grid[5],
-            dim.x + dim.width - hBackground.grid[5]->getWidth(), dim.y,
-            hBackground.grid[5]->getWidth(), dim.height);
+        graphics->drawPattern(hBackground.grid[5],
+            dim.x + dim.width - hBackground.grid[5]->getWidth(),
+            dim.y,
+            hBackground.grid[5]->getWidth(),
+            dim.height);
     }
 }
 
-void ScrollArea::calcHBar(gcn::Graphics *const graphics)
+void ScrollArea::calcHBar(Graphics *const graphics)
 {
-    const gcn::Rectangle &dim = getHorizontalBarDimension();
-    Graphics *const g = static_cast<Graphics*>(graphics);
+    const Rect &dim = getHorizontalBarDimension();
 
     if (hBackground.grid[4])
     {
-        g->calcPattern(mVertexes, hBackground.grid[4],
-            dim.x, dim.y, dim.width, dim.height);
+        graphics->calcPattern(mVertexes,
+            hBackground.grid[4],
+            dim.x, dim.y,
+            dim.width, dim.height);
     }
 
     if (hBackground.grid[3])
     {
-        g->calcPattern(mVertexes, hBackground.grid[3],
-            dim.x, dim.y, hBackground.grid[3]->getWidth(), dim.height);
+        graphics->calcPattern(mVertexes,
+            hBackground.grid[3],
+            dim.x, dim.y,
+            hBackground.grid[3]->getWidth(), dim.height);
     }
 
     if (hBackground.grid[5])
     {
-        g->calcPattern(mVertexes, hBackground.grid[5],
-            dim.x + dim.width - hBackground.grid[5]->getWidth(), dim.y,
-            hBackground.grid[5]->getWidth(), dim.height);
+        graphics->calcPattern(mVertexes,
+            hBackground.grid[5],
+            dim.x + dim.width - hBackground.grid[5]->getWidth(),
+            dim.y,
+            hBackground.grid[5]->getWidth(),
+            dim.height);
     }
 }
 
-void ScrollArea::drawVMarker(gcn::Graphics *const graphics)
+void ScrollArea::drawVMarker(Graphics *const graphics)
 {
-    const gcn::Rectangle &dim = getVerticalMarkerDimension();
+    const Rect &dim = getVerticalMarkerDimension();
 
     if ((mHasMouse) && (mX > (mDimension.width - mScrollbarWidth)))
     {
-        static_cast<Graphics*>(graphics)->
-            drawImageRect(dim.x, dim.y, dim.width, dim.height, vMarkerHi);
+        graphics->drawImageRect(dim.x, dim.y,
+            dim.width, dim.height,
+            vMarkerHi);
     }
     else
     {
-        static_cast<Graphics*>(graphics)->
-            drawImageRect(dim.x, dim.y, dim.width, dim.height, vMarker);
+        graphics->drawImageRect(dim.x, dim.y,
+            dim.width, dim.height,
+            vMarker);
     }
 }
 
-void ScrollArea::calcVMarker(gcn::Graphics *const graphics)
+void ScrollArea::calcVMarker(Graphics *const graphics)
 {
-    const gcn::Rectangle &dim = getVerticalMarkerDimension();
+    const Rect &dim = getVerticalMarkerDimension();
 
     if ((mHasMouse) && (mX > (mDimension.width - mScrollbarWidth)))
     {
-        static_cast<Graphics*>(graphics)->calcWindow(
-            mVertexes, dim.x, dim.y, dim.width, dim.height, vMarkerHi);
+        graphics->calcWindow(mVertexes,
+            dim.x, dim.y,
+            dim.width, dim.height,
+            vMarkerHi);
     }
     else
     {
-        static_cast<Graphics*>(graphics)->calcWindow(
-            mVertexes, dim.x, dim.y, dim.width, dim.height, vMarker);
+        graphics->calcWindow(mVertexes,
+            dim.x, dim.y,
+            dim.width, dim.height,
+            vMarker);
     }
 }
 
-void ScrollArea::drawHMarker(gcn::Graphics *const graphics)
+void ScrollArea::drawHMarker(Graphics *const graphics)
 {
-    const gcn::Rectangle dim = getHorizontalMarkerDimension();
+    const Rect dim = getHorizontalMarkerDimension();
 
     if ((mHasMouse) && (mY > (mDimension.height - mScrollbarWidth)))
     {
-        static_cast<Graphics*>(graphics)->
-            drawImageRect(dim.x, dim.y, dim.width, dim.height, vMarkerHi);
+        graphics->drawImageRect(dim.x, dim.y,
+            dim.width, dim.height,
+            vMarkerHi);
     }
     else
     {
-        static_cast<Graphics*>(graphics)->
-            drawImageRect(dim.x, dim.y, dim.width, dim.height, vMarker);
+        graphics->drawImageRect(
+            dim.x, dim.y,
+            dim.width, dim.height,
+            vMarker);
     }
 }
 
-void ScrollArea::calcHMarker(gcn::Graphics *const graphics)
+void ScrollArea::calcHMarker(Graphics *const graphics)
 {
-    const gcn::Rectangle dim = getHorizontalMarkerDimension();
+    const Rect dim = getHorizontalMarkerDimension();
 
     if ((mHasMouse) && (mY > (mDimension.height - mScrollbarWidth)))
     {
-        static_cast<Graphics*>(graphics)->calcWindow(
-            mVertexes, dim.x, dim.y, dim.width, dim.height, vMarkerHi);
+        graphics->calcWindow(mVertexes,
+            dim.x, dim.y,
+            dim.width, dim.height,
+            vMarkerHi);
     }
     else
     {
-        static_cast<Graphics*>(graphics)->calcWindow(
-            mVertexes, dim.x, dim.y, dim.width, dim.height, vMarker);
+        graphics->calcWindow(mVertexes,
+            dim.x, dim.y,
+            dim.width, dim.height,
+            vMarker);
     }
 }
 
-void ScrollArea::mouseMoved(gcn::MouseEvent& event)
+void ScrollArea::mouseMoved(MouseEvent& event)
 {
     mX = event.getX();
     mY = event.getY();
 }
 
-void ScrollArea::mouseEntered(gcn::MouseEvent& event A_UNUSED)
+void ScrollArea::mouseEntered(MouseEvent& event A_UNUSED)
 {
     mHasMouse = true;
 }
 
-void ScrollArea::mouseExited(gcn::MouseEvent& event A_UNUSED)
+void ScrollArea::mouseExited(MouseEvent& event A_UNUSED)
 {
     mHasMouse = false;
 }
 
-void ScrollArea::widgetResized(const gcn::Event &event A_UNUSED)
+void ScrollArea::widgetResized(const Event &event A_UNUSED)
 {
     mRedraw = true;
     const unsigned int frameSize = 2 * mFrameSize;
-    gcn::Widget *const content = getContent();
+    Widget *const content = getContent();
     if (content)
     {
         content->setSize(mDimension.width - frameSize,
@@ -656,12 +664,12 @@ void ScrollArea::widgetResized(const gcn::Event &event A_UNUSED)
     }
 }
 
-void ScrollArea::widgetMoved(const gcn::Event& event A_UNUSED)
+void ScrollArea::widgetMoved(const Event& event A_UNUSED)
 {
     mRedraw = true;
 }
 
-void ScrollArea::mousePressed(gcn::MouseEvent& event)
+void ScrollArea::mousePressed(MouseEvent& event)
 {
     const int x = event.getX();
     const int y = event.getY();
@@ -731,16 +739,16 @@ void ScrollArea::mousePressed(gcn::MouseEvent& event)
         }
     }
 
-    if (event.getButton() == gcn::MouseEvent::LEFT)
+    if (event.getButton() == MouseEvent::LEFT)
     {
         mClickX = event.getX();
         mClickY = event.getY();
     }
 }
 
-void ScrollArea::mouseReleased(gcn::MouseEvent& event)
+void ScrollArea::mouseReleased(MouseEvent& event)
 {
-    if (event.getButton() == gcn::MouseEvent::LEFT && mClickX && mClickY)
+    if (event.getButton() == MouseEvent::LEFT && mClickX && mClickY)
     {
         if (!event.isConsumed())
         {
@@ -799,11 +807,11 @@ void ScrollArea::mouseReleased(gcn::MouseEvent& event)
     mRedraw = true;
 }
 
-void ScrollArea::mouseDragged(gcn::MouseEvent &event)
+void ScrollArea::mouseDragged(MouseEvent &event)
 {
     if (mIsVerticalMarkerDragged)
     {
-        const gcn::Rectangle barDim = getVerticalBarDimension();
+        const Rect barDim = getVerticalBarDimension();
 
         const int pos = event.getY() - barDim.y
               - mVerticalMarkerDragOffset;
@@ -822,7 +830,7 @@ void ScrollArea::mouseDragged(gcn::MouseEvent &event)
 
     if (mIsHorizontalMarkerDragged)
     {
-        const gcn::Rectangle barDim = getHorizontalBarDimension();
+        const Rect barDim = getHorizontalBarDimension();
 
         const int pos = event.getX() - barDim.x
             - mHorizontalMarkerDragOffset;
@@ -843,56 +851,56 @@ void ScrollArea::mouseDragged(gcn::MouseEvent &event)
     mRedraw = true;
 }
 
-gcn::Rectangle ScrollArea::getVerticalBarDimension() const
+Rect ScrollArea::getVerticalBarDimension() const
 {
     if (!mVBarVisible)
-        return gcn::Rectangle(0, 0, 0, 0);
+        return Rect(0, 0, 0, 0);
 
     const int height = (mVBarVisible && mShowButtons) ? mScrollbarWidth : 0;
     if (mHBarVisible)
     {
-        return gcn::Rectangle(mDimension.width - mScrollbarWidth,
+        return Rect(mDimension.width - mScrollbarWidth,
             height,
             mScrollbarWidth,
             mDimension.height - 2 * height - mScrollbarWidth);
     }
 
-    return gcn::Rectangle(mDimension.width - mScrollbarWidth,
+    return Rect(mDimension.width - mScrollbarWidth,
         height,
         mScrollbarWidth,
         mDimension.height - 2 * height);
 }
 
-gcn::Rectangle ScrollArea::getHorizontalBarDimension() const
+Rect ScrollArea::getHorizontalBarDimension() const
 {
     if (!mHBarVisible)
-        return gcn::Rectangle(0, 0, 0, 0);
+        return Rect(0, 0, 0, 0);
 
     const int width = mShowButtons ? mScrollbarWidth : 0;
     if (mVBarVisible)
     {
-        return gcn::Rectangle(width,
+        return Rect(width,
             mDimension.height - mScrollbarWidth,
             mDimension.width - 2 * width - mScrollbarWidth,
             mScrollbarWidth);
     }
 
-    return gcn::Rectangle(width,
+    return Rect(width,
                       mDimension.height - mScrollbarWidth,
                       mDimension.width - 2 * width,
                       mScrollbarWidth);
 }
 
-gcn::Rectangle ScrollArea::getVerticalMarkerDimension()
+Rect ScrollArea::getVerticalMarkerDimension()
 {
     if (!mVBarVisible)
-        return gcn::Rectangle(0, 0, 0, 0);
+        return Rect(0, 0, 0, 0);
 
     int length, pos;
     int height;
     const int h2 = mShowButtons
         ? mScrollbarWidth : mMarkerSize / 2;
-    const gcn::Widget *content;
+    const Widget *content;
     if (!mWidgets.empty())
         content = *mWidgets.begin();
     else
@@ -937,20 +945,20 @@ gcn::Rectangle ScrollArea::getVerticalMarkerDimension()
             pos = 0;
     }
 
-    return gcn::Rectangle(mDimension.width - mScrollbarWidth, h2 + pos,
+    return Rect(mDimension.width - mScrollbarWidth, h2 + pos,
         mScrollbarWidth, length);
 }
 
-gcn::Rectangle ScrollArea::getHorizontalMarkerDimension()
+Rect ScrollArea::getHorizontalMarkerDimension()
 {
     if (!mHBarVisible)
-        return gcn::Rectangle(0, 0, 0, 0);
+        return Rect(0, 0, 0, 0);
 
     int length, pos;
     int width;
     const int w2 = mShowButtons
         ? mScrollbarWidth : mMarkerSize / 2;
-    const gcn::Widget *content;
+    const Widget *content;
     if (!mWidgets.empty())
         content = *mWidgets.begin();
     else
@@ -999,61 +1007,61 @@ gcn::Rectangle ScrollArea::getHorizontalMarkerDimension()
         }
     }
 
-    return gcn::Rectangle(w2 + pos, mDimension.height - mScrollbarWidth,
+    return Rect(w2 + pos, mDimension.height - mScrollbarWidth,
         length, mScrollbarWidth);
 }
 
-gcn::Rectangle ScrollArea::getUpButtonDimension() const
+Rect ScrollArea::getUpButtonDimension() const
 {
     if (!mVBarVisible || !mShowButtons)
-        return gcn::Rectangle(0, 0, 0, 0);
+        return Rect(0, 0, 0, 0);
 
-    return gcn::Rectangle(mDimension.width - mScrollbarWidth, 0,
+    return Rect(mDimension.width - mScrollbarWidth, 0,
         mScrollbarWidth, mScrollbarWidth);
 }
 
-gcn::Rectangle ScrollArea::getDownButtonDimension() const
+Rect ScrollArea::getDownButtonDimension() const
 {
     if (!mVBarVisible || !mShowButtons)
-        return gcn::Rectangle(0, 0, 0, 0);
+        return Rect(0, 0, 0, 0);
 
     if (mVBarVisible && mHBarVisible)
     {
-        return gcn::Rectangle(mDimension.width - mScrollbarWidth,
+        return Rect(mDimension.width - mScrollbarWidth,
             mDimension.height - mScrollbarWidth*2,
             mScrollbarWidth,
             mScrollbarWidth);
     }
 
-    return gcn::Rectangle(mDimension.width - mScrollbarWidth,
+    return Rect(mDimension.width - mScrollbarWidth,
         mDimension.height - mScrollbarWidth,
         mScrollbarWidth,
         mScrollbarWidth);
 }
 
-gcn::Rectangle ScrollArea::getLeftButtonDimension() const
+Rect ScrollArea::getLeftButtonDimension() const
 {
     if (!mHBarVisible || !mShowButtons)
-        return gcn::Rectangle(0, 0, 0, 0);
+        return Rect(0, 0, 0, 0);
 
-    return gcn::Rectangle(0, mDimension.height - mScrollbarWidth,
+    return Rect(0, mDimension.height - mScrollbarWidth,
         mScrollbarWidth, mScrollbarWidth);
 }
 
-gcn::Rectangle ScrollArea::getRightButtonDimension() const
+Rect ScrollArea::getRightButtonDimension() const
 {
     if (!mHBarVisible || !mShowButtons)
-        return gcn::Rectangle(0, 0, 0, 0);
+        return Rect(0, 0, 0, 0);
 
     if (mVBarVisible && mHBarVisible)
     {
-        return gcn::Rectangle(mDimension.width - mScrollbarWidth*2,
+        return Rect(mDimension.width - mScrollbarWidth*2,
             mDimension.height - mScrollbarWidth,
             mScrollbarWidth,
             mScrollbarWidth);
     }
 
-    return gcn::Rectangle(mDimension.width - mScrollbarWidth,
+    return Rect(mDimension.width - mScrollbarWidth,
         mDimension.height - mScrollbarWidth,
         mScrollbarWidth,
         mScrollbarWidth);

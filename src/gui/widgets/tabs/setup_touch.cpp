@@ -20,7 +20,11 @@
 
 #include "gui/widgets/tabs/setup_touch.h"
 
+#include "gui/models/namesmodel.h"
+#include "gui/models/touchactionmodel.h"
+
 #include "gui/widgets/layouthelper.h"
+#include "gui/widgets/setuptouchitem.h"
 #include "gui/widgets/scrollarea.h"
 
 #include "utils/gettext.h"
@@ -117,7 +121,7 @@ Setup_Touch::Setup_Touch(const Widget2 *const widget) :
             key, this, event, mActionsList, 250);
     }
 
-    setDimension(gcn::Rectangle(0, 0, 550, 350));
+    setDimension(Rect(0, 0, 550, 350));
 }
 
 Setup_Touch::~Setup_Touch()

@@ -30,7 +30,7 @@
 
 #include "utils/gettext.h"
 
-#include <guichan/font.hpp>
+#include "gui/font.h"
 
 #include "debug.h"
 
@@ -40,7 +40,7 @@ OkDialog::OkDialog(const std::string &restrict title,
                    const bool showCenter, Window *const parent,
                    const int minWidth) :
     Window(title, modal, parent, "ok.xml"),
-    gcn::ActionListener(),
+    ActionListener(),
     mTextBox(new TextBox(this))
 {
     mTextBox->setEditable(false);
@@ -84,7 +84,7 @@ OkDialog::OkDialog(const std::string &restrict title,
         soundManager.playGuiSound(SOUND_ERROR);
 }
 
-void OkDialog::action(const gcn::ActionEvent &event)
+void OkDialog::action(const ActionEvent &event)
 {
     setActionEventId(event.getId());
     distributeActionEvent();

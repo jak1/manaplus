@@ -23,11 +23,11 @@
 #ifndef GUI_WINDOWS_STATUSWINDOW_H
 #define GUI_WINDOWS_STATUSWINDOW_H
 
-#include "depricatedlistener.h"
+#include "listeners/depricatedlistener.h"
 
 #include "gui/widgets/window.h"
 
-#include <guichan/actionlistener.hpp>
+#include "listeners/actionlistener.h"
 
 #include <map>
 
@@ -44,7 +44,7 @@ class VertContainer;
  * \ingroup Interface
  */
 class StatusWindow final : public Window,
-                           public gcn::ActionListener,
+                           public ActionListener,
                            public DepricatedListener
 {
     public:
@@ -83,7 +83,7 @@ class StatusWindow final : public Window,
                                       const int id,
                                       const bool percent = true);
 
-        void action(const gcn::ActionEvent &event) override;
+        void action(const ActionEvent &event) override;
 
         void clearAttributes();
 

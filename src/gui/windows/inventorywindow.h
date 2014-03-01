@@ -24,19 +24,19 @@
 #define GUI_WINDOWS_INVENTORYWINDOW_H
 
 #include "inventory.h"
-#include "depricatedlistener.h"
+
+#include "listeners/depricatedlistener.h"
 
 #include "gui/widgets/window.h"
 
-#include <guichan/actionlistener.hpp>
-#include <guichan/keylistener.hpp>
-#include <guichan/selectionlistener.hpp>
+#include "listeners/actionlistener.h"
+#include "listeners/keylistener.h"
+#include "listeners/selectionlistener.h"
 
 class Button;
 class DropDown;
 class Item;
 class ItemContainer;
-class Label;
 class LayoutCell;
 class ProgressBar;
 class SortListModelInv;
@@ -50,9 +50,9 @@ class TextPopup;
  * \ingroup Interface
  */
 class InventoryWindow final : public Window,
-                              public gcn::ActionListener,
-                              public gcn::KeyListener,
-                              public gcn::SelectionListener,
+                              public ActionListener,
+                              public KeyListener,
+                              public SelectionListener,
                               public InventoryListener,
                               public DepricatedListener
 {
@@ -76,7 +76,7 @@ class InventoryWindow final : public Window,
         /**
          * Called when receiving actions from the widgets.
          */
-        void action(const gcn::ActionEvent &event) override final;
+        void action(const ActionEvent &event) override final;
 
         /**
          * Returns the selected item.
@@ -91,27 +91,27 @@ class InventoryWindow final : public Window,
         /**
          * Handles closing of the window
          */
-        void widgetHidden(const gcn::Event &event) override final;
+        void widgetHidden(const Event &event) override final;
 
         /**
          * Handles the mouse clicks.
          */
-        void mouseClicked(gcn::MouseEvent &event) override final;
+        void mouseClicked(MouseEvent &event) override final;
 
         /**
          * Handles the key presses.
          */
-        void keyPressed(gcn::KeyEvent &event) override final;
+        void keyPressed(KeyEvent &event) override final;
 
         /**
          * Handles the key releases.
          */
-        void keyReleased(gcn::KeyEvent &event) override final;
+        void keyReleased(KeyEvent &event) override final;
 
         /**
          * Updates labels to currently selected item.
          */
-        void valueChanged(const gcn::SelectionEvent &event) override final;
+        void valueChanged(const SelectionEvent &event) override final;
 
         /**
          * Sets whether the split button should be shown.
@@ -144,11 +144,11 @@ class InventoryWindow final : public Window,
 
         bool isInputFocused() const A_WARN_UNUSED;
 
-        void widgetResized(const gcn::Event &event) override final;
+        void widgetResized(const Event &event) override final;
 
-        void mouseMoved(gcn::MouseEvent &event) override final;
+        void mouseMoved(MouseEvent &event) override final;
 
-        void mouseExited(gcn::MouseEvent &event) override final;
+        void mouseExited(MouseEvent &event) override final;
 
         void setVisible(bool visible) override final;
 

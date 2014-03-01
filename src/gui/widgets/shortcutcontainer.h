@@ -23,11 +23,10 @@
 #ifndef GUI_WIDGETS_SHORTCUTCONTAINER_H
 #define GUI_WIDGETS_SHORTCUTCONTAINER_H
 
-#include "gui/widgets/widget2.h"
+#include "gui/widgets/widget.h"
 
-#include <guichan/mouselistener.hpp>
-#include <guichan/widget.hpp>
-#include <guichan/widgetlistener.hpp>
+#include "listeners/mouselistener.h"
+#include "listeners/widgetlistener.h"
 
 class Image;
 class ImageCollection;
@@ -37,10 +36,9 @@ class ImageCollection;
  *
  * \ingroup GUI
  */
-class ShortcutContainer : public gcn::Widget,
-                          public Widget2,
-                          public gcn::WidgetListener,
-                          public gcn::MouseListener
+class ShortcutContainer : public Widget,
+                          public WidgetListener,
+                          public MouseListener
 {
     public:
         A_DELETE_COPY(ShortcutContainer)
@@ -53,34 +51,34 @@ class ShortcutContainer : public gcn::Widget,
         /**
          * Draws the shortcuts
          */
-        virtual void draw(gcn::Graphics *graphics) override = 0;
+        virtual void draw(Graphics *graphics) override = 0;
 
         /**
          * Invoked when a widget changes its size. This is used to determine
          * the new height of the container.
          */
-        virtual void widgetResized(const gcn::Event &event) override final;
+        virtual void widgetResized(const Event &event) override final;
 
-        virtual void widgetMoved(const gcn::Event& event) override final;
+        virtual void widgetMoved(const Event& event) override final;
 
         /**
          * Handles mouse when dragged.
          */
-        virtual void mouseDragged(gcn::MouseEvent &event A_UNUSED) override
+        virtual void mouseDragged(MouseEvent &event A_UNUSED) override
         {
         }
 
         /**
          * Handles mouse when pressed.
          */
-        virtual void mousePressed(gcn::MouseEvent &event A_UNUSED) override
+        virtual void mousePressed(MouseEvent &event A_UNUSED) override
         {
         }
 
         /**
          * Handles mouse release.
          */
-        virtual void mouseReleased(gcn::MouseEvent &event A_UNUSED) override
+        virtual void mouseReleased(MouseEvent &event A_UNUSED) override
         {
         }
 
@@ -102,7 +100,7 @@ class ShortcutContainer : public gcn::Widget,
         /**
          * Constructor. Initializes the shortcut container.
          */
-        explicit ShortcutContainer();
+        explicit ShortcutContainer(Widget2 *const widget);
 
         /**
          * Gets the index from the grid provided the point is in an item box.

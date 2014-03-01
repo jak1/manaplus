@@ -88,18 +88,18 @@
 
         void _endDraw() override final;
 
-        bool pushClipArea(gcn::Rectangle area) override final;
+        bool pushClipArea(Rect area) override final;
 
         void popClipArea() override final;
 
-        void setColor(const gcn::Color &color) override final
+        void setColor(const Color &color) override final
         {
             mColor = color;
             mColor2 = color;
             mColorAlpha = (color.a != 255);
         }
 
-        void setColorAll(const gcn::Color &color, const gcn::Color &color2)
+        void setColorAll(const Color &color, const Color &color2)
         {
             mColor = color;
             mColor2 = color2;
@@ -110,12 +110,12 @@
 
         void drawLine(int x1, int y1, int x2, int y2) override final;
 
-        void drawRectangle(const gcn::Rectangle &rect,
+        void drawRectangle(const Rect &rect,
                            const bool filled);
 
-        void drawRectangle(const gcn::Rectangle &rect) override final;
+        void drawRectangle(const Rect &rect) override final;
 
-        void fillRectangle(const gcn::Rectangle &rect) override final;
+        void fillRectangle(const Rect &rect) override final;
 
         static void dumpSettings();
 
@@ -130,8 +130,8 @@
 
         void updateTextureFormat();
 
-        bool drawImage2(const Image *const image,
-                        int dstX, int dstY) override final;
+        bool drawImage(const Image *const image,
+                       int dstX, int dstY) override final;
 
         void drawImageCached(const Image *const image,
                              int x, int y) override final;

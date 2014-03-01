@@ -34,6 +34,7 @@
 #include "gui/windows/confirmdialog.h"
 #include "gui/windows/tradewindow.h"
 
+#include "net/messagein.h"
 #include "net/net.h"
 
 #include "net/ea/eaprotocol.h"
@@ -48,9 +49,9 @@ ConfirmDialog *confirmDlg = nullptr;
  */
 namespace
 {
-    struct RequestTradeListener : public gcn::ActionListener
+    struct RequestTradeListener : public ActionListener
     {
-        void action(const gcn::ActionEvent &event)
+        void action(const ActionEvent &event)
         {
             confirmDlg = nullptr;
             const std::string &eventId = event.getId();

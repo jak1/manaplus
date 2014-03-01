@@ -44,6 +44,7 @@
 #include "gui/widgets/tabs/setup_video.h"
 #include "gui/widgets/tabs/setup_visual.h"
 
+#include "gui/widgets/button.h"
 #include "gui/widgets/label.h"
 #include "gui/widgets/tabbedarea.h"
 
@@ -58,7 +59,7 @@ SetupWindow *setupWindow = nullptr;
 SetupWindow::SetupWindow() :
     // TRANSLATORS: setup window name
     Window(_("Setup"), false, nullptr, "setup.xml"),
-    gcn::ActionListener(),
+    ActionListener(),
     mTabs(),
     mModsTab(nullptr),
     mWindowsToReset(),
@@ -112,7 +113,7 @@ void SetupWindow::postInit()
             mResetWindows = btn;
     }
 
-    mPanel->setDimension(gcn::Rectangle(5, 5, width - 10, height - 40));
+    mPanel->setDimension(Rect(5, 5, width - 10, height - 40));
     mPanel->enableScrollButtons(true);
 
     mTabs.push_back(new Setup_Video(this));
@@ -149,7 +150,7 @@ void SetupWindow::postInit()
 
     center();
 
-    widgetResized(gcn::Event(nullptr));
+    widgetResized(Event(nullptr));
     setInGame(false);
     enableVisibleSound(true);
 }
@@ -160,7 +161,7 @@ SetupWindow::~SetupWindow()
     mButtons.clear();
 }
 
-void SetupWindow::action(const gcn::ActionEvent &event)
+void SetupWindow::action(const ActionEvent &event)
 {
     if (Game::instance())
         Game::instance()->resetAdjustLevel();
@@ -260,16 +261,16 @@ void SetupWindow::setVisible(bool visible)
     Window::setVisible(visible);
 }
 
-void SetupWindow::widgetResized(const gcn::Event &event)
+void SetupWindow::widgetResized(const Event &event)
 {
     Window::widgetResized(event);
 
-    const gcn::Rectangle area = getChildrenArea();
+    const Rect area = getChildrenArea();
     int x = area.width;
     const int height = area.height;
     const int width = area.width;
     const int buttonPadding = getOption("buttonPadding", 5);
-    mPanel->setDimension(gcn::Rectangle(5, 5, width - 10, height - 40));
+    mPanel->setDimension(Rect(5, 5, width - 10, height - 40));
     FOR_EACH (std::vector<Button*>::iterator, it, mButtons)
     {
         Button *const btn = *it;

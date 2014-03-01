@@ -48,7 +48,7 @@ class ExtendedListBox final : public ListBox
          * Constructor.
          */
         ExtendedListBox(const Widget2 *const widget,
-                        gcn::ListModel *const listModel,
+                        ListModel *const listModel,
                         const std::string &skin,
                         const int rowHeight = 13);
 
@@ -59,7 +59,7 @@ class ExtendedListBox final : public ListBox
         /**
          * Draws the list box.
          */
-        void draw(gcn::Graphics *graphics) override final;
+        void draw(Graphics *graphics) override final;
 
         void adjustSize() override;
 

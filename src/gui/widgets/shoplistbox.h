@@ -42,13 +42,13 @@ class ShopListBox final : public ListBox
          * Constructor.
          */
         ShopListBox(const Widget2 *const widget,
-                    gcn::ListModel *const listModel);
+                    ListModel *const listModel);
 
         /**
          * Constructor with shopitems
          */
         ShopListBox(const Widget2 *const widget,
-                    gcn::ListModel *const listModel,
+                    ListModel *const listModel,
                     ShopItems *const shopListModel);
 
         A_DELETE_COPY(ShopListBox)
@@ -56,7 +56,7 @@ class ShopListBox final : public ListBox
         /**
          * Draws the list box.
          */
-        void draw(gcn::Graphics *graphics) override final;
+        void draw(Graphics *graphics) override final;
 
         /**
          * gives information about the current player's money
@@ -74,11 +74,11 @@ class ShopListBox final : public ListBox
          */
         void setPriceCheck(const bool check);
 
-        void mouseMoved(gcn::MouseEvent &event) override final;
+        void mouseMoved(MouseEvent &event) override final;
 
-        void mouseReleased(gcn::MouseEvent& mouseEvent) override final;
+        void mouseReleased(MouseEvent& mouseEvent) override final;
 
-        void mouseExited(gcn::MouseEvent& mouseEvent) override final;
+        void mouseExited(MouseEvent& mouseEvent) override final;
 
         void setProtectItems(bool p)
         { mProtectItems = p; }
@@ -94,8 +94,8 @@ class ShopListBox final : public ListBox
 
         ItemPopup *mItemPopup;
 
-        gcn::Color mBackgroundColor;
-        gcn::Color mWarningColor;
+        Color mBackgroundColor;
+        Color mWarningColor;
 
         bool mPriceCheck;
         bool mProtectItems;

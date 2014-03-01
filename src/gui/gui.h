@@ -23,18 +23,19 @@
 #ifndef GUI_GUI_H
 #define GUI_GUI_H
 
-#include <guichan/color.hpp>
-#include <guichan/focuslistener.hpp>
-#include <guichan/gui.hpp>
+#include "gui/color.h"
+
+#include "gui/base/gui.hpp"
 
 #include "localconsts.h"
 
+class FocusListener;
 class Graphics;
 class GuiConfigListener;
 class ImageSet;
 class MouseEvent;
 class MouseInput;
-class SDLFont;
+class Font;
 class SDLInput;
 class Window;
 
@@ -89,38 +90,38 @@ class Gui final : public gcn::Gui
          */
         void videoResized() const;
 
-        gcn::FocusHandler *getFocusHandler() const A_WARN_UNUSED
+        FocusHandler *getFocusHandler() const A_WARN_UNUSED
         { return mFocusHandler; }
 
         /**
          * Return game font.
          */
-        SDLFont *getFont() const A_WARN_UNUSED
+        Font *getFont() const A_WARN_UNUSED
         { return mGuiFont; }
 
         /**
          * Return help font.
          */
-        SDLFont *getHelpFont() const A_WARN_UNUSED
+        Font *getHelpFont() const A_WARN_UNUSED
         { return mHelpFont; }
 
         /**
          * Return secure font.
          */
-        SDLFont *getSecureFont() const A_WARN_UNUSED
+        Font *getSecureFont() const A_WARN_UNUSED
         { return mSecureFont; }
 
         /**
          * Return npc font.
          */
-        SDLFont *getNpcFont() const A_WARN_UNUSED
+        Font *getNpcFont() const A_WARN_UNUSED
         { return mNpcFont; }
 
         /**
          * Return the Font used for "Info Particles", i.e. ones showing, what
          * you picked up, etc.
          */
-        SDLFont *getInfoParticleFont() const A_WARN_UNUSED
+        Font *getInfoParticleFont() const A_WARN_UNUSED
         { return mInfoParticleFont; }
 
         /**
@@ -147,17 +148,17 @@ class Gui final : public gcn::Gui
 
         MouseEvent *createMouseEvent(Window *const widget) A_WARN_UNUSED;
 
-        static void getAbsolutePosition(gcn::Widget *restrict widget,
+        static void getAbsolutePosition(Widget *restrict widget,
                                         int &restrict x,
                                         int &restrict y);
 
-        void addGlobalFocusListener(gcn::FocusListener* focusListener);
+        void addGlobalFocusListener(FocusListener* focusListener);
 
-        void removeGlobalFocusListener(gcn::FocusListener* focusListener);
+        void removeGlobalFocusListener(FocusListener* focusListener);
 
-        void distributeGlobalFocusGainedEvent(const gcn::Event &focusEvent);
+        void distributeGlobalFocusGainedEvent(const Event &focusEvent);
 
-        void removeDragged(gcn::Widget *widget);
+        void removeDragged(Widget *widget);
 
         int getLastMouseX() const
         { return mLastMouseX; }
@@ -168,25 +169,25 @@ class Gui final : public gcn::Gui
         static uint32_t getMouseState(int *const x, int *const y);
 
     protected:
-        void handleMouseMoved(const gcn::MouseInput &mouseInput);
+        void handleMouseMoved(const MouseInput &mouseInput);
 
-        void handleMouseReleased(const gcn::MouseInput &mouseInput);
+        void handleMouseReleased(const MouseInput &mouseInput);
 
-        void handleMousePressed(const gcn::MouseInput &mouseInput);
+        void handleMousePressed(const MouseInput &mouseInput);
 
         void handleMouseInput();
 
-        void distributeMouseEvent(gcn::Widget* source, int type, int button,
+        void distributeMouseEvent(Widget* source, int type, int button,
                                   int x, int y, bool force = false,
                                   bool toSourceOnly = false);
 
     private:
         GuiConfigListener *mConfigListener;
-        SDLFont *mGuiFont;                  /**< The global GUI font */
-        SDLFont *mInfoParticleFont;         /**< Font for Info Particles */
-        SDLFont *mHelpFont;                 /**< Font for Help Window */
-        SDLFont *mSecureFont;               /**< Font for secure labels */
-        SDLFont *mNpcFont;                  /**< Font for npc text */
+        Font *mGuiFont;                  /**< The global GUI font */
+        Font *mInfoParticleFont;         /**< Font for Info Particles */
+        Font *mHelpFont;                 /**< Font for Help Window */
+        Font *mSecureFont;               /**< Font for secure labels */
+        Font *mNpcFont;                  /**< Font for npc text */
         ImageSet *mMouseCursors;            /**< Mouse cursor images */
         float mMouseCursorAlpha;
         int mMouseInactivityTimer;
@@ -195,11 +196,11 @@ class Gui final : public gcn::Gui
         uint16_t mLastMouseRealX;
         uint16_t mLastMouseRealY;
 #endif
-        typedef std::list<gcn::FocusListener*> FocusListenerList;
+        typedef std::list<FocusListener*> FocusListenerList;
         typedef FocusListenerList::iterator FocusListenerIterator;
         FocusListenerList mFocusListeners;
-        gcn::Color mForegroundColor;
-        gcn::Color mForegroundColor2;
+        Color mForegroundColor;
+        Color mForegroundColor2;
         int mTime;
         bool mCustomCursor;                 /**< Show custom cursor */
         bool mDoubleClick;
@@ -211,6 +212,6 @@ extern SDLInput *guiInput;                  /**< GUI input */
 /**
  * Bolded text font
  */
-extern SDLFont *boldFont;
+extern Font *boldFont;
 
 #endif  // GUI_GUI_H

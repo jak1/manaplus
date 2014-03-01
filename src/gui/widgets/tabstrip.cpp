@@ -25,19 +25,21 @@
 #include "debug.h"
 
 TabStrip::TabStrip(const Widget2 *const widget,
-                   const std::string &group, const int height,
+                   const std::string &group,
+                   const int height,
                    const int spacing) :
     WidgetGroup(widget, group, height, spacing)
 {
 }
 
 TabStrip::TabStrip(const Widget2 *const widget,
-                   const int height, const int spacing) :
+                   const int height,
+                   const int spacing) :
     WidgetGroup(widget, "", height, spacing)
 {
 }
 
-gcn::Widget *TabStrip::createWidget(const std::string &text) const
+Widget *TabStrip::createWidget(const std::string &text) const
 {
     Button *const widget = new Button(this);
     widget->setStick(true);
@@ -48,12 +50,12 @@ gcn::Widget *TabStrip::createWidget(const std::string &text) const
     return widget;
 }
 
-void TabStrip::action(const gcn::ActionEvent &event)
+void TabStrip::action(const ActionEvent &event)
 {
     WidgetGroup::action(event);
     if (event.getSource())
     {
-        gcn::Widget *const widget = event.getSource();
+        Widget *const widget = event.getSource();
         if (static_cast<Button*>(widget)->isPressed2())
         {
             FOR_EACH (WidgetListConstIterator, iter, mWidgets)

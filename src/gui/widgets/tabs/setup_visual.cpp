@@ -21,8 +21,9 @@
 
 #include "gui/widgets/tabs/setup_visual.h"
 
+#include "gui/models/namesmodel.h"
+
 #include "gui/widgets/layouthelper.h"
-#include "gui/widgets/namesmodel.h"
 #include "gui/widgets/scrollarea.h"
 
 #include "client.h"
@@ -202,7 +203,7 @@ Setup_Visual::Setup_Visual(const Widget2 *const widget) :
     new SetupItemCheckBox(_("Allow screensaver to run"),
         "", "allowscreensaver", this, "allowscreensaverEvent");
 
-    setDimension(gcn::Rectangle(0, 0, 550, 350));
+    setDimension(Rect(0, 0, 550, 350));
 }
 
 Setup_Visual::~Setup_Visual()

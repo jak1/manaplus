@@ -25,12 +25,12 @@
 
 #include "localconsts.h"
 
-#include "gui/widgets/tablemodel.h"
-#include "gui/widgets/widget2.h"
+#include "gui/models/tablemodel.h"
 
-#include <guichan/keylistener.hpp>
-#include <guichan/mouselistener.hpp>
-#include <guichan/widget.hpp>
+#include "listeners/keylistener.h"
+#include "listeners/mouselistener.h"
+
+#include "gui/widgets/widget.h"
 
 #include <vector>
 
@@ -45,10 +45,9 @@ class GuiTableActionListener;
  *
  * \ingroup GUI
  */
-class GuiTable final : public gcn::Widget,
-                       public Widget2,
-                       public gcn::MouseListener,
-                       public gcn::KeyListener,
+class GuiTable final : public Widget,
+                       public MouseListener,
+                       public KeyListener,
                        public TableModelListener
 {
     // so that the action listener can call distributeActionEvent
@@ -94,7 +93,7 @@ public:
     void setWrappingEnabled(bool wrappingEnabled)
     { mWrappingEnabled = wrappingEnabled; }
 
-    gcn::Rectangle getChildrenArea() override final A_WARN_UNUSED;
+    Rect getChildrenArea() override final A_WARN_UNUSED;
 
     /**
      * Toggle whether to use linewise selection mode, in which the table selects
@@ -113,18 +112,18 @@ public:
     }
 
     // Inherited from Widget
-    void draw(gcn::Graphics* graphics) override final;
+    void draw(Graphics* graphics) override final;
 
-    gcn::Widget *getWidgetAt(int x, int y) override final A_WARN_UNUSED;
+    Widget *getWidgetAt(int x, int y) override final A_WARN_UNUSED;
 
-    void moveToTop(gcn::Widget *child) override final;
+    void moveToTop(Widget *child) override final;
 
-    void moveToBottom(gcn::Widget *child) override final;
+    void moveToBottom(Widget *child) override final;
 
-    void _setFocusHandler(gcn::FocusHandler* focusHandler) override final;
+    void _setFocusHandler(FocusHandler* focusHandler) override final;
 
     // Inherited from KeyListener
-    void keyPressed(gcn::KeyEvent& keyEvent) override final;
+    void keyPressed(KeyEvent& keyEvent) override final;
 
     /**
      * Sets the table to be opaque, that is sets the table
@@ -145,13 +144,13 @@ public:
     { return mOpaque; }
 
     // Inherited from MouseListener
-    void mousePressed(gcn::MouseEvent& mouseEvent) override final;
+    void mousePressed(MouseEvent& mouseEvent) override final;
 
-    void mouseWheelMovedUp(gcn::MouseEvent& mouseEvent) override final;
+    void mouseWheelMovedUp(MouseEvent& mouseEvent) override final;
 
-    void mouseWheelMovedDown(gcn::MouseEvent& mouseEvent) override final;
+    void mouseWheelMovedDown(MouseEvent& mouseEvent) override final;
 
-    void mouseDragged(gcn::MouseEvent& mouseEvent) override final;
+    void mouseDragged(MouseEvent& mouseEvent) override final;
 
     // Constraints inherited from TableModelListener
     void modelUpdated(const bool completed) override final;
@@ -181,7 +180,7 @@ private:
     TableModel *mModel;
 
     /** If someone moves a fresh widget to the top, we must display it. */
-    gcn::Widget *mTopWidget;
+    Widget *mTopWidget;
 
     /** Vector for compactness; used as a list in practice. */
     std::vector<GuiTableActionListener *> mActionListeners;
@@ -189,7 +188,7 @@ private:
     /**
      * Holds the background color of the table.
      */
-    gcn::Color mHighlightColor;
+    Color mHighlightColor;
 
     int mSelectedRow;
     int mSelectedColumn;

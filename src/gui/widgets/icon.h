@@ -23,9 +23,7 @@
 #ifndef GUI_WIDGETS_ICON_H
 #define GUI_WIDGETS_ICON_H
 
-#include "gui/widgets/widget2.h"
-
-#include <guichan/widget.hpp>
+#include "gui/widgets/widget.h"
 
 #include "localconsts.h"
 
@@ -36,19 +34,20 @@ class Image;
  *
  * \ingroup GUI
  */
-class Icon final : public gcn::Widget,
-                   public Widget2
+class Icon final : public Widget
 {
     public:
         /**
          * Constructor.
          */
-        Icon(const Widget2 *const widget, const std::string &filename);
+        Icon(const Widget2 *const widget,
+             const std::string &filename);
 
         /**
          * Constructor, uses an existing Image.
          */
-        Icon(const Widget2 *const widget, Image *const image);
+        Icon(const Widget2 *const widget,
+             Image *const image);
 
         A_DELETE_COPY(Icon)
 
@@ -68,7 +67,7 @@ class Icon final : public gcn::Widget,
         /**
          * Draws the Icon.
          */
-        void draw(gcn::Graphics *g) override final;
+        void draw(Graphics *g) override final;
 
     private:
         Image *mImage;

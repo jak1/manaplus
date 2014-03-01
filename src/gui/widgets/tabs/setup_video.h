@@ -25,7 +25,7 @@
 
 #include "gui/widgets/tabs/setuptab.h"
 
-#include <guichan/keylistener.hpp>
+#include "listeners/keylistener.h"
 
 class Button;
 class CheckBox;
@@ -37,7 +37,8 @@ class OpenGLListModel;
 class Slider;
 class TextDialog;
 
-class Setup_Video final : public SetupTab, public gcn::KeyListener
+class Setup_Video final : public SetupTab,
+                          public KeyListener
 {
     public:
         explicit Setup_Video(const Widget2 *const widget);
@@ -50,7 +51,7 @@ class Setup_Video final : public SetupTab, public gcn::KeyListener
 
         void cancel() override final;
 
-        void action(const gcn::ActionEvent &event) override final;
+        void action(const ActionEvent &event) override final;
 
     private:
         bool mFullScreenEnabled;

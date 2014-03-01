@@ -85,6 +85,8 @@
 #include "net/netconsts.h"
 #include "net/partyhandler.h"
 
+#include "particle/particle.h"
+
 #include "resources/imagehelper.h"
 #include "resources/openglimagehelper.h"
 #include "resources/surfaceimagehelper.h"
@@ -101,18 +103,15 @@
 #include "resources/db/moddb.h"
 #include "resources/db/monsterdb.h"
 #include "resources/db/npcdb.h"
-#ifdef MANASERV_SUPPORT
-#include "resources/db/specialdb.h"
-#endif
 #include "resources/db/palettedb.h"
 #include "resources/db/petdb.h"
+#include "resources/db/weaponsdb.h"
 
 #include "utils/base64.h"
 #include "utils/cpu.h"
 #include "utils/files.h"
 #include "utils/fuzzer.h"
 #include "utils/gettext.h"
-#include "utils/files.h"
 #include "utils/mkdir.h"
 #include "utils/paths.h"
 #include "utils/physfstools.h"
@@ -174,7 +173,7 @@ UserPalette *userPalette = nullptr;
 SoundManager soundManager;
 RenderType openGLMode = RENDER_SOFTWARE;
 
-void ErrorListener::action(const gcn::ActionEvent &event)
+void ErrorListener::action(const ActionEvent &event)
 {
     if (event.getId() == "yes")
         openBrowser(client->getSupportUrl());
@@ -193,26 +192,26 @@ int textures_count = 0;
 extern "C" char const *_nl_locale_name_default(void);
 #endif
 
-class AccountListener final : public gcn::ActionListener
+class AccountListener final : public ActionListener
 {
     public:
-        void action(const gcn::ActionEvent &)
+        void action(const ActionEvent &)
         {
             client->setState(STATE_CHAR_SELECT);
         }
 } accountListener;
 
-class LoginListener final : public gcn::ActionListener
+class LoginListener final : public ActionListener
 {
     public:
-        void action(const gcn::ActionEvent &)
+        void action(const ActionEvent &)
         {
             client->setState(STATE_PRE_LOGIN);
         }
 } loginListener;
 
 Client::Client(const Options &options) :
-    gcn::ActionListener(),
+    ActionListener(),
     mOptions(options),
     mConfigDir(),
     mServerConfigDir(),
@@ -613,10 +612,10 @@ static void updateProgress(int cnt)
 {
     const int progress = cnt + loadingProgressCounter;
     const int h = mainGraphics->mHeight;
-    mainGraphics->setColor(gcn::Color(255, 255, 255));
+    mainGraphics->setColor(Color(255, 255, 255));
     const int maxSize = mainGraphics->mWidth - 100;
     const int width = maxSize * progress / 450;
-    mainGraphics->fillRectangle(gcn::Rectangle(50, h - 100, width, 50));
+    mainGraphics->fillRectangle(Rect(50, h - 100, width, 50));
     mainGraphics->updateScreen();
 }
 
@@ -837,6 +836,7 @@ void Client::gameClear()
     MonsterDB::unload();
     NPCDB::unload();
     AvatarDB::unload();
+    WeaponsDB::unload();
     PaletteDB::unload();
     PETDB::unload();
     StatusEffect::unload();
@@ -1351,7 +1351,7 @@ int Client::gameExec()
                             if (mOptions.chooseDefault)
                             {
                                 static_cast<WorldSelectDialog*>(mCurrentDialog)
-                                    ->action(gcn::ActionEvent(nullptr, "ok"));
+                                    ->action(ActionEvent(nullptr, "ok"));
                             }
                         }
                     }
@@ -1463,10 +1463,8 @@ int Client::gameExec()
                     ItemDB::load();
                     Being::load();
                     MonsterDB::load();
-#ifdef MANASERV_SUPPORT
-                    SpecialDB::load();
-#endif
                     AvatarDB::load();
+                    WeaponsDB::load();
                     NPCDB::load();
                     PETDB::load();
                     EmoteDB::load();
@@ -1529,8 +1527,7 @@ int Client::gameExec()
                     mCurrentDialog = new ConnectionDialog(
                         // TRANSLATORS: connection dialog header
                         _("Connecting to the game server"),
-                        Net::getNetworkType() != ServerInfo::MANASERV ?
-                        STATE_CHOOSE_SERVER : STATE_SWITCH_CHARACTER);
+                        STATE_CHOOSE_SERVER);
                     mCurrentDialog->postInit();
                     Net::getGameHandler()->connect();
                     BLOCK_END("Client::gameExec STATE_CONNECT_GAME")
@@ -1853,7 +1850,7 @@ void Client::optionChanged(const std::string &name)
     }
 }
 
-void Client::action(const gcn::ActionEvent &event)
+void Client::action(const ActionEvent &event)
 {
     std::string tab;
     const std::string &eventId = event.getId();
@@ -1912,6 +1909,12 @@ void Client::initRootDir()
         std::string dir;
         Configuration portable;
         portable.init(portableName);
+
+        if (mOptions.brandingPath.empty())
+        {
+            branding.init(portableName);
+            branding.setDefaultValues(getBrandingDefaults());
+        }
 
         logger->log("Portable file: %s", portableName.c_str());
 

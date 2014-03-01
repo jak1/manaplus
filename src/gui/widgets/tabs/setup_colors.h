@@ -24,9 +24,7 @@
 
 #include "gui/widgets/tabs/setuptab.h"
 
-#include <guichan/selectionlistener.hpp>
-
-#include <string>
+#include "listeners/selectionlistener.h"
 
 class BrowserBox;
 class Label;
@@ -37,7 +35,7 @@ class TextField;
 class TextPreview;
 
 class Setup_Colors final : public SetupTab,
-                           public gcn::SelectionListener
+                           public SelectionListener
 {
     public:
         explicit Setup_Colors(const Widget2 *const widget);
@@ -50,9 +48,9 @@ class Setup_Colors final : public SetupTab,
 
         void cancel() override final;
 
-        void action(const gcn::ActionEvent &event) override final;
+        void action(const ActionEvent &event) override final;
 
-        void valueChanged(const gcn::SelectionEvent &event) override final;
+        void valueChanged(const SelectionEvent &event) override final;
 
     private:
         static const char *const rawmsg;

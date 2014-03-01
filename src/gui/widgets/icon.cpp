@@ -22,14 +22,16 @@
 
 #include "gui/widgets/icon.h"
 
+#include "gui/gui.h"
+
 #include "resources/image.h"
 #include "resources/resourcemanager.h"
 
 #include "debug.h"
 
-Icon::Icon(const Widget2 *const widget, const std::string &file) :
-    gcn::Widget(),
-    Widget2(widget),
+Icon::Icon(const Widget2 *const widget,
+           const std::string &file) :
+    Widget(widget),
     mImage(ResourceManager::getInstance()->getImage(file))
 {
     if (mImage)
@@ -39,9 +41,9 @@ Icon::Icon(const Widget2 *const widget, const std::string &file) :
     }
 }
 
-Icon::Icon(const Widget2 *const widget, Image *const image) :
-    gcn::Widget(),
-    Widget2(widget),
+Icon::Icon(const Widget2 *const widget,
+           Image *const image) :
+    Widget(widget),
     mImage(image)
 {
     if (mImage)
@@ -67,13 +69,12 @@ void Icon::setImage(Image *const image)
     }
 }
 
-void Icon::draw(gcn::Graphics *g)
+void Icon::draw(Graphics *graphics)
 {
     BLOCK_START("Icon::draw")
     if (mImage)
     {
-        Graphics *const graphics = static_cast<Graphics*>(g);
-        graphics->drawImage2(mImage,
+        graphics->drawImage(mImage,
             (mDimension.width - mImage->mBounds.w) / 2,
             (mDimension.height - mImage->mBounds.h) / 2);
     }

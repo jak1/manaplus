@@ -80,75 +80,16 @@
 
 #include "input/keyinput.h"
 
-#include "mouseinput.h"
-
 #include <SDL_events.h>
 
-#include <guichan/input.hpp>
-#include <guichan/keyinput.hpp>
-#include <guichan/mouseinput.hpp>
+#include "input/mouseinput.h"
 
 #include <queue>
 
-namespace Key
-{
-    enum
-    {
-        SPACE              = ' ',
-        TAB                = '\t',
-        ENTER              = '\n',
-        // Negative values, to avoid conflicts with higher character codes.
-        LEFT_ALT           = -1000,
-        RIGHT_ALT,
-        LEFT_SHIFT,
-        RIGHT_SHIFT,
-        LEFT_CONTROL,
-        RIGHT_CONTROL,
-        LEFT_META,
-        RIGHT_META,
-        LEFT_SUPER,
-        RIGHT_SUPER,
-        INSERT,
-        HOME,
-        PAGE_UP,
-        DELETE_,
-        END,
-        PAGE_DOWN,
-        ESCAPE,
-        CAPS_LOCK,
-        BACKSPACE,
-        F1,
-        F2,
-        F3,
-        F4,
-        F5,
-        F6,
-        F7,
-        F8,
-        F9,
-        F10,
-        F11,
-        F12,
-        F13,
-        F14,
-        F15,
-        PRINT_SCREEN,
-        SCROLL_LOCK,
-        PAUSE,
-        NUM_LOCK,
-        ALT_GR,
-        LEFT,
-        RIGHT,
-        UP,
-        DOWN,
-        TEXTINPUT
-    };
-}  // namespace Key
-
 /**
- * SDL implementation of Input.
+ * SDL implementation of SDLInput.
  */
-class SDLInput final : public gcn::Input
+class SDLInput final
 {
 public:
     /**
@@ -166,26 +107,18 @@ public:
      */
     void pushInput(const SDL_Event &event);
 
-    /**
-     * Polls all input. It exists for input driver compatibility. If you
-     * only use SDL and plan sticking with SDL you can safely ignore this
-     * function as it in the SDL case does nothing.
-     */
-    void _pollInput() override final
-    { }
-
     KeyInput dequeueKeyInput2() A_WARN_UNUSED;
 
-    gcn::KeyInput dequeueKeyInput() override final A_WARN_UNUSED
-    { return gcn::KeyInput(); }
+    KeyInput dequeueKeyInput() A_WARN_UNUSED
+    { return KeyInput(); }
 
-    // Inherited from Input
+    // Inherited from SDLInput
 
-    bool isKeyQueueEmpty() override final A_WARN_UNUSED;
+    bool isKeyQueueEmpty() const A_WARN_UNUSED;
 
-    bool isMouseQueueEmpty() override final A_WARN_UNUSED;
+    bool isMouseQueueEmpty() const A_WARN_UNUSED;
 
-    gcn::MouseInput dequeueMouseInput() override final A_WARN_UNUSED;
+    MouseInput dequeueMouseInput() A_WARN_UNUSED;
 
     MouseInput dequeueMouseInput2() A_WARN_UNUSED;
 
