@@ -193,6 +193,8 @@ ServerDialog::ServerDialog(ServerInfo *const serverInfo,
     KeyListener(),
     SelectionListener(),
     mMutex(),
+    mServers(ServerInfos()),
+    mDir(dir),
     mDescription(new Label(this, std::string())),
     // TRANSLATORS: servers dialog button
     mQuitButton(new Button(this, _("Quit"), "quit", this)),
@@ -206,15 +208,13 @@ ServerDialog::ServerDialog(ServerInfo *const serverInfo,
     mDeleteButton(new Button(this, _("Delete"), "remove", this)),
     // TRANSLATORS: servers dialog button
     mLoadButton(new Button(this, _("Load"), "load", this)),
-    mServers(ServerInfos()),
     mServersListModel(new ServersListModel(&mServers, this)),
     mServersList(new ServersListBox(this, mServersListModel)),
-    mDir(dir),
-    mDownloadStatus(DOWNLOADING_UNKNOWN),
     mDownload(nullptr),
-    mDownloadProgress(-1.0F),
     mServerInfo(serverInfo),
-    mPersistentIPCheckBox(nullptr)
+    mPersistentIPCheckBox(nullptr),
+    mDownloadProgress(-1.0F),
+    mDownloadStatus(DOWNLOADING_UNKNOWN)
 {
     mServersList->postInit();
 
@@ -240,7 +240,7 @@ ServerDialog::ServerDialog(ServerInfo *const serverInfo,
 
     ScrollArea *const usedScroll = new ScrollArea(this, mServersList,
         getOptionBool("showbackground"), "server_background.xml");
-    usedScroll->setHorizontalScrollPolicy(gcn::ScrollArea::SHOW_NEVER);
+    usedScroll->setHorizontalScrollPolicy(ScrollArea::SHOW_NEVER);
 
     mServersList->addSelectionListener(this);
     usedScroll->setVerticalScrollAmount(0);

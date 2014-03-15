@@ -75,19 +75,17 @@
 #include "gui/widgets/scrollarea.h"
 #include "gui/widgets/tabs/tab.h"
 
-#include "gui/base/widgets/container.hpp"
-
 #include "debug.h"
 
 TabbedArea::TabbedArea(const Widget2 *const widget) :
     ActionListener(),
-    gcn::BasicContainer(widget),
+    BasicContainer(widget),
     KeyListener(),
     MouseListener(),
     WidgetListener(),
     mSelectedTab(nullptr),
-    mTabContainer(new gcn::Container(widget)),
-    mWidgetContainer(new gcn::Container(widget)),
+    mTabContainer(new BasicContainer2(widget)),
+    mWidgetContainer(new BasicContainer2(widget)),
     mTabsToDelete(),
     mTabs(),
     mTabsWidth(0),
@@ -768,7 +766,7 @@ void TabbedArea::death(const Event &event)
     if (tab)
         removeTab(tab);
     else
-        gcn::BasicContainer::death(event);
+        BasicContainer::death(event);
 }
 
 void TabbedArea::selectNextTab()

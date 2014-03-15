@@ -366,6 +366,12 @@ static SetupActionData setupActionData2[] =
     },
     {
         // TRANSLATORS: input action name
+        N_("About Window"),
+        Input::KEY_WINDOW_ABOUT,
+        "",
+    },
+    {
+        // TRANSLATORS: input action name
         N_("Help Window"),
         Input::KEY_WINDOW_HELP,
         "",
@@ -1229,6 +1235,67 @@ static SetupActionData setupActionData5[] =
         // TRANSLATORS: input action name
         N_("Chat modifier key"),
         Input::KEY_CHAT_MOD,
+        "",
+    },
+    {
+        // TRANSLATORS: input action name
+        N_("Show smiles"),
+        Input::KEY_GUI_F1,
+        "",
+    },
+    {
+        "F2",
+        Input::KEY_GUI_F2,
+        "",
+    },
+    {
+        "F3",
+        Input::KEY_GUI_F3,
+        "",
+    },
+    {
+        "F4",
+        Input::KEY_GUI_F4,
+        "",
+    },
+    {
+        "F5",
+        Input::KEY_GUI_F5,
+        "",
+    },
+    {
+        "F6",
+        Input::KEY_GUI_F6,
+        "",
+    },
+    {
+        "F7",
+        Input::KEY_GUI_F7,
+        "",
+    },
+    {
+        "F8",
+        Input::KEY_GUI_F8,
+        "",
+    },
+    {
+        "F9",
+        Input::KEY_GUI_F9,
+        "",
+    },
+    {
+        "F10",
+        Input::KEY_GUI_F10,
+        "",
+    },
+    {
+        "F11",
+        Input::KEY_GUI_F11,
+        "",
+    },
+    {
+        "F12",
+        Input::KEY_GUI_F12,
         "",
     },
     {

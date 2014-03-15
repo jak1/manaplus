@@ -71,7 +71,7 @@
 #include "listeners/mouselistener.h"
 #include "listeners/widgetlistener.h"
 
-#include "gui/base/widgets/container.hpp"
+#include "gui/widgets/basiccontainer2.h"
 
 #include "localconsts.h"
 
@@ -88,7 +88,7 @@ class WindowContainer;
  *
  * \ingroup GUI
  */
-class Window : public gcn::Container,
+class Window : public BasicContainer2,
                public MouseListener,
                private WidgetListener
 {
@@ -498,7 +498,7 @@ class Window : public gcn::Container,
          * @return The title bar height.
          * @see setTitleBarHeight
          */
-        unsigned int getTitleBarHeight()
+        unsigned int getTitleBarHeight() const
         { return mTitleBarHeight; }
 
         /**

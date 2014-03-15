@@ -62,6 +62,7 @@ dyecmd_SOURCES += dyetool/dyemain.cpp \
 	      render/sdl2graphics.h \
 	      render/sdlgraphics.cpp \
 	      render/sdlgraphics.h \
+	      render/softwaregraphicsdef.hpp \
 	      resources/action.cpp \
 	      resources/action.h \
 	      resources/animation.cpp \
@@ -152,14 +153,13 @@ endif
 
 manaplus_SOURCES += events/actionevent.h \
 	      listeners/actionlistener.h \
-	      gui/base/basiccontainer.hpp \
+	      gui/widgets/basiccontainer.h \
 	      gui/cliprect.h \
 	      gui/color.h \
 	      listeners/deathlistener.h \
 	      events/event.h \
 	      listeners/focuslistener.h \
 	      render/graphics.h \
-	      gui/base/gui.hpp \
 	      events/inputguievent.h \
 	      input/key.h \
 	      events/keyevent.h \
@@ -174,33 +174,14 @@ manaplus_SOURCES += events/actionevent.h \
 	      utils/sdlpixel.h \
 	      gui/widgets/widget.h \
 	      listeners/widgetlistener.h \
-	      gui/base/widgets/button.hpp \
-	      gui/base/widgets/checkbox.hpp \
-	      gui/base/widgets/container.hpp \
-	      gui/base/widgets/label.hpp \
-	      gui/base/widgets/listbox.hpp \
-	      gui/base/widgets/radiobutton.hpp \
-	      gui/base/widgets/scrollarea.hpp \
-	      gui/base/widgets/slider.hpp \
-	      gui/base/widgets/textbox.hpp \
-	      gui/base/widgets/textfield.hpp \
-	      gui/base/basiccontainer.cpp \
+	      gui/widgets/basiccontainer2.h \
+	      gui/widgets/basiccontainer.cpp \
 	      gui/cliprect.cpp \
 	      gui/color.cpp \
-	      gui/base/gui.cpp \
 	      input/key.cpp \
 	      gui/rect.cpp \
 	      gui/widgets/widget.cpp \
-	      gui/base/widgets/button.cpp \
-	      gui/base/widgets/checkbox.cpp \
-	      gui/base/widgets/container.cpp \
-	      gui/base/widgets/label.cpp \
-	      gui/base/widgets/listbox.cpp \
-	      gui/base/widgets/radiobutton.cpp \
-	      gui/base/widgets/scrollarea.cpp \
-	      gui/base/widgets/slider.cpp \
-	      gui/base/widgets/textbox.cpp \
-	      gui/base/widgets/textfield.cpp
+	      gui/widgets/basiccontainer2.cpp
 
 manaplus_SOURCES += gui/widgets/avatarlistbox.cpp \
 	      gui/widgets/avatarlistbox.h \
@@ -819,11 +800,13 @@ manaplus_SOURCES += gui/widgets/avatarlistbox.cpp \
 	      notifications.h \
 	      notifymanager.cpp \
 	      notifymanager.h \
+	      render/graphicsdef.hpp \
 	      render/graphics_calcImageRect.hpp \
 	      render/graphics_drawImageRect.hpp \
 	      render/nullopenglgraphics.cpp \
 	      render/nullopenglgraphics.h \
 	      render/openglgraphicsdef.hpp \
+	      render/openglgraphicsdefadvanced.hpp \
 	      render/renderers.cpp \
 	      render/renderers.h \
 	      render/rendererslistsdl.h \
@@ -856,6 +839,7 @@ manaplus_SOURCES += gui/widgets/avatarlistbox.cpp \
 	      render/sdl2softwaregraphics.h \
 	      render/sdlgraphics.cpp \
 	      render/sdlgraphics.h \
+	      render/softwaregraphicsdef.hpp \
 	      sdlshared.h \
 	      shopitem.cpp \
 	      shopitem.h \

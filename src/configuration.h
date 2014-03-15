@@ -225,6 +225,8 @@ class ConfigurationObject
 #endif
 };
 
+#define valTest(num) mStatsRe##num
+
 /**
  * Configuration handler for reading (and writing).
  *
@@ -346,6 +348,8 @@ class Configuration final : public ConfigurationObject
         std::string getFileName() const A_WARN_UNUSED
         { return mFilename; }
 
+        void writeUpdated();
+
     private:
         /**
          * Clean up the default values member.
@@ -365,6 +369,7 @@ class Configuration final : public ConfigurationObject
         std::string mDirectory;
         std::string mFilename;
         bool mUseResManager;
+        bool mUpdated;
 };
 
 extern Configuration branding;

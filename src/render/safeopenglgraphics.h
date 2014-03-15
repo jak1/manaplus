@@ -50,44 +50,11 @@ class SafeOpenGLGraphics final : public Graphics
 
         ~SafeOpenGLGraphics();
 
+        #include "render/graphicsdef.hpp"
+
         #include "render/openglgraphicsdef.hpp"
 
-        /**
-         * Draws a rectangle using images. 4 corner images, 4 side images and 1
-         * image for the inside.
-         */
-        void drawImageRect(int x, int y, int w, int h,
-                           const ImageRect &imgRect);
-
-        bool drawNet(const int x1, const int y1,
-                     const int x2, const int y2,
-                     const int width, const int height) override final;
-
-    protected:
-        void setTexturingAndBlending(const bool enable);
-
     private:
-        void inline setColorAlpha(const float alpha);
-
-        void inline restoreColor();
-
-        void inline calcImageRect(ImageVertexes *const vert,
-                                  int x, int y,
-                                  int w, int h,
-                                  const ImageRect &imgRect);
-
-        void calcPatternInline(ImageVertexes *const vert,
-                               const Image *const image,
-                               const int x, const int y,
-                               const int w, const int h) const;
-
-        void inline calcTileVertexesInline(ImageVertexes *const vert,
-                                           const Image *const image,
-                                           int x, int y) const;
-
-        bool inline drawImageInline(const Image *const image,
-                                    int dstX, int dstY);
-
         bool mTexture;
         bool mIsByteColor;
         Color mByteColor;

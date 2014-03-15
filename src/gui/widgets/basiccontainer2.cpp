@@ -65,128 +65,65 @@
  * For comments regarding functions please see the header file.
  */
 
-#include "gui/base/widgets/button.hpp"
-
-#include "events/mouseevent.h"
-
-#include "render/graphics.h"
+#include "gui/widgets/basiccontainer2.h"
 
 #include "debug.h"
 
-namespace gcn
+BasicContainer2::BasicContainer2(const Widget2 *const widget) :
+    BasicContainer(widget),
+    mOpaque(true)
 {
-    Button::Button(const Widget2 *const widget) :
-        Widget(widget),
-        MouseListener(),
-        KeyListener(),
-        FocusListener(),
-        mCaption(),
-        mHasMouse(false),
-        mKeyPressed(false),
-        mMousePressed(false),
-        mAlignment(Graphics::CENTER),
-        mSpacing(4)
-    {
-        setFocusable(true);
-        adjustSize();
-        setFrameSize(1);
+}
 
-        addMouseListener(this);
-        addKeyListener(this);
-        addFocusListener(this);
+BasicContainer2::~BasicContainer2()
+{
+}
+
+void BasicContainer2::draw(Graphics* graphics)
+{
+    BLOCK_START("BasicContainer2::draw")
+    if (isOpaque())
+    {
+        graphics->setColor(getBaseColor());
+        graphics->fillRectangle(Rect(0, 0, getWidth(), getHeight()));
     }
 
-    Button::Button(const Widget2 *const widget,
-                   const std::string& caption) :
-        Widget(widget),
-        MouseListener(),
-        KeyListener(),
-        FocusListener(),
-        mCaption(caption),
-        mHasMouse(false),
-        mKeyPressed(false),
-        mMousePressed(false),
-        mAlignment(Graphics::CENTER),
-        mSpacing(4)
-    {
-        setFocusable(true);
-        adjustSize();
-        setFrameSize(1);
+    drawChildren(graphics);
+    BLOCK_END("BasicContainer2::draw")
+}
 
-        addMouseListener(this);
-        addKeyListener(this);
-        addFocusListener(this);
-    }
+void BasicContainer2::setOpaque(bool opaque)
+{
+    mOpaque = opaque;
+}
 
-    void Button::setCaption(const std::string& caption)
-    {
-        mCaption = caption;
-    }
+bool BasicContainer2::isOpaque() const
+{
+    return mOpaque;
+}
 
-    const std::string& Button::getCaption() const
-    {
-        return mCaption;
-    }
+void BasicContainer2::add(Widget* widget)
+{
+    BasicContainer::add(widget);
+}
 
-    void Button::setAlignment(Graphics::Alignment alignment)
-    {
-        mAlignment = alignment;
-    }
+void BasicContainer2::add(Widget* widget, int x, int y)
+{
+    widget->setPosition(x, y);
+    BasicContainer::add(widget);
+}
 
-    Graphics::Alignment Button::getAlignment() const
-    {
-        return mAlignment;
-    }
+void BasicContainer2::remove(Widget* widget)
+{
+    BasicContainer::remove(widget);
+}
 
-    void Button::setSpacing(unsigned int spacing)
-    {
-        mSpacing = spacing;
-    }
+void BasicContainer2::clear()
+{
+    BasicContainer::clear();
+}
 
-    unsigned int Button::getSpacing() const
-    {
-      return mSpacing;
-    }
-
-    void Button::adjustSize()
-    {
-    }
-
-    bool Button::isPressed() const
-    {
-        if (mMousePressed)
-            return mHasMouse;
-        else
-            return mKeyPressed;
-    }
-
-    void Button::mousePressed(MouseEvent& mouseEvent)
-    {
-        if (mouseEvent.getButton() == MouseEvent::LEFT)
-        {
-            mMousePressed = true;
-            mouseEvent.consume();
-        }
-    }
-
-    void Button::mouseExited(MouseEvent& mouseEvent A_UNUSED)
-    {
-        mHasMouse = false;
-    }
-
-    void Button::mouseEntered(MouseEvent& mouseEvent A_UNUSED)
-    {
-        mHasMouse = true;
-    }
-
-    void Button::mouseDragged(MouseEvent& mouseEvent)
-    {
-        mouseEvent.consume();
-    }
-
-    void Button::focusLost(const Event& event A_UNUSED)
-    {
-        mMousePressed = false;
-        mKeyPressed = false;
-    }
-}  // namespace gcn
+Widget* BasicContainer2::findWidgetById(const std::string &id)
+{
+    return BasicContainer::findWidgetById(id);
+}

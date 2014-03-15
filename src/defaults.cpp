@@ -124,6 +124,7 @@ DefaultsData* getConfigDefaults()
     AddDEF("showChatColorsList", false);
     AddDEF("customcursor", false);
     AddDEF("showDidYouKnow", false);
+    AddDEF("longmouseclick", true);
 #else
     AddDEF("screenwidth", defaultScreenWidth);
     AddDEF("screenheight", defaultScreenHeight);
@@ -141,6 +142,7 @@ DefaultsData* getConfigDefaults()
     AddDEF("customcursor", true);
 #endif
     AddDEF("showDidYouKnow", true);
+    AddDEF("longmouseclick", false);
 #endif
     AddDEF("showEmotesButton", true);
     AddDEF("screen", false);
@@ -163,7 +165,7 @@ DefaultsData* getConfigDefaults()
     AddDEF("leftTolerance", 100);
     AddDEF("rightTolerance", 100);
     AddDEF("logNpcInGui", true);
-    AddDEF("download-music", false);
+    AddDEF("download-music", true);
     AddDEF("guialpha", 0.8F);
     AddDEF("ChatLogLength", 0);
     AddDEF("enableChatLog", true);
@@ -320,15 +322,15 @@ DefaultsData* getConfigDefaults()
     AddDEF("serverslistupdate", "");
     AddDEF("fadeoutmusic", true);
     AddDEF("screenActionKeyboard", Input::KEY_SHOW_KEYBOARD);
-    AddDEF("screenActionButton0", Input::KEY_STOP_SIT);
+    AddDEF("screenActionButton0", Input::KEY_TALK);
     AddDEF("screenActionButton1", Input::KEY_TARGET_ATTACK);
     AddDEF("screenActionButton2", Input::KEY_PICKUP);
-    AddDEF("screenActionButton3", Input::KEY_PATHFIND);
-    AddDEF("screenActionButton4", Input::KEY_STOP_ATTACK);
-    AddDEF("screenActionButton5", Input::KEY_TALK);
-    AddDEF("screenActionButton6", Input::KEY_TARGET_NPC);
-    AddDEF("screenActionButton7", Input::KEY_TARGET_MONSTER);
-    AddDEF("screenActionButton8", Input::KEY_WINDOW_CHAT);
+    AddDEF("screenActionButton3", Input::KEY_STOP_SIT);
+    AddDEF("screenActionButton4", Input::KEY_TARGET_NPC);
+    AddDEF("screenActionButton5", Input::KEY_WINDOW_STATUS);
+    AddDEF("screenActionButton6", Input::KEY_WINDOW_INVENTORY);
+    AddDEF("screenActionButton7", Input::KEY_WINDOW_SKILL);
+    AddDEF("screenActionButton8", Input::KEY_WINDOW_SOCIAL);
     AddDEF("screenActionButton9", Input::KEY_WINDOW_DEBUG);
     AddDEF("screenActionButton10", Input::KEY_TRADE);
     AddDEF("screenActionButton11", Input::KEY_DIRECT_DOWN);
@@ -346,7 +348,7 @@ DefaultsData* getConfigDefaults()
     AddDEF("uselonglivesprites", false);
     AddDEF("uselonglivesounds", true);
     AddDEF("screenDensity", 0);
-    AddDEF("cfgver", 6);
+    AddDEF("cfgver", 7);
     AddDEF("enableDebugLog", false);
     AddDEF("doubleClick", true);
     AddDEF("useDiagonalSpeed", true);
@@ -358,6 +360,7 @@ DefaultsData* getConfigDefaults()
     AddDEF("playMapAnimations", true);
     AddDEF("usepets", true);
     AddDEF("scale", 1);
+    AddDEF("addwatermark", true);
     return configData;
 }
 

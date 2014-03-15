@@ -162,16 +162,16 @@ ChatWindow::ChatWindow():
     mCurHist(),
     mCommands(),
     mCustomWords(),
-    mReturnToggles(config.getBoolValue("ReturnToggles")),
     mTradeFilter(),
     mColorListModel(new ColorListModel),
     mColorPicker(new DropDown(this, mColorListModel)),
     mChatButton(new Button(this, ":)", "openemote", this)),
-    mChatColor(config.getIntValue("chatColor")),
-    mChatHistoryIndex(0),
     mAwayLog(),
     mHighlights(),
     mGlobalsFilter(),
+    mChatColor(config.getIntValue("chatColor")),
+    mChatHistoryIndex(0),
+    mReturnToggles(config.getBoolValue("ReturnToggles")),
     mGMLoaded(false),
     mHaveMouse(false),
     mAutoHide(config.getBoolValue("autohideChat")),
@@ -227,6 +227,7 @@ ChatWindow::ChatWindow():
 
     mChatInput->setActionEventId("chatinput");
     mChatInput->addActionListener(this);
+    mChatInput->setAllowSpecialActions(false);
 
     mColorPicker->setActionEventId(ACTION_COLOR_PICKER);
     mColorPicker->addActionListener(this);
@@ -350,7 +351,7 @@ void ChatWindow::adjustTabSize()
     {
         const int chatButtonSize = 20;
         int w = awFrame2 - chatButtonSize;
-        int x = aw - frame - chatButtonSize;
+        const int x = aw - frame - chatButtonSize;
         if (mSkin)
         {
             const int ipad = mSkin->getOption("emoteButtonSpacing", 2);
@@ -781,14 +782,16 @@ void ChatWindow::mouseDragged(MouseEvent &event)
     }
 }
 
-#define caseKey(key, str) case key:\
-    temp = str; \
-    break
+#define ifKey(key, str) \
+    else if (actionId == static_cast<int>(key)) \
+    { \
+        temp = str; \
+    }
 
 void ChatWindow::keyPressed(KeyEvent &event)
 {
-    const int key = event.getKey().getValue();
     const int actionId = event.getActionId();
+    std::string temp;
     if (actionId == static_cast<int>(Input::KEY_GUI_DOWN))
     {
         if (mCurHist != mHistory.end())
@@ -910,37 +913,52 @@ void ChatWindow::keyPressed(KeyEvent &event)
                     mChatInput->getText().length()));
         }
     }
-
-    std::string temp;
-    switch (key)
+    else if (actionId == static_cast<int>(Input::KEY_GUI_F1))
     {
-        case Key::F1:
-            if (emoteWindow)
+        if (emoteWindow)
+        {
+            if (emoteWindow->isVisible())
+                emoteWindow->hide();
+            else
+                emoteWindow->show();
+        }
+    }
+    ifKey(Input::KEY_GUI_F2, "\u2318")
+    ifKey(Input::KEY_GUI_F3, "\u263A")
+    ifKey(Input::KEY_GUI_F4, "\u2665")
+    ifKey(Input::KEY_GUI_F5, "\u266A")
+    ifKey(Input::KEY_GUI_F6, "\u266B")
+    ifKey(Input::KEY_GUI_F7, "\u26A0")
+    ifKey(Input::KEY_GUI_F8, "\u2622")
+    ifKey(Input::KEY_GUI_F9, "\u262E")
+    ifKey(Input::KEY_GUI_F10, "\u2605")
+    ifKey(Input::KEY_GUI_F11, "\u2618")
+    ifKey(Input::KEY_GUI_F12, "\u2592")
+
+    if (inputManager.isActionActive(static_cast<int>(Input::KEY_GUI_CTRL)))
+    {
+        if (actionId == static_cast<int>(Input::KEY_GUI_B))
+        {
+            std::string inputText = mChatInput->getTextBeforeCaret();
+            toLower(inputText);
+            const size_t idx = inputText.rfind("##b");
+            if (idx == std::string::npos
+                || mChatInput->getTextBeforeCaret().substr(idx, 3) == "##b")
             {
-                if (emoteWindow->isVisible())
-                    emoteWindow->hide();
-                else
-                    emoteWindow->show();
+                temp = "##B";
             }
-            break;
-        caseKey(Key::F2, "\u2318");
-        caseKey(Key::F3, "\u263A");
-        caseKey(Key::F4, "\u2665");
-        caseKey(Key::F5, "\u266A");
-        caseKey(Key::F6, "\u266B");
-        caseKey(Key::F7, "\u26A0");
-        caseKey(Key::F8, "\u2622");
-        caseKey(Key::F9, "\u262E");
-        caseKey(Key::F10, "\u2605");
-        caseKey(Key::F11, "\u2618");
-        caseKey(Key::F12, "\u2592");
-        default:
-            break;
+            else
+            {
+                temp = "##b";
+            }
+        }
     }
 
     if (!temp.empty())
         addInputText(temp, false);
 }
+
+#undef ifKey
 
 void ChatWindow::processEvent(const Channels channel,
                               const DepricatedEvent &event)

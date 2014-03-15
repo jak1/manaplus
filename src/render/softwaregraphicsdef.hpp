@@ -20,30 +20,6 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef GUI_WIDGETS_CONTAINER_H
-#define GUI_WIDGETS_CONTAINER_H
-
-#include "gui/widgets/basiccontainer2.h"
-
-/**
- * A widget container.
- *
- * The main difference between the standard Guichan container and this one is
- * that childs added to this container are automatically deleted when the
- * container is deleted.
- *
- * This container is also non-opaque by default.
- */
-class Container : public BasicContainer2
-{
-    public:
-        explicit Container(const Widget2 *const widget);
-
-        virtual ~Container();
-
-        bool safeRemove(Widget *const widget);
-
-        void removeControls();
-};
-
-#endif  // GUI_WIDGETS_CONTAINER_H
+public:
+    void calcTileSDL(ImageVertexes *const vert,
+                     int x, int y) const override final;

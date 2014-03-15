@@ -13,8 +13,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ManaPlus\n"
 "Report-Msgid-Bugs-To: akaras@inbox.ru\n"
-"POT-Creation-Date: 2014-02-28 21:21+0300\n"
-"PO-Revision-Date: 2014-03-01 08:14+0000\n"
+"POT-Creation-Date: 2014-03-15 11:37+0300\n"
+"PO-Revision-Date: 2014-03-10 08:13+0000\n"
 "Last-Translator: Andrei Karas <akaras@inbox.ru>\n"
 "Language-Team: Japanese (http://www.transifex.com/projects/p/manaplus/"
 "language/ja/)\n"
@@ -25,12 +25,12 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #. TRANSLATORS: disable trades message
-#: src/actionmanager.cpp:874
+#: src/actionmanager.cpp:884
 msgid "Ignoring incoming trade requests"
 msgstr "トレードリクエストを無効にしています"
 
 #. TRANSLATORS: enable trades message
-#: src/actionmanager.cpp:884
+#: src/actionmanager.cpp:894
 msgid "Accepting incoming trade requests"
 msgstr "トレードリクエストを有効にしました"
 
@@ -53,12 +53,12 @@ msgid "miss"
 msgstr "ミス"
 
 #. TRANSLATORS: this away status writed in player nick
-#: src/being/being.cpp:1818 src/gui/windows/whoisonline.cpp:863
+#: src/being/being.cpp:1818 src/gui/windows/whoisonline.cpp:838
 msgid "A"
 msgstr "A"
 
 #. TRANSLATORS: this inactive status writed in player nick
-#: src/being/being.cpp:1823 src/gui/windows/whoisonline.cpp:868
+#: src/being/being.cpp:1823 src/gui/windows/whoisonline.cpp:843
 msgid "I"
 msgstr "I"
 
@@ -530,32 +530,37 @@ msgstr "吹出し"
 #. TRANSLATORS: setup tab quick button
 #. TRANSLATORS: full button name
 #. TRANSLATORS: setup window name
-#: src/client.cpp:1138 src/gui/windowmenu.cpp:155
+#: src/client.cpp:1141 src/gui/windowmenu.cpp:155
 #: src/gui/windows/setupwindow.cpp:61
 msgid "Setup"
 msgstr "設定"
 
 #. TRANSLATORS: perfoamance tab quick button
 #. TRANSLATORS: settings tab name
-#: src/client.cpp:1142 src/gui/widgets/tabs/setup_perfomance.cpp:51
+#: src/client.cpp:1144 src/gui/widgets/tabs/setup_perfomance.cpp:51
 msgid "Performance"
 msgstr ""
 
 #. TRANSLATORS: video tab quick button
 #. TRANSLATORS: video settings tab name
-#: src/client.cpp:1145 src/gui/widgets/tabs/setup_video.cpp:225
+#: src/client.cpp:1147 src/gui/widgets/tabs/setup_video.cpp:225
 msgid "Video"
 msgstr "ビデオ"
 
 #. TRANSLATORS: theme tab quick button
 #. TRANSLATORS: theme settings tab name
-#: src/client.cpp:1148 src/gui/widgets/tabs/setup_theme.cpp:268
+#: src/client.cpp:1150 src/gui/widgets/tabs/setup_theme.cpp:268
 msgid "Theme"
 msgstr "テーマ"
 
 #. TRANSLATORS: theme tab quick button
+#: src/client.cpp:1153
+msgid "About"
+msgstr ""
+
+#. TRANSLATORS: theme tab quick button
 #. TRANSLATORS: help window name
-#: src/client.cpp:1151 src/gui/windowmenu.cpp:71
+#: src/client.cpp:1156 src/gui/windowmenu.cpp:71
 #: src/gui/windows/helpwindow.cpp:50
 msgid "Help"
 msgstr "ヘルプ"
@@ -568,41 +573,41 @@ msgstr "ヘルプ"
 #. TRANSLATORS: npc dialog button
 #. TRANSLATORS: quests window button
 #. TRANSLATORS: shop window button
-#: src/client.cpp:1155 src/gui/popups/popupmenu.cpp:619
+#: src/client.cpp:1160 src/gui/popups/popupmenu.cpp:619
 #: src/gui/windows/didyouknowwindow.cpp:78
-#: src/gui/windows/inventorywindow.cpp:226 src/gui/windows/npcdialog.cpp:69
+#: src/gui/windows/inventorywindow.cpp:224 src/gui/windows/npcdialog.cpp:69
 #: src/gui/windows/npcdialog.cpp:107 src/gui/windows/questswindow.cpp:124
 #: src/gui/windows/shopwindow.cpp:78
 msgid "Close"
 msgstr "閉じる"
 
 #. TRANSLATORS: connection dialog header
-#: src/client.cpp:1280
+#: src/client.cpp:1284
 msgid "Connecting to server"
 msgstr "サーバーに接続しています"
 
 #. TRANSLATORS: connection dialog header
-#: src/client.cpp:1324
+#: src/client.cpp:1331
 msgid "Logging in"
 msgstr "ログインしています"
 
 #. TRANSLATORS: connection dialog header
-#: src/client.cpp:1366
+#: src/client.cpp:1373
 msgid "Entering game world"
 msgstr "ゲームの世界に移動しています"
 
 #. TRANSLATORS: connection dialog header
-#: src/client.cpp:1489
+#: src/client.cpp:1496
 msgid "Requesting characters"
 msgstr "キャラクターを呼び出しています"
 
 #. TRANSLATORS: connection dialog header
-#: src/client.cpp:1529
+#: src/client.cpp:1536
 msgid "Connecting to the game server"
 msgstr "ゲームサーバーに接続しています"
 
 #. TRANSLATORS: connection dialog header
-#: src/client.cpp:1541
+#: src/client.cpp:1548
 msgid "Changing game servers"
 msgstr "ゲームサーバーを変更しています"
 
@@ -617,7 +622,7 @@ msgstr "ゲームサーバーを変更しています"
 #. TRANSLATORS: unregister dialog. error message.
 #. TRANSLATORS: error message header
 #. TRANSLATORS: error message
-#: src/client.cpp:1602 src/client.cpp:1613 src/client.cpp:1797
+#: src/client.cpp:1611 src/client.cpp:1622 src/client.cpp:1806
 #: src/gui/windows/changeemaildialog.cpp:167
 #: src/gui/windows/changepassworddialog.cpp:157
 #: src/gui/windows/charcreatedialog.cpp:349
@@ -630,65 +635,65 @@ msgid "Error"
 msgstr "エラー"
 
 #. TRANSLATORS: connection dialog header
-#: src/client.cpp:1625
+#: src/client.cpp:1634
 msgid "Requesting registration details"
 msgstr "登録内容を呼び出しています"
 
 #. TRANSLATORS: password change message header
-#: src/client.cpp:1666
+#: src/client.cpp:1675
 msgid "Password Change"
 msgstr "パスワード変更"
 
 #. TRANSLATORS: password change message text
-#: src/client.cpp:1668
+#: src/client.cpp:1677
 msgid "Password changed successfully!"
 msgstr "パスワードを変更しました"
 
 #. TRANSLATORS: email change message header
-#: src/client.cpp:1690
+#: src/client.cpp:1699
 msgid "Email Change"
 msgstr "メールアドレス変更"
 
 #. TRANSLATORS: email change message text
-#: src/client.cpp:1692
+#: src/client.cpp:1701
 msgid "Email changed successfully!"
 msgstr "メールアドレスを変更しました"
 
 #. TRANSLATORS: unregister message header
-#: src/client.cpp:1715
+#: src/client.cpp:1724
 msgid "Unregister Successful"
 msgstr "登録を解除しました"
 
 #. TRANSLATORS: unregister message text
-#: src/client.cpp:1717
+#: src/client.cpp:1726
 msgid "Farewell, come back any time..."
 msgstr "さようなら　また会いましょう"
 
 #. TRANSLATORS: directory creation error
-#: src/client.cpp:2000 src/client.cpp:2015 src/client.cpp:2060
-#: src/client.cpp:2076 src/client.cpp:2527 src/client.cpp:2535
+#: src/client.cpp:2014 src/client.cpp:2029 src/client.cpp:2074
+#: src/client.cpp:2090 src/client.cpp:2517 src/client.cpp:2525
 #, c-format
 msgid "%s doesn't exist and can't be created! Exiting."
 msgstr "%sは存在しない為、作成できません"
 
 #. TRANSLATORS: update server initialisation error
-#: src/client.cpp:2232
+#: src/client.cpp:2246
 #, c-format
 msgid "Invalid update host: %s."
 msgstr ""
 
 #. TRANSLATORS: update server initialisation error
-#: src/client.cpp:2273 src/client.cpp:2280
+#: src/client.cpp:2287 src/client.cpp:2294
 msgid "Error creating updates directory!"
 msgstr "更新フォルダの作成エラー"
 
-#: src/client.cpp:2302 src/client.cpp:2319
+#: src/client.cpp:2316 src/client.cpp:2333
 #, c-format
 msgid "Error: %s doesn't exist and can't be created! Exiting."
 msgstr "エラー: %s は存在しない為、作成できません"
 
 #. TRANSLATORS: error message question
-#: src/client.cpp:3003
+#: src/client.cpp:2996
 msgid "Do you want to open support page?"
 msgstr ""
 
@@ -937,36 +942,36 @@ msgid "dyecmd srcdyestring dstfile"
 msgstr ""
 
 #. TRANSLATORS: chat tab header
-#: src/game.cpp:268 src/gui/widgets/tabs/chattab.cpp:464
+#: src/game.cpp:270 src/gui/widgets/tabs/chattab.cpp:464
 msgid "General"
 msgstr "一般"
 
 #. TRANSLATORS: chat tab header
 #. TRANSLATORS: full button name
 #. TRANSLATORS: debug window name
-#: src/game.cpp:284 src/gui/widgets/tabs/chattab.cpp:466
+#: src/game.cpp:286 src/gui/widgets/tabs/chattab.cpp:466
 #: src/gui/windowmenu.cpp:142 src/gui/windows/debugwindow.cpp:53
 msgid "Debug"
 msgstr "デバッグ"
 
 #. TRANSLATORS: save file message
-#: src/game.cpp:563
+#: src/game.cpp:577
 #, c-format
 msgid "Screenshot saved as %s"
 msgstr ""
 
 #. TRANSLATORS: save file message
-#: src/game.cpp:573
+#: src/game.cpp:587
 msgid "Saving screenshot failed!"
 msgstr "スクリーンショットを保存できませんでした"
 
 #. TRANSLATORS: error message text
-#: src/game.cpp:644
+#: src/game.cpp:668
 msgid "The connection to the server was lost."
 msgstr "サーバーへの接続が切断されました"
 
 #. TRANSLATORS: error message header
-#: src/game.cpp:647
+#: src/game.cpp:671
 msgid "Network Error"
 msgstr "ネットワークエラー"
 
@@ -1086,37 +1091,37 @@ msgid "Astral Magic"
 msgstr "アストラル魔法"
 
 #. TRANSLATORS: relation type
-#: src/gui/models/playerrelationlistmodel.h:33
+#: src/gui/models/playerrelationlistmodel.h:35
 msgid "Neutral"
 msgstr "普通"
 
 #. TRANSLATORS: relation type
-#: src/gui/models/playerrelationlistmodel.h:35
+#: src/gui/models/playerrelationlistmodel.h:37
 msgid "Friend"
 msgstr "友達"
 
 #. TRANSLATORS: relation type
-#: src/gui/models/playerrelationlistmodel.h:37
+#: src/gui/models/playerrelationlistmodel.h:39
 msgid "Disregarded"
 msgstr "無視している"
 
 #. TRANSLATORS: relation type
-#: src/gui/models/playerrelationlistmodel.h:39
+#: src/gui/models/playerrelationlistmodel.h:41
 msgid "Ignored"
 msgstr "完全無視している"
 
 #. TRANSLATORS: relation type
-#: src/gui/models/playerrelationlistmodel.h:41
+#: src/gui/models/playerrelationlistmodel.h:43
 msgid "Erased"
 msgstr "削除済"
 
 #. TRANSLATORS: relation type
-#: src/gui/models/playerrelationlistmodel.h:43
+#: src/gui/models/playerrelationlistmodel.h:45
 msgid "Blacklisted"
 msgstr "ブラックリスト化されています"
 
 #. TRANSLATORS: relation type
-#: src/gui/models/playerrelationlistmodel.h:45
+#: src/gui/models/playerrelationlistmodel.h:47
 msgid "Enemy"
 msgstr "敵"
 
@@ -1240,7 +1245,7 @@ msgstr "トレード"
 #. TRANSLATORS: player stat
 #: src/gui/popups/popupmenu.cpp:156 src/gui/popups/popupmenu.cpp:260
 #: src/gui/popups/popupmenu.cpp:695 src/gui/setupactiondata.h:51
-#: src/gui/windows/botcheckerwindow.cpp:303
+#: src/gui/windows/botcheckerwindow.cpp:302
 #: src/net/eathena/generalhandler.cpp:251 src/net/tmwa/generalhandler.cpp:289
 msgid "Attack"
 msgstr "攻撃"
@@ -1301,7 +1306,7 @@ msgstr "消す"
 #: src/gui/popups/popupmenu.cpp:228 src/gui/popups/popupmenu.cpp:249
 #: src/gui/popups/popupmenu.cpp:396 src/gui/popups/popupmenu.cpp:547
 #: src/gui/popups/popupmenu.cpp:706 src/gui/popups/popupmenu.cpp:787
-#: src/gui/setupactiondata.h:1942 src/gui/windows/botcheckerwindow.cpp:307
+#: src/gui/setupactiondata.h:2009 src/gui/windows/botcheckerwindow.cpp:306
 msgid "Move"
 msgstr "動く"
 
@@ -1310,7 +1315,7 @@ msgstr "動く"
 #. TRANSLATORS: input action name
 #. TRANSLATORS: bot checker window table header
 #: src/gui/popups/popupmenu.cpp:239 src/gui/setupactiondata.h:93
-#: src/gui/windows/botcheckerwindow.cpp:305
+#: src/gui/windows/botcheckerwindow.cpp:304
 msgid "Talk"
 msgstr "話す"
 
@@ -1321,8 +1326,8 @@ msgstr "話す"
 #. TRANSLATORS: buy dialog name
 #. TRANSLATORS: shop window button
 #: src/gui/popups/popupmenu.cpp:242 src/gui/popups/popupmenu.cpp:2599
-#: src/gui/windows/buydialog.cpp:174 src/gui/windows/buydialog.cpp:186
-#: src/gui/windows/buydialog.cpp:240 src/gui/windows/buyselldialog.cpp:67
+#: src/gui/windows/buydialog.cpp:178 src/gui/windows/buydialog.cpp:194
+#: src/gui/windows/buydialog.cpp:252 src/gui/windows/buyselldialog.cpp:67
 msgid "Buy"
 msgstr "買う"
 
@@ -1335,7 +1340,7 @@ msgstr "買う"
 #. TRANSLATORS: sell dialog button
 #: src/gui/popups/popupmenu.cpp:245 src/gui/popups/popupmenu.cpp:2602
 #: src/gui/windows/buyselldialog.cpp:69 src/gui/windows/selldialog.cpp:56
-#: src/gui/windows/selldialog.cpp:66 src/gui/windows/selldialog.cpp:108
+#: src/gui/windows/selldialog.cpp:70 src/gui/windows/selldialog.cpp:116
 msgid "Sell"
 msgstr "売る"
 
@@ -1413,12 +1418,12 @@ msgstr "名前をチャットへ追加する"
 #: src/gui/popups/popupmenu.cpp:2332 src/gui/popups/popupmenu.cpp:2354
 #: src/gui/popups/popupmenu.cpp:2377 src/gui/popups/popupmenu.cpp:2404
 #: src/gui/popups/popupmenu.cpp:2421 src/gui/popups/popupmenu.cpp:2701
-#: src/gui/popups/popupmenu.cpp:2837 src/gui/setupactiondata.h:1827
+#: src/gui/popups/popupmenu.cpp:2837 src/gui/setupactiondata.h:1894
 #: src/gui/windows/buyselldialog.cpp:71
 #: src/gui/windows/changeemaildialog.cpp:55
 #: src/gui/windows/changepassworddialog.cpp:57
-#: src/gui/windows/charcreatedialog.cpp:121
-#: src/gui/windows/connectiondialog.cpp:48
+#: src/gui/windows/charcreatedialog.cpp:119
+#: src/gui/windows/connectiondialog.cpp:50
 #: src/gui/windows/editserverdialog.cpp:58
 #: src/gui/windows/itemamountwindow.cpp:162
 #: src/gui/windows/npcpostdialog.cpp:68 src/gui/windows/quitdialog.cpp:70
@@ -1426,7 +1431,7 @@ msgstr "名前をチャットへ追加する"
 #: src/gui/windows/socialwindow.cpp:1205
 #: src/gui/windows/textcommandeditor.cpp:86 src/gui/windows/textdialog.cpp:55
 #: src/gui/windows/unregisterdialog.cpp:54
-#: src/gui/windows/updaterwindow.cpp:186
+#: src/gui/windows/updaterwindow.cpp:178
 msgid "Cancel"
 msgstr "キャンセル"
 
@@ -1495,8 +1500,8 @@ msgstr "カメラを動かす"
 #. TRANSLATORS: full button name
 #. TRANSLATORS: inventory button
 #. TRANSLATORS: outfits window name
-#: src/gui/popups/popupmenu.cpp:567 src/gui/setupactiondata.h:1950
-#: src/gui/windowmenu.cpp:138 src/gui/windows/inventorywindow.cpp:192
+#: src/gui/popups/popupmenu.cpp:567 src/gui/setupactiondata.h:2017
+#: src/gui/windowmenu.cpp:138 src/gui/windows/inventorywindow.cpp:190
 #: src/gui/windows/outfitwindow.cpp:53
 msgid "Outfits"
 msgstr "服装"
@@ -1646,8 +1651,8 @@ msgstr "トレードウィンドウに全て追加する"
 #. TRANSLATORS: inventory button
 #. TRANSLATORS: setup button
 #: src/gui/popups/popupmenu.cpp:1895 src/gui/popups/popupmenu.cpp:2025
-#: src/gui/popups/popupmenu.cpp:2066 src/gui/windows/inventorywindow.cpp:222
-#: src/gui/windows/inventorywindow.cpp:744 src/gui/windows/setupwindow.cpp:96
+#: src/gui/popups/popupmenu.cpp:2066 src/gui/windows/inventorywindow.cpp:220
+#: src/gui/windows/inventorywindow.cpp:743 src/gui/windows/setupwindow.cpp:96
 msgid "Store"
 msgstr "保管"
 
@@ -1678,7 +1683,7 @@ msgstr "全部保存"
 #. TRANSLATORS: popup menu item
 #. TRANSLATORS: get item from storage
 #. TRANSLATORS: storage button
-#: src/gui/popups/popupmenu.cpp:1924 src/gui/windows/inventorywindow.cpp:224
+#: src/gui/popups/popupmenu.cpp:1924 src/gui/windows/inventorywindow.cpp:222
 msgid "Retrieve"
 msgstr "取出す"
 
@@ -1711,8 +1716,8 @@ msgstr "全部取出す"
 #. TRANSLATORS: inventory button
 #. TRANSLATORS: skills dialog button
 #: src/gui/popups/popupmenu.cpp:1987 src/gui/popups/popupmenu.cpp:2765
-#: src/gui/windows/inventorywindow.cpp:173
-#: src/gui/windows/inventorywindow.cpp:655 src/gui/windows/skilldialog.cpp:290
+#: src/gui/windows/inventorywindow.cpp:171
+#: src/gui/windows/inventorywindow.cpp:653 src/gui/windows/skilldialog.cpp:290
 msgid "Use"
 msgstr "使用"
 
@@ -1903,8 +1908,8 @@ msgstr ""
 #. TRANSLATORS: equipment window button
 #. TRANSLATORS: inventory button
 #: src/gui/popups/popupmenu.cpp:2750 src/gui/windows/equipmentwindow.cpp:66
-#: src/gui/windows/inventorywindow.cpp:175
-#: src/gui/windows/inventorywindow.cpp:644
+#: src/gui/windows/inventorywindow.cpp:173
+#: src/gui/windows/inventorywindow.cpp:642
 msgid "Unequip"
 msgstr "取外す"
 
@@ -1912,16 +1917,16 @@ msgstr "取外す"
 #. TRANSLATORS: use item
 #. TRANSLATORS: inventory button
 #. TRANSLATORS: outfits window button
-#: src/gui/popups/popupmenu.cpp:2756 src/gui/windows/inventorywindow.cpp:171
-#: src/gui/windows/inventorywindow.cpp:649 src/gui/windows/outfitwindow.cpp:60
+#: src/gui/popups/popupmenu.cpp:2756 src/gui/windows/inventorywindow.cpp:169
+#: src/gui/windows/inventorywindow.cpp:647 src/gui/windows/outfitwindow.cpp:60
 msgid "Equip"
 msgstr "装着"
 
 #. TRANSLATORS: popup menu item
 #. TRANSLATORS: drop item
 #. TRANSLATORS: inventory button
-#: src/gui/popups/popupmenu.cpp:2776 src/gui/windows/inventorywindow.cpp:188
-#: src/gui/windows/inventorywindow.cpp:752
+#: src/gui/popups/popupmenu.cpp:2776 src/gui/windows/inventorywindow.cpp:186
+#: src/gui/windows/inventorywindow.cpp:751
 msgid "Drop..."
 msgstr "落とす..."
 
@@ -1936,14 +1941,14 @@ msgstr "全て落とす"
 #. TRANSLATORS: full button name
 #. TRANSLATORS: inventory button
 #: src/gui/popups/popupmenu.cpp:2785 src/gui/windowmenu.cpp:126
-#: src/gui/windows/inventorywindow.cpp:757
+#: src/gui/windows/inventorywindow.cpp:756
 msgid "Drop"
 msgstr "落とす"
 
 #. TRANSLATORS: popup menu item
 #. TRANSLATORS: split items
 #. TRANSLATORS: inventory button
-#: src/gui/popups/popupmenu.cpp:2793 src/gui/windows/inventorywindow.cpp:190
+#: src/gui/popups/popupmenu.cpp:2793 src/gui/windows/inventorywindow.cpp:188
 msgid "Split"
 msgstr "分割"
 
@@ -2099,10 +2104,10 @@ msgstr "OKを選択する"
 #. TRANSLATORS: quit dialog button
 #. TRANSLATORS: sell dialog button
 #. TRANSLATORS: servers dialog button
-#: src/gui/setupactiondata.h:183 src/gui/windows/buydialog.cpp:242
+#: src/gui/setupactiondata.h:183 src/gui/windows/buydialog.cpp:254
 #: src/gui/windows/quitdialog.cpp:52 src/gui/windows/quitdialog.cpp:57
-#: src/gui/windows/quitdialog.cpp:59 src/gui/windows/selldialog.cpp:110
-#: src/gui/windows/serverdialog.cpp:198
+#: src/gui/windows/quitdialog.cpp:59 src/gui/windows/selldialog.cpp:118
+#: src/gui/windows/serverdialog.cpp:200
 msgid "Quit"
 msgstr "終了"
 
@@ -2158,503 +2163,513 @@ msgstr "ウィンドウを隠す"
 
 #. TRANSLATORS: input action name
 #: src/gui/setupactiondata.h:369
+msgid "About Window"
+msgstr ""
+
+#. TRANSLATORS: input action name
+#: src/gui/setupactiondata.h:375
 msgid "Help Window"
 msgstr "ヘルプウィンドウ"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:375
+#: src/gui/setupactiondata.h:381
 msgid "Status Window"
 msgstr "ステータスウィンドウ"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:381
+#: src/gui/setupactiondata.h:387
 msgid "Inventory Window"
 msgstr "インベントリーウィンドウ"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:387
+#: src/gui/setupactiondata.h:393
 msgid "Equipment Window"
 msgstr "装着ウィンドウ"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:393
+#: src/gui/setupactiondata.h:399
 msgid "Skill Window"
 msgstr "スキルウィンドウ"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:399
+#: src/gui/setupactiondata.h:405
 msgid "Minimap Window"
 msgstr "ミニマップウィンドウ"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:405
+#: src/gui/setupactiondata.h:411
 msgid "Chat Window"
 msgstr "チャットウィンドウ"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:411
+#: src/gui/setupactiondata.h:417
 msgid "Item Shortcut Window"
 msgstr "アイテムショートカットウィンドウ"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:417
+#: src/gui/setupactiondata.h:423
 msgid "Setup Window"
 msgstr "設定ウィンドウ"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:423
+#: src/gui/setupactiondata.h:429
 msgid "Debug Window"
 msgstr "デバグウィンドウ"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:429
+#: src/gui/setupactiondata.h:435
 msgid "Social Window"
 msgstr "ソーシャルウインドウ"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:435
+#: src/gui/setupactiondata.h:441
 msgid "Emote Shortcut Window"
 msgstr "スマイリーショートカットウィンドウ"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:441
+#: src/gui/setupactiondata.h:447
 msgid "Outfits Window"
 msgstr "服装ウインドウ"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:447
+#: src/gui/setupactiondata.h:453
 msgid "Shop Window"
 msgstr "ショップウィンドウ"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:453
+#: src/gui/setupactiondata.h:459
 msgid "Quick drop Window"
 msgstr "クイックドロップウィンドウ"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:459
+#: src/gui/setupactiondata.h:465
 msgid "Kill Stats Window"
 msgstr "キルスタッツ窓"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:465
+#: src/gui/setupactiondata.h:471
 msgid "Commands Window"
 msgstr "コマンドウインドウ"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:471
+#: src/gui/setupactiondata.h:477
 msgid "Bot Checker Window"
 msgstr "ボットチェッカーウィンドウ"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:477
+#: src/gui/setupactiondata.h:483
 msgid "Who Is Online Window"
 msgstr "オンラインユーザーウインドウ"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:483
+#: src/gui/setupactiondata.h:489
 msgid "Did you know Window"
 msgstr "豆知識窓"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:489
+#: src/gui/setupactiondata.h:495
 msgid "Quests Window"
 msgstr "クエスト窓"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:495
+#: src/gui/setupactiondata.h:501
 msgid "Previous Social Tab"
 msgstr "前ソーシャルタブ"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:501
+#: src/gui/setupactiondata.h:507
 msgid "Next Social Tab"
 msgstr "次ソーシャルタブ"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:507
+#: src/gui/setupactiondata.h:513
 msgid "Previous Shortcuts tab"
 msgstr ""
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:513
+#: src/gui/setupactiondata.h:519
 msgid "Next Shortcuts tab"
 msgstr ""
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:519
+#: src/gui/setupactiondata.h:525
 msgid "Previous Commands tab"
 msgstr ""
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:525
+#: src/gui/setupactiondata.h:531
 msgid "Next Commands tab"
 msgstr ""
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:540
+#: src/gui/setupactiondata.h:546
 msgid "Emote modifiers keys"
 msgstr "スマイリー編集キー"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:546
+#: src/gui/setupactiondata.h:552
 msgid "Emote modifier key"
 msgstr "スマイリー編集キー"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:552
+#: src/gui/setupactiondata.h:558
 msgid "Emote shortcuts"
 msgstr "スマイリーショートカット"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:558 src/gui/setupactiondata.h:564
-#: src/gui/setupactiondata.h:570 src/gui/setupactiondata.h:576
-#: src/gui/setupactiondata.h:582 src/gui/setupactiondata.h:588
-#: src/gui/setupactiondata.h:594 src/gui/setupactiondata.h:600
-#: src/gui/setupactiondata.h:606 src/gui/setupactiondata.h:612
-#: src/gui/setupactiondata.h:618 src/gui/setupactiondata.h:624
-#: src/gui/setupactiondata.h:630 src/gui/setupactiondata.h:636
-#: src/gui/setupactiondata.h:642 src/gui/setupactiondata.h:648
-#: src/gui/setupactiondata.h:654 src/gui/setupactiondata.h:660
-#: src/gui/setupactiondata.h:666 src/gui/setupactiondata.h:672
-#: src/gui/setupactiondata.h:678 src/gui/setupactiondata.h:684
-#: src/gui/setupactiondata.h:690 src/gui/setupactiondata.h:696
-#: src/gui/setupactiondata.h:702 src/gui/setupactiondata.h:708
-#: src/gui/setupactiondata.h:714 src/gui/setupactiondata.h:720
-#: src/gui/setupactiondata.h:726 src/gui/setupactiondata.h:732
-#: src/gui/setupactiondata.h:738 src/gui/setupactiondata.h:744
-#: src/gui/setupactiondata.h:750 src/gui/setupactiondata.h:756
-#: src/gui/setupactiondata.h:762 src/gui/setupactiondata.h:768
-#: src/gui/setupactiondata.h:774 src/gui/setupactiondata.h:780
-#: src/gui/setupactiondata.h:786 src/gui/setupactiondata.h:792
-#: src/gui/setupactiondata.h:798 src/gui/setupactiondata.h:804
-#: src/gui/setupactiondata.h:810 src/gui/setupactiondata.h:816
-#: src/gui/setupactiondata.h:822 src/gui/setupactiondata.h:828
-#: src/gui/setupactiondata.h:834 src/gui/setupactiondata.h:840
+#: src/gui/setupactiondata.h:564 src/gui/setupactiondata.h:570
+#: src/gui/setupactiondata.h:576 src/gui/setupactiondata.h:582
+#: src/gui/setupactiondata.h:588 src/gui/setupactiondata.h:594
+#: src/gui/setupactiondata.h:600 src/gui/setupactiondata.h:606
+#: src/gui/setupactiondata.h:612 src/gui/setupactiondata.h:618
+#: src/gui/setupactiondata.h:624 src/gui/setupactiondata.h:630
+#: src/gui/setupactiondata.h:636 src/gui/setupactiondata.h:642
+#: src/gui/setupactiondata.h:648 src/gui/setupactiondata.h:654
+#: src/gui/setupactiondata.h:660 src/gui/setupactiondata.h:666
+#: src/gui/setupactiondata.h:672 src/gui/setupactiondata.h:678
+#: src/gui/setupactiondata.h:684 src/gui/setupactiondata.h:690
+#: src/gui/setupactiondata.h:696 src/gui/setupactiondata.h:702
+#: src/gui/setupactiondata.h:708 src/gui/setupactiondata.h:714
+#: src/gui/setupactiondata.h:720 src/gui/setupactiondata.h:726
+#: src/gui/setupactiondata.h:732 src/gui/setupactiondata.h:738
+#: src/gui/setupactiondata.h:744 src/gui/setupactiondata.h:750
+#: src/gui/setupactiondata.h:756 src/gui/setupactiondata.h:762
+#: src/gui/setupactiondata.h:768 src/gui/setupactiondata.h:774
+#: src/gui/setupactiondata.h:780 src/gui/setupactiondata.h:786
+#: src/gui/setupactiondata.h:792 src/gui/setupactiondata.h:798
+#: src/gui/setupactiondata.h:804 src/gui/setupactiondata.h:810
+#: src/gui/setupactiondata.h:816 src/gui/setupactiondata.h:822
+#: src/gui/setupactiondata.h:828 src/gui/setupactiondata.h:834
+#: src/gui/setupactiondata.h:840 src/gui/setupactiondata.h:846
 #, c-format
 msgid "Emote Shortcut %d"
 msgstr "スマイリーショートカット: %d"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:855
+#: src/gui/setupactiondata.h:861
 msgid "Outfits keys"
 msgstr "服装キー"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:861
+#: src/gui/setupactiondata.h:867
 msgid "Wear Outfit"
 msgstr "服を着る"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:867
+#: src/gui/setupactiondata.h:873
 msgid "Copy Outfit"
 msgstr "服をコピーする"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:873
+#: src/gui/setupactiondata.h:879
 msgid "Copy equipped to Outfit"
 msgstr "装着品を服装にコピー"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:879
+#: src/gui/setupactiondata.h:885
 msgid "Outfits shortcuts"
 msgstr "服装ショートカット"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:885 src/gui/setupactiondata.h:891
-#: src/gui/setupactiondata.h:897 src/gui/setupactiondata.h:903
-#: src/gui/setupactiondata.h:909 src/gui/setupactiondata.h:915
-#: src/gui/setupactiondata.h:921 src/gui/setupactiondata.h:927
-#: src/gui/setupactiondata.h:933 src/gui/setupactiondata.h:939
-#: src/gui/setupactiondata.h:945 src/gui/setupactiondata.h:951
-#: src/gui/setupactiondata.h:957 src/gui/setupactiondata.h:963
-#: src/gui/setupactiondata.h:969 src/gui/setupactiondata.h:975
-#: src/gui/setupactiondata.h:981 src/gui/setupactiondata.h:987
-#: src/gui/setupactiondata.h:993 src/gui/setupactiondata.h:999
-#: src/gui/setupactiondata.h:1005 src/gui/setupactiondata.h:1011
-#: src/gui/setupactiondata.h:1017 src/gui/setupactiondata.h:1023
-#: src/gui/setupactiondata.h:1029 src/gui/setupactiondata.h:1035
-#: src/gui/setupactiondata.h:1041 src/gui/setupactiondata.h:1047
-#: src/gui/setupactiondata.h:1053 src/gui/setupactiondata.h:1059
-#: src/gui/setupactiondata.h:1065 src/gui/setupactiondata.h:1071
-#: src/gui/setupactiondata.h:1077 src/gui/setupactiondata.h:1083
-#: src/gui/setupactiondata.h:1089 src/gui/setupactiondata.h:1095
-#: src/gui/setupactiondata.h:1101 src/gui/setupactiondata.h:1107
-#: src/gui/setupactiondata.h:1113 src/gui/setupactiondata.h:1119
-#: src/gui/setupactiondata.h:1125 src/gui/setupactiondata.h:1131
-#: src/gui/setupactiondata.h:1137 src/gui/setupactiondata.h:1143
-#: src/gui/setupactiondata.h:1149 src/gui/setupactiondata.h:1155
-#: src/gui/setupactiondata.h:1161 src/gui/setupactiondata.h:1167
+#: src/gui/setupactiondata.h:891 src/gui/setupactiondata.h:897
+#: src/gui/setupactiondata.h:903 src/gui/setupactiondata.h:909
+#: src/gui/setupactiondata.h:915 src/gui/setupactiondata.h:921
+#: src/gui/setupactiondata.h:927 src/gui/setupactiondata.h:933
+#: src/gui/setupactiondata.h:939 src/gui/setupactiondata.h:945
+#: src/gui/setupactiondata.h:951 src/gui/setupactiondata.h:957
+#: src/gui/setupactiondata.h:963 src/gui/setupactiondata.h:969
+#: src/gui/setupactiondata.h:975 src/gui/setupactiondata.h:981
+#: src/gui/setupactiondata.h:987 src/gui/setupactiondata.h:993
+#: src/gui/setupactiondata.h:999 src/gui/setupactiondata.h:1005
+#: src/gui/setupactiondata.h:1011 src/gui/setupactiondata.h:1017
+#: src/gui/setupactiondata.h:1023 src/gui/setupactiondata.h:1029
+#: src/gui/setupactiondata.h:1035 src/gui/setupactiondata.h:1041
+#: src/gui/setupactiondata.h:1047 src/gui/setupactiondata.h:1053
+#: src/gui/setupactiondata.h:1059 src/gui/setupactiondata.h:1065
+#: src/gui/setupactiondata.h:1071 src/gui/setupactiondata.h:1077
+#: src/gui/setupactiondata.h:1083 src/gui/setupactiondata.h:1089
+#: src/gui/setupactiondata.h:1095 src/gui/setupactiondata.h:1101
+#: src/gui/setupactiondata.h:1107 src/gui/setupactiondata.h:1113
+#: src/gui/setupactiondata.h:1119 src/gui/setupactiondata.h:1125
+#: src/gui/setupactiondata.h:1131 src/gui/setupactiondata.h:1137
+#: src/gui/setupactiondata.h:1143 src/gui/setupactiondata.h:1149
+#: src/gui/setupactiondata.h:1155 src/gui/setupactiondata.h:1161
+#: src/gui/setupactiondata.h:1167 src/gui/setupactiondata.h:1173
 #, c-format
 msgid "Outfit Shortcut %d"
 msgstr "服装ショートカット %d"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:1182
+#: src/gui/setupactiondata.h:1188
 msgid "Toggle Chat"
 msgstr "トグルチャット"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:1188
+#: src/gui/setupactiondata.h:1194
 msgid "Scroll Chat Up"
 msgstr "チャットを上へスクロールする"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:1194
+#: src/gui/setupactiondata.h:1200
 msgid "Scroll Chat Down"
 msgstr "チャットを下へスクロールする"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:1200
+#: src/gui/setupactiondata.h:1206
 msgid "Previous Chat Tab"
 msgstr "前のチャットタブ"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:1206
+#: src/gui/setupactiondata.h:1212
 msgid "Next Chat Tab"
 msgstr "次のチャットタブ"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:1212
+#: src/gui/setupactiondata.h:1218
 msgid "Close current Chat Tab"
 msgstr "このチャットタブを閉じる"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:1218
+#: src/gui/setupactiondata.h:1224
 msgid "Previous chat line"
 msgstr "前チャット文"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:1224
+#: src/gui/setupactiondata.h:1230
 msgid "Next chat line"
 msgstr "次チャット文"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:1230
+#: src/gui/setupactiondata.h:1236
 msgid "Chat modifier key"
 msgstr ""
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:1245
+#: src/gui/setupactiondata.h:1242
+msgid "Show smiles"
+msgstr ""
+
+#. TRANSLATORS: input action name
+#: src/gui/setupactiondata.h:1312
 msgid "Ignore input 1"
 msgstr "インプット１完全無視"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:1251
+#: src/gui/setupactiondata.h:1318
 msgid "Ignore input 2"
 msgstr "インプット２完全無視"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:1257
+#: src/gui/setupactiondata.h:1324
 msgid "Direct Up"
 msgstr "上方向"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:1263
+#: src/gui/setupactiondata.h:1330
 msgid "Direct Down"
 msgstr "下方向"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:1269
+#: src/gui/setupactiondata.h:1336
 msgid "Direct Left"
 msgstr "左方向"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:1275
+#: src/gui/setupactiondata.h:1342
 msgid "Direct Right"
 msgstr "右方向"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:1281
+#: src/gui/setupactiondata.h:1348
 msgid "Crazy moves"
 msgstr "クレイジームーブ"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:1287
+#: src/gui/setupactiondata.h:1354
 msgid "Change Crazy Move mode"
 msgstr "クレイジームーブモード変更"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:1293
+#: src/gui/setupactiondata.h:1360
 msgid "Quick Drop N Items from 0 slot"
 msgstr "Nアイテムを 0スロットからクイックドロップ"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:1299
+#: src/gui/setupactiondata.h:1366
 msgid "Quick Drop N Items"
 msgstr "Nアイテムをクイックドロップ"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:1305
+#: src/gui/setupactiondata.h:1372
 msgid "Switch Quick Drop Counter"
 msgstr "クイックドロップカウンター変更"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:1311
+#: src/gui/setupactiondata.h:1378
 msgid "Quick heal target or self"
 msgstr "ターゲット又は自分をHP回復させる"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:1317
+#: src/gui/setupactiondata.h:1384
 msgid "Use #itenplz spell"
 msgstr "呪文 #itenplz を唱える"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:1323
+#: src/gui/setupactiondata.h:1390
 msgid "Use magic attack"
 msgstr "魔法攻撃を使用"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:1329
+#: src/gui/setupactiondata.h:1396
 msgid "Switch magic attack"
 msgstr "マジックアタック変更"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:1335
+#: src/gui/setupactiondata.h:1402
 msgid "Switch pvp attack"
 msgstr "PvP攻撃変更"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:1341
+#: src/gui/setupactiondata.h:1408
 msgid "Change move type"
 msgstr "ムーブタイプ変更"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:1347
+#: src/gui/setupactiondata.h:1414
 msgid "Change Attack Weapon Type"
 msgstr "武器変更"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:1353
+#: src/gui/setupactiondata.h:1420
 msgid "Change Attack Type"
 msgstr "攻撃方法変更"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:1359
+#: src/gui/setupactiondata.h:1426
 msgid "Change Follow mode"
 msgstr "フォローモード変更"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:1365
+#: src/gui/setupactiondata.h:1432
 msgid "Change Imitation mode"
 msgstr "真似モード変更"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:1371
+#: src/gui/setupactiondata.h:1438
 msgid "Disable / Enable Game modifier keys"
 msgstr "ゲームモディファイアキーを無効 / 有効にする"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:1377
+#: src/gui/setupactiondata.h:1444
 msgid "On / Off audio"
 msgstr "オーディオ　オン/オフ"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:1383
+#: src/gui/setupactiondata.h:1450
 msgid "Enable / Disable away mode"
 msgstr "AFKモードを有効 / 無効にする"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:1389
+#: src/gui/setupactiondata.h:1456
 msgid "Emulate right click from keyboard"
 msgstr "右クリックをエミュレートする"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:1395
+#: src/gui/setupactiondata.h:1462
 msgid "Toggle camera mode"
 msgstr "カメラモード変更"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:1401
+#: src/gui/setupactiondata.h:1468
 msgid "Show onscreen keyboard"
 msgstr "オンスクリーンキーボード"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:1416
+#: src/gui/setupactiondata.h:1483
 msgid "Move Keys"
 msgstr "キーを移動"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:1422 src/gui/setupactiondata.h:1761
+#: src/gui/setupactiondata.h:1489 src/gui/setupactiondata.h:1828
 msgid "Move Up"
 msgstr "上へ移動"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:1428 src/gui/setupactiondata.h:1767
+#: src/gui/setupactiondata.h:1495 src/gui/setupactiondata.h:1834
 msgid "Move Down"
 msgstr "下へ移動"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:1434 src/gui/setupactiondata.h:1773
+#: src/gui/setupactiondata.h:1501 src/gui/setupactiondata.h:1840
 msgid "Move Left"
 msgstr "左へ移動"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:1440 src/gui/setupactiondata.h:1779
+#: src/gui/setupactiondata.h:1507 src/gui/setupactiondata.h:1846
 msgid "Move Right"
 msgstr "右へ移動"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:1446
+#: src/gui/setupactiondata.h:1513
 msgid "Move Forward"
 msgstr ""
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:1452
+#: src/gui/setupactiondata.h:1519
 msgid "Move to navigation point shortcuts"
 msgstr "ナビポイントショートカットまで移動"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:1458 src/gui/setupactiondata.h:1464
-#: src/gui/setupactiondata.h:1470 src/gui/setupactiondata.h:1476
-#: src/gui/setupactiondata.h:1482 src/gui/setupactiondata.h:1488
-#: src/gui/setupactiondata.h:1494 src/gui/setupactiondata.h:1500
-#: src/gui/setupactiondata.h:1506 src/gui/setupactiondata.h:1512
-#: src/gui/setupactiondata.h:1518 src/gui/setupactiondata.h:1524
-#: src/gui/setupactiondata.h:1530 src/gui/setupactiondata.h:1536
-#: src/gui/setupactiondata.h:1542 src/gui/setupactiondata.h:1548
-#: src/gui/setupactiondata.h:1554 src/gui/setupactiondata.h:1560
-#: src/gui/setupactiondata.h:1566 src/gui/setupactiondata.h:1572
-#: src/gui/setupactiondata.h:1578 src/gui/setupactiondata.h:1584
-#: src/gui/setupactiondata.h:1590 src/gui/setupactiondata.h:1596
-#: src/gui/setupactiondata.h:1602 src/gui/setupactiondata.h:1608
-#: src/gui/setupactiondata.h:1614 src/gui/setupactiondata.h:1620
-#: src/gui/setupactiondata.h:1626 src/gui/setupactiondata.h:1632
-#: src/gui/setupactiondata.h:1638 src/gui/setupactiondata.h:1644
-#: src/gui/setupactiondata.h:1650 src/gui/setupactiondata.h:1656
-#: src/gui/setupactiondata.h:1662 src/gui/setupactiondata.h:1668
-#: src/gui/setupactiondata.h:1674 src/gui/setupactiondata.h:1680
-#: src/gui/setupactiondata.h:1686 src/gui/setupactiondata.h:1692
-#: src/gui/setupactiondata.h:1698 src/gui/setupactiondata.h:1704
-#: src/gui/setupactiondata.h:1710 src/gui/setupactiondata.h:1716
-#: src/gui/setupactiondata.h:1722 src/gui/setupactiondata.h:1728
-#: src/gui/setupactiondata.h:1734 src/gui/setupactiondata.h:1740
+#: src/gui/setupactiondata.h:1525 src/gui/setupactiondata.h:1531
+#: src/gui/setupactiondata.h:1537 src/gui/setupactiondata.h:1543
+#: src/gui/setupactiondata.h:1549 src/gui/setupactiondata.h:1555
+#: src/gui/setupactiondata.h:1561 src/gui/setupactiondata.h:1567
+#: src/gui/setupactiondata.h:1573 src/gui/setupactiondata.h:1579
+#: src/gui/setupactiondata.h:1585 src/gui/setupactiondata.h:1591
+#: src/gui/setupactiondata.h:1597 src/gui/setupactiondata.h:1603
+#: src/gui/setupactiondata.h:1609 src/gui/setupactiondata.h:1615
+#: src/gui/setupactiondata.h:1621 src/gui/setupactiondata.h:1627
+#: src/gui/setupactiondata.h:1633 src/gui/setupactiondata.h:1639
+#: src/gui/setupactiondata.h:1645 src/gui/setupactiondata.h:1651
+#: src/gui/setupactiondata.h:1657 src/gui/setupactiondata.h:1663
+#: src/gui/setupactiondata.h:1669 src/gui/setupactiondata.h:1675
+#: src/gui/setupactiondata.h:1681 src/gui/setupactiondata.h:1687
+#: src/gui/setupactiondata.h:1693 src/gui/setupactiondata.h:1699
+#: src/gui/setupactiondata.h:1705 src/gui/setupactiondata.h:1711
+#: src/gui/setupactiondata.h:1717 src/gui/setupactiondata.h:1723
+#: src/gui/setupactiondata.h:1729 src/gui/setupactiondata.h:1735
+#: src/gui/setupactiondata.h:1741 src/gui/setupactiondata.h:1747
+#: src/gui/setupactiondata.h:1753 src/gui/setupactiondata.h:1759
+#: src/gui/setupactiondata.h:1765 src/gui/setupactiondata.h:1771
+#: src/gui/setupactiondata.h:1777 src/gui/setupactiondata.h:1783
+#: src/gui/setupactiondata.h:1789 src/gui/setupactiondata.h:1795
+#: src/gui/setupactiondata.h:1801 src/gui/setupactiondata.h:1807
 #, c-format
 msgid "Move to point Shortcut %d"
 msgstr "ショートカット %dまで移動"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:1755
+#: src/gui/setupactiondata.h:1822
 msgid "Move & selection"
 msgstr ""
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:1785
+#: src/gui/setupactiondata.h:1852
 msgid "Move Home"
 msgstr "ホームへ移動"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:1791
+#: src/gui/setupactiondata.h:1858
 msgid "Move End"
 msgstr "最後まで移動"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:1797
+#: src/gui/setupactiondata.h:1864
 msgid "Page up"
 msgstr "ページ上へ"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:1803
+#: src/gui/setupactiondata.h:1870
 msgid "Page down"
 msgstr "ページ下へ"
 
@@ -2663,7 +2678,7 @@ msgstr "ページ下へ"
 #. TRANSLATORS: settings group
 #. TRANSLATORS: char create dialog button
 #. TRANSLATORS: register dialog. button.
-#: src/gui/setupactiondata.h:1809 src/gui/setupactiondata.h:1954
+#: src/gui/setupactiondata.h:1876 src/gui/setupactiondata.h:2021
 #: src/gui/widgets/tabs/setup_audio.cpp:146
 #: src/gui/widgets/tabs/setup_chat.cpp:180
 #: src/gui/widgets/tabs/setup_other.cpp:330
@@ -2674,12 +2689,12 @@ msgid "Other"
 msgstr "その他"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:1815
+#: src/gui/setupactiondata.h:1882
 msgid "Select"
 msgstr "選択"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:1821
+#: src/gui/setupactiondata.h:1888
 msgid "Select2"
 msgstr "選択2"
 
@@ -2689,53 +2704,53 @@ msgstr "選択2"
 #. TRANSLATORS: shop window label
 #. TRANSLATORS: shop window button
 #. TRANSLATORS: command editor button
-#: src/gui/setupactiondata.h:1833 src/gui/widgets/tabs/setup_relations.cpp:200
+#: src/gui/setupactiondata.h:1900 src/gui/widgets/tabs/setup_relations.cpp:200
 #: src/gui/windows/charselectdialog.cpp:108
-#: src/gui/windows/serverdialog.cpp:206 src/gui/windows/shopwindow.cpp:94
-#: src/gui/windows/shopwindow.cpp:101 src/gui/windows/textcommandeditor.cpp:90
+#: src/gui/windows/serverdialog.cpp:208 src/gui/windows/shopwindow.cpp:95
+#: src/gui/windows/shopwindow.cpp:102 src/gui/windows/textcommandeditor.cpp:90
 msgid "Delete"
 msgstr "削除"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:1839
+#: src/gui/setupactiondata.h:1906
 msgid "Backspace"
 msgstr "バックスペース"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:1845
+#: src/gui/setupactiondata.h:1912
 msgid "Insert"
 msgstr "挿入"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:1851
+#: src/gui/setupactiondata.h:1918
 msgid "Tab"
 msgstr "タブ"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:1857
+#: src/gui/setupactiondata.h:1924
 msgid "Mod"
 msgstr "モッド"
 
 #. TRANSLATORS: input action name
-#: src/gui/setupactiondata.h:1863
+#: src/gui/setupactiondata.h:1930
 msgid "Ctrl"
 msgstr ""
 
 #. TRANSLATORS: input tab sub tab name
-#: src/gui/setupactiondata.h:1940
+#: src/gui/setupactiondata.h:2007
 msgid "Basic"
 msgstr "基本"
 
 #. TRANSLATORS: input tab sub tab name
 #. TRANSLATORS: full button name
-#: src/gui/setupactiondata.h:1944 src/gui/windowmenu.cpp:118
+#: src/gui/setupactiondata.h:2011 src/gui/windowmenu.cpp:118
 msgid "Shortcuts"
 msgstr "ショートカット"
 
 #. TRANSLATORS: input tab sub tab name
 #. TRANSLATORS: settings group
 #. TRANSLATORS: full button name
-#: src/gui/setupactiondata.h:1946 src/gui/widgets/tabs/setup_other.cpp:308
+#: src/gui/setupactiondata.h:2013 src/gui/widgets/tabs/setup_other.cpp:308
 #: src/gui/windowmenu.cpp:151
 msgid "Windows"
 msgstr "ウィンドウ"
@@ -2743,7 +2758,7 @@ msgstr "ウィンドウ"
 #. TRANSLATORS: input tab sub tab name
 #. TRANSLATORS: emotes window name
 #. TRANSLATORS: emotes tab name
-#: src/gui/setupactiondata.h:1948 src/gui/windows/emotewindow.cpp:50
+#: src/gui/setupactiondata.h:2015 src/gui/windows/emotewindow.cpp:50
 #: src/gui/windows/emotewindow.cpp:108
 msgid "Emotes"
 msgstr "スマイリー"
@@ -2751,13 +2766,13 @@ msgstr "スマイリー"
 #. TRANSLATORS: input tab sub tab name
 #. TRANSLATORS: settings tab name
 #. TRANSLATORS: chat window name
-#: src/gui/setupactiondata.h:1952 src/gui/widgets/tabs/setup_chat.cpp:41
+#: src/gui/setupactiondata.h:2019 src/gui/widgets/tabs/setup_chat.cpp:41
 #: src/gui/windowmenu.cpp:85 src/gui/windows/chatwindow.cpp:153
 msgid "Chat"
 msgstr "チャット"
 
 #. TRANSLATORS: input tab sub tab name
-#: src/gui/setupactiondata.h:1956
+#: src/gui/setupactiondata.h:2023
 msgid "Gui"
 msgstr "GUI"
 
@@ -2975,7 +2990,7 @@ msgstr ""
 
 #. TRANSLATORS: status window label
 #: src/gui/widgets/characterdisplay.cpp:137
-#: src/gui/windows/inventorywindow.cpp:568
+#: src/gui/windows/inventorywindow.cpp:566
 #: src/gui/windows/statuswindow.cpp:149 src/gui/windows/statuswindow.cpp:312
 #: src/gui/windows/statuswindow.cpp:365
 #, c-format
@@ -2995,7 +3010,7 @@ msgstr "URLを開く"
 #. TRANSLATORS: setup item button
 #. TRANSLATORS: servers dialog button
 #: src/gui/widgets/setupitem.cpp:365 src/gui/widgets/setupitem.cpp:501
-#: src/gui/windows/serverdialog.cpp:204
+#: src/gui/windows/serverdialog.cpp:206
 msgid "Edit"
 msgstr "編集"
 
@@ -3821,7 +3836,7 @@ msgstr ""
 #. TRANSLATORS: inventory button
 #: src/gui/widgets/tabs/setup_other.cpp:256 src/gui/windowmenu.cpp:134
 #: src/gui/windows/buyselldialog.cpp:39 src/gui/windows/buyselldialog.cpp:50
-#: src/gui/windows/inventorywindow.cpp:194
+#: src/gui/windows/inventorywindow.cpp:192
 msgid "Shop"
 msgstr "店"
 
@@ -4170,10 +4185,16 @@ msgstr ""
 msgid "Use special diagonal speed in players moving"
 msgstr ""
 
+#. TRANSLATORS: settings option
+#: src/gui/widgets/tabs/setup_players.cpp:104
+msgid ""
+"Emulate right mouse button by long mouse click (usefull for touch interfaces)"
+msgstr ""
+
 #. TRANSLATORS: relations table header
 #. TRANSLATORS: bot checker window table header
 #: src/gui/widgets/tabs/setup_relations.cpp:61
-#: src/gui/windows/botcheckerwindow.cpp:301
+#: src/gui/windows/botcheckerwindow.cpp:300
 msgid "Name"
 msgstr "名前"
 
@@ -4778,6 +4799,15 @@ msgstr ""
 msgid "Allow screensaver to run"
 msgstr "スクリーンセーバーを有効にする"
 
+#. TRANSLATORS: settings group
+#: src/gui/widgets/tabs/setup_visual.cpp:208
+msgid "Screenshots"
+msgstr ""
+
+#: src/gui/widgets/tabs/setup_visual.cpp:210
+msgid "Add water mark into screenshots"
+msgstr ""
+
 #. TRANSLATORS: short button name for who is online window.
 #: src/gui/windowmenu.cpp:67
 msgid "ONL"
@@ -4847,7 +4877,7 @@ msgstr "EQU"
 #. TRANSLATORS: equipment window name
 #. TRANSLATORS: inventory button
 #: src/gui/windowmenu.cpp:96 src/gui/windows/equipmentwindow.cpp:58
-#: src/gui/windows/inventorywindow.cpp:196
+#: src/gui/windows/inventorywindow.cpp:194
 msgid "Equipment"
 msgstr "装着品"
 
@@ -4858,7 +4888,7 @@ msgstr "INV"
 
 #. TRANSLATORS: inventory window name
 #. TRANSLATORS: inventory type name
-#: src/gui/windowmenu.cpp:99 src/gui/windows/inventorywindow.cpp:129
+#: src/gui/windowmenu.cpp:99 src/gui/windows/inventorywindow.cpp:127
 #: src/inventory.cpp:257
 msgid "Inventory"
 msgstr "インベントリー"
@@ -4941,25 +4971,25 @@ msgstr "SET"
 
 #. TRANSLATORS: short key name
 #. TRANSLATORS: outfits window label
-#: src/gui/windowmenu.cpp:289 src/gui/windows/outfitwindow.cpp:71
+#: src/gui/windowmenu.cpp:289 src/gui/windows/outfitwindow.cpp:70
 #: src/gui/windows/outfitwindow.cpp:561
 #, c-format
 msgid "Key: %s"
 msgstr "鍵: %s"
 
 #. TRANSLATORS: bot checker window header
-#: src/gui/windows/botcheckerwindow.cpp:262
+#: src/gui/windows/botcheckerwindow.cpp:261
 msgid "Bot Checker"
 msgstr "ボットチェッカー"
 
 #. TRANSLATORS: bot checker window button
 #. TRANSLATORS: npc dialog button
-#: src/gui/windows/botcheckerwindow.cpp:271 src/gui/windows/npcdialog.cpp:111
+#: src/gui/windows/botcheckerwindow.cpp:270 src/gui/windows/npcdialog.cpp:111
 msgid "Reset"
 msgstr "リセット"
 
 #. TRANSLATORS: bot checker window table header
-#: src/gui/windows/botcheckerwindow.cpp:309
+#: src/gui/windows/botcheckerwindow.cpp:308
 msgid "Result"
 msgstr "結果"
 
@@ -4970,14 +5000,14 @@ msgstr ""
 
 #. TRANSLATORS: buy dialog label
 #. TRANSLATORS: sell dialog label
-#: src/gui/windows/buydialog.cpp:220 src/gui/windows/buydialog.cpp:507
-#: src/gui/windows/selldialog.cpp:100 src/gui/windows/selldialog.cpp:356
+#: src/gui/windows/buydialog.cpp:232 src/gui/windows/buydialog.cpp:519
+#: src/gui/windows/selldialog.cpp:108 src/gui/windows/selldialog.cpp:364
 #, c-format
 msgid "Price: %s / Total: %s"
 msgstr "価格:%s /合計:%s"
 
 #. TRANSLATORS: buy dialog label
-#: src/gui/windows/buydialog.cpp:229
+#: src/gui/windows/buydialog.cpp:241
 msgid "Amount:"
 msgstr "量:"
 
@@ -4987,9 +5017,9 @@ msgstr "量:"
 #. TRANSLATORS: npc dialog button
 #. TRANSLATORS: sell dialog button
 #. TRANSLATORS: status window label (plus sign)
-#: src/gui/windows/buydialog.cpp:234 src/gui/windows/itemamountwindow.cpp:158
+#: src/gui/windows/buydialog.cpp:246 src/gui/windows/itemamountwindow.cpp:158
 #: src/gui/windows/itemamountwindow.cpp:193 src/gui/windows/npcdialog.cpp:100
-#: src/gui/windows/selldialog.cpp:104 src/gui/windows/statuswindow.cpp:829
+#: src/gui/windows/selldialog.cpp:112 src/gui/windows/statuswindow.cpp:829
 msgid "+"
 msgstr "+"
 
@@ -4999,16 +5029,16 @@ msgstr "+"
 #. TRANSLATORS: npc dialog button
 #. TRANSLATORS: sell dialog button
 #. TRANSLATORS: status window label (minus sign)
-#: src/gui/windows/buydialog.cpp:237 src/gui/windows/itemamountwindow.cpp:156
+#: src/gui/windows/buydialog.cpp:249 src/gui/windows/itemamountwindow.cpp:156
 #: src/gui/windows/itemamountwindow.cpp:190 src/gui/windows/npcdialog.cpp:102
-#: src/gui/windows/selldialog.cpp:106 src/gui/windows/statuswindow.cpp:842
+#: src/gui/windows/selldialog.cpp:114 src/gui/windows/statuswindow.cpp:842
 msgid "-"
 msgstr "-"
 
 #. TRANSLATORS: char create dialog button
 #. TRANSLATORS: char select dialog. button.
 #. TRANSLATORS: social window button
-#: src/gui/windows/buydialog.cpp:240 src/gui/windows/charcreatedialog.cpp:119
+#: src/gui/windows/buydialog.cpp:252 src/gui/windows/charcreatedialog.cpp:117
 #: src/gui/windows/charselectdialog.cpp:585
 #: src/gui/windows/socialwindow.cpp:1274
 msgid "Create"
@@ -5019,7 +5049,7 @@ msgstr "作成"
 #. TRANSLATORS: status bar label
 #. TRANSLATORS: status window label
 #. TRANSLATORS: status bar label
-#: src/gui/windows/buydialog.cpp:244 src/gui/windows/selldialog.cpp:112
+#: src/gui/windows/buydialog.cpp:256 src/gui/windows/selldialog.cpp:120
 #: src/gui/windows/statuswindow.cpp:568 src/gui/windows/statuswindow.cpp:623
 #: src/gui/windows/statuswindow.cpp:826 src/gui/windows/statuswindow.cpp:858
 msgid "Max"
@@ -5235,7 +5265,7 @@ msgstr "別アカウントでログイン"
 #. TRANSLATORS: updater window button
 #: src/gui/windows/charselectdialog.cpp:104
 #: src/gui/windows/charselectdialog.cpp:580
-#: src/gui/windows/updaterwindow.cpp:188
+#: src/gui/windows/updaterwindow.cpp:180
 msgid "Play"
 msgstr "プレイ"
 
@@ -5291,19 +5321,19 @@ msgid "Enter password:"
 msgstr "パスワードを入力して下さい:"
 
 #. TRANSLATORS: chat message
-#: src/gui/windows/chatwindow.cpp:705
+#: src/gui/windows/chatwindow.cpp:706
 #, c-format
 msgid "Present: %s; %d players are present."
 msgstr "現在: %s; %d プレイヤーがいます"
 
 #. TRANSLATORS: chat message
-#: src/gui/windows/chatwindow.cpp:1119
+#: src/gui/windows/chatwindow.cpp:1137
 #, c-format
 msgid "Whispering to %s: %s"
 msgstr "%sにささやき中:%s"
 
 #. TRANSLATORS: owners pet name. For example: 4144's pet
-#: src/gui/windows/chatwindow.cpp:1563
+#: src/gui/windows/chatwindow.cpp:1581
 #, c-format
 msgid "%s's pet"
 msgstr ""
@@ -5563,7 +5593,7 @@ msgstr "サーバー編集"
 #. TRANSLATORS: edit server dialog button
 #. TRANSLATORS: servers dialog button
 #: src/gui/windows/editserverdialog.cpp:54
-#: src/gui/windows/serverdialog.cpp:200
+#: src/gui/windows/serverdialog.cpp:202
 msgid "Connect"
 msgstr "接続"
 
@@ -5658,107 +5688,107 @@ msgid "Unknown."
 msgstr "不明"
 
 #. TRANSLATORS: kill stats window button
-#: src/gui/windows/killstats.cpp:50
+#: src/gui/windows/killstats.cpp:46
 msgid "Reset stats"
 msgstr "統計をリセット"
 
 #. TRANSLATORS: kill stats window button
-#: src/gui/windows/killstats.cpp:52
+#: src/gui/windows/killstats.cpp:48
 msgid "Reset timer"
 msgstr "タイマーをリセット"
 
 #. TRANSLATORS: kill stats window label
-#: src/gui/windows/killstats.cpp:57 src/gui/windows/killstats.cpp:169
-#: src/gui/windows/killstats.cpp:274 src/gui/windows/killstats.cpp:507
+#: src/gui/windows/killstats.cpp:53 src/gui/windows/killstats.cpp:165
+#: src/gui/windows/killstats.cpp:270 src/gui/windows/killstats.cpp:512
 #, c-format
 msgid "Kills: %s, total exp: %s"
 msgstr "キル: %s, 合計exp: %s"
 
 #. TRANSLATORS: kill stats window label
-#: src/gui/windows/killstats.cpp:60 src/gui/windows/killstats.cpp:171
-#: src/gui/windows/killstats.cpp:251 src/gui/windows/killstats.cpp:266
-#: src/gui/windows/killstats.cpp:509
+#: src/gui/windows/killstats.cpp:56 src/gui/windows/killstats.cpp:167
+#: src/gui/windows/killstats.cpp:247 src/gui/windows/killstats.cpp:262
+#: src/gui/windows/killstats.cpp:514
 #, c-format
 msgid "Avg Exp: %s"
 msgstr "平均 Exp: %s"
 
 #. TRANSLATORS: kill stats window label
-#: src/gui/windows/killstats.cpp:62 src/gui/windows/killstats.cpp:174
-#: src/gui/windows/killstats.cpp:256 src/gui/windows/killstats.cpp:270
-#: src/gui/windows/killstats.cpp:512
+#: src/gui/windows/killstats.cpp:58 src/gui/windows/killstats.cpp:170
+#: src/gui/windows/killstats.cpp:252 src/gui/windows/killstats.cpp:266
+#: src/gui/windows/killstats.cpp:517
 #, c-format
 msgid "No. of avg mob to next level: %s"
 msgstr "次のレベルまでに必要なモブ数　約: %s"
 
 #. TRANSLATORS: kill stats window label
-#: src/gui/windows/killstats.cpp:65 src/gui/windows/killstats.cpp:185
-#: src/gui/windows/killstats.cpp:278 src/gui/windows/killstats.cpp:515
+#: src/gui/windows/killstats.cpp:61 src/gui/windows/killstats.cpp:181
+#: src/gui/windows/killstats.cpp:274 src/gui/windows/killstats.cpp:520
 #, c-format
 msgid "Kills/Min: %s, Exp/Min: %s"
 msgstr "キル/分: %s, Exp/分: %s"
 
 #. TRANSLATORS: kill stats window label
-#: src/gui/windows/killstats.cpp:69 src/gui/windows/killstats.cpp:74
-#: src/gui/windows/killstats.cpp:79 src/gui/windows/killstats.cpp:335
-#: src/gui/windows/killstats.cpp:354 src/gui/windows/killstats.cpp:375
+#: src/gui/windows/killstats.cpp:65 src/gui/windows/killstats.cpp:70
+#: src/gui/windows/killstats.cpp:75 src/gui/windows/killstats.cpp:340
+#: src/gui/windows/killstats.cpp:359 src/gui/windows/killstats.cpp:380
 #, c-format
 msgid "Exp speed per %d min: %s"
 msgid_plural "Exp speed per %d min: %s"
 msgstr[0] "Expスピード %d 分ごと: %s"
 
-#: src/gui/windows/killstats.cpp:71 src/gui/windows/killstats.cpp:76
-#: src/gui/windows/killstats.cpp:82
+#: src/gui/windows/killstats.cpp:67 src/gui/windows/killstats.cpp:72
+#: src/gui/windows/killstats.cpp:78
 #, c-format
 msgid "Time for next level per %d min: %s"
 msgid_plural "Time for next level per %d min: %s"
 msgstr[0] "次のレベルアップ %d 分ごと: %s"
 
 #. TRANSLATORS: kill stats window label
-#: src/gui/windows/killstats.cpp:85 src/gui/windows/killstats.cpp:283
+#: src/gui/windows/killstats.cpp:81 src/gui/windows/killstats.cpp:279
 msgid "Last kill exp:"
 msgstr "最後のExp:"
 
 #. TRANSLATORS: kill stats window label
-#: src/gui/windows/killstats.cpp:88 src/gui/windows/killstats.cpp:406
-#: src/gui/windows/killstats.cpp:413 src/gui/windows/killstats.cpp:420
-#: src/gui/windows/killstats.cpp:426
+#: src/gui/windows/killstats.cpp:84 src/gui/windows/killstats.cpp:411
+#: src/gui/windows/killstats.cpp:418 src/gui/windows/killstats.cpp:425
+#: src/gui/windows/killstats.cpp:431
 msgid "Time before jacko spawn:"
 msgstr "次のJackOの出現まで:"
 
 #. TRANSLATORS: kill stats window label
-#: src/gui/windows/killstats.cpp:119 src/gui/windows/killstats.cpp:236
+#: src/gui/windows/killstats.cpp:119 src/gui/windows/killstats.cpp:232
 #, c-format
 msgid "Level: %d at %f%%"
 msgstr "レベル: %d と %f%%"
 
 #. TRANSLATORS: kill stats window label
-#: src/gui/windows/killstats.cpp:124 src/gui/windows/killstats.cpp:241
+#: src/gui/windows/killstats.cpp:124 src/gui/windows/killstats.cpp:237
 #, c-format
 msgid "Exp: %d/%d Left: %d"
 msgstr "Exp: %d/%d 残り: %d"
 
 #. TRANSLATORS: kill stats window label
-#: src/gui/windows/killstats.cpp:128 src/gui/windows/killstats.cpp:247
-#: src/gui/windows/killstats.cpp:261
+#: src/gui/windows/killstats.cpp:128 src/gui/windows/killstats.cpp:243
+#: src/gui/windows/killstats.cpp:257
 #, c-format
 msgid "1%% = %d exp, avg mob for 1%%: %s"
 msgstr "1%% = %d exp, 平均の敵 1%%: %s"
 
 #. TRANSLATORS: kill stats window label
-#: src/gui/windows/killstats.cpp:341 src/gui/windows/killstats.cpp:350
-#: src/gui/windows/killstats.cpp:361 src/gui/windows/killstats.cpp:370
-#: src/gui/windows/killstats.cpp:383 src/gui/windows/killstats.cpp:392
+#: src/gui/windows/killstats.cpp:346 src/gui/windows/killstats.cpp:355
+#: src/gui/windows/killstats.cpp:366 src/gui/windows/killstats.cpp:375
+#: src/gui/windows/killstats.cpp:388 src/gui/windows/killstats.cpp:397
 #, c-format
 msgid "  Time for next level: %s"
 msgstr "  次のレベル達成までの時間: %s"
 
 #. TRANSLATORS: kill stats window label
-#: src/gui/windows/killstats.cpp:413
+#: src/gui/windows/killstats.cpp:418
 #, c-format
 msgid "%s %d?"
 msgstr "%s %d?"
 
-#: src/gui/windows/killstats.cpp:420
+#: src/gui/windows/killstats.cpp:425
 msgid "jacko spawning"
 msgstr "JackOが出現中"
 
@@ -5811,42 +5841,42 @@ msgstr "アップデートホスト: %s"
 msgid "Open register url"
 msgstr ""
 
-#: src/gui/windows/ministatuswindow.cpp:67
+#: src/gui/windows/ministatuswindow.cpp:63
 msgid "health bar"
 msgstr "健康"
 
 #. TRANSLATORS: status bar name
-#: src/gui/windows/ministatuswindow.cpp:78
+#: src/gui/windows/ministatuswindow.cpp:74
 msgid "mana bar"
 msgstr "マナ"
 
 #. TRANSLATORS: status bar name
-#: src/gui/windows/ministatuswindow.cpp:82
+#: src/gui/windows/ministatuswindow.cpp:78
 msgid "experience bar"
 msgstr "Expバー"
 
 #. TRANSLATORS: status bar name
-#: src/gui/windows/ministatuswindow.cpp:87
+#: src/gui/windows/ministatuswindow.cpp:83
 msgid "weight bar"
 msgstr "重量"
 
 #. TRANSLATORS: status bar name
-#: src/gui/windows/ministatuswindow.cpp:93
+#: src/gui/windows/ministatuswindow.cpp:89
 msgid "inventory slots bar"
 msgstr "インベントリースロットバー"
 
 #. TRANSLATORS: status bar name
-#: src/gui/windows/ministatuswindow.cpp:97
+#: src/gui/windows/ministatuswindow.cpp:93
 msgid "money bar"
 msgstr "金銭"
 
 #. TRANSLATORS: status bar name
-#: src/gui/windows/ministatuswindow.cpp:101
+#: src/gui/windows/ministatuswindow.cpp:97
 msgid "arrows bar"
 msgstr "矢"
 
 #. TRANSLATORS: status bar name
-#: src/gui/windows/ministatuswindow.cpp:106
+#: src/gui/windows/ministatuswindow.cpp:102
 msgid "status bar"
 msgstr "情勢"
 
@@ -5903,8 +5933,8 @@ msgstr "決定"
 #. TRANSLATORS: shop window label
 #. TRANSLATORS: shop window button
 #. TRANSLATORS: trade window button
-#: src/gui/windows/npcdialog.cpp:109 src/gui/windows/serverdialog.cpp:202
-#: src/gui/windows/shopwindow.cpp:92 src/gui/windows/shopwindow.cpp:99
+#: src/gui/windows/npcdialog.cpp:109 src/gui/windows/serverdialog.cpp:204
+#: src/gui/windows/shopwindow.cpp:93 src/gui/windows/shopwindow.cpp:100
 #: src/gui/windows/tradewindow.cpp:78
 msgid "Add"
 msgstr "追加"
@@ -5994,12 +6024,12 @@ msgid "Passwords do not match."
 msgstr "パスワードが一致しません"
 
 #. TRANSLATORS: sell confirmation header
-#: src/gui/windows/selldialog.cpp:246
+#: src/gui/windows/selldialog.cpp:254
 msgid "sell item"
 msgstr ""
 
 #. TRANSLATORS: sell confirmation message
-#: src/gui/windows/selldialog.cpp:248
+#: src/gui/windows/selldialog.cpp:256
 #, c-format
 msgid "Do you really want to sell %s?"
 msgstr ""
@@ -6010,7 +6040,7 @@ msgid "Choose Your Server"
 msgstr "サーバーを選択してください"
 
 #. TRANSLATORS: servers dialog button
-#: src/gui/windows/serverdialog.cpp:208
+#: src/gui/windows/serverdialog.cpp:210
 msgid "Load"
 msgstr "読込み"
 
@@ -6072,23 +6102,23 @@ msgid "Personal Shop"
 msgstr "最大 (15)"
 
 #. TRANSLATORS: shop window label
-#: src/gui/windows/shopwindow.cpp:88
+#: src/gui/windows/shopwindow.cpp:89
 msgid "Buy items"
 msgstr "購入"
 
 #. TRANSLATORS: shop window label
-#: src/gui/windows/shopwindow.cpp:90
+#: src/gui/windows/shopwindow.cpp:91
 msgid "Sell items"
 msgstr "販売"
 
 #. TRANSLATORS: shop window label
 #. TRANSLATORS: shop window button
-#: src/gui/windows/shopwindow.cpp:96 src/gui/windows/shopwindow.cpp:103
+#: src/gui/windows/shopwindow.cpp:97 src/gui/windows/shopwindow.cpp:104
 msgid "Announce"
 msgstr "アナウンス"
 
 #. TRANSLATORS: shop window checkbox
-#: src/gui/windows/shopwindow.cpp:107
+#: src/gui/windows/shopwindow.cpp:108
 msgid "Show links in announce"
 msgstr "アナウンスにリンクを表示する"
 
@@ -6574,7 +6604,7 @@ msgid "Updating..."
 msgstr "更新しています..."
 
 #. TRANSLATORS: updater window label
-#: src/gui/windows/updaterwindow.cpp:184
+#: src/gui/windows/updaterwindow.cpp:176
 msgid "Connecting..."
 msgstr "接続しています..."
 
@@ -6603,12 +6633,12 @@ msgid "Completed"
 msgstr "完了"
 
 #. TRANSLATORS: who is online window name
-#: src/gui/windows/whoisonline.cpp:81 src/gui/windows/whoisonline.cpp:641
+#: src/gui/windows/whoisonline.cpp:81 src/gui/windows/whoisonline.cpp:616
 msgid "Who Is Online - Updating"
 msgstr "オンラインリスト - アップデート中"
 
 #. TRANSLATORS: who is online. button.
-#: src/gui/windows/whoisonline.cpp:95
+#: src/gui/windows/whoisonline.cpp:92
 msgid "Update"
 msgstr "アップデート"
 
@@ -6618,12 +6648,12 @@ msgid "Who Is Online - "
 msgstr "オンラインリスト - "
 
 #. TRANSLATORS: who is online window name
-#: src/gui/windows/whoisonline.cpp:656
+#: src/gui/windows/whoisonline.cpp:631
 msgid "Who Is Online - error"
 msgstr "オンラインリスト - エラー"
 
 #. TRANSLATORS: who is online window name
-#: src/gui/windows/whoisonline.cpp:698
+#: src/gui/windows/whoisonline.cpp:673
 msgid "Who Is Online - Update"
 msgstr "オンラインリスト - アップデート"
 
@@ -6645,25 +6675,25 @@ msgstr "世界の選択"
 #. TRANSLATORS: long key name. must be short.
 #. TRANSLATORS: short key name. must be very short.
 #. TRANSLATORS: long key name, should be short
-#: src/input/inputmanager.cpp:383 src/input/inputmanager.cpp:427
+#: src/input/inputmanager.cpp:360 src/input/inputmanager.cpp:404
 #: src/input/keyboardconfig.cpp:101
 #, c-format
 msgid "key_%d"
 msgstr "キー_%d"
 
 #. TRANSLATORS: long joystick button name. must be short.
-#: src/input/inputmanager.cpp:389
+#: src/input/inputmanager.cpp:366
 #, c-format
 msgid "JButton%d"
 msgstr "ジョイスティックボタン%d"
 
 #. TRANSLATORS: unknown long key type
-#: src/input/inputmanager.cpp:403
+#: src/input/inputmanager.cpp:380
 msgid "unknown key"
 msgstr "不明なキー"
 
 #. TRANSLATORS: short joystick button name. muse be very short
-#: src/input/inputmanager.cpp:433
+#: src/input/inputmanager.cpp:410
 #, c-format
 msgid "JB%d"
 msgstr "JB%d"
@@ -6671,7 +6701,7 @@ msgstr "JB%d"
 #. TRANSLATORS: unknown short key type. must be short
 #. TRANSLATORS: Unknown key short string.
 #. TRANSLATORS: This string must be maximum 5 chars
-#: src/input/inputmanager.cpp:447 src/input/keyboardconfig.cpp:145
+#: src/input/inputmanager.cpp:424 src/input/keyboardconfig.cpp:145
 msgid "u key"
 msgstr "u キー"
 
@@ -6910,11 +6940,11 @@ msgstr "%sがオフラインの為ささやきは送れませんでした"
 msgid "Whisper could not be sent, ignored by %s."
 msgstr "%sが完全無視設定をしている為ささやきは送れませんでした"
 
-#: src/net/ea/gamehandler.cpp:85
+#: src/net/ea/gamehandler.cpp:88
 msgid "Game"
 msgstr "ゲーム"
 
-#: src/net/ea/gamehandler.cpp:85
+#: src/net/ea/gamehandler.cpp:88
 msgid "Request to quit denied!"
 msgstr "今キャンセルできません"
 
@@ -7100,17 +7130,17 @@ msgid "Username permanently erased."
 msgstr "ユーザーネームは永久に削除されました"
 
 #. TRANSLATORS: error message
-#: src/net/ea/network.cpp:99
+#: src/net/ea/network.cpp:100
 msgid "Empty address given to Network::connect()!"
 msgstr "ネットワークに空のアドレスが送信されました::connect()!"
 
 #. TRANSLATORS: error message
-#: src/net/ea/network.cpp:201
+#: src/net/ea/network.cpp:202
 msgid "Unable to resolve host \""
 msgstr "ホスト名を解決できません"
 
 #. TRANSLATORS: error message
-#: src/net/ea/network.cpp:280
+#: src/net/ea/network.cpp:282
 msgid "Connection to server terminated. "
 msgstr "サーバーへの接続が切断されました "
 

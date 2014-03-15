@@ -20,30 +20,19 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef GUI_WIDGETS_CONTAINER_H
-#define GUI_WIDGETS_CONTAINER_H
+public:
+    inline void drawVertexes(const NormalOpenGLGraphicsVertexes &ogl);
 
-#include "gui/widgets/basiccontainer2.h"
+    void initArrays() override final;
 
-/**
- * A widget container.
- *
- * The main difference between the standard Guichan container and this one is
- * that childs added to this container are automatically deleted when the
- * container is deleted.
- *
- * This container is also non-opaque by default.
- */
-class Container : public BasicContainer2
-{
-    public:
-        explicit Container(const Widget2 *const widget);
+#ifdef DEBUG_DRAW_CALLS
+    unsigned int getDrawCalls() const
+    { return mLastDrawCalls; }
 
-        virtual ~Container();
+    static unsigned int mDrawCalls;
 
-        bool safeRemove(Widget *const widget);
+    static unsigned int mLastDrawCalls;
+#endif
 
-        void removeControls();
-};
-
-#endif  // GUI_WIDGETS_CONTAINER_H
+protected:
+    void debugBindTexture(const Image *const image);

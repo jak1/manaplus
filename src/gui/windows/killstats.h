@@ -46,7 +46,8 @@ class KillStats final : public Window,
         /**
          * Destructor.
          */
-        ~KillStats();
+        ~KillStats()
+        { }
 
         /**
          * Stuff.
@@ -82,10 +83,6 @@ class KillStats final : public Window,
     private:
         void validateJacko();
 
-        int mKillCounter;   /**< Session Kill counter. */
-        int mExpCounter;    /**< Session Exp counter. */
-        int mKillTCounter;   /**< Timer Kill counter. */
-        int mExpTCounter;    /**< Timer Exp counter. */
         time_t mKillTimer;  /**< Timer for kill stats. */
         Button *mResetButton;
         Button *mTimerButton;
@@ -106,6 +103,11 @@ class KillStats final : public Window,
 
         Label *mLastKillExpLabel;
         Label *mTimeBeforeJackoLabel;
+
+        int mKillCounter;   /**< Session Kill counter. */
+        int mExpCounter;    /**< Session Exp counter. */
+        int mKillTCounter;   /**< Timer Kill counter. */
+        int mExpTCounter;    /**< Timer Exp counter. */
 
         int m1minExpTime;
         int m1minExpNum;

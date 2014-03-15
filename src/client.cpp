@@ -76,6 +76,7 @@
 #include "gui/widgets/desktop.h"
 
 #include "net/chathandler.h"
+#include "net/download.h"
 #include "net/gamehandler.h"
 #include "net/generalhandler.h"
 #include "net/guildhandler.h"
@@ -185,7 +186,8 @@ bool isSafeMode = false;
 int serverVersion = 0;
 unsigned int tmwServerVersion = 0;
 int start_time;
-
+unsigned int mLastHost = 0;
+unsigned long mSearchHash = 0;
 int textures_count = 0;
 
 #ifdef WIN32
@@ -234,6 +236,7 @@ Client::Client(const Options &options) :
     mSetupButton(nullptr),
     mVideoButton(nullptr),
     mHelpButton(nullptr),
+    mAboutButton(nullptr),
     mThemesButton(nullptr),
     mPerfomanceButton(nullptr),
 #ifdef ANDROID
@@ -243,13 +246,13 @@ Client::Client(const Options &options) :
     mOldState(STATE_START),
     mIcon(nullptr),
     mCaption(),
+    mOldUpdates(),
     mFpsManager(),
     mSkin(nullptr),
+    mGuiAlpha(1.0F),
     mButtonPadding(1),
     mButtonSpacing(3),
     mKeyboardHeight(0),
-    mOldUpdates(),
-    mGuiAlpha(1.0F),
     mLimitFps(false),
     mConfigAutoSaved(false),
     mIsMinimized(false),
@@ -1123,7 +1126,7 @@ int Client::gameExec()
             if (!gui)
                 break;
 
-            gcn::Container *const top = static_cast<gcn::Container*>(
+            BasicContainer2 *const top = static_cast<BasicContainer2*>(
                 gui->getTop());
 
             if (!top)
@@ -1136,7 +1139,6 @@ int Client::gameExec()
             ADDBUTTON(mSetupButton, new Button(mDesktop,
                 // TRANSLATORS: setup tab quick button
                 _("Setup"), "Setup", this))
-#ifndef WIN32
             ADDBUTTON(mPerfomanceButton, new Button(mDesktop,
                 // TRANSLATORS: perfoamance tab quick button
                 _("Performance"), "Perfomance", this))
@@ -1146,6 +1148,9 @@ int Client::gameExec()
             ADDBUTTON(mThemesButton, new Button(mDesktop,
                 // TRANSLATORS: theme tab quick button
                 _("Theme"), "Themes", this))
+            ADDBUTTON(mAboutButton, new Button(mDesktop,
+                // TRANSLATORS: theme tab quick button
+                _("About"), "about", this))
             ADDBUTTON(mHelpButton, new Button(mDesktop,
                 // TRANSLATORS: theme tab quick button
                 _("Help"), "help", this))
@@ -1153,7 +1158,6 @@ int Client::gameExec()
             ADDBUTTON(mCloseButton, new Button(mDesktop,
                 // TRANSLATORS: close quick button
                 _("Close"), "close", this))
-#endif
 #endif
             mDesktop->setSize(mainGraphics->getWidth(),
                 mainGraphics->getHeight());
@@ -1299,6 +1303,9 @@ int Client::gameExec()
                     loginData.updateType
                         = serverConfig.getValue("updateType", 1);
 
+                    mSearchHash = Net::Download::adlerBuffer(
+                        const_cast<char*>(mCurrentServer.hostname.c_str()),
+                        mCurrentServer.hostname.size());
                     if (mOptions.username.empty()
                         || mOptions.password.empty())
                     {
@@ -1323,7 +1330,7 @@ int Client::gameExec()
                         // TRANSLATORS: connection dialog header
                         _("Logging in"), STATE_SWITCH_SERVER);
                     mCurrentDialog->postInit();
-                    accountLogin(&loginData);
+                    Net::getLoginHandler()->loginOrRegister(&loginData);
                     BLOCK_END("Client::gameExec STATE_LOGIN_ATTEMPT")
                     break;
 
@@ -1579,6 +1586,8 @@ int Client::gameExec()
                     mVideoButton = nullptr;
                     delete mThemesButton;
                     mThemesButton = nullptr;
+                    delete mAboutButton;
+                    mAboutButton = nullptr;
                     delete mHelpButton;
                     mHelpButton = nullptr;
                     delete mPerfomanceButton;
@@ -1867,6 +1876,11 @@ void Client::action(const ActionEvent &event)
     else if (eventId == "help")
     {
         inputManager.executeAction(Input::KEY_WINDOW_HELP);
+        return;
+    }
+    else if (eventId == "about")
+    {
+        inputManager.executeAction(Input::KEY_WINDOW_ABOUT);
         return;
     }
     else if (eventId == "Video")
@@ -2338,30 +2352,6 @@ void Client::initScreenshotDir()
         }
     }
     logger->log("screenshotDirectory: " + mScreenshotDir);
-}
-
-void Client::accountLogin(LoginData *const data)
-{
-    if (!data)
-        return;
-
-    logger->log("Username is %s", data->username.c_str());
-
-    // Send login infos
-    if (data->registerLogin)
-        Net::getLoginHandler()->registerAccount(data);
-    else
-        Net::getLoginHandler()->loginAccount(data);
-
-    // Clear the password, avoids auto login when returning to login
-    data->password.clear();
-
-    const bool remember = data->remember;
-    if (remember)
-        serverConfig.setValue("username", data->username);
-    else
-        serverConfig.setValue("username", "");
-    serverConfig.setValue("remember", remember);
 }
 
 #ifndef ANDROID
@@ -2984,7 +2974,10 @@ void Client::checkConfigVersion()
     if (version < 6)
         config.setValue("blur", false);
 
-    config.setValue("cfgver", 6);
+    if (version < 7)
+        config.setValue("download-music", true);
+
+    config.setValue("cfgver", 7);
 }
 
 Window *Client::openErrorDialog(const std::string &header,

@@ -20,13 +20,54 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/*      _______   __   __   __   ______   __   __   _______   __   __
+ *     / _____/\ / /\ / /\ / /\ / ____/\ / /\ / /\ / ___  /\ /  |\/ /\
+ *    / /\____\// / // / // / // /\___\// /_// / // /\_/ / // , |/ / /
+ *   / / /__   / / // / // / // / /    / ___  / // ___  / // /| ' / /
+ *  / /_// /\ / /_// / // / // /_/_   / / // / // /\_/ / // / |  / /
+ * /______/ //______/ //_/ //_____/\ /_/ //_/ //_/ //_/ //_/ /|_/ /
+ * \______\/ \______\/ \_\/ \_____\/ \_\/ \_\/ \_\/ \_\/ \_\/ \_\/
+ *
+ * Copyright (c) 2004 - 2008 Olof Naessén and Per Larsson
+ *
+ *
+ * Per Larsson a.k.a finalman
+ * Olof Naessén a.k.a jansem/yakslem
+ *
+ * Visit: http://guichan.sourceforge.net
+ *
+ * License: (BSD)
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in
+ *    the documentation and/or other materials provided with the
+ *    distribution.
+ * 3. Neither the name of Guichan nor the names of its contributors may
+ *    be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+ * TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
 #include "gui/widgets/textfield.h"
 
 #include "client.h"
 
 #include "input/inputmanager.h"
-
-#include "events/keyevent.h"
 
 #include "gui/font.h"
 #include "gui/gui.h"
@@ -54,9 +95,13 @@ TextField::TextField(const Widget2 *restrict const widget,
                      ActionListener *restrict const listener,
                      const std::string &restrict eventId,
                      const bool sendAlwaysEvents):
-    gcn::TextField(widget, text),
+    Widget(widget),
     FocusListener(),
-    mSendAlwaysEvents(sendAlwaysEvents),
+    KeyListener(),
+    MouseListener(),
+    mText(text),
+    mCaretPosition(0),
+    mXScroll(0),
     mCaretColor(&getThemeColor(Theme::CARET)),
     mPopupMenu(nullptr),
     mMinimum(0),
@@ -64,8 +109,14 @@ TextField::TextField(const Widget2 *restrict const widget,
     mLastEventPaste(false),
     mPadding(1),
     mNumeric(false),
-    mLoseFocusOnTab(loseFocusOnTab)
+    mLoseFocusOnTab(loseFocusOnTab),
+    mAllowSpecialActions(true),
+    mSendAlwaysEvents(sendAlwaysEvents)
 {
+    setFocusable(true);
+    addMouseListener(this);
+    addKeyListener(this);
+
     setFrameSize(2);
     mForegroundColor = getThemeColor(Theme::TEXTFIELD);
     mForegroundColor2 = getThemeColor(Theme::TEXTFIELD_OUTLINE);
@@ -271,40 +322,22 @@ void TextField::keyPressed(KeyEvent &keyEvent)
         mLastEventPaste = 0;
 
     bool consumed(false);
-    handleSDLKeys(val, consumed);
-
-    if (consumed)
-    {
-        if (mSendAlwaysEvents)
-            distributeActionEvent();
-
-        keyEvent.consume();
-        fixScroll();
-        return;
-    }
 #endif
 
-    if (consumed)
+    const int action = keyEvent.getActionId();
+    if (!inputManager.isActionActive(static_cast<int>(
+        Input::KEY_GUI_CTRL)))
     {
-        keyEvent.consume();
+        if (!handleNormalKeys(action, consumed))
+        {
+            if (consumed)
+                keyEvent.consume();
+            return;
+        }
     }
     else
     {
-        const int action = keyEvent.getActionId();
-        if (!inputManager.isActionActive(static_cast<int>(
-            Input::KEY_GUI_CTRL)))
-        {
-            if (!handleNormalKeys(action, consumed))
-            {
-                if (consumed)
-                    keyEvent.consume();
-                return;
-            }
-        }
-        else
-        {
-            handleCtrlKeys(action, consumed);
-        }
+        handleCtrlKeys(action, consumed);
     }
 
     if (mSendAlwaysEvents)
@@ -413,16 +446,18 @@ void TextField::handleCtrlKeys(const int action, bool &consumed)
             consumed = true;
             break;
         }
-#ifdef USE_SDL2
         case Input::KEY_GUI_B:
         {
-            moveCaretBack();
-            consumed = true;
+            if (mAllowSpecialActions)
+            {
+                moveCaretBack();
+                consumed = true;
+            }
             break;
         }
-        case Input::KEY_GUI_C:
+        case Input::KEY_GUI_F:
         {
-            handleCopy();
+            moveCaretForward();
             consumed = true;
             break;
         }
@@ -438,21 +473,9 @@ void TextField::handleCtrlKeys(const int action, bool &consumed)
             consumed = true;
             break;
         }
-        case Input::KEY_GUI_F:
-        {
-            moveCaretBack();
-            consumed = true;
-            break;
-        }
         case Input::KEY_GUI_H:
         {
             deleteCharLeft(mText, &mCaretPosition);
-            consumed = true;
-            break;
-        }
-        case Input::KEY_GUI_U:
-        {
-            caretDeleteToStart();
             consumed = true;
             break;
         }
@@ -462,9 +485,29 @@ void TextField::handleCtrlKeys(const int action, bool &consumed)
             consumed = true;
             break;
         }
+        case Input::KEY_GUI_U:
+        {
+            caretDeleteToStart();
+            consumed = true;
+            break;
+        }
+        case Input::KEY_GUI_C:
+        {
+            handleCopy();
+            consumed = true;
+            break;
+        }
         case Input::KEY_GUI_V:
         {
+#ifdef USE_SDL2
             handlePaste();
+#else
+            // hack to prevent paste key sticking
+            if (mLastEventPaste && mLastEventPaste > cur_time)
+                break;
+            handlePaste();
+            mLastEventPaste = cur_time + 2;
+#endif
             consumed = true;
             break;
         }
@@ -474,82 +517,10 @@ void TextField::handleCtrlKeys(const int action, bool &consumed)
             consumed = true;
             break;
         }
-#endif
         default:
             break;
     }
 }
-
-#ifndef USE_SDL2
-void TextField::handleSDLKeys(const int val, bool &consumed)
-{
-    switch (val)
-    {
-        case 2:  // Ctrl+b
-        {
-            moveCaretBack();
-            consumed = true;
-            break;
-        }
-
-        case 6:  // Ctrl+f
-        {
-            moveCaretForward();
-            consumed = true;
-            break;
-        }
-
-        case 4:  // Ctrl+d
-        {
-            caretDelete();
-            consumed = true;
-            break;
-        }
-
-        case 8:  // Ctrl+h
-            deleteCharLeft(mText, &mCaretPosition);
-            consumed = true;
-            break;
-
-        case 5:  // Ctrl+e
-            mCaretPosition = static_cast<int>(mText.size());
-            consumed = true;
-            break;
-
-        case 11:  // Ctrl+k
-            mText = mText.substr(0, mCaretPosition);
-            consumed = true;
-            break;
-
-        case 21:  // Ctrl+u
-            caretDeleteToStart();
-            consumed = true;
-            break;
-
-        case 3:  // Ctrl+c
-            handleCopy();
-            consumed = true;
-            break;
-
-        case 22:  // Control code 22, SYNCHRONOUS IDLE, sent on Ctrl+v
-            // hack to prevent paste key sticking
-            if (mLastEventPaste && mLastEventPaste > cur_time)
-                break;
-            handlePaste();
-            mLastEventPaste = cur_time + 2;
-            consumed = true;
-            break;
-
-        case 23:  // Ctrl+w
-            caretDeleteWord();
-            consumed = true;
-            break;
-
-        default:
-            break;
-    }
-}
-#endif
 
 void TextField::moveCaretBack()
 {
@@ -751,9 +722,11 @@ void TextField::mousePressed(MouseEvent &mouseEvent)
             }
         }
     }
-    else
+    else if (mouseEvent.getButton() == MouseEvent::LEFT)
     {
-        gcn::TextField::mousePressed(mouseEvent);
+        mCaretPosition = getFont()->getStringIndexAt(
+            mText, mouseEvent.getX() + mXScroll);
+        fixScroll();
     }
 }
 
@@ -767,4 +740,17 @@ void TextField::focusGained(const Event &event A_UNUSED)
 
 void TextField::focusLost(const Event &event A_UNUSED)
 {
+}
+
+void TextField::setText(const std::string& text)
+{
+    const size_t sz = text.size();
+    if (sz < mCaretPosition)
+        mCaretPosition = sz;
+    mText = text;
+}
+
+void TextField::mouseDragged(MouseEvent& mouseEvent)
+{
+    mouseEvent.consume();
 }

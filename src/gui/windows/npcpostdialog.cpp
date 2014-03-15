@@ -43,9 +43,9 @@ NpcPostDialog::NpcPostDialog(const int npcId):
     // TRANSLATORS: npc post dialog caption
     Window(_("NPC"), false, nullptr, "npcpost.xml"),
     ActionListener(),
-    mNpcId(npcId),
     mText(new TextBox(this)),
-    mSender(new TextField(this))
+    mSender(new TextField(this)),
+    mNpcId(npcId)
 {
     setContentSize(400, 180);
 }
@@ -75,7 +75,7 @@ void NpcPostDialog::postInit()
 
     // create scroll box for letter text
     ScrollArea *const scrollArea = new ScrollArea(this, mText);
-    scrollArea->setHorizontalScrollPolicy(gcn::ScrollArea::SHOW_NEVER);
+    scrollArea->setHorizontalScrollPolicy(ScrollArea::SHOW_NEVER);
     scrollArea->setDimension(Rect(
                 5, mSender->getHeight() + 5,
                 380, 140 - (mSender->getHeight() + sendButton->getHeight())));

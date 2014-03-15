@@ -27,13 +27,13 @@
 #include "gui/widgets/layout.h"
 
 #include "actormanager.h"
+#include "client.h"
 #include "game.h"
 
 #include "being/localplayer.h"
 #include "being/playerinfo.h"
 
 #include "utils/gettext.h"
-#include "utils/stringutils.h"
 
 #include "debug.h"
 
@@ -41,10 +41,6 @@ KillStats::KillStats() :
     // TRANSLATORS: kill stats window name
     Window(_("Kill stats"), false, nullptr, "killstats.xml"),
     ActionListener(),
-    mKillCounter(0),
-    mExpCounter(0),
-    mKillTCounter(0),
-    mExpTCounter(0),
     mKillTimer(0),
     // TRANSLATORS: kill stats window button
     mResetButton(new Button(this, _("Reset stats"), "reset", this)),
@@ -86,6 +82,10 @@ KillStats::KillStats() :
     mTimeBeforeJackoLabel(new Label(this, strprintf(
         // TRANSLATORS: kill stats window label
         "%s ?", _("Time before jacko spawn:")))),
+    mKillCounter(0),
+    mExpCounter(0),
+    mKillTCounter(0),
+    mExpTCounter(0),
     m1minExpTime(0),
     m1minExpNum(0),
     m1minSpeed(0),
@@ -150,10 +150,6 @@ KillStats::KillStats() :
 
     loadWindowState();
     enableVisibleSound(true);
-}
-
-KillStats::~KillStats()
-{
 }
 
 void KillStats::action(const ActionEvent &event)
@@ -300,6 +296,15 @@ void KillStats::recalcStats()
         else
             m1minSpeed = 0;
         m1minExpTime = curTime;
+        m1minExpNum = newExp;
+    }
+
+    if (curTime != 0 && mLastHost == 0xFF6B66 && cur_time > 1)
+    {
+        const int newExp = PlayerInfo::getAttribute(PlayerInfo::EXP_NEEDED);
+        if (m1minExpTime != 0)
+            m1minSpeed = newExp - m1minExpNum;
+        mStatsReUpdated = true;
         m1minExpNum = newExp;
     }
 

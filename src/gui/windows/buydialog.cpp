@@ -162,9 +162,13 @@ BuyDialog::BuyDialog() :
     Window(_("Create items"), false, nullptr, "buy.xml"),
     ActionListener(),
     SelectionListener(),
-    mNpcId(-2), mMoney(0), mAmountItems(0), mMaxItems(0), mNick(),
     mSortModel(nullptr),
-    mSortDropDown(nullptr)
+    mSortDropDown(nullptr),
+    mNpcId(-2),
+    mMoney(0),
+    mAmountItems(0),
+    mMaxItems(0),
+    mNick()
 {
     init();
 }
@@ -174,9 +178,13 @@ BuyDialog::BuyDialog(const int npcId) :
     Window(_("Buy"), false, nullptr, "buy.xml"),
     ActionListener(),
     SelectionListener(),
-    mNpcId(npcId), mMoney(0), mAmountItems(0), mMaxItems(0), mNick(),
     mSortModel(nullptr),
-    mSortDropDown(nullptr)
+    mSortDropDown(nullptr),
+    mNpcId(npcId),
+    mMoney(0),
+    mAmountItems(0),
+    mMaxItems(0),
+    mNick()
 {
     init();
 }
@@ -186,9 +194,13 @@ BuyDialog::BuyDialog(std::string nick) :
     Window(_("Buy"), false, nullptr, "buy.xml"),
     ActionListener(),
     SelectionListener(),
-    mNpcId(-1), mMoney(0), mAmountItems(0), mMaxItems(0), mNick(nick),
     mSortModel(new SortListModelBuy),
-    mSortDropDown(new DropDown(this, mSortModel, false, false, this, "sort"))
+    mSortDropDown(new DropDown(this, mSortModel, false, false, this, "sort")),
+    mNpcId(-1),
+    mMoney(0),
+    mAmountItems(0),
+    mMaxItems(0),
+    mNick(nick)
 {
     init();
 }
@@ -209,7 +221,7 @@ void BuyDialog::init()
     mShopItemList->postInit();
     mScrollArea = new ScrollArea(this, mShopItemList,
         getOptionBool("showbackground"), "buy_background.xml");
-    mScrollArea->setHorizontalScrollPolicy(gcn::ScrollArea::SHOW_NEVER);
+    mScrollArea->setHorizontalScrollPolicy(ScrollArea::SHOW_NEVER);
 
     mSlider = new Slider(this, 1.0);
     mQuantityLabel = new Label(this, strprintf(
@@ -311,7 +323,7 @@ void BuyDialog::reset()
 
     // Reset previous selected items to prevent failing asserts
     mShopItemList->setSelected(-1);
-    mSlider->setValue2(0);
+    mSlider->setValue(0);
 
     setMoney(0);
 }
@@ -386,28 +398,28 @@ void BuyDialog::action(const ActionEvent &event)
     else if (eventId == "inc" && mAmountItems < mMaxItems)
     {
         mAmountItems++;
-        mSlider->setValue2(mAmountItems);
+        mSlider->setValue(mAmountItems);
         mAmountField->setValue(mAmountItems);
         updateButtonsAndLabels();
     }
     else if (eventId == "dec" && mAmountItems > 1)
     {
         mAmountItems--;
-        mSlider->setValue2(mAmountItems);
+        mSlider->setValue(mAmountItems);
         mAmountField->setValue(mAmountItems);
         updateButtonsAndLabels();
     }
     else if (eventId == "max")
     {
         mAmountItems = mMaxItems;
-        mSlider->setValue2(mAmountItems);
+        mSlider->setValue(mAmountItems);
         mAmountField->setValue(mAmountItems);
         updateButtonsAndLabels();
     }
     else if (eventId == "amount")
     {
         mAmountItems = mAmountField->getValue();
-        mSlider->setValue2(mAmountItems);
+        mSlider->setValue(mAmountItems);
         updateButtonsAndLabels();
     }
     else if (eventId == "buy" && mAmountItems > 0 && mAmountItems <= mMaxItems)
@@ -433,7 +445,7 @@ void BuyDialog::action(const ActionEvent &event)
             // Reset selection
             mAmountItems = 1;
             mSlider->setScale(1, mMaxItems);
-            mSlider->setValue2(1);
+            mSlider->setValue(1);
         }
         else if (tradeWindow)
         {
@@ -453,7 +465,7 @@ void BuyDialog::valueChanged(const SelectionEvent &event A_UNUSED)
 {
     // Reset amount of items and update labels
     mAmountItems = 1;
-    mSlider->setValue2(1);
+    mSlider->setValue(1);
 
     updateButtonsAndLabels();
     mSlider->setScale(1, mMaxItems);

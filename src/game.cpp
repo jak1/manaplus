@@ -48,6 +48,7 @@
 #include "input/joystick.h"
 #include "input/keyboardconfig.h"
 
+#include "gui/font.h"
 #include "gui/gui.h"
 #include "gui/viewport.h"
 #include "gui/windowmenu.h"
@@ -165,6 +166,7 @@ BattleTab *battleChatTab = nullptr;
 GmTab *gmChatTab = nullptr;
 LangTab *langChatTab = nullptr;
 
+bool mStatsReUpdated = false;
 const unsigned adjustDelay = 10;
 
 /**
@@ -390,7 +392,8 @@ Game::Game():
     mAdjustPerfomance(config.getBoolValue("adjustPerfomance")),
     mLowerCounter(0),
     mPing(0),
-    mTime(cur_time + 1)
+    mTime(cur_time + 1),
+    mTime2(cur_time + 10)
 {
     touchManager.setInGame(true);
     spellManager = new SpellManager;
@@ -410,7 +413,7 @@ Game::Game():
     viewport->setSize(mainGraphics->mWidth, mainGraphics->mHeight);
     PlayerInfo::clear();
 
-    gcn::Container *const top = static_cast<gcn::Container*>(gui->getTop());
+    BasicContainer2 *const top = static_cast<BasicContainer2*>(gui->getTop());
     if (top)
         top->add(viewport);
     viewport->requestMoveToBottom();
@@ -477,6 +480,15 @@ Game::~Game()
     PlayerInfo::gameDestroyed();
 }
 
+void Game::addWatermark()
+{
+    if (!boldFont || !config.getBoolValue("addwatermark"))
+        return;
+    mainGraphics->setColorAll(Theme::getThemeColor(Theme::TEXT),
+        Theme::getThemeColor(Theme::TEXT_OUTLINE));
+    boldFont->drawString(mainGraphics, client->getServerName(), 100, 50);
+}
+
 bool Game::createScreenshot()
 {
     if (!mainGraphics)
@@ -489,11 +501,13 @@ bool Game::createScreenshot()
         mainGraphics->setSecure(true);
         mainGraphics->prepareScreenshot();
         gui->draw();
+        addWatermark();
         screenshot = mainGraphics->getScreenshot();
         mainGraphics->setSecure(false);
     }
     else
     {
+        addWatermark();
         screenshot = mainGraphics->getScreenshot();
     }
 
@@ -606,6 +620,9 @@ void Game::slowLogic()
     const int time = cur_time;
     if (mTime != time)
     {
+        if (valTest(Updated))
+            mValidSpeed = false;
+
         mTime = time + 1;
         if (botCheckerWindow)
             botCheckerWindow->slowLogic();
@@ -620,6 +637,13 @@ void Game::slowLogic()
         Being::reReadConfig();
         if (killStats)
             killStats->recalcStats();
+
+        if (time > mTime2 || mTime2 - time > 10)
+        {
+            mTime2 = time + 10;
+            config.writeUpdated();
+            serverConfig.writeUpdated();
+        }
     }
 
     if (shopWindow)
