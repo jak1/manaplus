@@ -120,10 +120,10 @@ public:
 
     void moveToBottom(Widget *child) override final;
 
-    void _setFocusHandler(FocusHandler* focusHandler) override final;
+    void setFocusHandler(FocusHandler *const focusHandler) override final;
 
     // Inherited from KeyListener
-    void keyPressed(KeyEvent& keyEvent) override final;
+    void keyPressed(KeyEvent& event) override final;
 
     /**
      * Sets the table to be opaque, that is sets the table
@@ -144,13 +144,13 @@ public:
     { return mOpaque; }
 
     // Inherited from MouseListener
-    void mousePressed(MouseEvent& mouseEvent) override final;
+    void mousePressed(MouseEvent& event) override final;
 
-    void mouseWheelMovedUp(MouseEvent& mouseEvent) override final;
+    void mouseWheelMovedUp(MouseEvent& event) override final;
 
-    void mouseWheelMovedDown(MouseEvent& mouseEvent) override final;
+    void mouseWheelMovedDown(MouseEvent& event) override final;
 
-    void mouseDragged(MouseEvent& mouseEvent) override final;
+    void mouseDragged(MouseEvent& event) override final;
 
     // Constraints inherited from TableModelListener
     void modelUpdated(const bool completed) override final;

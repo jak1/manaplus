@@ -195,7 +195,7 @@ class TabbedArea final : public ActionListener,
 
         // Inherited from MouseListener
 
-        void mousePressed(MouseEvent &mouseEvent) override final;
+        void mousePressed(MouseEvent &event) override final;
 
         void enableScrollButtons(const bool enable);
 
@@ -211,7 +211,7 @@ class TabbedArea final : public ActionListener,
         bool getFollowDownScroll() const A_WARN_UNUSED
         { return mFollowDownScroll; }
 
-        void keyPressed(KeyEvent& keyEvent) override final;
+        void keyPressed(KeyEvent& event) override final;
 
         void setBlockSwitching(const bool b)
         { mBlockSwitching = b; }

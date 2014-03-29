@@ -38,6 +38,7 @@
 #include "net/loginhandler.h"
 #include "net/net.h"
 
+#include "utils/delete2.h"
 #include "utils/gettext.h"
 
 #include "debug.h"
@@ -95,8 +96,7 @@ void WorldSelectDialog::postInit()
 
 WorldSelectDialog::~WorldSelectDialog()
 {
-    delete mWorldListModel;
-    mWorldListModel = nullptr;
+    delete2(mWorldListModel);
 }
 
 void WorldSelectDialog::action(const ActionEvent &event)
@@ -118,9 +118,9 @@ void WorldSelectDialog::action(const ActionEvent &event)
     }
 }
 
-void WorldSelectDialog::keyPressed(KeyEvent &keyEvent)
+void WorldSelectDialog::keyPressed(KeyEvent &event)
 {
-    const int actionId = keyEvent.getActionId();
+    const int actionId = event.getActionId();
 
     if (actionId == static_cast<int>(Input::KEY_GUI_CANCEL))
     {

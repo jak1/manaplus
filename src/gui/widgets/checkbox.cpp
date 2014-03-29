@@ -98,6 +98,7 @@ CheckBox::CheckBox(const Widget2 *const widget,
     mDrawBox(true)
 {
     setCaption(caption);
+    mAllowLogic = false;
 
     setFocusable(true);
     addMouseListener(this);
@@ -106,9 +107,9 @@ CheckBox::CheckBox(const Widget2 *const widget,
     mForegroundColor2 = getThemeColor(Theme::CHECKBOX_OUTLINE);
     if (instances == 0)
     {
-        if (Theme::instance())
+        if (theme)
         {
-            mSkin = Theme::instance()->load("checkbox.xml", "");
+            mSkin = theme->load("checkbox.xml", "");
             updateAlpha();
         }
     }
@@ -142,8 +143,8 @@ CheckBox::~CheckBox()
 
     if (instances == 0)
     {
-        if (Theme::instance())
-            Theme::instance()->unload(mSkin);
+        if (theme)
+            theme->unload(mSkin);
     }
 }
 
@@ -162,7 +163,7 @@ void CheckBox::draw(Graphics *const graphics)
 void CheckBox::updateAlpha()
 {
     const float alpha = std::max(client->getGuiAlpha(),
-        Theme::instance()->getMinimumOpacity());
+        theme->getMinimumOpacity());
 
     if (mAlpha != alpha)
     {
@@ -234,14 +235,14 @@ void CheckBox::mouseExited(MouseEvent& event A_UNUSED)
     mHasMouse = false;
 }
 
-void CheckBox::keyPressed(KeyEvent& keyEvent)
+void CheckBox::keyPressed(KeyEvent& event)
 {
-    const int action = keyEvent.getActionId();
+    const int action = event.getActionId();
 
     if (action == Input::KEY_GUI_SELECT)
     {
         toggleSelected();
-        keyEvent.consume();
+        event.consume();
     }
 }
 
@@ -252,15 +253,18 @@ void CheckBox::adjustSize()
         + getFont()->getWidth(mCaption) + mPadding);
 }
 
-void CheckBox::mouseClicked(MouseEvent& mouseEvent)
+void CheckBox::mouseClicked(MouseEvent& event)
 {
-    if (mouseEvent.getButton() == MouseEvent::LEFT)
+    if (event.getButton() == MouseEvent::LEFT)
+    {
         toggleSelected();
+        event.consume();
+    }
 }
 
-void CheckBox::mouseDragged(MouseEvent& mouseEvent)
+void CheckBox::mouseDragged(MouseEvent& event)
 {
-    mouseEvent.consume();
+    event.consume();
 }
 
 void CheckBox::toggleSelected()

@@ -37,6 +37,8 @@
 
 #include "resources/image.h"
 
+#include "utils/delete2.h"
+
 #include "debug.h"
 
 TouchManager touchManager;
@@ -70,8 +72,7 @@ TouchManager::TouchManager() :
 TouchManager::~TouchManager()
 {
     clear();
-    delete mVertexes;
-    mVertexes = nullptr;
+    delete2(mVertexes);
     CHECKLISTENERS
 }
 
@@ -122,7 +123,6 @@ void TouchManager::loadTouchItem(TouchItem **item, const std::string &name,
                                  const TouchFuncPtr fOut)
 {
     *item = nullptr;
-    Theme *const theme = Theme::instance();
     if (!theme)
         return;
     ImageRect *images = new ImageRect;
@@ -243,8 +243,8 @@ void TouchManager::draw()
         return;
 
     Font *const font = boldFont;
-    mainGraphics->setColorAll(Theme::getThemeColor(Theme::TEXT),
-        Theme::getThemeColor(Theme::TEXT_OUTLINE));
+    mainGraphics->setColorAll(theme->getColor(Theme::TEXT, 255),
+        theme->getColor(Theme::TEXT_OUTLINE, 255));
     FOR_EACH (TouchItemVectorCIter, it, mObjects)
     {
         const TouchItem *const item = *it;
@@ -358,8 +358,7 @@ void TouchManager::unload(TouchItem *const item)
         if (item->images)
         {
             Theme::unloadRect(*item->images);
-            delete item->images;
-            item->images = nullptr;
+            delete2(item->images);
             if (item->icon)
             {
                 item->icon->decRef();
@@ -394,7 +393,6 @@ void TouchManager::loadPad()
 void TouchManager::loadButtons()
 {
     const int sz = (mButtonsSize + 1) * 50;
-    Theme *const theme = Theme::instance();
     if (!theme)
         return;
     Skin *const skin = theme->load("dbutton.xml", "");

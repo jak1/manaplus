@@ -75,6 +75,8 @@
 #include "gui/widgets/scrollarea.h"
 #include "gui/widgets/tabs/tab.h"
 
+#include "utils/delete2.h"
+
 #include "debug.h"
 
 TabbedArea::TabbedArea(const Widget2 *const widget) :
@@ -127,21 +129,14 @@ TabbedArea::~TabbedArea()
     remove(mTabContainer);
     remove(mWidgetContainer);
 
-    delete mTabContainer;
-    mTabContainer = nullptr;
-    delete mWidgetContainer;
-    mWidgetContainer = nullptr;
+    delete2(mTabContainer);
+    delete2(mWidgetContainer);
 
     for (size_t i = 0, sz = mTabsToDelete.size(); i < sz; i++)
-    {
-        delete mTabsToDelete[i];
-        mTabsToDelete[i] = nullptr;
-    }
+        delete2(mTabsToDelete[i])
 
-    delete mArrowButton[0];
-    mArrowButton[0] = nullptr;
-    delete mArrowButton[1];
-    mArrowButton[1] = nullptr;
+    delete2(mArrowButton[0]);
+    delete2(mArrowButton[1]);
 }
 
 void TabbedArea::enableScrollButtons(const bool enable)
@@ -366,19 +361,20 @@ void TabbedArea::logic()
     BLOCK_END("TabbedArea::logic")
 }
 
-void TabbedArea::mousePressed(MouseEvent &mouseEvent)
+void TabbedArea::mousePressed(MouseEvent &event)
 {
-    if (mouseEvent.isConsumed())
+    if (event.isConsumed())
         return;
 
-    if (mouseEvent.getButton() == MouseEvent::LEFT)
+    if (event.getButton() == MouseEvent::LEFT)
     {
         Widget *const widget = mTabContainer->getWidgetAt(
-            mouseEvent.getX(), mouseEvent.getY());
+            event.getX(), event.getY());
         Tab *const tab = dynamic_cast<Tab *const>(widget);
 
         if (tab)
         {
+            event.consume();
             setSelectedTab(tab);
             requestFocus();
         }
@@ -726,12 +722,12 @@ void TabbedArea::setDimension(const Rect &dimension)
     adjustSize();
 }
 
-void TabbedArea::keyPressed(KeyEvent& keyEvent)
+void TabbedArea::keyPressed(KeyEvent& event)
 {
-    if (mBlockSwitching || keyEvent.isConsumed() || !isFocused())
+    if (mBlockSwitching || event.isConsumed() || !isFocused())
         return;
 
-    const int actionId = keyEvent.getActionId();
+    const int actionId = event.getActionId();
 
     if (actionId == Input::KEY_GUI_LEFT)
     {
@@ -743,7 +739,7 @@ void TabbedArea::keyPressed(KeyEvent& keyEvent)
         else
             setSelectedTab(mTabs[index].first);
 
-        keyEvent.consume();
+        event.consume();
     }
     else if (actionId == Input::KEY_GUI_RIGHT)
     {
@@ -755,7 +751,7 @@ void TabbedArea::keyPressed(KeyEvent& keyEvent)
         else
             setSelectedTab(mTabs[index].first);
 
-        keyEvent.consume();
+        event.consume();
     }
 }
 

@@ -42,6 +42,7 @@
 
 #include "resources/db/moddb.h"
 
+#include "utils/delete2.h"
 #include "utils/gettext.h"
 #include "utils/mkdir.h"
 #include "utils/paths.h"
@@ -242,8 +243,7 @@ UpdaterWindow::~UpdaterWindow()
     {
         mDownload->cancel();
 
-        delete mDownload;
-        mDownload = nullptr;
+        delete2(mDownload)
     }
     free(mMemoryBuffer);
 }
@@ -292,9 +292,9 @@ void UpdaterWindow::action(const ActionEvent &event)
     }
 }
 
-void UpdaterWindow::keyPressed(KeyEvent &keyEvent)
+void UpdaterWindow::keyPressed(KeyEvent &event)
 {
-    const int actionId = keyEvent.getActionId();
+    const int actionId = event.getActionId();
     if (actionId == static_cast<int>(Input::KEY_GUI_CANCEL))
     {
         action(ActionEvent(nullptr, mCancelButton->getActionEventId()));

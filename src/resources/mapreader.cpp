@@ -37,6 +37,7 @@
 #include "resources/db/mapdb.h"
 
 #include "utils/base64.h"
+#include "utils/delete2.h"
 
 #include <iostream>
 #include <zlib.h>
@@ -202,6 +203,7 @@ void MapReader::addLayerToList(const std::string &fileName)
         return;
     }
 
+    int cnt = 0;
     for_each_xml_child_node(childNode, node)
     {
         if (!xmlNameEqual(childNode, "layer"))
@@ -213,8 +215,10 @@ void MapReader::addLayerToList(const std::string &fileName)
         logger->log("found patch layer: " + name);
         mKnownLayers[name] = childNode;
         mKnownDocs.insert(doc);
+        cnt ++;
     }
-    delete doc;
+    if (!cnt)
+        delete doc;
 }
 
 Map *MapReader::readMap(const std::string &restrict filename,
@@ -974,14 +978,9 @@ Tileset *MapReader::readTileset(XmlNodePtr node,
                 }
 
                 if (ani->getLength() > 0)
-                {
                     map->addAnimation(tileGID, new TileAnimation(ani));
-                }
                 else
-                {
-                    delete ani;
-                    ani = nullptr;
-                }
+                    delete2(ani)
             }
         }
     }

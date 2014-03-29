@@ -131,14 +131,10 @@ QuitDialog::~QuitDialog()
 {
     if (mMyPointer)
         *mMyPointer = nullptr;
-    delete mForceQuit;
-    mForceQuit = nullptr;
-    delete mLogoutQuit;
-    mLogoutQuit = nullptr;
-    delete mSwitchAccountServer;
-    mSwitchAccountServer = nullptr;
-    delete mSwitchCharacter;
-    mSwitchCharacter = nullptr;
+    delete2(mForceQuit);
+    delete2(mLogoutQuit);
+    delete2(mSwitchAccountServer);
+    delete2(mSwitchCharacter);
 }
 
 void QuitDialog::placeOption(ContainerPlacer &placer,
@@ -203,9 +199,9 @@ void QuitDialog::action(const ActionEvent &event)
     scheduleDelete();
 }
 
-void QuitDialog::keyPressed(KeyEvent &keyEvent)
+void QuitDialog::keyPressed(KeyEvent &event)
 {
-    const int actionId = keyEvent.getActionId();
+    const int actionId = event.getActionId();
     int dir = 0;
 
     switch (actionId)

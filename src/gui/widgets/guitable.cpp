@@ -30,11 +30,12 @@
 
 #include "input/keydata.h"
 
-#include "utils/dtor.h"
-
 #include "listeners/actionlistener.h"
 
 #include "render/graphics.h"
+
+#include "utils/delete2.h"
+#include "utils/dtor.h"
 
 #include "debug.h"
 
@@ -73,7 +74,7 @@ GuiTableActionListener::GuiTableActionListener(GuiTable *restrict table,
     if (widget)
     {
         widget->addActionListener(this);
-        widget->_setParent(table);
+        widget->setParent(table);
     }
 }
 
@@ -82,7 +83,7 @@ GuiTableActionListener::~GuiTableActionListener()
     if (mWidget)
     {
         mWidget->removeActionListener(this);
-        mWidget->_setParent(nullptr);
+        mWidget->setParent(nullptr);
     }
 }
 
@@ -110,6 +111,7 @@ GuiTable::GuiTable(const Widget2 *const widget,
     mOpaque(opacity),
     mSelectable(true)
 {
+    mAllowLogic = false;
     mBackgroundColor = getThemeColor(Theme::BACKGROUND);
 
     setModel(initial_model);
@@ -125,8 +127,7 @@ GuiTable::~GuiTable()
         gui->removeDragged(this);
 
     uninstallActionListeners();
-    delete mModel;
-    mModel = nullptr;
+    delete2(mModel);
 }
 
 const TableModel *GuiTable::getModel() const
@@ -291,7 +292,7 @@ void GuiTable::installActionListeners()
         }
     }
 
-    _setFocusHandler(_getFocusHandler());
+    setFocusHandler(getFocusHandler());
 }
 
 // -- widget ops
@@ -420,99 +421,100 @@ Rect GuiTable::getChildrenArea()
 }
 
 // -- KeyListener notifications
-void GuiTable::keyPressed(KeyEvent& keyEvent)
+void GuiTable::keyPressed(KeyEvent& event)
 {
-    const int action = keyEvent.getActionId();
+    const int action = event.getActionId();
 
     if (action == Input::KEY_GUI_SELECT)
     {
         distributeActionEvent();
-        keyEvent.consume();
+        event.consume();
     }
     else if (action == Input::KEY_GUI_UP)
     {
         setSelectedRow(mSelectedRow - 1);
-        keyEvent.consume();
+        event.consume();
     }
     else if (action == Input::KEY_GUI_DOWN)
     {
         setSelectedRow(mSelectedRow + 1);
-        keyEvent.consume();
+        event.consume();
     }
     else if (action == Input::KEY_GUI_LEFT)
     {
         setSelectedColumn(mSelectedColumn - 1);
-        keyEvent.consume();
+        event.consume();
     }
     else if (action == Input::KEY_GUI_RIGHT)
     {
         setSelectedColumn(mSelectedColumn + 1);
-        keyEvent.consume();
+        event.consume();
     }
     else if (action == Input::KEY_GUI_HOME)
     {
         setSelectedRow(0);
         setSelectedColumn(0);
-        keyEvent.consume();
+        event.consume();
     }
     else if (action == Input::KEY_GUI_END && mModel)
     {
         setSelectedRow(mModel->getRows() - 1);
         setSelectedColumn(mModel->getColumns() - 1);
-        keyEvent.consume();
+        event.consume();
     }
 }
 
 // -- MouseListener notifications
-void GuiTable::mousePressed(MouseEvent& mouseEvent)
+void GuiTable::mousePressed(MouseEvent& event)
 {
     if (!mModel || !mSelectable)
         return;
 
-    if (mouseEvent.getButton() == MouseEvent::LEFT)
+    if (event.getButton() == MouseEvent::LEFT)
     {
-        const int row = getRowForY(mouseEvent.getY());
-        const int column = getColumnForX(mouseEvent.getX());
+        const int row = getRowForY(event.getY());
+        const int column = getColumnForX(event.getX());
 
         if (row > -1 && column > -1 &&
             row < mModel->getRows() && column < mModel->getColumns())
         {
             mSelectedColumn = column;
             mSelectedRow = row;
+            event.consume();
         }
 
         distributeActionEvent();
     }
 }
 
-void GuiTable::mouseWheelMovedUp(MouseEvent& mouseEvent)
+void GuiTable::mouseWheelMovedUp(MouseEvent& event)
 {
     if (isFocused())
     {
         const int selRow = getSelectedRow();
         if (selRow > 0 || (selRow == 0 && mWrappingEnabled))
             setSelectedRow(selRow - 1);
-        mouseEvent.consume();
+        event.consume();
     }
 }
 
-void GuiTable::mouseWheelMovedDown(MouseEvent& mouseEvent)
+void GuiTable::mouseWheelMovedDown(MouseEvent& event)
 {
     if (isFocused())
     {
         setSelectedRow(getSelectedRow() + 1);
-        mouseEvent.consume();
+        event.consume();
     }
 }
 
-void GuiTable::mouseDragged(MouseEvent& mouseEvent)
+void GuiTable::mouseDragged(MouseEvent& event)
 {
-    if (mouseEvent.getButton() != MouseEvent::LEFT)
+    if (event.getButton() != MouseEvent::LEFT)
         return;
 
     // Make table selection update on drag
-    const int x = std::max(0, mouseEvent.getX());
-    const int y = std::max(0, mouseEvent.getY());
+    const int x = std::max(0, event.getX());
+    const int y = std::max(0, event.getY());
 
     setSelectedRow(getRowForY(y));
     setSelectedColumn(getColumnForX(x));
@@ -588,14 +590,14 @@ int GuiTable::getColumnForX(int x) const
         return column;
 }
 
-void GuiTable::_setFocusHandler(FocusHandler* focusHandler)
+void GuiTable::setFocusHandler(FocusHandler *const focusHandler)
 {
 // add check for focusHandler. may be need remove it?
 
     if (!mModel || !focusHandler)
         return;
 
-    Widget::_setFocusHandler(focusHandler);
+    Widget::setFocusHandler(focusHandler);
 
     const int rows = mModel->getRows();
     const int cols = mModel->getColumns();
@@ -605,7 +607,7 @@ void GuiTable::_setFocusHandler(FocusHandler* focusHandler)
         {
             Widget *const w = mModel->getElementAt(r, c);
             if (w)
-                w->_setFocusHandler(focusHandler);
+                w->setFocusHandler(focusHandler);
         }
     }
 }

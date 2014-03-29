@@ -75,6 +75,8 @@
 
 #include "resources/image.h"
 
+#include "utils/delete2.h"
+
 #include "debug.h"
 
 int Tab::mInstances = 0;
@@ -123,23 +125,20 @@ Tab::~Tab()
         gui->removeDragged(this);
 
     mInstances--;
-    if (mInstances == 0 && Theme::instance())
+    if (mInstances == 0 && theme)
     {
-        Theme *const theme = Theme::instance();
         for (int mode = 0; mode < TAB_COUNT; mode ++)
             theme->unload(tabImg[mode]);
     }
 
-    delete mLabel;
-    mLabel = nullptr;
+    delete2(mLabel);
 
     if (mImage)
     {
         mImage->decRef();
         mImage = nullptr;
     }
-    delete mVertexes;
-    mVertexes = nullptr;
+    delete2(mVertexes);
 }
 
 void Tab::init()
@@ -154,7 +153,6 @@ void Tab::init()
     if (mInstances == 0)
     {
         // Load the skin
-        Theme *const theme = Theme::instance();
         if (theme)
         {
             for (int mode = 0; mode < TAB_COUNT; mode ++)
@@ -177,7 +175,7 @@ void Tab::init()
 void Tab::updateAlpha()
 {
     const float alpha = std::max(client->getGuiAlpha(),
-        Theme::instance()->getMinimumOpacity());
+        theme->getMinimumOpacity());
 
     if (alpha != mAlpha)
     {
@@ -373,12 +371,12 @@ const std::string &Tab::getCaption() const
     return mLabel->getCaption();
 }
 
-void Tab::mouseEntered(MouseEvent& mouseEvent A_UNUSED)
+void Tab::mouseEntered(MouseEvent& event A_UNUSED)
 {
     mHasMouse = true;
 }
 
-void Tab::mouseExited(MouseEvent& mouseEvent A_UNUSED)
+void Tab::mouseExited(MouseEvent& event A_UNUSED)
 {
     mHasMouse = false;
 }

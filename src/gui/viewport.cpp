@@ -35,6 +35,7 @@
 #include "input/inputmanager.h"
 
 #include "gui/gui.h"
+#include "gui/font.h"
 
 #include "gui/popups/beingpopup.h"
 #include "gui/popups/popupmenu.h"
@@ -42,7 +43,7 @@
 
 #include "gui/windows/ministatuswindow.h"
 
-#include "gui/font.h"
+#include "utils/delete2.h"
 
 #include "debug.h"
 
@@ -104,12 +105,9 @@ Viewport::~Viewport()
 {
     config.removeListeners(this);
     CHECKLISTENERS
-    delete mPopupMenu;
-    mPopupMenu = nullptr;
-    delete mBeingPopup;
-    mBeingPopup = nullptr;
-    delete mTextPopup;
-    mTextPopup = nullptr;
+    delete2(mPopupMenu);
+    delete2(mBeingPopup);
+    delete2(mTextPopup);
 }
 
 void Viewport::setMap(Map *const map)
@@ -235,7 +233,7 @@ void Viewport::draw(Graphics *graphics)
         mMap->drawCollision(graphics, mPixelViewX,
             mPixelViewY, mShowDebugPath);
         if (mShowDebugPath == Map::MAP_DEBUG)
-            _drawDebugPath(graphics);
+            drawDebugPath(graphics);
     }
 
     if (player_node->getCheckNameSetting())
@@ -272,11 +270,11 @@ void Viewport::logic()
     BLOCK_START("Viewport::logic")
     // Make the player follow the mouse position
     // if the mouse is dragged elsewhere than in a window.
-    _followMouse();
+    followMouse();
     BLOCK_END("Viewport::logic")
 }
 
-void Viewport::_followMouse()
+void Viewport::followMouse()
 {
     if (!gui)
         return;
@@ -285,18 +283,18 @@ void Viewport::_followMouse()
     if (mPlayerFollowMouse && (button & SDL_BUTTON(1)))
     {
         // We create a mouse event and send it to mouseDragged.
-        MouseEvent mouseEvent(nullptr,
+        MouseEvent event(nullptr,
             MouseEvent::DRAGGED,
             MouseEvent::LEFT,
             mMouseX,
             mMouseY,
             0);
 
-        walkByMouse(mouseEvent);
+        walkByMouse(event);
     }
 }
 
-void Viewport::_drawDebugPath(Graphics *const graphics)
+void Viewport::drawDebugPath(Graphics *const graphics)
 {
     if (!player_node || !userPalette || !actorManager || !mMap || !gui)
         return;
@@ -322,7 +320,7 @@ void Viewport::_drawDebugPath(Graphics *const graphics)
             500);
         lastMouseDestination = mouseDestination;
     }
-    _drawPath(graphics, debugPath, userPalette->getColorWithAlpha(
+    drawPath(graphics, debugPath, userPalette->getColorWithAlpha(
         UserPalette::ROAD_POINT));
 
     const ActorSprites &actors = actorManager->getAll();
@@ -332,14 +330,15 @@ void Viewport::_drawDebugPath(Graphics *const graphics)
         if (being && being != player_node)
         {
             const Path &beingPath = being->getPath();
-            _drawPath(graphics, beingPath, userPalette->getColorWithAlpha(
+            drawPath(graphics, beingPath, userPalette->getColorWithAlpha(
                 UserPalette::ROAD_POINT));
         }
     }
 }
 
-void Viewport::_drawPath(Graphics *const graphics, const Path &path,
-                         const Color &color) const
+void Viewport::drawPath(Graphics *const graphics,
+                        const Path &path,
+                        const Color &color) const
 {
     graphics->setColor(color);
     Font *const font = getFont();
@@ -477,7 +476,7 @@ bool Viewport::leftMouseAction()
         mPlayerFollowMouse = true;
 
         // Make the player go to the mouse position
-        _followMouse();
+        followMouse();
     }
     return false;
 }
@@ -547,9 +546,9 @@ void Viewport::walkByMouse(const MouseEvent &event)
 {
     if (!mMap || !player_node)
         return;
-    if (mPlayerFollowMouse && !inputManager.isActionActive(
-        Input::KEY_STOP_ATTACK) && !inputManager.isActionActive(
-        Input::KEY_UNTARGET))
+    if (mPlayerFollowMouse
+        && !inputManager.isActionActive(Input::KEY_STOP_ATTACK)
+        && !inputManager.isActionActive(Input::KEY_UNTARGET))
     {
         if (!mMouseDirectionMove)
             mPlayerFollowMouse = false;
@@ -712,8 +711,10 @@ void Viewport::mouseReleased(MouseEvent &event)
     }
 }
 
-void Viewport::showPopup(Window *const parent, const int x, const int y,
-                         Item *const item, const bool isInventory)
+void Viewport::showPopup(Window *const parent,
+                         const int x, const int y,
+                         Item *const item,
+                         const bool isInventory)
 {
     mPopupMenu->showPopup(parent, x, y, item, isInventory);
 }
@@ -723,7 +724,8 @@ void Viewport::showPopup(MapItem *const item)
     mPopupMenu->showPopup(mMouseX, mMouseY, item);
 }
 
-void Viewport::showPopup(Window *const parent, Item *const item,
+void Viewport::showPopup(Window *const parent,
+                         Item *const item,
                          const bool isInventory)
 {
     mPopupMenu->showPopup(parent, mMouseX, mMouseY, item, isInventory);
@@ -734,7 +736,8 @@ void Viewport::showItemPopup(Item *const item)
     mPopupMenu->showItemPopup(mMouseX, mMouseY, item);
 }
 
-void Viewport::showItemPopup(const int itemId, const unsigned char color)
+void Viewport::showItemPopup(const int itemId,
+                             const unsigned char color)
 {
     mPopupMenu->showItemPopup(mMouseX, mMouseY, itemId, color);
 }
@@ -759,7 +762,8 @@ void Viewport::showSpellPopup(TextCommand *const cmd)
     mPopupMenu->showSpellPopup(mMouseX, mMouseY, cmd);
 }
 
-void Viewport::showChatPopup(const int x, const int y, ChatTab *const tab)
+void Viewport::showChatPopup(const int x, const int y,
+                             ChatTab *const tab)
 {
     mPopupMenu->showChatPopup(x, y, tab);
 }
@@ -769,7 +773,8 @@ void Viewport::showChatPopup(ChatTab *const tab)
     mPopupMenu->showChatPopup(mMouseX, mMouseY, tab);
 }
 
-void Viewport::showPopup(const int x, const int y, const Being *const being)
+void Viewport::showPopup(const int x, const int y,
+                         const Being *const being)
 {
     mPopupMenu->showPopup(x, y, being);
 }
@@ -784,7 +789,8 @@ void Viewport::showPlayerPopup(const std::string &nick)
     mPopupMenu->showPlayerPopup(mMouseX, mMouseY, nick);
 }
 
-void Viewport::showPopup(const int x, const int y, Button *const button)
+void Viewport::showPopup(const int x, const int y,
+                         Button *const button)
 {
     mPopupMenu->showPopup(x, y, button);
 }
@@ -795,7 +801,8 @@ void Viewport::showPopup(const int x, const int y,
     mPopupMenu->showPopup(x, y, bar);
 }
 
-void Viewport::showAttackMonsterPopup(const std::string &name, const int type)
+void Viewport::showAttackMonsterPopup(const std::string &name,
+                                      const int type)
 {
     mPopupMenu->showAttackMonsterPopup(mMouseX, mMouseY, name, type);
 }
@@ -806,7 +813,8 @@ void Viewport::showPickupItemPopup(const std::string &name)
 }
 
 void Viewport::showUndressPopup(const int x, const int y,
-                                const Being *const being, Item *const item)
+                                const Being *const being,
+                                Item *const item)
 {
     mPopupMenu->showUndressPopup(x, y, being, item);
 }
@@ -834,6 +842,11 @@ void Viewport::showWindowsPopup()
 void Viewport::showNpcDialogPopup(const int npcId)
 {
     mPopupMenu->showNpcDialogPopup(npcId, mMouseX, mMouseY);
+}
+
+void Viewport::showWindowPopup(Window *const window)
+{
+    mPopupMenu->showWindowPopup(window, mMouseX, mMouseY);
 }
 
 void Viewport::closePopupMenu()
@@ -869,10 +882,14 @@ void Viewport::mouseMoved(MouseEvent &event A_UNUSED)
     const int x = mMouseX + mPixelViewX;
     const int y = mMouseY + mPixelViewY;
 
+    ActorSprite::Type type = ActorSprite::UNKNOWN;
+    if (mHoverBeing)
+        type = mHoverBeing->getType();
     mHoverBeing = actorManager->findBeingByPixel(x, y, true);
-    if (mHoverBeing && (mHoverBeing->getType() == Being::PLAYER
-        || mHoverBeing->getType() == Being::NPC
-        || mHoverBeing->getType() == Being::PET))
+    if (mHoverBeing
+        && (type == Being::PLAYER
+        || type == Being::NPC
+        || type == Being::PET))
     {
         mTextPopup->setVisible(false);
         if (mShowBeingPopup)
@@ -920,7 +937,7 @@ void Viewport::mouseMoved(MouseEvent &event A_UNUSED)
 
     if (mHoverBeing)
     {
-        switch (mHoverBeing->getType())
+        switch (type)
         {
             case ActorSprite::NPC:
                 gui->setCursorType(mHoverBeing->getHoverCursor());
@@ -1013,7 +1030,8 @@ bool Viewport::isPopupMenuVisible() const
     return mPopupMenu ? mPopupMenu->isPopupVisible() : false;
 }
 
-void Viewport::moveCameraToActor(const int actorId, const int x, const int y)
+void Viewport::moveCameraToActor(const int actorId,
+                                 const int x, const int y)
 {
     if (!player_node || !actorManager)
         return;

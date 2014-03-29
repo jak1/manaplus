@@ -77,8 +77,9 @@
 
 #include "gui/font.h"
 #include "gui/gui.h"
-
 #include "gui/rect.h"
+
+#include "utils/delete2.h"
 
 #include "debug.h"
 
@@ -327,6 +328,7 @@ Button::Button(const Widget2 *const widget,
 
 void Button::init()
 {
+    mAllowLogic = false;
     addMouseListener(this);
     addKeyListener(this);
     addFocusListener(this);
@@ -337,13 +339,10 @@ void Button::init()
 
     if (mInstances == 0)
     {
-        if (Theme::instance())
+        if (theme)
         {
             for (int mode = 0; mode < BUTTON_COUNT; mode ++)
-            {
-                button[mode] = Theme::instance()->load(
-                    data[mode], "button.xml");
-            }
+                button[mode] = theme->load(data[mode], "button.xml");
         }
 
         updateAlpha();
@@ -359,14 +358,12 @@ Button::~Button()
 
     mInstances--;
 
-    if (mInstances == 0 && Theme::instance())
+    if (mInstances == 0 && theme)
     {
-        Theme *const theme = Theme::instance();
         for (int mode = 0; mode < BUTTON_COUNT; mode ++)
             theme->unload(button[mode]);
     }
-    delete mVertexes2;
-    mVertexes2 = nullptr;
+    delete2(mVertexes2);
     if (mImageSet)
     {
         mImageSet->decRef();
@@ -420,7 +417,7 @@ void Button::loadImageSet(const std::string &imageName)
 void Button::updateAlpha()
 {
     const float alpha = std::max(client->getGuiAlpha(),
-        Theme::instance()->getMinimumOpacity());
+        theme->getMinimumOpacity());
 
     if (mAlpha != alpha)
     {
@@ -616,9 +613,9 @@ void Button::draw(Graphics *graphics)
     BLOCK_END("Button::draw")
 }
 
-void Button::mouseReleased(MouseEvent& mouseEvent)
+void Button::mouseReleased(MouseEvent& event)
 {
-    if (mouseEvent.getButton() == MouseEvent::LEFT)
+    if (event.getButton() == MouseEvent::LEFT)
     {
         if (mStick)
             mPressed = !mPressed;
@@ -626,7 +623,7 @@ void Button::mouseReleased(MouseEvent& mouseEvent)
         if (mMousePressed && mHasMouse)
         {
             mMousePressed = false;
-            mClickCount = mouseEvent.getClickCount();
+            mClickCount = event.getClickCount();
             distributeActionEvent();
         }
         else
@@ -634,7 +631,7 @@ void Button::mouseReleased(MouseEvent& mouseEvent)
             mMousePressed = false;
             mClickCount = 0;
         }
-        mouseEvent.consume();
+        event.consume();
     }
 }
 
@@ -676,20 +673,20 @@ void Button::adjustSize()
     }
 }
 
-void Button::keyPressed(KeyEvent& keyEvent)
+void Button::keyPressed(KeyEvent& event)
 {
-    const int action = keyEvent.getActionId();
+    const int action = event.getActionId();
 
     if (action == Input::KEY_GUI_SELECT)
     {
         mKeyPressed = true;
-        keyEvent.consume();
+        event.consume();
     }
 }
 
-void Button::keyReleased(KeyEvent& keyEvent)
+void Button::keyReleased(KeyEvent& event)
 {
-    const int action = keyEvent.getActionId();
+    const int action = event.getActionId();
 
     if (action == Input::KEY_GUI_SELECT && mKeyPressed)
     {
@@ -697,7 +694,7 @@ void Button::keyReleased(KeyEvent& keyEvent)
         if (mStick)
             mPressed = !mPressed;
         distributeActionEvent();
-        keyEvent.consume();
+        event.consume();
     }
 }
 
@@ -720,26 +717,26 @@ void Button::focusLost(const Event& event A_UNUSED)
     mKeyPressed = false;
 }
 
-void Button::mousePressed(MouseEvent& mouseEvent)
+void Button::mousePressed(MouseEvent& event)
 {
-    if (mouseEvent.getButton() == MouseEvent::LEFT)
+    if (event.getButton() == MouseEvent::LEFT)
     {
         mMousePressed = true;
-        mouseEvent.consume();
+        event.consume();
     }
 }
 
-void Button::mouseEntered(MouseEvent& mouseEvent A_UNUSED)
+void Button::mouseEntered(MouseEvent& event A_UNUSED)
 {
     mHasMouse = true;
 }
 
-void Button::mouseExited(MouseEvent& mouseEvent A_UNUSED)
+void Button::mouseExited(MouseEvent& event A_UNUSED)
 {
     mHasMouse = false;
 }
 
-void Button::mouseDragged(MouseEvent& mouseEvent)
+void Button::mouseDragged(MouseEvent& event)
 {
-    mouseEvent.consume();
+    event.consume();
 }

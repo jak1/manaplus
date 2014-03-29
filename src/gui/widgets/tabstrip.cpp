@@ -30,6 +30,7 @@ TabStrip::TabStrip(const Widget2 *const widget,
                    const int spacing) :
     WidgetGroup(widget, group, height, spacing)
 {
+    mAllowLogic = false;
 }
 
 TabStrip::TabStrip(const Widget2 *const widget,
@@ -37,6 +38,7 @@ TabStrip::TabStrip(const Widget2 *const widget,
                    const int spacing) :
     WidgetGroup(widget, "", height, spacing)
 {
+    mAllowLogic = false;
 }
 
 Widget *TabStrip::createWidget(const std::string &text) const
@@ -55,8 +57,8 @@ void TabStrip::action(const ActionEvent &event)
     WidgetGroup::action(event);
     if (event.getSource())
     {
-        Widget *const widget = event.getSource();
-        if (static_cast<Button*>(widget)->isPressed2())
+        const Widget *const widget = event.getSource();
+        if (static_cast<const Button*>(widget)->isPressed2())
         {
             FOR_EACH (WidgetListConstIterator, iter, mWidgets)
             {

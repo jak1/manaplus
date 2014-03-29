@@ -69,6 +69,7 @@
 #include "resources/db/emotedb.h"
 #include "resources/db/weaponsdb.h"
 
+#include "utils/delete2.h"
 #include "utils/gettext.h"
 #include "utils/timer.h"
 
@@ -161,6 +162,7 @@ LocalPlayer::LocalPlayer(const int id, const int subtype) :
     mAttackMoving(config.getBoolValue("attackMoving")),
     mAttackNext(config.getBoolValue("attackNext")),
     mShowJobExp(config.getBoolValue("showJobExp")),
+    mShowServerPos(config.getBoolValue("showserverpos")),
     mNextStep(false),
     mDisableCrazyMove(false),
     mGoingToTarget(false),
@@ -178,7 +180,7 @@ LocalPlayer::LocalPlayer(const int id, const int subtype) :
     mAttackRange = 0;
     mLevel = 1;
     mAdvanced = true;
-    mTextColor = &Theme::getThemeColor(Theme::PLAYER);
+    mTextColor = &theme->getColor(Theme::PLAYER, 255);
     if (userPalette)
         mNameColor = &userPalette->getColor(UserPalette::SELF);
     else
@@ -202,6 +204,7 @@ LocalPlayer::LocalPlayer(const int id, const int subtype) :
     config.addListener("enableAdvert", this);
     config.addListener("tradebot", this);
     config.addListener("targetOnlyReachable", this);
+    config.addListener("showserverpos", this);
     setShowName(config.getBoolValue("showownname"));
 }
 
@@ -221,11 +224,9 @@ LocalPlayer::~LocalPlayer()
     if (mAwayDialog)
     {
         soundManager.volumeRestore();
-        delete mAwayDialog;
-        mAwayDialog = nullptr;
+        delete2(mAwayDialog)
     }
-    delete mAwayListener;
-    mAwayListener = nullptr;
+    delete2(mAwayListener);
 }
 
 void LocalPlayer::logic()
@@ -1019,6 +1020,8 @@ void LocalPlayer::optionChanged(const std::string &value)
         mTradebot = config.getBoolValue("tradebot");
     else if (value == "targetOnlyReachable")
         mTargetOnlyReachable = config.getBoolValue("targetOnlyReachable");
+    else if (value == "showserverpos")
+        mShowServerPos = config.getBoolValue("showserverpos");
 }
 
 void LocalPlayer::processEvent(const Channels channel,
@@ -3552,14 +3555,15 @@ void LocalPlayer::setRealPos(const int x, const int y)
     {
         fixPos(1);
 
-        if ((mCrossX || mCrossY) && layer->getTile(mCrossX, mCrossY)
+        if ((mCrossX || mCrossY)
+            && layer->getTile(mCrossX, mCrossY)
             && layer->getTile(mCrossX, mCrossY)->getType() == MapItem::CROSS)
         {
             layer->setTile(mCrossX, mCrossY, MapItem::EMPTY);
         }
 
-        if (!layer->getTile(x, y)
-            || layer->getTile(x, y)->getType() == MapItem::EMPTY)
+        if (mShowServerPos && (!layer->getTile(x, y)
+            || layer->getTile(x, y)->getType() == MapItem::EMPTY))
         {
             if (getTileX() != x && getTileY() != y)
                 layer->setTile(x, y, MapItem::CROSS);

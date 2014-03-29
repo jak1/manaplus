@@ -83,10 +83,10 @@ PlayerBox::~PlayerBox()
 
 void PlayerBox::init(std::string name, std::string selectedName)
 {
+    mAllowLogic = false;
     setFrameSize(2);
     addMouseListener(this);
 
-    Theme *const theme = Theme::instance();
     if (theme)
     {
         if (name.empty())

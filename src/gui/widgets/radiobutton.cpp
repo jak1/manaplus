@@ -98,6 +98,7 @@ RadioButton::RadioButton(const Widget2 *const widget,
     mSpacing(2),
     mHasMouse(false)
 {
+    mAllowLogic = false;
     setCaption(caption);
     setGroup(group);
     setSelected(marked);
@@ -110,7 +111,6 @@ RadioButton::RadioButton(const Widget2 *const widget,
     mForegroundColor2 = getThemeColor(Theme::RADIOBUTTON_OUTLINE);
     if (instances == 0)
     {
-        Theme *const theme = Theme::instance();
         if (theme)
         {
             mSkin = theme->load("radio.xml", "");
@@ -142,7 +142,6 @@ RadioButton::~RadioButton()
 
     if (instances == 0)
     {
-        Theme *const theme = Theme::instance();
         if (theme)
             theme->unload(mSkin);
     }
@@ -151,7 +150,7 @@ RadioButton::~RadioButton()
 void RadioButton::updateAlpha()
 {
     const float alpha = std::max(client->getGuiAlpha(),
-        Theme::instance()->getMinimumOpacity());
+        theme->getMinimumOpacity());
 
     if (mAlpha != alpha)
     {
@@ -236,14 +235,14 @@ void RadioButton::mouseExited(MouseEvent& event A_UNUSED)
     mHasMouse = false;
 }
 
-void RadioButton::keyPressed(KeyEvent& keyEvent)
+void RadioButton::keyPressed(KeyEvent& event)
 {
-    const int action = keyEvent.getActionId();
+    const int action = event.getActionId();
     if (action == Input::KEY_GUI_SELECT)
     {
         setSelected(true);
         distributeActionEvent();
-        keyEvent.consume();
+        event.consume();
     }
 }
 
@@ -272,18 +271,19 @@ void RadioButton::setSelected(const bool selected)
     mSelected = selected;
 }
 
-void RadioButton::mouseClicked(MouseEvent& mouseEvent)
+void RadioButton::mouseClicked(MouseEvent& event)
 {
-    if (mouseEvent.getButton() == MouseEvent::LEFT)
+    if (event.getButton() == MouseEvent::LEFT)
     {
         setSelected(true);
+        event.consume();
         distributeActionEvent();
     }
 }
 
-void RadioButton::mouseDragged(MouseEvent& mouseEvent)
+void RadioButton::mouseDragged(MouseEvent& event)
 {
-    mouseEvent.consume();
+    event.consume();
 }
 
 void RadioButton::setGroup(const std::string &group)

@@ -36,6 +36,8 @@
 
 #include "resources/image.h"
 
+#include "utils/delete2.h"
+
 #include "debug.h"
 
 SpellShortcutContainer::SpellShortcutContainer(Widget2 *const widget,
@@ -78,8 +80,7 @@ SpellShortcutContainer::~SpellShortcutContainer()
     if (mBackgroundImg)
         mBackgroundImg->decRef();
     mBackgroundImg = nullptr;
-    delete mSpellPopup;
-    mSpellPopup = nullptr;
+    delete2(mSpellPopup);
 }
 
 void SpellShortcutContainer::setWidget2(const Widget2 *const widget)
@@ -189,6 +190,7 @@ void SpellShortcutContainer::mousePressed(MouseEvent &event)
         const int itemId = getItemByIndex(index);
         if (itemId > 0)
             mSpellClicked = true;
+        event.consume();
     }
     else if (eventButton == MouseEvent::RIGHT)
     {
@@ -198,6 +200,7 @@ void SpellShortcutContainer::mousePressed(MouseEvent &event)
         if (!spellShortcut || !spellManager)
             return;
 
+        event.consume();
         const int itemId = getItemByIndex(index);
         spellManager->invoke(itemId);
     }

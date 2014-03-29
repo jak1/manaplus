@@ -85,7 +85,8 @@ class BasicContainer : public Widget,
         explicit BasicContainer(const Widget2 *const widget) :
             Widget(widget),
             DeathListener(),
-            mWidgets()
+            mWidgets(),
+            mLogicWidgets()
         { }
 
         A_DELETE_COPY(BasicContainer)
@@ -110,28 +111,28 @@ class BasicContainer : public Widget,
 
         // Inherited from Widget
 
-        virtual void moveToTop(Widget* widget);
+        virtual void moveToTop(Widget* widget) override;
 
-        virtual void moveToBottom(Widget* widget);
+        virtual void moveToBottom(Widget* widget) override;
 
-        virtual Rect getChildrenArea() A_WARN_UNUSED;
+        virtual Rect getChildrenArea() override A_WARN_UNUSED;
 
-        virtual void focusNext();
+        virtual void focusNext() override;
 
-        virtual void focusPrevious();
+        virtual void focusPrevious() override;
 
-        virtual void logic();
+        virtual void logic() override;
 
-        virtual void _setFocusHandler(FocusHandler* focusHandler);
+        virtual void setFocusHandler(FocusHandler *const focusHandler)
+                                     override;
 
         void setInternalFocusHandler(FocusHandler* focusHandler);
 
-        virtual Widget *getWidgetAt(int x, int y) A_WARN_UNUSED;
-
+        virtual Widget *getWidgetAt(int x, int y) override A_WARN_UNUSED;
 
         // Inherited from DeathListener
 
-        virtual void death(const Event& event);
+        virtual void death(const Event& event) override;
 
     protected:
         /**
@@ -140,7 +141,7 @@ class BasicContainer : public Widget,
           * @param widget The widget to add.
           * @see remove, clear
           */
-        void add(Widget* widget);
+        void add(Widget *const widget);
 
         /**
           * Removes a widget from the basic container.
@@ -171,17 +172,6 @@ class BasicContainer : public Widget,
         virtual void logicChildren();
 
         /**
-          * Finds a widget given an id. This function can be useful
-          * when implementing a GUI generator for Guichan, such as
-          * the ability to create a Guichan GUI from an XML file.
-          *
-          * @param id The id to find a widget by.
-          * @return The widget with the corrosponding id, 
-                    NULL of no widget is found.
-          */
-        virtual Widget* findWidgetById(const std::string& id) A_WARN_UNUSED;
-
-        /**
           * Typedef.
           */
         typedef std::vector<Widget *> WidgetList;
@@ -210,6 +200,8 @@ class BasicContainer : public Widget,
           * Holds all widgets of the basic container.
           */
         WidgetList mWidgets;
+
+        WidgetList mLogicWidgets;
 };
 
 #endif  // GUI_WIDGETS_BASICCONTAINER_H

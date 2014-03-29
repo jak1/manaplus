@@ -74,14 +74,14 @@ class ServerDialog final : public Window,
          */
         void action(const ActionEvent &event) override final;
 
-        void keyPressed(KeyEvent &keyEvent) override final;
+        void keyPressed(KeyEvent &event) override final;
 
         /**
          * Called when the selected value changed in the servers list box.
          */
         void valueChanged(const SelectionEvent &event) override final;
 
-        void mouseClicked(MouseEvent &mouseEvent) override final;
+        void mouseClicked(MouseEvent &event) override final;
 
         void logic() override final;
 

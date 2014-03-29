@@ -232,17 +232,11 @@ Being::~Being()
     delete [] mSpriteDraw;
     mSpriteDraw = nullptr;
 
-    delete mSpeechBubble;
-    mSpeechBubble = nullptr;
-    delete mDispName;
-    mDispName = nullptr;
-    delete mText;
-    mText = nullptr;
-
-    delete mEmotionSprite;
-    mEmotionSprite = nullptr;
-    delete mAnimationEffect;
-    mAnimationEffect = nullptr;
+    delete2(mSpeechBubble);
+    delete2(mDispName);
+    delete2(mText);
+    delete2(mEmotionSprite);
+    delete2(mAnimationEffect);
 
     if (mOwner)
         mOwner->unassignPet(this);
@@ -469,7 +463,6 @@ void Being::setSpeech(const std::string &text, const std::string &channel,
     if (speech == TEXT_OVERHEAD && userPalette)
     {
         delete mText;
-
         mText = new Text(mSpeech,
                          getPixelX(), getPixelY() - getHeight(),
                          Graphics::CENTER,
@@ -821,14 +814,9 @@ void Being::setShowName(const bool doShowName)
     mShowName = doShowName;
 
     if (doShowName)
-    {
         showName();
-    }
     else
-    {
-        delete mDispName;
-        mDispName = nullptr;
-    }
+        delete2(mDispName)
 }
 
 void Being::setGuildName(const std::string &name)
@@ -1365,10 +1353,7 @@ void Being::logic()
 
     // Remove text and speechbubbles if speech boxes aren't being used
     if (mSpeechTime == 0 && mText)
-    {
-        delete mText;
-        mText = nullptr;
-    }
+        delete2(mText)
 
     const int time = tick_time * MILLISECONDS_IN_A_TICK;
     if (mEmotionSprite)
@@ -1378,10 +1363,7 @@ void Being::logic()
     {
         mAnimationEffect->update(time);
         if (mAnimationEffect->isTerminated())
-        {
-            delete mAnimationEffect;
-            mAnimationEffect = nullptr;
-        }
+            delete2(mAnimationEffect)
     }
 
     int frameCount = static_cast<int>(getFrameCount());
@@ -1453,10 +1435,7 @@ void Being::logic()
     {
         mEmotionTime--;
         if (mEmotionTime == 0)
-        {
-            delete mEmotionSprite;
-            mEmotionSprite = nullptr;
-        }
+            delete2(mEmotionSprite)
     }
 
     ActorSprite::logic();
@@ -1695,8 +1674,7 @@ void Being::drawSpeech(const int offsetX, const int offsetY)
     else if (mSpeechTime > 0 && (speech == NAME_IN_BUBBLE ||
              speech == NO_NAME_IN_BUBBLE))
     {
-        delete mText;
-        mText = nullptr;
+        delete2(mText)
 
         mSpeechBubble->setPosition(px - (mSpeechBubble->getWidth() / 2),
             py - getHeight() - (mSpeechBubble->getHeight()));
@@ -1710,16 +1688,14 @@ void Being::drawSpeech(const int offsetX, const int offsetY)
         if (!mText && userPalette)
         {
             mText = new Text(mSpeech, getPixelX(), getPixelY() - getHeight(),
-                Graphics::CENTER, &Theme::getThemeColor(
-                Theme::BUBBLE_TEXT), true);
+                Graphics::CENTER, &theme->getColor(
+                Theme::BUBBLE_TEXT, 255), true);
         }
     }
     else if (speech == NO_SPEECH)
     {
         mSpeechBubble->setVisible(false);
-
-        delete mText;
-        mText = nullptr;
+        delete2(mText)
     }
 }
 
@@ -1831,8 +1807,7 @@ void Being::showName()
     if (mName.empty())
         return;
 
-    delete mDispName;
-    mDispName = nullptr;
+    delete2(mDispName);
 
     if (mHideErased && player_relations.getRelation(mName) ==
         PlayerRelation::ERASED)
@@ -1901,11 +1876,11 @@ void Being::updateColors()
         else if (this == player_node)
         {
             mNameColor = &userPalette->getColor(UserPalette::SELF);
-            mTextColor = &Theme::getThemeColor(Theme::PLAYER);
+            mTextColor = &theme->getColor(Theme::PLAYER, 255);
         }
         else
         {
-            mTextColor = &Theme::getThemeColor(Theme::PLAYER);
+            mTextColor = &theme->getColor(Theme::PLAYER, 255);
 
             if (player_relations.getRelation(mName) != PlayerRelation::ERASED)
                 mErased = false;
@@ -2967,8 +2942,7 @@ void Being::setEmote(const uint8_t emotion, const int emote_time)
         const int emotionIndex = emotion - 1;
         if (emotionIndex >= 0 && emotionIndex <= EmoteDB::getLast())
         {
-            delete mEmotionSprite;
-            mEmotionSprite = nullptr;
+            delete2(mEmotionSprite)
             const EmoteInfo *const info = EmoteDB::get2(emotionIndex, true);
             if (info)
             {
@@ -3076,8 +3050,7 @@ void Being::removeSpecialEffect()
         mChildParticleEffects.removeLocally(mSpecialParticle);
         mSpecialParticle = nullptr;
     }
-    delete mAnimationEffect;
-    mAnimationEffect = nullptr;
+    delete2(mAnimationEffect);
 }
 
 void Being::updateAwayEffect()
@@ -3322,9 +3295,7 @@ void Being::setMap(Map *const map)
 void Being::removeAllItemsParticles()
 {
     FOR_EACH (SpriteParticleInfoIter, it, mSpriteParticles)
-    {
         delete (*it).second;
-    }
     mSpriteParticles.clear();
 }
 

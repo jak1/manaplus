@@ -42,6 +42,7 @@
 #include "net/playerhandler.h"
 #include "net/gamehandler.h"
 
+#include "utils/delete2.h"
 #include "utils/dtor.h"
 #include "utils/gettext.h"
 
@@ -52,7 +53,7 @@ extern volatile int tick_time;
 typedef std::vector <ProgressBar*>::const_iterator ProgressBarVectorCIter;
 
 MiniStatusWindow::MiniStatusWindow() :
-    Popup("MiniStatus", "ministatus.xml"),
+    Window("MiniStatus", false, nullptr, "ministatus.xml"),
     InventoryListener(),
     mBars(),
     mBarNames(),
@@ -114,8 +115,8 @@ MiniStatusWindow::MiniStatusWindow() :
 
     StatusWindow::updateHPBar(mHpBar);
 
-    if (Net::getGameHandler()->canUseMagicBar())
-        StatusWindow::updateMPBar(mMpBar);
+    if (Net::getGameHandler()->canUseMagicBar() && statusWindow)
+        statusWindow->updateMPBar(mMpBar);
 
     const int job = Net::getPlayerHandler()->getJobLocation()
         && serverConfig.getValueBool("showJob", true);
@@ -134,7 +135,7 @@ MiniStatusWindow::MiniStatusWindow() :
     loadBars();
     updateBars();
 
-    setVisible(config.getValueBool(getPopupName() + "Visible", true));
+    setVisible(true);
     addMouseListener(this);
     Inventory *const inv = PlayerInfo::getInventory();
     if (inv)
@@ -147,10 +148,8 @@ MiniStatusWindow::MiniStatusWindow() :
 
 MiniStatusWindow::~MiniStatusWindow()
 {
-    delete mTextPopup;
-    mTextPopup = nullptr;
-    delete mStatusPopup;
-    mStatusPopup = nullptr;
+    delete2(mTextPopup);
+    delete2(mStatusPopup);
     delete_all(mIcons);
     mIcons.clear();
 
@@ -183,8 +182,7 @@ ProgressBar *MiniStatusWindow::createBar(const float progress,
         progress, width, height, backColor, skin, skinFill);
     bar->setActionEventId(name);
     bar->setId(description);
-    bar->setColor(Theme::getThemeColor(textColor),
-        Theme::getThemeColor(textColor + 1));
+    bar->setColor(getThemeColor(textColor), getThemeColor(textColor + 1));
     mBars.push_back(bar);
     mBarNames[name] = bar;
     return bar;
@@ -195,7 +193,7 @@ void MiniStatusWindow::updateBars()
     int x = 0;
     const ProgressBar *lastBar = nullptr;
     FOR_EACH (ProgressBarVectorCIter, it, mBars)
-        safeRemove(*it);
+        remove(*it);
 
     FOR_EACH (ProgressBarVectorCIter, it, mBars)
     {
@@ -264,7 +262,7 @@ void MiniStatusWindow::processEvent(const Channels channel A_UNUSED,
         }
         else if (id == PlayerInfo::MP || id == PlayerInfo::MAX_MP)
         {
-            StatusWindow::updateMPBar(mMpBar);
+            statusWindow->updateMPBar(mMpBar);
         }
         else if (id == PlayerInfo::EXP || id == PlayerInfo::EXP_NEEDED)
         {
@@ -282,14 +280,14 @@ void MiniStatusWindow::processEvent(const Channels channel A_UNUSED,
     }
     else if (event.getName() == EVENT_UPDATESTAT)
     {
-        StatusWindow::updateMPBar(mMpBar);
+        statusWindow->updateMPBar(mMpBar);
         StatusWindow::updateJobBar(mJobBar);
     }
 }
 
 void MiniStatusWindow::updateStatus()
 {
-    StatusWindow::updateStatusBar(mStatusBar);
+    statusWindow->updateStatusBar(mStatusBar);
     if (mStatusPopup && mStatusPopup->isPopupVisible())
         mStatusPopup->update();
 }
@@ -297,7 +295,7 @@ void MiniStatusWindow::updateStatus()
 void MiniStatusWindow::logic()
 {
     BLOCK_START("MiniStatusWindow::logic")
-    Popup::logic();
+    Window::logic();
 
     for (size_t i = 0, sz = mIcons.size(); i < sz; i++)
     {
@@ -317,7 +315,7 @@ void MiniStatusWindow::draw(Graphics *graphics)
 
 void MiniStatusWindow::mouseMoved(MouseEvent &event)
 {
-    Popup::mouseMoved(event);
+    Window::mouseMoved(event);
 
     const int x = event.getX();
     const int y = event.getY();
@@ -444,6 +442,7 @@ void MiniStatusWindow::mousePressed(MouseEvent &event)
             event.getSource());
         if (!bar)
             return;
+        event.consume();
         if (viewport)
         {
             viewport->showPopup(getX() + event.getX(),
@@ -454,7 +453,7 @@ void MiniStatusWindow::mousePressed(MouseEvent &event)
 
 void MiniStatusWindow::mouseExited(MouseEvent &event)
 {
-    Popup::mouseExited(event);
+    Window::mouseExited(event);
 
     mTextPopup->hide();
     mStatusPopup->hide();

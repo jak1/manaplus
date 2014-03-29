@@ -72,6 +72,8 @@
 
 #include "resources/image.h"
 
+#include "utils/delete2.h"
+
 #include "debug.h"
 
 int ScrollArea::instances = 0;
@@ -164,10 +166,8 @@ ScrollArea::~ScrollArea()
         }
     }
 
-    delete mVertexes;
-    mVertexes = nullptr;
-    delete mVertexes2;
-    mVertexes2 = nullptr;
+    delete2(mVertexes);
+    delete2(mVertexes2);
 
     setContent(nullptr);
 }
@@ -195,7 +195,6 @@ void ScrollArea::init(std::string skinName)
         // +++ here probably need move background from static
         if (skinName == "")
             skinName = "scroll_background.xml";
-        Theme *const theme = Theme::instance();
         if (theme)
         {
             theme->loadRect(background, skinName, "scroll_background.xml");
@@ -207,8 +206,9 @@ void ScrollArea::init(std::string skinName)
 
         for (int i = 0; i < 2; i ++)
         {
-            Skin *const skin = Theme::instance()->load(
-                buttonFiles[i], "scrollbuttons.xml");
+            Skin *skin = nullptr;
+            if (theme)
+                skin = theme->load(buttonFiles[i], "scrollbuttons.xml");
             if (skin)
             {
                 const ImageRect &rect = skin->getBorder();
@@ -230,7 +230,8 @@ void ScrollArea::init(std::string skinName)
                 for (int f = UP; f < BUTTONS_DIR; f ++)
                     buttons[f][i] = nullptr;
             }
-            Theme::instance()->unload(skin);
+            if (theme)
+                theme->unload(skin);
         }
     }
     mScrollbarWidth = mScrollbarSize;
@@ -290,7 +291,7 @@ void ScrollArea::logic()
 void ScrollArea::updateAlpha()
 {
     const float alpha = std::max(client->getGuiAlpha(),
-        Theme::instance()->getMinimumOpacity());
+        theme->getMinimumOpacity());
 
     if (alpha != mAlpha)
     {
@@ -738,24 +739,28 @@ void ScrollArea::mousePressed(MouseEvent& event)
         setVerticalScrollAmount(mVScroll
                                 - mUpButtonScrollAmount);
         mUpButtonPressed = true;
+        event.consume();
     }
     else if (getDownButtonDimension().isPointInRect(x, y))
     {
         setVerticalScrollAmount(mVScroll
                                 + mDownButtonScrollAmount);
         mDownButtonPressed = true;
+        event.consume();
     }
     else if (getLeftButtonDimension().isPointInRect(x, y))
     {
         setHorizontalScrollAmount(mHScroll
                                   - mLeftButtonScrollAmount);
         mLeftButtonPressed = true;
+        event.consume();
     }
     else if (getRightButtonDimension().isPointInRect(x, y))
     {
         setHorizontalScrollAmount(mHScroll
                                   + mRightButtonScrollAmount);
         mRightButtonPressed = true;
+        event.consume();
     }
     else if (getVerticalMarkerDimension().isPointInRect(x, y))
     {
@@ -763,6 +768,7 @@ void ScrollArea::mousePressed(MouseEvent& event)
         mIsVerticalMarkerDragged = true;
 
         mVerticalMarkerDragOffset = y - getVerticalMarkerDimension().y;
+        event.consume();
     }
     else if (getVerticalBarDimension().isPointInRect(x, y))
     {
@@ -776,13 +782,14 @@ void ScrollArea::mousePressed(MouseEvent& event)
             setVerticalScrollAmount(mVScroll
                 + static_cast<int>(getChildrenArea().height * 0.95));
         }
+        event.consume();
     }
     else if (getHorizontalMarkerDimension().isPointInRect(x, y))
     {
         mIsHorizontalMarkerDragged = true;
         mIsVerticalMarkerDragged = false;
-
         mHorizontalMarkerDragOffset = x - getHorizontalMarkerDimension().x;
+        event.consume();
     }
     else if (getHorizontalBarDimension().isPointInRect(x, y))
     {
@@ -796,6 +803,7 @@ void ScrollArea::mousePressed(MouseEvent& event)
             setHorizontalScrollAmount(mHScroll
                 + static_cast<int>(getChildrenArea().width * 0.95));
         }
+        event.consume();
     }
 
     if (event.getButton() == MouseEvent::LEFT)
@@ -1301,26 +1309,26 @@ void ScrollArea::setDimension(const Rect& dimension)
     checkPolicies();
 }
 
-void ScrollArea::mouseWheelMovedUp(MouseEvent& mouseEvent)
+void ScrollArea::mouseWheelMovedUp(MouseEvent& event)
 {
-    if (mouseEvent.isConsumed())
+    if (event.isConsumed())
         return;
 
     setVerticalScrollAmount(getVerticalScrollAmount()
         - getChildrenArea().height / 8);
 
-    mouseEvent.consume();
+    event.consume();
 }
 
-void ScrollArea::mouseWheelMovedDown(MouseEvent& mouseEvent)
+void ScrollArea::mouseWheelMovedDown(MouseEvent& event)
 {
-    if (mouseEvent.isConsumed())
+    if (event.isConsumed())
         return;
 
     setVerticalScrollAmount(getVerticalScrollAmount()
         + getChildrenArea().height / 8);
 
-    mouseEvent.consume();
+    event.consume();
 }
 
 void ScrollArea::checkPolicies()

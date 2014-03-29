@@ -29,6 +29,7 @@
 
 #include "being/playerinfo.h"
 
+#include "gui/font.h"
 #include "gui/gui.h"
 #include "gui/viewport.h"
 
@@ -46,8 +47,9 @@
 
 #include "resources/image.h"
 
-#include "gui/font.h"
 #include "listeners/selectionlistener.h"
+
+#include "utils/delete2.h"
 
 #include <algorithm>
 
@@ -168,8 +170,7 @@ ItemContainer::ItemContainer(const Widget2 *const widget,
     mName(),
     mItemPopup(new ItemPopup),
     mShowMatrix(nullptr),
-    mSkin(Theme::instance() ? Theme::instance()->load(
-          "itemcontainer.xml", "") : nullptr),
+    mSkin(theme ? theme->load("itemcontainer.xml", "") : nullptr),
     mEquipedColor(getThemeColor(Theme::ITEM_EQUIPPED)),
     mEquipedColor2(getThemeColor(Theme::ITEM_EQUIPPED_OUTLINE)),
     mUnEquipedColor(getThemeColor(Theme::ITEM_NOT_EQUIPPED)),
@@ -197,6 +198,7 @@ ItemContainer::ItemContainer(const Widget2 *const widget,
     addKeyListener(this);
     addMouseListener(this);
     addWidgetListener(this);
+    mAllowLogic = false;
 }
 
 ItemContainer::~ItemContainer()
@@ -215,11 +217,10 @@ ItemContainer::~ItemContainer()
         mProtectedImg = nullptr;
     }
 
-    if (Theme::instance())
-        Theme::instance()->unload(mSkin);
+    if (theme)
+        theme->unload(mSkin);
 
-    delete mItemPopup;
-    mItemPopup = nullptr;
+    delete2(mItemPopup);
     delete []mShowMatrix;
 }
 
@@ -403,6 +404,7 @@ void ItemContainer::mousePressed(MouseEvent &event)
 
     if (button == MouseEvent::LEFT || button == MouseEvent::RIGHT)
     {
+        event.consume();
         const int index = getSlotIndex(event.getX(), event.getY());
         if (index == Inventory::NO_SLOT_INDEX)
             return;

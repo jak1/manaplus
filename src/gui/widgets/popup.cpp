@@ -27,6 +27,8 @@
 
 #include "gui/viewport.h"
 
+#include "utils/delete2.h"
+
 #include "debug.h"
 
 Popup::Popup(const std::string &name,
@@ -51,7 +53,6 @@ Popup::Popup(const std::string &name,
     if (skin == "")
         skin = "popup.xml";
 
-    Theme *const theme = Theme::instance();
     if (theme)
     {
         mSkin = theme->load(skin, "popup.xml");
@@ -73,12 +74,10 @@ Popup::~Popup()
 {
     logger->log("Popup::~Popup(\"%s\")", mPopupName.c_str());
 
-    delete mVertexes;
-    mVertexes = nullptr;
+    delete2(mVertexes);
 
     if (mSkin)
     {
-        Theme *const theme = Theme::instance();
         if (theme)
             theme->unload(mSkin);
         mSkin = nullptr;

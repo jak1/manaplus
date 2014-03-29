@@ -25,7 +25,7 @@ else
 manaplus_SOURCES =
 endif
 
-dyecmd_CXXFLAGS =
+dyecmd_CXXFLAGS = -DDYECMD
 dyecmd_SOURCES = gui/cliprect.cpp \
 	      gui/color.cpp \
 	      gui/rect.cpp \
@@ -632,6 +632,7 @@ manaplus_SOURCES += gui/widgets/avatarlistbox.cpp \
 	      utils/copynpaste.h \
 	      utils/cpu.cpp \
 	      utils/cpu.h \
+	      utils/delete2.h \
 	      utils/dtor.h \
 	      utils/files.cpp \
 	      utils/files.h \

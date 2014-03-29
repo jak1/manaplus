@@ -105,7 +105,7 @@ class TextBox final : public Widget,
         int getMinWidth() const A_WARN_UNUSED
         { return mMinWidth; }
 
-        void keyPressed(KeyEvent& keyEvent) override final;
+        void keyPressed(KeyEvent& event) override final;
 
         void draw(Graphics* graphics) override final;
 
@@ -272,9 +272,9 @@ class TextBox final : public Widget,
         void fontChanged() override final
         { adjustSize(); }
 
-        void mousePressed(MouseEvent& mouseEvent) override final;
+        void mousePressed(MouseEvent& event) override final;
 
-        void mouseDragged(MouseEvent& mouseEvent) override final;
+        void mouseDragged(MouseEvent& event) override final;
 
     private:
         /**

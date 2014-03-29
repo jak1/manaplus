@@ -44,6 +44,7 @@
 
 #include "resources/imageset.h"
 
+#include "utils/delete2.h"
 #include "utils/dtor.h"
 #include "utils/gettext.h"
 
@@ -122,7 +123,7 @@ void EquipmentWindow::postInit()
     mUnequip->setEnabled(false);
 
     ImageRect rect;
-    Theme::instance()->loadRect(rect, "equipment_background.xml", "", 0, 1);
+    theme->loadRect(rect, "equipment_background.xml", "", 0, 1);
     mSlotBackground = rect.grid[0];
     mSlotHighlightedBackground = rect.grid[1];
     add(mPlayerBox);
@@ -132,14 +133,12 @@ void EquipmentWindow::postInit()
 
 EquipmentWindow::~EquipmentWindow()
 {
-    delete mItemPopup;
-    mItemPopup = nullptr;
+    delete2(mItemPopup);
     if (this == beingEquipmentWindow)
     {
         if (mEquipment)
             delete mEquipment->getBackend();
-        delete mEquipment;
-        mEquipment = nullptr;
+        delete2(mEquipment)
     }
     delete_all(mBoxes);
     mBoxes.clear();
@@ -152,8 +151,7 @@ EquipmentWindow::~EquipmentWindow()
         mSlotBackground->decRef();
     if (mSlotHighlightedBackground)
         mSlotHighlightedBackground->decRef();
-    delete mVertexes;
-    mVertexes = nullptr;
+    delete2(mVertexes);
 }
 
 void EquipmentWindow::draw(Graphics *graphics)
@@ -295,22 +293,22 @@ Item *EquipmentWindow::getItem(const int x, const int y) const
     return nullptr;
 }
 
-void EquipmentWindow::mousePressed(MouseEvent& mouseEvent)
+void EquipmentWindow::mousePressed(MouseEvent& event)
 {
     if (!mEquipment)
     {
-        Window::mousePressed(mouseEvent);
+        Window::mousePressed(event);
         return;
     }
 
-    const int x = mouseEvent.getX();
-    const int y = mouseEvent.getY();
+    const int x = event.getX();
+    const int y = event.getY();
 
-    if (mouseEvent.getButton() == MouseEvent::LEFT)
+    if (event.getButton() == MouseEvent::LEFT)
     {
         if (mForing)
         {
-            Window::mousePressed(mouseEvent);
+            Window::mousePressed(event);
             return;
         }
         // Checks if any of the presses were in the equip boxes.
@@ -332,6 +330,7 @@ void EquipmentWindow::mousePressed(MouseEvent& mouseEvent)
                 inBox = true;
                 if (item)
                 {
+                    event.consume();
                     setSelected(i);
                     dragDrop.dragItem(item, DRAGDROP_SOURCE_EQUIPMENT);
                     return;
@@ -341,7 +340,7 @@ void EquipmentWindow::mousePressed(MouseEvent& mouseEvent)
                 return;
         }
     }
-    else if (mouseEvent.getButton() == MouseEvent::RIGHT)
+    else if (event.getButton() == MouseEvent::RIGHT)
     {
         if (Item *const item = getItem(x, y))
         {
@@ -355,6 +354,7 @@ void EquipmentWindow::mousePressed(MouseEvent& mouseEvent)
             const int my = y + getY();
             if (viewport)
             {
+                event.consume();
                 if (mForing)
                     viewport->showUndressPopup(mx, my, mBeing, item);
                 else
@@ -363,12 +363,12 @@ void EquipmentWindow::mousePressed(MouseEvent& mouseEvent)
             }
         }
     }
-    Window::mousePressed(mouseEvent);
+    Window::mousePressed(event);
 }
 
-void EquipmentWindow::mouseReleased(MouseEvent &mouseEvent)
+void EquipmentWindow::mouseReleased(MouseEvent &event)
 {
-    Window::mouseReleased(mouseEvent);
+    Window::mouseReleased(event);
     const DragDropSource src = dragDrop.getSource();
     if (dragDrop.isEmpty() || (src != DRAGDROP_SOURCE_INVENTORY
         && src != DRAGDROP_SOURCE_EQUIPMENT))
@@ -397,8 +397,8 @@ void EquipmentWindow::mouseReleased(MouseEvent &mouseEvent)
     {
         if (item->isEquipment())
         {
-            const int x = mouseEvent.getX();
-            const int y = mouseEvent.getY();
+            const int x = event.getX();
+            const int y = event.getY();
             for (std::vector<EquipmentBox*>::const_iterator
                  it = mBoxes.begin(), it_end = mBoxes.end();
                  it != it_end; ++ it)

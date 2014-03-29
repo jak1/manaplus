@@ -78,6 +78,7 @@
 #include "resources/image.h"
 
 #include "utils/copynpaste.h"
+#include "utils/delete2.h"
 #include "utils/timer.h"
 
 #undef DELETE  // Win32 compatibility hack
@@ -113,6 +114,7 @@ TextField::TextField(const Widget2 *restrict const widget,
     mAllowSpecialActions(true),
     mSendAlwaysEvents(sendAlwaysEvents)
 {
+    mAllowLogic = false;
     setFocusable(true);
     addMouseListener(this);
     addKeyListener(this);
@@ -125,7 +127,6 @@ TextField::TextField(const Widget2 *restrict const widget,
 
     if (instances == 0)
     {
-        Theme *const theme = Theme::instance();
         if (theme)
         {
             mSkin = theme->loadSkinRect(skin, "textfield.xml",
@@ -154,13 +155,11 @@ TextField::~TextField()
     if (gui)
         gui->removeDragged(this);
 
-    delete mPopupMenu;
-    mPopupMenu = nullptr;
+    delete2(mPopupMenu);
 
     instances--;
     if (instances == 0)
     {
-        Theme *const theme = Theme::instance();
         if (theme)
         {
             theme->unload(mSkin);
@@ -172,7 +171,7 @@ TextField::~TextField()
 void TextField::updateAlpha()
 {
     const float alpha = std::max(client->getGuiAlpha(),
-        Theme::instance()->getMinimumOpacity());
+        theme->getMinimumOpacity());
 
     if (alpha != mAlpha)
     {
@@ -246,16 +245,16 @@ int TextField::getValue() const
     return value;
 }
 
-void TextField::keyPressed(KeyEvent &keyEvent)
+void TextField::keyPressed(KeyEvent &event)
 {
-    const int val = keyEvent.getKey().getValue();
+    const int val = event.getKey().getValue();
 #ifdef USE_SDL2
     if (val == Key::TEXTINPUT)
     {
-        std::string str = keyEvent.getText();
+        std::string str = event.getText();
         mText.insert(mCaretPosition, str);
         mCaretPosition += str.size();
-        keyEvent.consume();
+        event.consume();
         fixScroll();
         if (mSendAlwaysEvents)
             distributeActionEvent();
@@ -274,7 +273,7 @@ void TextField::keyPressed(KeyEvent &keyEvent)
                 buf[1] = 0;
                 mText.insert(mCaretPosition, std::string(buf));
                 mCaretPosition += 1;
-                keyEvent.consume();
+                event.consume();
                 fixScroll();
                 if (mSendAlwaysEvents)
                     distributeActionEvent();
@@ -306,7 +305,7 @@ void TextField::keyPressed(KeyEvent &keyEvent)
 
             mText.insert(mCaretPosition, std::string(buf, buf + len));
             mCaretPosition += len;
-            keyEvent.consume();
+            event.consume();
             fixScroll();
             if (mSendAlwaysEvents)
                 distributeActionEvent();
@@ -324,14 +323,14 @@ void TextField::keyPressed(KeyEvent &keyEvent)
     bool consumed(false);
 #endif
 
-    const int action = keyEvent.getActionId();
+    const int action = event.getActionId();
     if (!inputManager.isActionActive(static_cast<int>(
         Input::KEY_GUI_CTRL)))
     {
         if (!handleNormalKeys(action, consumed))
         {
             if (consumed)
-                keyEvent.consume();
+                event.consume();
             return;
         }
     }
@@ -344,7 +343,7 @@ void TextField::keyPressed(KeyEvent &keyEvent)
         distributeActionEvent();
 
     if (consumed)
-        keyEvent.consume();
+        event.consume();
     fixScroll();
 }
 
@@ -694,13 +693,14 @@ void TextField::fontChanged()
     fixScroll();
 }
 
-void TextField::mousePressed(MouseEvent &mouseEvent)
+void TextField::mousePressed(MouseEvent &event)
 {
 #ifdef ANDROID
     if (!client->isKeyboardVisible())
         inputManager.executeAction(Input::KEY_SHOW_KEYBOARD);
 #endif
-    if (mouseEvent.getButton() == MouseEvent::RIGHT)
+    event.consume();
+    if (event.getButton() == MouseEvent::RIGHT)
     {
         if (viewport)
         {
@@ -722,10 +722,10 @@ void TextField::mousePressed(MouseEvent &mouseEvent)
             }
         }
     }
-    else if (mouseEvent.getButton() == MouseEvent::LEFT)
+    else if (event.getButton() == MouseEvent::LEFT)
     {
         mCaretPosition = getFont()->getStringIndexAt(
-            mText, mouseEvent.getX() + mXScroll);
+            mText, event.getX() + mXScroll);
         fixScroll();
     }
 }
@@ -750,7 +750,7 @@ void TextField::setText(const std::string& text)
     mText = text;
 }
 
-void TextField::mouseDragged(MouseEvent& mouseEvent)
+void TextField::mouseDragged(MouseEvent& event)
 {
-    mouseEvent.consume();
+    event.consume();
 }

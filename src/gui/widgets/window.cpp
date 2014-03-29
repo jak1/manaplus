@@ -82,6 +82,8 @@
 #include "resources/cursor.h"
 #include "resources/image.h"
 
+#include "utils/delete2.h"
+
 #include "debug.h"
 
 const int resizeMask = 8 + 4 + 2 + 1;
@@ -155,7 +157,6 @@ Window::Window(const std::string &caption, const bool modal,
 
     int childPalette = 1;
     // Loads the skin
-    Theme *const theme = Theme::instance();
     if (theme)
     {
         mSkin = theme->load(skin, "window.xml");
@@ -220,8 +221,7 @@ Window::~Window()
 
     saveWindowState();
 
-    delete mLayout;
-    mLayout = nullptr;
+    delete2(mLayout);
 
     while (!mWidgets.empty())
         delete mWidgets.front();
@@ -229,14 +229,12 @@ Window::~Window()
     mWidgets.clear();
 
     removeWidgetListener(this);
-    delete mVertexes;
-    mVertexes = nullptr;
+    delete2(mVertexes);
 
     windowInstances--;
 
     if (mSkin)
     {
-        Theme *const theme = Theme::instance();
         if (theme)
             theme->unload(mSkin);
         mSkin = nullptr;
@@ -643,6 +641,7 @@ void Window::setStickyButton(const bool flag)
 void Window::setSticky(const bool sticky)
 {
     mSticky = sticky;
+    mRedraw = true;
 }
 
 void Window::setStickyButtonLock(const bool lock)
@@ -706,6 +705,9 @@ void Window::scheduleDelete()
 
 void Window::mousePressed(MouseEvent &event)
 {
+    if (event.isConsumed())
+        return;
+
     if (event.getSource() == this)
     {
         if (getParent())
@@ -716,7 +718,8 @@ void Window::mousePressed(MouseEvent &event)
         mMoved = event.getY() <= static_cast<int>(mTitleBarHeight);
     }
 
-    if (event.getButton() == MouseEvent::LEFT)
+    const unsigned int button = event.getButton();
+    if (button == MouseEvent::LEFT)
     {
         const int x = event.getX();
         const int y = event.getY();
@@ -726,6 +729,7 @@ void Window::mousePressed(MouseEvent &event)
         {
             mouseResize = 0;
             mMoved = 0;
+            event.consume();
             close();
             return;
         }
@@ -736,16 +740,26 @@ void Window::mousePressed(MouseEvent &event)
             setSticky(!isSticky());
             mouseResize = 0;
             mMoved = 0;
-            mRedraw = true;
+            event.consume();
             return;
         }
 
         // Handle window resizing
         mouseResize = getResizeHandles(event) & resizeMask;
+        if (mouseResize != 0)
+            event.consume();
         if (canMove())
             mMoved = !mouseResize;
         else
             mMoved = false;
+    }
+    else if (button == MouseEvent::RIGHT)
+    {
+        if (viewport)
+        {
+            event.consume();
+            viewport->showWindowPopup(this);
+        }
     }
 }
 
@@ -1207,7 +1221,7 @@ bool Window::isResizeAllowed(const MouseEvent &event) const
 int Window::getGuiAlpha() const
 {
     const float alpha = std::max(client->getGuiAlpha(),
-        Theme::instance()->getMinimumOpacity());
+        theme->getMinimumOpacity());
     return static_cast<int>(alpha * 255.0F);
 }
 
@@ -1248,8 +1262,7 @@ void Window::reflowLayout(int w, int h)
         return;
 
     mLayout->reflow(w, h);
-    delete mLayout;
-    mLayout = nullptr;
+    delete2(mLayout);
     setContentSize(w, h);
 }
 

@@ -26,6 +26,8 @@
 
 #include "gui/gui.h"
 
+#include "utils/delete2.h"
+
 #include "debug.h"
 
 float ShortcutContainer::mAlpha = 1.0;
@@ -43,6 +45,7 @@ ShortcutContainer::ShortcutContainer(Widget2 *const widget) :
     mVertexes(new ImageCollection),
     mRedraw(true)
 {
+    mAllowLogic = false;
 }
 
 ShortcutContainer::~ShortcutContainer()
@@ -50,8 +53,7 @@ ShortcutContainer::~ShortcutContainer()
     if (gui)
         gui->removeDragged(this);
 
-    delete mVertexes;
-    mVertexes = nullptr;
+    delete2(mVertexes);
 }
 
 void ShortcutContainer::widgetResized(const Event &event A_UNUSED)

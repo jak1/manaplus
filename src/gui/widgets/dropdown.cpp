@@ -78,6 +78,7 @@ DropDown::DropDown(const Widget2 *const widget,
     mPushed(false),
     mIsDragged(false)
 {
+    mAllowLogic = false;
     mPopup->postInit();
     mFrameSize = 2;
     mForegroundColor2 = getThemeColor(Theme::DROPDOWN_OUTLINE);
@@ -85,13 +86,12 @@ DropDown::DropDown(const Widget2 *const widget,
     mPopup->setHeight(100);
 
     // Initialize graphics
-    if (instances == 0)
+    if (instances == 0 && theme)
     {
         // Load the background skin
         for (int i = 0; i < 2; i ++)
         {
-            Skin *const skin = Theme::instance()->load(
-                dropdownFiles[i], "dropdown.xml");
+            Skin *const skin = theme->load(dropdownFiles[i], "dropdown.xml");
             if (skin)
             {
                 if (!i)
@@ -111,7 +111,7 @@ DropDown::DropDown(const Widget2 *const widget,
                     }
                 }
                 if (i)
-                    Theme::instance()->unload(skin);
+                    theme->unload(skin);
             }
             else
             {
@@ -121,11 +121,8 @@ DropDown::DropDown(const Widget2 *const widget,
         }
 
         // get the border skin
-        if (Theme::instance())
-        {
-            Theme::instance()->loadRect(skinRect,
-                "dropdown_background.xml", "");
-        }
+        if (theme)
+            theme->loadRect(skinRect, "dropdown_background.xml", "");
     }
 
     instances++;
@@ -181,7 +178,6 @@ DropDown::~DropDown()
                     buttons[f][i]->decRef();
             }
         }
-        Theme *const theme = Theme::instance();
         if (theme)
         {
             theme->unload(mSkin);
@@ -193,7 +189,7 @@ DropDown::~DropDown()
 void DropDown::updateAlpha()
 {
     const float alpha = std::max(client->getGuiAlpha(),
-        Theme::instance()->getMinimumOpacity());
+        theme->getMinimumOpacity());
 
     if (mAlpha != alpha)
     {
@@ -311,12 +307,12 @@ void DropDown::drawButton(Graphics *graphics)
     }
 }
 
-void DropDown::keyPressed(KeyEvent& keyEvent)
+void DropDown::keyPressed(KeyEvent& event)
 {
-    if (keyEvent.isConsumed())
+    if (event.isConsumed())
         return;
 
-    const int actionId = keyEvent.getActionId();
+    const int actionId = event.getActionId();
     switch (actionId)
     {
         case Input::KEY_GUI_SELECT:
@@ -348,7 +344,7 @@ void DropDown::keyPressed(KeyEvent& keyEvent)
             return;
     }
 
-    keyEvent.consume();
+    event.consume();
 }
 
 void DropDown::hideDrop(bool event)
@@ -358,11 +354,12 @@ void DropDown::hideDrop(bool event)
     mPopup->setVisible(false);
 }
 
-void DropDown::mousePressed(MouseEvent& mouseEvent)
+void DropDown::mousePressed(MouseEvent& event)
 {
+    event.consume();
     // If we have a mouse press on the widget.
-    if (mouseEvent.getButton() == MouseEvent::LEFT
-        && !mDroppedDown && mouseEvent.getSource() == this)
+    if (event.getButton() == MouseEvent::LEFT
+        && !mDroppedDown && event.getSource() == this)
     {
         mPushed = true;
         dropDown();
@@ -375,14 +372,14 @@ void DropDown::mousePressed(MouseEvent& mouseEvent)
     }
 }
 
-void DropDown::mouseReleased(MouseEvent &mouseEvent)
+void DropDown::mouseReleased(MouseEvent &event)
 {
     if (mIsDragged)
         mPushed = false;
 
-    const int button = mouseEvent.getButton();
-    const int x = mouseEvent.getX();
-    const int y = mouseEvent.getY();
+    const int button = event.getButton();
+    const int x = event.getX();
+    const int y = event.getY();
     // Released outside of widget. Can happen when we have modal
     // input focus.
     if ((0 > y || y >= mDimension.height || x < 0 || x >= mDimension.width)
@@ -399,22 +396,22 @@ void DropDown::mouseReleased(MouseEvent &mouseEvent)
     mIsDragged = false;
 }
 
-void DropDown::mouseDragged(MouseEvent &mouseEvent)
+void DropDown::mouseDragged(MouseEvent &event)
 {
     mIsDragged = true;
-    mouseEvent.consume();
+    event.consume();
 }
 
-void DropDown::mouseWheelMovedUp(MouseEvent& mouseEvent)
+void DropDown::mouseWheelMovedUp(MouseEvent& event)
 {
     setSelected(getSelected() - 1);
-    mouseEvent.consume();
+    event.consume();
 }
 
-void DropDown::mouseWheelMovedDown(MouseEvent& mouseEvent)
+void DropDown::mouseWheelMovedDown(MouseEvent& event)
 {
     setSelected(getSelected() + 1);
-    mouseEvent.consume();
+    event.consume();
 }
 
 void DropDown::setSelectedString(const std::string &str)

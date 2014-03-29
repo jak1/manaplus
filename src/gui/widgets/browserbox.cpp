@@ -83,12 +83,13 @@ BrowserBox::BrowserBox(const Widget2 *const widget,
     mEnableKeys(false),
     mEnableTabs(false)
 {
+    mAllowLogic = false;
+
     setFocusable(true);
     addMouseListener(this);
 
     mBackgroundColor = getThemeColor(Theme::BACKGROUND);
 
-    Theme *const theme = Theme::instance();
     if (theme)
         mSkin = theme->load(skin, "browserbox.xml");
     if (mInstances == 0)
@@ -140,7 +141,6 @@ BrowserBox::~BrowserBox()
     if (gui)
         gui->removeDragged(this);
 
-    Theme *const theme = Theme::instance();
     if (theme)
     {
         theme->unload(mSkin);
@@ -443,6 +443,11 @@ void BrowserBox::mouseMoved(MouseEvent &event)
 
     mSelectedLink = (i != mLinks.end())
         ? static_cast<int>(i - mLinks.begin()) : -1;
+}
+
+void BrowserBox::mouseExited(MouseEvent &event A_UNUSED)
+{
+    mSelectedLink = -1;
 }
 
 void BrowserBox::draw(Graphics *graphics)

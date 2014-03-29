@@ -67,6 +67,7 @@
 #include "net/net.h"
 
 #include "utils/copynpaste.h"
+#include "utils/delete2.h"
 #include "utils/gettext.h"
 
 #include "resources/resourcemanager.h"
@@ -266,12 +267,9 @@ ChatWindow::~ChatWindow()
     saveState();
     config.setValue("ReturnToggles", mReturnToggles);
     removeAllWhispers();
-    delete mItemLinkHandler;
-    mItemLinkHandler = nullptr;
-    delete mColorPicker;
-    mColorPicker = nullptr;
-    delete mColorListModel;
-    mColorListModel = nullptr;
+    delete2(mItemLinkHandler);
+    delete2(mColorPicker);
+    delete2(mColorListModel);
 }
 
 void ChatWindow::postInit()
@@ -646,8 +644,7 @@ void ChatWindow::ignoreAllWhispers()
                                          PlayerRelation::IGNORED);
         }
 
-        delete (iter->second);
-        iter->second = nullptr;
+        delete2(iter->second)
     }
 }
 
@@ -732,6 +729,7 @@ void ChatWindow::mousePressed(MouseEvent &event)
             Tab *const tab = mChatTabs->getSelectedTab();
             if (tab)
             {
+                event.consume();
                 if (inputManager.isActionActive(static_cast<int>(
                     Input::KEY_CHAT_MOD)))
                 {
@@ -1857,16 +1855,16 @@ void ChatWindow::mouseMoved(MouseEvent &event)
     Window::mouseMoved(event);
 }
 
-void ChatWindow::mouseEntered(MouseEvent& mouseEvent)
+void ChatWindow::mouseEntered(MouseEvent& event)
 {
     mHaveMouse = true;
-    Window::mouseEntered(mouseEvent);
+    Window::mouseEntered(event);
 }
 
-void ChatWindow::mouseExited(MouseEvent& mouseEvent)
+void ChatWindow::mouseExited(MouseEvent& event)
 {
     updateVisibility();
-    Window::mouseExited(mouseEvent);
+    Window::mouseExited(event);
 }
 
 void ChatWindow::draw(Graphics* graphics)

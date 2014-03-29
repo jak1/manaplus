@@ -361,6 +361,8 @@ DefaultsData* getConfigDefaults()
     AddDEF("usepets", true);
     AddDEF("scale", 1);
     AddDEF("addwatermark", true);
+    AddDEF("hidesupport", false);
+    AddDEF("showserverpos", false);
     return configData;
 }
 
@@ -535,6 +537,7 @@ DefaultsData* getPathsDefaults()
     AddDEF("deadMessagesFile", "deadmessages.xml");
     AddDEF("deadMessagesPatchFile", "deadmessages_patch.xml");
     AddDEF("deadMessagesPatchDir", "deadmessages.d");
+    AddDEF("poisonEffectName", "poison");
 
     return configData;
 }

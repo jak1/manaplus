@@ -34,6 +34,7 @@
 
 #include "gui/widgets/button.h"
 
+#include "utils/delete2.h"
 #include "utils/dtor.h"
 #include "utils/gettext.h"
 
@@ -46,8 +47,7 @@ WindowMenu::WindowMenu(const Widget2 *const widget) :
     ActionListener(),
     SelectionListener(),
     MouseListener(),
-    mSkin(Theme::instance() ? Theme::instance()->load("windowmenu.xml", "")
-          : nullptr),
+    mSkin(theme ? theme->load("windowmenu.xml", "") : nullptr),
     mPadding(mSkin ? mSkin->getPadding() : 1),
     mSpacing(mSkin ? mSkin->getOption("spacing", 3) : 3),
     mTextPopup(new TextPopup),
@@ -172,8 +172,7 @@ WindowMenu::~WindowMenu()
     config.removeListener("autohideButtons", this);
     CHECKLISTENERS
 
-    delete mTextPopup;
-    mTextPopup = nullptr;
+    delete2(mTextPopup);
     for (std::map <std::string, ButtonInfo*>::iterator
          it = mButtonNames.begin(),
          it_end = mButtonNames.end(); it != it_end; ++it)
@@ -181,22 +180,18 @@ WindowMenu::~WindowMenu()
         delete (*it).second;
     }
     mButtonNames.clear();
-    for (std::vector <Button*>::iterator it = mButtons.begin(),
-         it_end = mButtons.end(); it != it_end; ++it)
+    FOR_EACH (std::vector <Button*>::iterator, it, mButtons)
     {
         Button *const btn = dynamic_cast<Button*>(*it);
         if (!btn)
             continue;
         if (!btn->isVisible())
-        {
             delete btn;
-        }
     }
     delete_all(mButtonTexts);
     mButtonTexts.clear();
     if (mSkin)
     {
-        Theme *const theme = Theme::instance();
         if (theme)
             theme->unload(mSkin);
         mSkin = nullptr;
@@ -206,7 +201,6 @@ WindowMenu::~WindowMenu()
 void WindowMenu::action(const ActionEvent &event)
 {
     const std::string &eventId = event.getId();
-
     const std::map <std::string, ButtonInfo*>::iterator
         it = mButtonNames.find(eventId);
     if (it == mButtonNames.end())
@@ -221,7 +215,9 @@ void WindowMenu::action(const ActionEvent &event)
 
 void WindowMenu::addButton(const char *const text,
                            const std::string &description,
-                           int &restrict x, int &restrict h, const int key,
+                           int &restrict x,
+                           int &restrict h,
+                           const int key,
                            const bool visible)
 {
     Button *const btn = new Button(this, gettext(text), text, this);
@@ -243,8 +239,12 @@ void WindowMenu::mousePressed(MouseEvent &event)
     if (!viewport)
         return;
 
-    if (!mSmallWindow && event.getButton() == MouseEvent::RIGHT)
+    if (event.getButton() == MouseEvent::RIGHT)
     {
+        if (mSmallWindow)
+            return;
+
+        event.consume();
         Button *const btn = dynamic_cast<Button*>(event.getSource());
         if (!btn)
             return;
@@ -295,7 +295,7 @@ void WindowMenu::mouseMoved(MouseEvent &event)
     }
 }
 
-void WindowMenu::mouseExited(MouseEvent& mouseEvent A_UNUSED)
+void WindowMenu::mouseExited(MouseEvent& event A_UNUSED)
 {
     mHaveMouse = false;
     if (!mTextPopup)
@@ -393,9 +393,7 @@ void WindowMenu::loadButtons()
 void WindowMenu::saveButtons() const
 {
     int i = 0;
-    for (std::vector <Button*>::const_iterator it = mButtons.begin(),
-         it_end = mButtons.end();
-         it != it_end; ++it)
+    FOR_EACH (std::vector <Button*>::const_iterator, it, mButtons)
     {
         const Button *const btn = dynamic_cast<const Button *const>(*it);
         if (btn && !btn->isVisible())

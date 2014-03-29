@@ -46,6 +46,7 @@
 #include "gui/widgets/listbox.h"
 #include "gui/widgets/scrollarea.h"
 
+#include "utils/delete2.h"
 #include "utils/gettext.h"
 #include "utils/langs.h"
 
@@ -295,11 +296,9 @@ ServerDialog::~ServerDialog()
     if (mDownload)
     {
         mDownload->cancel();
-        delete mDownload;
-        mDownload = nullptr;
+        delete2(mDownload)
     }
-    delete mServersListModel;
-    mServersListModel = nullptr;
+    delete2(mServersListModel);
 }
 
 void ServerDialog::connectToSelectedServer()
@@ -389,18 +388,18 @@ void ServerDialog::action(const ActionEvent &event)
     }
 }
 
-void ServerDialog::keyPressed(KeyEvent &keyEvent)
+void ServerDialog::keyPressed(KeyEvent &event)
 {
-    switch (keyEvent.getActionId())
+    switch (event.getActionId())
     {
         case Input::KEY_GUI_CANCEL:
-            keyEvent.consume();
+            event.consume();
             client->setState(STATE_EXIT);
             return;
 
         case Input::KEY_GUI_SELECT:
         case Input::KEY_GUI_SELECT2:
-            keyEvent.consume();
+            event.consume();
             action(ActionEvent(nullptr,
                 mConnectButton->getActionEventId()));
             return;
@@ -435,8 +434,8 @@ void ServerDialog::keyPressed(KeyEvent &keyEvent)
         default:
             break;
     }
-    if (!keyEvent.isConsumed())
-        mServersList->keyPressed(keyEvent);
+    if (!event.isConsumed())
+        mServersList->keyPressed(event);
 }
 
 void ServerDialog::valueChanged(const SelectionEvent &)
@@ -450,13 +449,17 @@ void ServerDialog::valueChanged(const SelectionEvent &)
     mDeleteButton->setEnabled(true);
 }
 
-void ServerDialog::mouseClicked(MouseEvent &mouseEvent)
+void ServerDialog::mouseClicked(MouseEvent &event)
 {
-    if (mouseEvent.getClickCount() == 2 &&
-        mouseEvent.getSource() == mServersList)
+    if (event.getButton() == MouseEvent::LEFT)
     {
-        action(ActionEvent(mConnectButton,
-            mConnectButton->getActionEventId()));
+        event.consume();
+        if (event.getClickCount() == 2 &&
+            event.getSource() == mServersList)
+        {
+            action(ActionEvent(mConnectButton,
+                mConnectButton->getActionEventId()));
+        }
     }
 }
 
@@ -513,8 +516,7 @@ void ServerDialog::downloadServerList()
     if (mDownload)
     {
         mDownload->cancel();
-        delete mDownload;
-        mDownload = nullptr;
+        delete2(mDownload)
     }
 
     mDownload = new Net::Download(this, listFile,

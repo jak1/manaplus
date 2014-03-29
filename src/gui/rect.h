@@ -64,8 +64,6 @@
 #ifndef GUI_RECT_H
 #define GUI_RECT_H
 
-#include <iostream>
-
 #include "localconsts.h"
 
 /**
@@ -127,16 +125,7 @@ class Rect
           * @return True if the point is inside the rectangle.
           * @since 0.1.0
           */
-        bool isPointInRect(int x, int y) const A_WARN_UNUSED;
-
-        /**
-          * Output operator for output.
-          *
-          * @param out The stream to output to.
-          * @param rectangle The rectangle to output.
-          */
-        friend std::ostream& operator<<(std::ostream& out,
-                                        const Rect& rectangle);
+        bool isPointInRect(const int x, const int y) const A_WARN_UNUSED;
 
         /**
           * Holds the x coordinate of the rectangle.

@@ -77,6 +77,7 @@
 
 #include "resources/db/itemdb.h"
 
+#include "utils/delete2.h"
 #include "utils/gettext.h"
 #include "utils/process.h"
 #include "utils/timer.h"
@@ -1270,6 +1271,10 @@ impHandler1(talkPet)
         Net::getChatHandler()->talk(args, GENERAL_CHANNEL);
 }
 
+impHandler1(gm)
+{
+    Net::getChatHandler()->talk("@wgm " + args, GENERAL_CHANNEL);
+}
 
 struct UploadChatInfo
 {
@@ -1315,8 +1320,7 @@ static int uploadUpdate(void *ptr,
             }
         }
     }
-    delete info->upload;
-    info->upload = nullptr;
+    delete2(info->upload);
     delete info;
     return 0;
 }
@@ -1375,7 +1379,7 @@ impHandler0(testsdlfont)
 
     for (int f = 0; f < 300; f ++)
         data.push_back("test " + toString(f) + "string");
-    nullGraphics->_beginDraw();
+    nullGraphics->beginDraw();
 
     clock_gettime(CLOCK_MONOTONIC, &time1);
     for (int f = 0; f < 500; f ++)

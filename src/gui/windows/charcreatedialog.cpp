@@ -313,8 +313,7 @@ CharCreateDialog::CharCreateDialog(CharSelectDialog *const parent,
 
 CharCreateDialog::~CharCreateDialog()
 {
-    delete mPlayer;
-    mPlayer = nullptr;
+    delete2(mPlayer);
 
     if (Net::getCharServerHandler())
         Net::getCharServerHandler()->setCharCreateDialog(nullptr);
@@ -491,14 +490,11 @@ void CharCreateDialog::setAttributes(const StringVect &labels,
     for (unsigned i = 0; i < mAttributeLabel.size(); i++)
     {
         remove(mAttributeLabel[i]);
-        delete mAttributeLabel[i];
-        mAttributeLabel[i] = nullptr;
+        delete2(mAttributeLabel[i])
         remove(mAttributeSlider[i]);
-        delete mAttributeSlider[i];
-        mAttributeSlider[i] = nullptr;
+        delete2(mAttributeSlider[i])
         remove(mAttributeValue[i]);
-        delete mAttributeValue[i];
-        mAttributeValue[i] = nullptr;
+        delete2(mAttributeValue[i])
     }
 
     mAttributeLabel.resize(labels.size());
@@ -655,13 +651,13 @@ void CharCreateDialog::updatePlayer()
     }
 }
 
-void CharCreateDialog::keyPressed(KeyEvent &keyEvent)
+void CharCreateDialog::keyPressed(KeyEvent &event)
 {
-    const int actionId = keyEvent.getActionId();
+    const int actionId = event.getActionId();
     switch (actionId)
     {
         case Input::KEY_GUI_CANCEL:
-            keyEvent.consume();
+            event.consume();
             action(ActionEvent(mCancelButton,
                 mCancelButton->getActionEventId()));
             break;

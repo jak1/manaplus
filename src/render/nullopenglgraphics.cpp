@@ -77,9 +77,12 @@ void NullOpenGLGraphics::initArrays()
     // need alocate small size, after if limit reached reallocate to double size
     vertexBufSize = mMaxVertices;
     const int sz = mMaxVertices * 4 + 30;
-    mFloatTexArray = new GLfloat[sz];
-    mIntTexArray = new GLint[sz];
-    mIntVertArray = new GLint[sz];
+    if (!mFloatTexArray)
+        mFloatTexArray = new GLfloat[sz];
+    if (!mIntTexArray)
+        mIntTexArray = new GLint[sz];
+    if (!mIntVertArray)
+        mIntVertArray = new GLint[sz];
 }
 
 bool NullOpenGLGraphics::setVideoMode(const int w, const int h,
@@ -916,12 +919,12 @@ void NullOpenGLGraphics::updateScreen()
     BLOCK_END("Graphics::updateScreen")
 }
 
-void NullOpenGLGraphics::_beginDraw()
+void NullOpenGLGraphics::beginDraw()
 {
     pushClipArea(Rect(0, 0, 640, 480));
 }
 
-void NullOpenGLGraphics::_endDraw()
+void NullOpenGLGraphics::endDraw()
 {
     popClipArea();
 }

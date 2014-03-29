@@ -46,6 +46,7 @@ SliderList::SliderList(const Widget2 *const widget,
     mOldWidth(0),
     mSelectedIndex(0)
 {
+    mAllowLogic = false;
     setHeight(sliderHeight);
 }
 
@@ -81,16 +82,16 @@ void SliderList::updateAlpha()
     Button::updateAlpha();
 }
 
-void SliderList::mouseWheelMovedUp(MouseEvent& mouseEvent)
+void SliderList::mouseWheelMovedUp(MouseEvent& event)
 {
     setSelected(mSelectedIndex - 1);
-    mouseEvent.consume();
+    event.consume();
 }
 
-void SliderList::mouseWheelMovedDown(MouseEvent& mouseEvent)
+void SliderList::mouseWheelMovedDown(MouseEvent& event)
 {
     setSelected(mSelectedIndex + 1);
-    mouseEvent.consume();
+    event.consume();
 }
 
 void SliderList::resize()

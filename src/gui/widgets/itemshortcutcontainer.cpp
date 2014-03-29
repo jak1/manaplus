@@ -46,6 +46,8 @@
 
 #include "resources/image.h"
 
+#include "utils/delete2.h"
+
 #include "debug.h"
 
 ItemShortcutContainer::ItemShortcutContainer(Widget2 *const widget,
@@ -95,10 +97,8 @@ ItemShortcutContainer::~ItemShortcutContainer()
         mBackgroundImg->decRef();
         mBackgroundImg = nullptr;
     }
-    delete mItemPopup;
-    mItemPopup = nullptr;
-    delete mSpellPopup;
-    mSpellPopup = nullptr;
+    delete2(mItemPopup);
+    delete2(mSpellPopup);
 }
 
 void ItemShortcutContainer::setWidget2(const Widget2 *const widget)
@@ -334,6 +334,7 @@ void ItemShortcutContainer::mousePressed(MouseEvent &event)
 
     if (event.getButton() == MouseEvent::LEFT)
     {
+        event.consume();
         // Stores the selected item if theirs one.
         if (selShortcut->isItemSelected() && inventoryWindow &&
             (inventoryWindow->isWindowVisible()
@@ -352,6 +353,7 @@ void ItemShortcutContainer::mousePressed(MouseEvent &event)
     }
     else if (event.getButton() == MouseEvent::RIGHT)
     {
+        event.consume();
         if (viewport && selShortcut)
         {
             viewport->showItemPopup(selShortcut->getItem(index),

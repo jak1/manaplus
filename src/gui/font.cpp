@@ -76,6 +76,7 @@
 #include "resources/resourcemanager.h"
 #include "resources/surfaceimagehelper.h"
 
+#include "utils/delete2.h"
 #include "utils/paths.h"
 #include "utils/sdlcheckutils.h"
 #include "utils/stringutils.h"
@@ -163,8 +164,7 @@ SDLTextChunk::SDLTextChunk(const std::string &text0, const Color &color0,
 
 SDLTextChunk::~SDLTextChunk()
 {
-    delete img;
-    img = nullptr;
+    delete2(img);
 #ifdef UNITTESTS
     sdlTextChunkCnt --;
 #endif
@@ -294,7 +294,7 @@ void TextChunkList::insertFirst(SDLTextChunk *const item)
     searchWidth[item->text] = item;
 }
 
-void TextChunkList::moveToFirst(SDLTextChunk *item)
+void TextChunkList::moveToFirst(SDLTextChunk *const item)
 {
     if (item == start)
         return;

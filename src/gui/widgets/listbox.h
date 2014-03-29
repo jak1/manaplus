@@ -119,13 +119,13 @@ class ListBox : public Widget,
 
         // Inherited from KeyListener
 
-        void keyPressed(KeyEvent& keyEvent) override final;
+        void keyPressed(KeyEvent& event) override final;
 
         // Inherited from MouseListener
 
-        void mouseWheelMovedUp(MouseEvent& mouseEvent) override final;
+        void mouseWheelMovedUp(MouseEvent& event) override final;
 
-        void mouseWheelMovedDown(MouseEvent& mouseEvent) override final;
+        void mouseWheelMovedDown(MouseEvent& event) override final;
 
         void mousePressed(MouseEvent &event) override;
 

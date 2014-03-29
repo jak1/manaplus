@@ -99,6 +99,8 @@ class WidgetListener;
 class Widget : public Widget2
 {
     public:
+        friend class BasicContainer;
+
         /**
           * Constructor. Resets member variables. Noteable, a widget is not
           * focusable as default, therefore, widgets that are supposed to be
@@ -145,7 +147,8 @@ class Widget : public Widget2
           * @see setFrameSize, getFrameSize
           * @since 0.8.0
           */
-        virtual void drawFrame(Graphics* graphics);
+        virtual void drawFrame(Graphics* graphics A_UNUSED)
+        { }
 
         /**
           * Sets the size of the widget's frame. The frame is not considered a part of 
@@ -161,7 +164,8 @@ class Widget : public Widget2
           * @see getFrameSize, drawFrame
           * @since 0.8.0
           */
-        void setFrameSize(unsigned int frameSize);
+        void setFrameSize(const unsigned int frameSize)
+        { mFrameSize = frameSize; }
 
         /**
           * Gets the size of the widget's frame. The frame is not considered a part of 
@@ -177,7 +181,8 @@ class Widget : public Widget2
           * @see setFrameSize, drawFrame
           * @since 0.8.0
           */
-        unsigned int getFrameSize() const A_WARN_UNUSED;
+        unsigned int getFrameSize() const A_WARN_UNUSED
+        { return mFrameSize; }
 
         /**
           * Called for all widgets in the gui each time Gui::logic is called.
@@ -207,7 +212,7 @@ class Widget : public Widget2
           *      setDimension, getDimensi
           * @since 0.1.0
           */
-        void setWidth(int width);
+        void setWidth(const int width);
 
         /**
           * Gets the width of the widget.
@@ -228,7 +233,7 @@ class Widget : public Widget2
           *      setDimension, getDimension
           * @since 0.1.0
           */
-        void setHeight(int height);
+        void setHeight(const int height);
 
         /**
           * Gets the height of the widget.
@@ -250,7 +255,7 @@ class Widget : public Widget2
           *      setDimension, getDimension
           * @since 0.1.0
           */
-        void setSize(int width, int height);
+        void setSize(const int width, const int height);
 
         /**
           * Sets the x coordinate of the widget. The coordinate is
@@ -260,7 +265,7 @@ class Widget : public Widget2
           * @see getX, setY, getY, setPosition, setDimension, getDimension
           * @since 0.1.0
           */
-        void setX(int x);
+        void setX(const int x);
 
         /**
           * Gets the x coordinate of the widget. The coordinate is
@@ -281,7 +286,7 @@ class Widget : public Widget2
           * @see setY, setX, getX, setPosition, setDimension, getDimension
           * @since 0.1.0
           */
-        void setY(int y);
+        void setY(const int y);
 
         /**
           * Gets the y coordinate of the widget. The coordinate is
@@ -303,7 +308,7 @@ class Widget : public Widget2
           * @see setX, getX, setY, getY, setDimension, getDimension
           * @since 0.1.0
           */
-        void setPosition(int x, int y);
+        void setPosition(const int x, const int y);
 
         /**
           * Sets the dimension of the widget. The dimension is
@@ -323,7 +328,8 @@ class Widget : public Widget2
           * @see getDimension, setX, getX, setY, getY, setPosition
           * @since 0.1.0
           */
-        const Rect& getDimension() const A_WARN_UNUSED;
+        const Rect& getDimension() const A_WARN_UNUSED
+        { return mDimension; }
 
         /**
           * Sets the widget to be fosusable, or not.
@@ -333,7 +339,7 @@ class Widget : public Widget2
           * @see isFocusable
           * @since 0.1.0
           */
-        void setFocusable(bool focusable);
+        void setFocusable(const bool focusable);
 
           /**
           * Checks if a widget is focsable.
@@ -361,7 +367,8 @@ class Widget : public Widget2
           * @see isEnabled
           * @since 0.1.0
           */
-        void setEnabled(bool enabled);
+        void setEnabled(const bool enabled)
+        { mEnabled = enabled; }
 
         /**
           * Checks if the widget is enabled. A disabled
@@ -399,7 +406,8 @@ class Widget : public Widget2
           * @see getBaseColor
           * @since 0.1.0
           */
-        void setBaseColor(const Color& color);
+        void setBaseColor(const Color& color)
+        { mBaseColor = color; }
 
         /**
           * Gets the base color.
@@ -408,7 +416,8 @@ class Widget : public Widget2
           * @see setBaseColor
           * @since 0.1.0
           */
-        const Color& getBaseColor() const A_WARN_UNUSED;
+        const Color& getBaseColor() const A_WARN_UNUSED
+        { return mBaseColor; }
 
         /**
           * Sets the foreground color.
@@ -417,7 +426,8 @@ class Widget : public Widget2
           * @see getForegroundColor
           * @since 0.1.0
           */
-        void setForegroundColor(const Color& color);
+        void setForegroundColor(const Color& color)
+        { mForegroundColor = color; }
 
         /**
           * Gets the foreground color.
@@ -425,7 +435,8 @@ class Widget : public Widget2
           * @see setForegroundColor
           * @since 0.1.0
           */
-        const Color& getForegroundColor() const A_WARN_UNUSED;
+        const Color& getForegroundColor() const A_WARN_UNUSED
+        { return mForegroundColor; }
 
         /**
           * Sets the background color.
@@ -434,7 +445,8 @@ class Widget : public Widget2
           * @see setBackgroundColor
           * @since 0.1.0
           */
-        void setBackgroundColor(const Color& color);
+        void setBackgroundColor(const Color& color)
+        { mBackgroundColor = color; }
 
         /**
           * Gets the background color.
@@ -442,25 +454,8 @@ class Widget : public Widget2
           * @see setBackgroundColor
           * @since 0.1.0
           */
-        const Color& getBackgroundColor() const A_WARN_UNUSED;
-
-        /**
-          * Sets the selection color.
-          *
-          * @param color The selection color.
-          * @see getSelectionColor
-          * @since 0.6.0
-          */
-        void setSelectionColor(const Color& color);
-
-        /**
-          * Gets the selection color.
-          *
-          * @return The selection color.
-          * @see setSelectionColor
-          * @since 0.6.0
-          */
-        const Color& getSelectionColor() const A_WARN_UNUSED;
+        const Color& getBackgroundColor() const A_WARN_UNUSED
+        { return mBackgroundColor; }
 
         /**
           * Requests focus for the widget. A widget will only recieve focus
@@ -486,10 +481,10 @@ class Widget : public Widget2
           *          are doing.
           *
           * @param focusHandler The focus handler to use.
-          * @see _getFocusHandler
+          * @see getFocusHandler
           * @since 0.1.0
           */
-        virtual void _setFocusHandler(FocusHandler* focusHandler);
+        virtual void setFocusHandler(FocusHandler *const focusHandler);
 
         /**
           * Gets the focus handler used.
@@ -499,10 +494,11 @@ class Widget : public Widget2
           *          are doing.
           *
           * @return The focus handler used.
-          * @see _setFocusHandler
+          * @see setFocusHandler
           * @since 0.1.0
           */
-        virtual FocusHandler* _getFocusHandler() A_WARN_UNUSED;
+        virtual FocusHandler* getFocusHandler() A_WARN_UNUSED
+        { return mFocusHandler; }
 
         /**
           * Adds an action listener to the widget. When an action event 
@@ -513,7 +509,7 @@ class Widget : public Widget2
           * @see removeActionListener
           * @since 0.1.0
           */
-        void addActionListener(ActionListener* actionListener);
+        void addActionListener(ActionListener *const actionListener);
 
         /**
           * Removes an added action listener from the widget.
@@ -522,7 +518,7 @@ class Widget : public Widget2
           * @see addActionListener
           * @since 0.1.0
           */
-        void removeActionListener(ActionListener* actionListener);
+        void removeActionListener(ActionListener *const actionListener);
 
         /**
           * Adds a death listener to the widget. When a death event is 
@@ -533,7 +529,7 @@ class Widget : public Widget2
           * @see removeDeathListener
           * @since 0.1.0
           */
-        void addDeathListener(DeathListener* deathListener);
+        void addDeathListener(DeathListener *const deathListener);
 
         /**
           * Removes an added death listener from the widget.
@@ -542,7 +538,7 @@ class Widget : public Widget2
           * @see addDeathListener
           * @since 0.1.0
           */
-        void removeDeathListener(DeathListener* deathListener);
+        void removeDeathListener(DeathListener *const deathListener);
 
         /**
           * Adds a mouse listener to the widget. When a mouse event is 
@@ -553,7 +549,7 @@ class Widget : public Widget2
           * @see removeMouseListener
           * @since 0.1.0
           */
-        void addMouseListener(MouseListener* mouseListener);
+        void addMouseListener(MouseListener *const mouseListener);
 
         /**
           * Removes an added mouse listener from the widget.
@@ -562,7 +558,7 @@ class Widget : public Widget2
           * @see addMouseListener
           * @since 0.1.0
           */
-        void removeMouseListener(MouseListener* mouseListener);
+        void removeMouseListener(MouseListener *const mouseListener);
 
         /**
           * Adds a key listener to the widget. When a key event is 
@@ -573,7 +569,7 @@ class Widget : public Widget2
           * @see removeKeyListener
           * @since 0.1.0
           */
-        void addKeyListener(KeyListener* keyListener);
+        void addKeyListener(KeyListener *const keyListener);
 
         /**
           * Removes an added key listener from the widget.
@@ -582,7 +578,7 @@ class Widget : public Widget2
           * @see addKeyListener
           * @since 0.1.0
           */
-        void removeKeyListener(KeyListener* keyListener);
+        void removeKeyListener(KeyListener *const keyListener);
 
         /**
           * Adds a focus listener to the widget. When a focus event is 
@@ -593,7 +589,7 @@ class Widget : public Widget2
           * @see removeFocusListener
           * @since 0.7.0
           */
-        void addFocusListener(FocusListener* focusListener);
+        void addFocusListener(FocusListener *const focusListener);
 
         /**
           * Removes an added focus listener from the widget.
@@ -602,7 +598,7 @@ class Widget : public Widget2
           * @see addFocusListener
           * @since 0.7.0
           */
-        void removeFocusListener(FocusListener* focusListener);
+        void removeFocusListener(FocusListener *const focusListener);
 
         /**
           * Adds a widget listener to the widget. When a widget event is 
@@ -613,7 +609,7 @@ class Widget : public Widget2
           * @see removeWidgetListener
           * @since 0.8.0
           */
-        void addWidgetListener(WidgetListener* widgetListener);
+        void addWidgetListener(WidgetListener *const widgetListener);
 
         /**
           * Removes an added widget listener from the widget.
@@ -622,7 +618,7 @@ class Widget : public Widget2
           * @see addWidgetListener
           * @since 0.8.0
           */
-        void removeWidgetListener(WidgetListener* widgetListener);
+        void removeWidgetListener(WidgetListener *const widgetListener);
 
         /**
           * Sets the action event identifier of the widget. The identifier is
@@ -636,7 +632,8 @@ class Widget : public Widget2
           * @see getActionEventId
           * @since 0.6.0
           */
-        void setActionEventId(const std::string& actionEventId);
+        void setActionEventId(const std::string& actionEventId)
+        { mActionEventId = actionEventId; }
 
         /**
           * Gets the action event identifier of the widget.
@@ -645,7 +642,8 @@ class Widget : public Widget2
           * @see setActionEventId
           * @since 0.6.0
           */
-        const std::string& getActionEventId() const;
+        const std::string& getActionEventId() const
+        { return mActionEventId; }
 
         /**
           * Gets the absolute position on the screen for the widget.
@@ -667,7 +665,8 @@ class Widget : public Widget2
           * @see getParent
           * @since 0.1.0
           */
-        virtual void _setParent(Widget* parent);
+        virtual void setParent(Widget* parent)
+        { mParent = parent; }
 
         /**
           * Gets the font set for the widget. If no font has been set, 
@@ -687,7 +686,7 @@ class Widget : public Widget2
           * @see getGlobalFont
           * @since 0.1.0
           */
-        static void setGlobalFont(Font* font);
+        static void setGlobalFont(Font *const font);
 
         /**
           * Sets the font for the widget. If NULL is passed, the global font 
@@ -697,7 +696,7 @@ class Widget : public Widget2
           * @see getFont
           * @since 0.1.0
           */
-        void setFont(Font* font);
+        void setFont(Font *const font);
 
         /**
           * Called when the font has changed. If the change is global,
@@ -729,7 +728,8 @@ class Widget : public Widget2
           * @see setTabInEnabled
           * @since 0.1.0
           */
-        bool isTabInEnabled() const A_WARN_UNUSED;
+        bool isTabInEnabled() const A_WARN_UNUSED
+        { return mTabIn; }
 
         /**
           * Sets tab in enabled, or not. Tab in means that you can set focus
@@ -741,7 +741,8 @@ class Widget : public Widget2
           * @see isTabInEnabled
           * @since 0.1.0
           */
-        void setTabInEnabled(bool enabled);
+        void setTabInEnabled(const bool enabled)
+        { mTabIn = enabled; }
 
         /**
           * Checks if tab out is enabled. Tab out means that you can lose
@@ -753,7 +754,8 @@ class Widget : public Widget2
           * @see setTabOutEnabled
           * @since 0.1.0
           */
-        bool isTabOutEnabled() const A_WARN_UNUSED;
+        bool isTabOutEnabled() const A_WARN_UNUSED
+        { return mTabOut; }
 
         /**
           * Sets tab out enabled. Tab out means that you can lose
@@ -765,7 +767,8 @@ class Widget : public Widget2
           * @see isTabOutEnabled
           * @since 0.1.0
           */
-        void setTabOutEnabled(bool enabled);
+        void setTabOutEnabled(const bool enabled)
+        { mTabOut = enabled; }
 
         /**
           * Requests modal focus. When a widget has modal focus, only that
@@ -839,7 +842,9 @@ class Widget : public Widget2
           *         if no widget is found.
           * @since 0.6.0
           */
-        virtual Widget *getWidgetAt(int x, int y) A_WARN_UNUSED;
+        virtual Widget *getWidgetAt(int x A_UNUSED,
+                                    int y A_UNUSED) A_WARN_UNUSED
+        { return nullptr; }
 
         /**
           * Gets the mouse listeners of the widget.
@@ -847,8 +852,8 @@ class Widget : public Widget2
           * @return The mouse listeners of the widget.
           * @since 0.6.0
           */
-        virtual const std::list<MouseListener*>& _getMouseListeners()
-                                                  A_WARN_UNUSED;
+        virtual const std::list<MouseListener*>& getMouseListeners()
+                                                 A_WARN_UNUSED;
 
         /**
           * Gets the key listeners of the widget.
@@ -856,8 +861,8 @@ class Widget : public Widget2
           * @return The key listeners of the widget.
           * @since 0.6.0
           */
-        virtual const std::list<KeyListener*>& _getKeyListeners()
-                                                A_WARN_UNUSED;
+        virtual const std::list<KeyListener*>& getKeyListeners()
+                                               A_WARN_UNUSED;
 
         /**
           * Gets the focus listeners of the widget.
@@ -865,8 +870,8 @@ class Widget : public Widget2
           * @return The focus listeners of the widget.
           * @since 0.7.0
           */
-        virtual const std::list<FocusListener*>& _getFocusListeners()
-                                                  A_WARN_UNUSED;
+        virtual const std::list<FocusListener*>& getFocusListeners()
+                                                 A_WARN_UNUSED;
 
         /**
           * Gets the area of the widget occupied by the widget's children.
@@ -898,7 +903,7 @@ class Widget : public Widget2
           * @see setInternalFocusHandler
           * @since 0.1.0
           */
-        virtual FocusHandler* _getInternalFocusHandler() A_WARN_UNUSED;
+        virtual FocusHandler* getInternalFocusHandler() A_WARN_UNUSED;
 
         /**
           * Sets the internal focus handler. An internal focus handler is
@@ -909,7 +914,7 @@ class Widget : public Widget2
           * @see getInternalFocusHandler
           * @since 0.1.0
           */
-        void setInternalFocusHandler(FocusHandler* internalFocusHandler);
+        void setInternalFocusHandler(FocusHandler *const internalFocusHandler);
 
         /**
           * Moves a widget to the top of this widget. The moved widget will be
@@ -970,7 +975,7 @@ class Widget : public Widget2
           * has an id.
           *
           * @param id The id to set to the widget.
-          * @see getId, BasicContainer::findWidgetById
+          * @see getId
           * @since 0.8.0
           */
         void setId(const std::string& id)
@@ -983,7 +988,7 @@ class Widget : public Widget2
           * has an id.
           *
           * @param id The id to set to the widget.
-          * @see setId, BasicContainer::findWidgetById
+          * @see setId
           * @since 0.8.0
           */
         const std::string& getId() const A_WARN_UNUSED
@@ -999,7 +1004,10 @@ class Widget : public Widget2
           * @param rectangle The rectangle to be shown.
           * @since 0.8.0
           */
-        virtual void showPart(Rect rectangle);
+        virtual void showPart(const Rect &rectangle);
+
+        bool isAllowLogic() const
+        { return mAllowLogic; }
 
     protected:
         /**
@@ -1143,9 +1151,19 @@ class Widget : public Widget2
         Color mBaseColor;
 
         /**
-          * Holds the selection color of the widget.
+          * Holds the dimension of the widget.
           */
-        Color mSelectionColor;
+        Rect mDimension;
+
+        /**
+          * Holds the action event of the widget.
+          */
+        std::string mActionEventId;
+
+        /**
+          * Holds the id of the widget.
+          */
+        std::string mId;
 
         /**
           * Holds the focus handler used by the widget.
@@ -1165,19 +1183,14 @@ class Widget : public Widget2
         Widget* mParent;
 
         /**
-          * Holds the dimension of the widget.
+          * Holds the font used by the widget.
           */
-        Rect mDimension;
+        Font* mCurrentFont;
 
         /** 
           * Holds the frame size of the widget.
           */
         unsigned int mFrameSize;
-
-        /**
-          * Holds the action event of the widget.
-          */
-        std::string mActionEventId;
 
         /**
           * True if the widget focusable, false otherwise.
@@ -1204,15 +1217,7 @@ class Widget : public Widget2
           */
         bool mEnabled;
 
-        /**
-          * Holds the id of the widget.
-          */
-        std::string mId;
-
-        /**
-          * Holds the font used by the widget.
-          */
-        Font* mCurrentFont;
+        bool mAllowLogic;
 
         /**
           * Holds the global font used by the widget.

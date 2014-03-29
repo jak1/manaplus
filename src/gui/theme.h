@@ -40,8 +40,11 @@
 class DyePalette;
 class Image;
 class ImageSet;
+class Theme;
 
 const int THEME_PALETTES = 5;
+
+extern Theme *theme;
 
 struct ThemeInfo final
 {
@@ -79,9 +82,12 @@ struct ThemeInfo final
 class Skin final
 {
     public:
-        Skin(ImageRect *restrict skin, const ImageRect *restrict images,
-             const std::string &filePath, const std::string &name = "",
-             const int padding = 3, const int titlePadding = 4,
+        Skin(ImageRect *const restrict skin,
+             const ImageRect *const restrict images,
+             const std::string &filePath,
+             const std::string &name = "",
+             const int padding = 3,
+             const int titlePadding = 4,
              std::map<std::string, int> *restrict const options = nullptr);
 
         A_DELETE_COPY(Skin)
@@ -173,14 +179,15 @@ class Skin final
         std::map<std::string, int> *mOptions;
 };
 
-class Theme final : public Palette, public ConfigListener
+class Theme final : public Palette,
+                    public ConfigListener
 {
     public:
+        Theme();
+
+        ~Theme();
+
         A_DELETE_COPY(Theme)
-
-        static Theme *instance() A_WARN_UNUSED;
-
-        static void deleteInstance();
 
         static void prepareThemePath();
 
@@ -428,6 +435,7 @@ class Theme final : public Palette, public ConfigListener
         enum ProgressPalette
         {
             PROG_HP = 0,
+            PROG_HP_POISON,
             PROG_MP,
             PROG_NO_MP,
             PROG_EXP,
@@ -441,40 +449,22 @@ class Theme final : public Palette, public ConfigListener
             THEME_PROG_END
         };
 
-        /**
-         * Gets the color associated with the type. Sets the alpha channel
-         * before returning.
-         *
-         * @param type the color type requested
-         * @param alpha alpha channel to use
-         *
-         * @return the requested color
-         */
-        inline static const Color &getThemeColor(const int type,
-                                                 const int alpha = 255)
-                                                 A_WARN_UNUSED
-        { return mInstance->getColor(type, alpha); }
-
-        static const Color &getThemeCharColor(const signed char c,
-                                              bool &valid) A_WARN_UNUSED
-        { return mInstance->getCharColor(c, valid); }
-
-        static int getThemeIdByChar(const signed char c,
-                                    bool &valid) A_WARN_UNUSED
-        { return mInstance->getIdByChar(c, valid); }
-
         static Color getProgressColor(const int type,
                                       const float progress) A_WARN_UNUSED;
 
         /**
          * Loads a skin.
          */
-        Skin *load(const std::string &filename, const std::string &filename2,
-                   const bool full = true, const std::string
+        Skin *load(const std::string &filename,
+                   const std::string &filename2,
+                   const bool full = true,
+                   const std::string
                    &restrict defaultPath = getThemePath()) A_WARN_UNUSED;
 
-        Skin *loadSkinRect(ImageRect &image, const std::string &name,
-                           const std::string &name2, const int start = 0,
+        Skin *loadSkinRect(ImageRect &image,
+                           const std::string &name,
+                           const std::string &name2,
+                           const int start = 0,
                            const int end = 8) A_WARN_UNUSED;
 
         void unload(Skin *const skin);
@@ -498,8 +488,10 @@ class Theme final : public Palette, public ConfigListener
 
         void optionChanged(const std::string &) override final;
 
-        void loadRect(ImageRect &image, const std::string &name,
-                      const std::string &name2, const int start = 0,
+        void loadRect(ImageRect &image,
+                      const std::string &name,
+                      const std::string &name2,
+                      const int start = 0,
                       const int end = 8);
 
         static void unloadRect(const ImageRect &rect,
@@ -513,10 +505,6 @@ class Theme final : public Palette, public ConfigListener
         static ThemeInfo *loadInfo(const std::string &themeName) A_WARN_UNUSED;
 
     private:
-        Theme();
-
-        ~Theme();
-
         Skin *readSkin(const std::string &filename0,
                        const bool full) A_WARN_UNUSED;
 
@@ -529,7 +517,6 @@ class Theme final : public Palette, public ConfigListener
         static std::string mThemePath;
         static std::string mThemeName;
         static std::string mScreenDensity;
-        static Theme *mInstance;
 
         static bool tryThemePath(const std::string &themePath) A_WARN_UNUSED;
 

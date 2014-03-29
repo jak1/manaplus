@@ -316,9 +316,12 @@ class Gui final
 
         void handleMouseInput();
 
-        void distributeMouseEvent(Widget* source, int type, int button,
-                                  int x, int y, bool force = false,
-                                  bool toSourceOnly = false);
+        void distributeMouseEvent(Widget *const source,
+                                  const int type,
+                                  const int button,
+                                  const int x, const int y,
+                                  const bool force = false,
+                                  const bool toSourceOnly = false);
 
         /**
          *
@@ -343,7 +346,7 @@ class Gui final
          * @return The widget at a certain position.
          * @since 0.6.0
          */
-        Widget* getWidgetAt(int x, int y) A_WARN_UNUSED;
+        Widget* getWidgetAt(const int x, const int y) const A_WARN_UNUSED;
 
         /**
          * Gets the source of the mouse event.
@@ -351,7 +354,8 @@ class Gui final
          * @return The source widget of the mouse event.
          * @since 0.6.0
          */
-        Widget* getMouseEventSource(int x, int y) A_WARN_UNUSED;
+        Widget* getMouseEventSource(const int x,
+                                    const int y) const A_WARN_UNUSED;
 
         /**
          * Gets the source of the key event.
@@ -359,25 +363,25 @@ class Gui final
          * @return The source widget of the key event.
          * @since 0.6.0
          */
-        Widget* getKeyEventSource() A_WARN_UNUSED;
+        Widget* getKeyEventSource() const A_WARN_UNUSED;
 
         /**
          * Distributes a key event.
          *
-         * @param keyEvent The key event to distribute.
+         * @param event The key event to distribute.
 
          * @since 0.6.0
          */
-        void distributeKeyEvent(KeyEvent& keyEvent) const;
+        void distributeKeyEvent(KeyEvent &event) const;
 
         /**
          * Distributes a key event to the global key listeners.
          *
-         * @param keyEvent The key event to distribute.
+         * @param event The key event to distribute.
          *
          * @since 0.6.0
          */
-        void distributeKeyEventToGlobalKeyListeners(KeyEvent& keyEvent);
+        void distributeKeyEventToGlobalKeyListeners(KeyEvent& event);
 
         /**
          * Handles modal mouse input focus. Modal mouse input focus needs 

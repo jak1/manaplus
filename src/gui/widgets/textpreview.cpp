@@ -48,9 +48,9 @@ TextPreview::TextPreview(const Widget2 *const widget,
     mShadow(false),
     mOutline(false)
 {
+    mAllowLogic = false;
     if (instances == 0)
     {
-        Theme *const theme = Theme::instance();
         if (theme)
             mSkin = theme->load("textpreview.xml", "");
     }
@@ -72,7 +72,6 @@ TextPreview::~TextPreview()
 
     if (instances == 0)
     {
-        Theme *const theme = Theme::instance();
         if (theme)
             theme->unload(mSkin);
     }
@@ -118,7 +117,7 @@ void TextPreview::draw(Graphics* graphics)
         Color(mTextColor2->r, mTextColor2->g, mTextColor2->b, alpha));
 
     if (mOutline && mTextColor != mTextColor2)
-        graphics->setColor2(Theme::getThemeColor(Theme::OUTLINE));
+        graphics->setColor2(getThemeColor(Theme::OUTLINE, 255));
 
     mFont->drawString(graphics, mText, mPadding + 1, mPadding + 1);
     BLOCK_END("TextPreview::draw")

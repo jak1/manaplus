@@ -31,6 +31,7 @@
 #include "configuration.h"
 #include "map.h"
 
+#include "utils/delete2.h"
 #include "utils/gettext.h"
 
 #include "debug.h"
@@ -180,6 +181,10 @@ Setup_Other::Setup_Other(const Widget2 *const widget) :
     // TRANSLATORS: settings option
     new SetupItemCheckBox(_("Auto fix position"), "",
         "autofixPos", this, "autofixPosEvent");
+
+    // TRANSLATORS: settings option
+    new SetupItemCheckBox(_("Show server side position"), "",
+        "showserverpos", this, "showserverposEvent");
 
     // TRANSLATORS: settings option
     new SetupItemCheckBox(_("Attack while moving"), "",
@@ -334,6 +339,10 @@ Setup_Other::Setup_Other(const Widget2 *const widget) :
         "serverAttack", this, "serverAttackEvent");
 
     // TRANSLATORS: settings option
+    new SetupItemCheckBox(_("Hide support page link on error"), "",
+        "hidesupport", this, "hidesupportEvent");
+
+    // TRANSLATORS: settings option
     new SetupItemCheckBox(_("Enable double clicks"), "",
         "doubleClick", this, "doubleClickEvent");
 
@@ -396,12 +405,9 @@ Setup_Other::Setup_Other(const Widget2 *const widget) :
 
 Setup_Other::~Setup_Other()
 {
-    delete mProxyTypeList;
-    mProxyTypeList = nullptr;
-    delete mShortcutsList;
-    mShortcutsList = nullptr;
-    delete mDensityList;
-    mDensityList = nullptr;
+    delete2(mProxyTypeList);
+    delete2(mShortcutsList);
+    delete2(mDensityList);
 }
 
 void Setup_Other::apply()

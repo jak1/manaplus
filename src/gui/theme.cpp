@@ -32,6 +32,7 @@
 #include "resources/image.h"
 #include "resources/resourcemanager.h"
 
+#include "utils/delete2.h"
 #include "utils/dtor.h"
 #include "utils/files.h"
 #include "utils/physfstools.h"
@@ -46,7 +47,7 @@ std::string Theme::mThemePath;
 std::string Theme::mThemeName;
 std::string Theme::mScreenDensity;
 
-Theme *Theme::mInstance = nullptr;
+Theme *theme = nullptr;
 
 // Set the theme path...
 static void initDefaultThemePath()
@@ -61,7 +62,8 @@ static void initDefaultThemePath()
         defaultThemePath = "themes/";
 }
 
-Skin::Skin(ImageRect *restrict skin, const ImageRect *restrict images,
+Skin::Skin(ImageRect *const restrict skin,
+           const ImageRect *const restrict images,
            const std::string &filePath, const std::string &name,
            const int padding, const int titlePadding,
            std::map<std::string, int> *restrict const options):
@@ -120,10 +122,8 @@ Skin::~Skin()
         mStickyImageDown = nullptr;
     }
 
-    delete mOptions;
-    mOptions = nullptr;
-    delete mBorder;
-    mBorder = nullptr;
+    delete2(mOptions);
+    delete2(mBorder);
 }
 
 void Skin::updateAlpha(const float minimumOpacityAllowed)
@@ -245,27 +245,13 @@ Theme::~Theme()
     delete_all(mProgressColors);
 }
 
-Theme *Theme::instance()
-{
-    if (!mInstance)
-        mInstance = new Theme;
-
-    return mInstance;
-}
-
-void Theme::deleteInstance()
-{
-    delete mInstance;
-    mInstance = nullptr;
-}
-
 Color Theme::getProgressColor(const int type, const float progress)
 {
     int color[3] = {0, 0, 0};
 
-    if (mInstance)
+    if (theme)
     {
-        const DyePalette *const dye = mInstance->mProgressColors[type];
+        const DyePalette *const dye = theme->mProgressColors[type];
 
         if (dye)
             dye->getColor(progress, color);
@@ -276,8 +262,10 @@ Color Theme::getProgressColor(const int type, const float progress)
     return Color(color[0], color[1], color[2]);
 }
 
-Skin *Theme::load(const std::string &filename, const std::string &filename2,
-                  const bool full, const std::string &restrict defaultPath)
+Skin *Theme::load(const std::string &filename,
+                  const std::string &filename2,
+                  const bool full,
+                  const std::string &restrict defaultPath)
 {
     // Check if this skin was already loaded
 
@@ -380,8 +368,9 @@ void Theme::updateAlpha()
 {
     FOR_EACH (SkinIterator, iter, mSkins)
     {
-        if (iter->second)
-            iter->second->updateAlpha(mMinimumOpacity);
+        Skin *const skin = iter->second;
+        if (skin)
+            skin->updateAlpha(mMinimumOpacity);
     }
 }
 
@@ -474,9 +463,10 @@ struct SkinHelper final
     {
         for (unsigned f = 0; f < size; f ++)
         {
-            if (partType == params[f].name)
+            const SkinParameter &param = params[f];
+            if (partType == param.name)
             {
-                rect->grid[params[f].index] = resman->getSubImage(
+                rect->grid[param.index] = resman->getSubImage(
                     image, xPos, yPos, width, height);
                 return true;
             }
@@ -639,8 +629,8 @@ bool Theme::tryThemePath(const std::string &themeName)
         {
             mThemePath = path;
             mThemeName = themeName;
-            if (instance())
-                instance()->loadColors("");
+            if (theme)
+                theme->loadColors("");
             return true;
         }
     }
@@ -703,7 +693,7 @@ void Theme::prepareThemePath()
     if (mThemePath.empty())
         mThemePath = "graphics/gui";
 
-    instance()->loadColors(mThemePath);
+    theme->loadColors(mThemePath);
 
     logger->log("Selected Theme: " + mThemePath);
 }
@@ -1040,6 +1030,7 @@ static int readProgressType(const std::string &type)
     static const std::string colors[Theme::THEME_PROG_END] =
     {
         "HP",
+        "HP_POISON",
         "MP",
         "NO_MP",
         "EXP",
@@ -1082,16 +1073,12 @@ void Theme::loadColors(std::string file)
 
     logger->log("Loading colors file: %s", file.c_str());
 
-    int type;
-    std::string temp;
-    Color color;
-    GradientType grad;
-
     for_each_xml_child_node(paletteNode, root)
     {
         if (xmlNameEqual(paletteNode, "progressbar"))
         {
-            type = readProgressType(XML::getProperty(paletteNode, "id", ""));
+            const int type = readProgressType(XML::getProperty(
+                paletteNode, "id", ""));
             if (type < 0)
                 continue;
 
@@ -1112,16 +1099,17 @@ void Theme::loadColors(std::string file)
             if (xmlNameEqual(node, "color"))
             {
                 const std::string id = XML::getProperty(node, "id", "");
-                type = readColorType(id);
+                const int type = readColorType(id);
                 if (type < 0)
                     continue;
 
-                temp = XML::getProperty(node, "color", "");
+                const std::string temp = XML::getProperty(node, "color", "");
                 if (temp.empty())
                     continue;
 
-                color = readColor(temp);
-                grad = readColorGradient(XML::getProperty(node, "effect", ""));
+                const Color color = readColor(temp);
+                const GradientType grad = readColorGradient(
+                    XML::getProperty(node, "effect", ""));
                 mColors[paletteId * THEME_COLORS_END + type].set(
                     type, color, grad, 10);
 
@@ -1138,9 +1126,11 @@ void Theme::loadColors(std::string file)
     }
 }
 
-void Theme::loadRect(ImageRect &image, const std::string &name,
+void Theme::loadRect(ImageRect &image,
+                     const std::string &name,
                      const std::string &name2,
-                     const int start, const int end)
+                     const int start,
+                     const int end)
 {
     Skin *const skin = load(name, name2, false);
     if (skin)
@@ -1158,8 +1148,10 @@ void Theme::loadRect(ImageRect &image, const std::string &name,
     }
 }
 
-Skin *Theme::loadSkinRect(ImageRect &image, const std::string &name,
-                          const std::string &name2, const int start,
+Skin *Theme::loadSkinRect(ImageRect &image,
+                          const std::string &name,
+                          const std::string &name2,
+                          const int start,
                           const int end)
 {
     Skin *const skin = load(name, name2);
@@ -1178,7 +1170,8 @@ Skin *Theme::loadSkinRect(ImageRect &image, const std::string &name,
     return skin;
 }
 
-void Theme::unloadRect(const ImageRect &rect, const int start,
+void Theme::unloadRect(const ImageRect &rect,
+                       const int start,
                        const int end)
 {
     for (int f = start; f <= end; f ++)
@@ -1191,7 +1184,9 @@ void Theme::unloadRect(const ImageRect &rect, const int start,
 Image *Theme::getImageFromThemeXml(const std::string &name,
                                    const std::string &name2)
 {
-    Theme *const theme = Theme::instance();
+    if (!theme)
+        return nullptr;
+
     Skin *const skin = theme->load(name, name2, false);
     if (skin)
     {
@@ -1212,7 +1207,9 @@ ImageSet *Theme::getImageSetFromThemeXml(const std::string &name,
                                          const std::string &name2,
                                          const int w, const int h)
 {
-    Theme *const theme = Theme::instance();
+    if (!theme)
+        return nullptr;
+
     Skin *const skin = theme->load(name, name2, false);
     if (skin)
     {
@@ -1265,7 +1262,7 @@ ThemeInfo *Theme::loadInfo(const std::string &themeName)
     if (!rootNode || !xmlNameEqual(rootNode, "info"))
         return nullptr;
 
-    ThemeInfo *info = new ThemeInfo();
+    ThemeInfo *const info = new ThemeInfo();
 
     const std::string fontSize2("fontSize_" + mScreenDensity);
     const std::string npcfontSize2("npcfontSize_" + mScreenDensity);

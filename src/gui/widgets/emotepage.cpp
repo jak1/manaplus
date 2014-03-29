@@ -25,6 +25,8 @@
 #include "resources/imageset.h"
 #include "resources/resourcemanager.h"
 
+#include "utils/delete2.h"
+
 #include "debug.h"
 
 namespace
@@ -45,6 +47,7 @@ EmotePage::EmotePage(const Widget2 *const widget) :
 {
     addMouseListener(this);
     addWidgetListener(this);
+    mAllowLogic = false;
 }
 
 EmotePage::~EmotePage()
@@ -54,8 +57,7 @@ EmotePage::~EmotePage()
         mEmotes->decRef();
         mEmotes = nullptr;
     }
-    delete mVertexes;
-    mVertexes = nullptr;
+    delete2(mVertexes);
 }
 
 void EmotePage::draw(Graphics *graphics)
@@ -115,9 +117,10 @@ void EmotePage::draw(Graphics *graphics)
     BLOCK_END("EmotePage::draw")
 }
 
-void EmotePage::mousePressed(MouseEvent &mouseEvent)
+void EmotePage::mousePressed(MouseEvent &event)
 {
-    mSelectedIndex = getIndexFromGrid(mouseEvent.getX(), mouseEvent.getY());
+    mSelectedIndex = getIndexFromGrid(event.getX(), event.getY());
+    event.consume();
     distributeActionEvent();
 }
 
