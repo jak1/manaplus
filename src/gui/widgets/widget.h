@@ -399,6 +399,9 @@ class Widget : public Widget2
         bool isVisible() const A_WARN_UNUSED
         { return mVisible && (!mParent || mParent->isVisible()); }
 
+        bool isVisibleLocal() const A_WARN_UNUSED
+        { return mVisible; }
+
         /**
           * Sets the base color of the widget.
           *
@@ -1006,8 +1009,21 @@ class Widget : public Widget2
           */
         virtual void showPart(const Rect &rectangle);
 
-        bool isAllowLogic() const
+        bool isAllowLogic() const A_WARN_UNUSED
         { return mAllowLogic; }
+
+        void setMouseConsume(const bool b)
+        { mMouseConsume = b; }
+
+        bool isMouseConsume() const A_WARN_UNUSED
+        { return mMouseConsume; }
+
+        void setRedraw(const bool b)
+        { mRedraw = b; }
+
+        static void distributeWindowResizeEvent();
+
+        void windowResized();
 
     protected:
         /**
@@ -1218,6 +1234,10 @@ class Widget : public Widget2
         bool mEnabled;
 
         bool mAllowLogic;
+
+        bool mMouseConsume;
+
+        bool mRedraw;
 
         /**
           * Holds the global font used by the widget.

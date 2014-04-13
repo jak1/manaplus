@@ -244,6 +244,15 @@ Image *OpenGLImageHelper::glLoad(SDL_Surface *tmpImage,
         tmpImage->w, tmpImage->h,
         0, GL_RGBA, GL_UNSIGNED_BYTE, tmpImage->pixels);
 
+#ifdef DEBUG_OPENGL
+//  disabled for now, because debugger cant show it
+//    if (mglLabelObject)
+//    {
+//        const char *const text = "image text";
+//        mglLabelObject(GL_TEXTURE, texture, strlen(text), text);
+//    }
+#endif
+
 /*
     GLint compressed;
     glGetTexLevelParameteriv(mTextureType, 0,

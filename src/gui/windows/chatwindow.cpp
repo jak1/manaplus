@@ -62,6 +62,8 @@
 #include "gui/widgets/tabs/tradetab.h"
 #include "gui/widgets/tabs/whispertab.h"
 
+#include "render/opengldebug.h"
+
 #include "net/chathandler.h"
 #include "net/playerhandler.h"
 #include "net/net.h"
@@ -314,14 +316,10 @@ void ChatWindow::loadGMCommands()
 
 void ChatWindow::updateTabsMargin()
 {
-    if (mColorPicker->isVisible())
-    {
+    if (mColorPicker->isVisibleLocal())
         mChatTabs->setRightMargin(mColorPicker->getWidth() + 16 + 8);
-    }
     else
-    {
         mChatTabs->setRightMargin(8);
-    }
 }
 
 void ChatWindow::adjustTabSize()
@@ -339,7 +337,7 @@ void ChatWindow::adjustTabSize()
     mChatInput->setPosition(frame, y);
     mChatTabs->setWidth(awFrame2);
     const int height = ah - frame2 - (inputHeight + frame2);
-    if (mChatInput->isVisible() || !config.getBoolValue("hideChatInput"))
+    if (mChatInput->isVisibleLocal() || !config.getBoolValue("hideChatInput"))
         mChatTabs->setHeight(height);
     else
         mChatTabs->setHeight(height + inputHeight);
@@ -362,7 +360,7 @@ void ChatWindow::adjustTabSize()
             y -= 2;
         }
         mChatInput->setWidth(w);
-        mChatButton->setVisible(mChatInput->isVisible());
+        mChatButton->setVisible(mChatInput->isVisibleLocal());
         mChatButton->setPosition(x, y);
     }
     else
@@ -514,7 +512,7 @@ void ChatWindow::action(const ActionEvent &event)
     {
         if (emoteWindow)
         {
-            if (emoteWindow->isVisible())
+            if (emoteWindow->isVisibleLocal())
                 emoteWindow->hide();
             else
                 emoteWindow->show();
@@ -553,7 +551,7 @@ void ChatWindow::action(const ActionEvent &event)
         }
     }
 
-    if (mColorPicker && mColorPicker->isVisible()
+    if (mColorPicker && mColorPicker->isVisibleLocal()
         != config.getBoolValue("showChatColorsList"))
     {
         mColorPicker->setVisible(config.getBoolValue(
@@ -839,12 +837,12 @@ void ChatWindow::keyPressed(KeyEvent &event)
         return;
     }
     else if (actionId == static_cast<int>(Input::KEY_GUI_CANCEL) &&
-             mChatInput->isVisible())
+             mChatInput->isVisibleLocal())
     {
         mChatInput->processVisible(false);
     }
     else if (actionId == static_cast<int>(Input::KEY_CHAT_PREV_HISTORY) &&
-             mChatInput->isVisible())
+             mChatInput->isVisibleLocal())
     {
         const ChatTab *const tab = getFocused();
         if (tab && tab->hasRows())
@@ -876,7 +874,7 @@ void ChatWindow::keyPressed(KeyEvent &event)
         }
     }
     else if (actionId == static_cast<int>(Input::KEY_CHAT_NEXT_HISTORY) &&
-             mChatInput->isVisible())
+             mChatInput->isVisibleLocal())
     {
         const ChatTab *const tab = getFocused();
         if (tab && tab->hasRows())
@@ -915,7 +913,7 @@ void ChatWindow::keyPressed(KeyEvent &event)
     {
         if (emoteWindow)
         {
-            if (emoteWindow->isVisible())
+            if (emoteWindow->isVisibleLocal())
                 emoteWindow->hide();
             else
                 emoteWindow->show();
@@ -1023,7 +1021,7 @@ void ChatWindow::processEvent(const Channels channel,
 void ChatWindow::addInputText(const std::string &text, const bool space)
 {
     const int caretPos = mChatInput->getCaretPosition();
-    const std::string inputText = mChatInput->getText();
+    const std::string &inputText = mChatInput->getText();
 
     std::ostringstream ss;
     ss << inputText.substr(0, caretPos) << text;
@@ -1277,7 +1275,7 @@ void ChatWindow::autoComplete()
 {
     const int caretPos = mChatInput->getCaretPosition();
     int startName = 0;
-    const std::string inputText = mChatInput->getText();
+    const std::string &inputText = mChatInput->getText();
     std::string name = inputText.substr(0, caretPos);
 
     for (int f = caretPos - 1; f > -1; f --)
@@ -1645,7 +1643,7 @@ void ChatWindow::updateOnline(std::set<std::string> &onlinePlayers) const
         }
         else
         {
-            const std::string nick = tab->getNick();
+            const std::string &nick = tab->getNick();
             if (actorManager)
             {
                 const Being *const being = actorManager->findBeingByName(
@@ -1871,7 +1869,11 @@ void ChatWindow::draw(Graphics* graphics)
 {
     BLOCK_START("ChatWindow::draw")
     if (!mAutoHide || mHaveMouse)
+    {
+        GLDEBUG_START("ChatWindow::draw");
         Window::draw(graphics);
+        GLDEBUG_END();
+    }
     BLOCK_END("ChatWindow::draw")
 }
 

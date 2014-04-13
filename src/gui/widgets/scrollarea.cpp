@@ -131,8 +131,7 @@ ScrollArea::ScrollArea(Widget2 *const widget2,
     mIsVerticalMarkerDragged(false),
     mIsHorizontalMarkerDragged(false),
     mOpaque(true),
-    mHasMouse(false),
-    mRedraw(true)
+    mHasMouse(false)
 {
     setContent(widget);
     addMouseListener(this);
@@ -866,7 +865,7 @@ void ScrollArea::mouseReleased(MouseEvent& event)
             }
             mClickX = 0;
             mClickY = 0;
-            if (dx || dy)
+            if (mMouseConsume && (dx || dy))
                 event.consume();
         }
     }
@@ -876,7 +875,8 @@ void ScrollArea::mouseReleased(MouseEvent& event)
     mRightButtonPressed = false;
     mIsHorizontalMarkerDragged = false;
     mIsVerticalMarkerDragged = false;
-    event.consume();
+    if (mMouseConsume)
+        event.consume();
     mRedraw = true;
 }
 

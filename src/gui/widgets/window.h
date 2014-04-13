@@ -448,11 +448,6 @@ class Window : public BasicContainer2,
          */
         void setModal(const bool modal);
 
-        /**
-         * Gets the alpha value used by the window, in a GUIChan usable format.
-         */
-        int getGuiAlpha() const A_WARN_UNUSED;
-
         Rect getWindowArea() const A_WARN_UNUSED;
 
         bool isResizeAllowed(const MouseEvent &event) const A_WARN_UNUSED;
@@ -633,7 +628,6 @@ class Window : public BasicContainer2,
         int mDefaultY;                /**< Default window Y position */
         int mDefaultWidth;            /**< Default window width */
         int mDefaultHeight;           /**< Default window height */
-        bool mRedraw;
         bool mLastRedraw;
 
     private:

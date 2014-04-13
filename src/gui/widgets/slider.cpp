@@ -91,38 +91,38 @@ static std::string const data[2] =
 };
 
 Slider::Slider(Widget2 *const widget,
-               const double scaleEnd) :
+               const double scaleEnd,
+               const double stepLength) :
     Widget(widget),
     MouseListener(),
     KeyListener(),
     mValue(0),
-    mStepLength(scaleEnd / 10),
+    mStepLength(stepLength),
     mScaleStart(0),
     mScaleEnd(scaleEnd),
     mOrientation(HORIZONTAL),
     mVertexes(new ImageCollection),
     mMarkerLength(10),
-    mHasMouse(false),
-    mRedraw(true)
+    mHasMouse(false)
 {
     init();
 }
 
 Slider::Slider(Widget2 *const widget,
                const double scaleStart,
-               const double scaleEnd) :
+               const double scaleEnd,
+               const double stepLength) :
     Widget(widget),
     MouseListener(),
     KeyListener(),
     mValue(scaleStart),
-    mStepLength((scaleEnd - scaleStart) / 10),
+    mStepLength(stepLength),
     mScaleStart(scaleStart),
     mScaleEnd(scaleEnd),
     mOrientation(HORIZONTAL),
     mVertexes(new ImageCollection),
     mMarkerLength(10),
-    mHasMouse(false),
-    mRedraw(true)
+    mHasMouse(false)
 {
     init();
 }
@@ -368,7 +368,6 @@ void Slider::mousePressed(MouseEvent &event)
             setValue(markerPositionToValue(x - mMarkerLength / 2));
         else
             setValue(markerPositionToValue(height - y - mMarkerLength / 2));
-
         distributeActionEvent();
     }
 }
@@ -450,18 +449,13 @@ void Slider::setValue(const double value)
 {
     mRedraw = true;
     if (value > mScaleEnd)
-    {
         mValue = mScaleEnd;
-        return;
-    }
-
-    if (value < mScaleStart)
-    {
+    else if (value < mScaleStart)
         mValue = mScaleStart;
-        return;
-    }
-
-    mValue = value;
+    else
+        mValue = value;
+    mValue = static_cast<int>((mValue - mScaleStart) / mStepLength)
+        * mStepLength + mScaleStart;
 }
 
 double Slider::markerPositionToValue(const int v) const

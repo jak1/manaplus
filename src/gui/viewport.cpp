@@ -276,6 +276,7 @@ void Viewport::logic()
 
 void Viewport::followMouse()
 {
+    return;
     if (!gui)
         return;
     const uint8_t button = Gui::getMouseState(&mMouseX, &mMouseY);
@@ -667,7 +668,10 @@ void Viewport::walkByMouse(const MouseEvent &event)
 void Viewport::mouseDragged(MouseEvent &event)
 {
     if (event.getSource() != this || event.isConsumed())
+    {
+        mPlayerFollowMouse = false;
         return;
+    }
     if (mMouseClicked)
     {
         if (abs(event.getX() - mMousePressX) > 32
@@ -879,13 +883,16 @@ void Viewport::mouseMoved(MouseEvent &event A_UNUSED)
     if (!mMap || !player_node || !actorManager)
         return;
 
+    if (mMouseDirectionMove)
+        mPlayerFollowMouse = false;
+
     const int x = mMouseX + mPixelViewX;
     const int y = mMouseY + mPixelViewY;
 
     ActorSprite::Type type = ActorSprite::UNKNOWN;
+    mHoverBeing = actorManager->findBeingByPixel(x, y, true);
     if (mHoverBeing)
         type = mHoverBeing->getType();
-    mHoverBeing = actorManager->findBeingByPixel(x, y, true);
     if (mHoverBeing
         && (type == Being::PLAYER
         || type == Being::NPC

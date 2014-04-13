@@ -816,6 +816,42 @@ void GraphicsManager::initOpenGLFunctions()
         mSupportDebug = 0;
     }
 
+    if (supportExtension("GL_GREMEDY_frame_terminator"))
+    {
+        logger->log1("found GL_GREMEDY_frame_terminator");
+        assignFunction(glFrameTerminator, "glFrameTerminatorGREMEDY");
+    }
+    if (supportExtension("GL_EXT_debug_label"))
+    {
+        logger->log1("found GL_EXT_debug_label");
+        assignFunction(glLabelObject, "glLabelObjectEXT");
+        if (!mglLabelObject)
+            assignFunction(glLabelObject, "glLabelObject");
+        if (!mglLabelObject)
+            assignFunction(glLabelObject, "glObjectLabel");
+        assignFunction(glGetObjectLabel, "glGetObjectLabelEXT");
+        if (!mglGetObjectLabel)
+            assignFunction(glGetObjectLabel, "glGetObjectLabel");
+    }
+    if (supportExtension("GL_GREMEDY_string_marker"))
+    {
+        logger->log1("found GL_GREMEDY_string_marker");
+        assignFunction(glPushGroupMarker, "glStringMarkerGREMEDY");
+    }
+    else if (supportExtension("GL_EXT_debug_marker"))
+    {
+        logger->log1("found GL_EXT_debug_marker");
+        assignFunction(glInsertEventMarker, "glInsertEventMarkerEXT");
+        if (!mglInsertEventMarker)
+            assignFunction(glInsertEventMarker, "glInsertEventMarker");
+        assignFunction(glPushGroupMarker, "glPushGroupMarkerEXT");
+        if (!mglPushGroupMarker)
+            assignFunction(glPushGroupMarker, "glPushGroupMarker");
+        assignFunction(glPopGroupMarker, "glPopGroupMarkerEXT");
+        if (!mglPopGroupMarker)
+            assignFunction(glPopGroupMarker, "glPopGroupMarker");
+    }
+
 #ifdef WIN32
     assignFunction(wglGetExtensionsString, "wglGetExtensionsStringARB");
 #endif

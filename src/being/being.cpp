@@ -1668,7 +1668,7 @@ void Being::drawSpeech(const int offsetX, const int offsetY)
     // Draw speech above this being
     if (mSpeechTime == 0)
     {
-        if (mSpeechBubble->isVisible())
+        if (mSpeechBubble->isVisibleLocal())
             mSpeechBubble->setVisible(false);
     }
     else if (mSpeechTime > 0 && (speech == NAME_IN_BUBBLE ||
@@ -2003,7 +2003,7 @@ void Being::setSprite(const unsigned int slot, const int id,
     else
     {
         const ItemInfo &info = ItemDB::get(id);
-        const std::string filename = info.getSprite(mGender, mSubType);
+        const std::string &filename = info.getSprite(mGender, mSubType);
         AnimatedSprite *equipmentSprite = nullptr;
 
         if (!isTempSprite && mType == PLAYER)
