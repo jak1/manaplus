@@ -15,6 +15,8 @@ before_script:
   - ":; ${UPDATEREPOS}"
   - ":; ${DOCKERRETRY} ${PMUPDATE} >logs/apt.log"
   - ":; ${DOCKERRETRY} ${PMINSTALL} ${PACKAGES} >>logs/apt.log"
+  - ":; ./tools/ci/scripts/clonesrc.sh"
+  - ":; cd manaplus"
 
 image: debian:unstable
 variables:
