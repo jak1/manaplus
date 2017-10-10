@@ -1,7 +1,0 @@
- <- @@index|<<Back to Index>>@@
-
-
-##3                      === <<Search error>> ===
-<<Search string not found.>>
-
-

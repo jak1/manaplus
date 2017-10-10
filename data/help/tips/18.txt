@@ -1,3 +1,0 @@
-<<You can select other themes.
-For this you should open settings and select theme tab
-and change "gui theme">>

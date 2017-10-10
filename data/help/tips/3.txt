@@ -1,2 +1,0 @@
-<<You can disable yellow bar,
-by pressing ###keyDisableGameModifiers;.>>

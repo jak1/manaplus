@@ -1,3 +1,0 @@
-<<You can walk to warps automatically.
-Open Social Window (###keyWindowSocial;) and selecy Nav tab,
-then click on warp what you want.>>

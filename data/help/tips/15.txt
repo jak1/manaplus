@@ -1,2 +1,0 @@
-<<You can do basic searching in help by using command
-##2?text>>
