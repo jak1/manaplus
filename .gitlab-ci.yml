@@ -52,7 +52,7 @@ gcc-4.4:
   image: debian:wheezy
   <<: *job-push
   variables:
-    PACKAGES: gcc-4.4 g++-4.4 
+    PACKAGES: git gcc-4.4 g++-4.4 
               make autoconf automake autopoint gettext 
               libxml2-dev libcurl4-gnutls-dev libpng-dev 
               libsdl-gfx1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-net1.2-dev libsdl-ttf2.0-dev
@@ -128,7 +128,7 @@ gcc-4.4_i386:
   image: vicamo/debian:wheezy-i386
   <<: *job-push
   variables:
-    PACKAGES: gcc-4.4 g++-4.4 
+    PACKAGES: git gcc-4.4 g++-4.4 
               make autoconf automake autopoint gettext 
               libxml2-dev libcurl4-gnutls-dev libpng-dev 
               libsdl-gfx1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-net1.2-dev libsdl-ttf2.0-dev
@@ -144,7 +144,7 @@ gcc-4.5:
   image: ubuntu:12.04
   <<: *job-push
   variables:
-    PACKAGES: gcc-4.5 g++-4.5 
+    PACKAGES: git gcc-4.5 g++-4.5 
               make autoconf automake autopoint gettext 
               libxml2-dev libcurl4-gnutls-dev libpng-dev 
               libsdl-gfx1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-net1.2-dev libsdl-ttf2.0-dev
@@ -160,7 +160,7 @@ gcc-4.6:
   image: debian:wheezy
   <<: *job-push
   variables:
-    PACKAGES: gcc-4.6 g++-4.6 
+    PACKAGES: git gcc-4.6 g++-4.6 
               make autoconf automake autopoint gettext 
               libxml2-dev libcurl4-gnutls-dev libpng-dev 
               libsdl-gfx1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-net1.2-dev libsdl-ttf2.0-dev
@@ -176,7 +176,7 @@ gcc-4.6_i386:
   image: vicamo/debian:wheezy-i386
   <<: *job-push
   variables:
-    PACKAGES: gcc-4.6 g++-4.6 
+    PACKAGES: git gcc-4.6 g++-4.6 
               make autoconf automake autopoint gettext 
               libxml2-dev libcurl4-gnutls-dev libpng-dev 
               libsdl-gfx1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-net1.2-dev libsdl-ttf2.0-dev
@@ -194,7 +194,7 @@ gcc-4.7:
   image: debian:wheezy
   <<: *job-push
   variables:
-    PACKAGES: gcc-4.7 g++-4.7 
+    PACKAGES: git gcc-4.7 g++-4.7 
               make autoconf automake autopoint gettext 
               libxml2-dev libcurl4-gnutls-dev libpng-dev 
               libsdl-gfx1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-net1.2-dev libsdl-ttf2.0-dev
@@ -210,7 +210,7 @@ gcc-4.7_i386:
   image: vicamo/debian:wheezy-i386
   <<: *job-push
   variables:
-    PACKAGES: gcc-4.7 g++-4.7 
+    PACKAGES: git gcc-4.7 g++-4.7 
               make autoconf automake autopoint gettext 
               libxml2-dev libcurl4-gnutls-dev libpng-dev 
               libsdl-gfx1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-net1.2-dev libsdl-ttf2.0-dev
@@ -228,7 +228,7 @@ gcc-4.8:
   image: debian:jessie
   <<: *job-push
   variables:
-    PACKAGES: gcc-4.8 g++-4.8 
+    PACKAGES: git gcc-4.8 g++-4.8 
               make autoconf automake autopoint gettext 
               libxml2-dev libcurl4-gnutls-dev libpng-dev 
               libsdl-gfx1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-net1.2-dev libsdl-ttf2.0-dev
@@ -242,7 +242,7 @@ gcc-4.8_i386:
   image: vicamo/debian:jessie-i386
   <<: *job-push
   variables:
-    PACKAGES: gcc-4.8 g++-4.8 
+    PACKAGES: git gcc-4.8 g++-4.8 
               make autoconf automake autopoint gettext 
               libxml2-dev libcurl4-gnutls-dev libpng-dev 
               libsdl-gfx1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-net1.2-dev libsdl-ttf2.0-dev
@@ -258,7 +258,7 @@ gcc-4.8_sdl2:
   image: debian:jessie
   <<: *job-push
   variables:
-    PACKAGES: gcc-4.8 g++-4.8 
+    PACKAGES: git gcc-4.8 g++-4.8 
               make autoconf automake autopoint gettext 
               libxml2-dev libcurl4-gnutls-dev libpng-dev 
               libsdl2-gfx-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-net-dev libsdl2-ttf-dev
@@ -272,7 +272,7 @@ gcc-4.8_sdl2_i386:
   image: vicamo/debian:jessie-i386
   <<: *job-push
   variables:
-    PACKAGES: gcc-4.8 g++-4.8 
+    PACKAGES: git gcc-4.8 g++-4.8 
               make autoconf automake autopoint gettext 
               libxml2-dev libcurl4-gnutls-dev libpng-dev 
               libsdl2-gfx-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-net-dev libsdl2-ttf-dev
