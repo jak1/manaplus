@@ -54,7 +54,7 @@ gcc-7_tests_gcov:
               libxml2-dev libcurl4-gnutls-dev libpng-dev 
               libsdl-gfx1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-net1.2-dev libsdl-ttf2.0-dev 
               gcovr 
-              valgrind
+              git-core valgrind
   tags:
     - docker
 
@@ -69,7 +69,7 @@ gcc-7_sdl2_tests_gcov:
               libxml2-dev libcurl4-gnutls-dev libpng-dev 
               libsdl2-dev libsdl2-gfx-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-net-dev libsdl2-ttf-dev 
               gcovr
-              valgrind
+              git-core valgrind
   tags:
     - docker
 
@@ -87,6 +87,7 @@ doxygen:
     PACKAGES: doxygen graphviz 
               libxml2-dev libcurl4-gnutls-dev libpng-dev 
               libsdl-gfx1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-net1.2-dev libsdl-ttf2.0-dev
+              git-core
   tags:
     - docker
 
@@ -102,7 +103,7 @@ gitstats:
   dependencies: []
   variables:
     GIT_DEPTH: "100000"
-    PACKAGES: python zlib1g git-core gnuplot
+    PACKAGES: git-core python zlib1g git-core gnuplot
   tags:
     - docker
 
