@@ -55,7 +55,7 @@ gcc-7_sanitize_i386:
               make autoconf automake autopoint gettext 
               libxml2-dev libcurl4-gnutls-dev libpng-dev 
               libsdl-gfx1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-net1.2-dev libsdl-ttf2.0-dev
-              gdb valgrind netcat-openbsd procps
+              git gdb valgrind netcat-openbsd procps
     JOBS: 1
   tags:
     - docker
@@ -72,7 +72,7 @@ gcc-7_sanitize_i386:
               make autoconf automake autopoint gettext 
               libxml2-dev libcurl4-gnutls-dev libpng-dev 
               libsdl-gfx1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-net1.2-dev libsdl-ttf2.0-dev
-              gdb valgrind netcat-openbsd procps
+              git gdb valgrind netcat-openbsd procps
   tags:
     - docker
 
@@ -87,7 +87,7 @@ gcc-7_lto:
               make autoconf automake autopoint gettext 
               libxml2-dev libcurl4-gnutls-dev libpng-dev 
               libsdl-gfx1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-net1.2-dev libsdl-ttf2.0-dev
-              gdb valgrind netcat-openbsd procps
+              git gdb valgrind netcat-openbsd procps
     POST_CXXFLAGS: "-Wno-null-dereference"
 
 gcc-7_lto_i386:
@@ -102,7 +102,7 @@ gcc-7_lto_i386:
               make autoconf automake autopoint gettext 
               libxml2-dev libcurl4-gnutls-dev libpng-dev 
               libsdl-gfx1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-net1.2-dev libsdl-ttf2.0-dev
-              gdb valgrind netcat-openbsd procps
+              git gdb valgrind netcat-openbsd procps
     POST_CXXFLAGS: "-Wno-null-dereference"
   tags:
     - docker
@@ -152,7 +152,7 @@ gcc7_without_mumble_sdl1:
               make autoconf automake autopoint gettext 
               libxml2-dev libcurl4-gnutls-dev libpng-dev 
               libsdl-gfx1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-net1.2-dev libsdl-ttf2.0-dev
-              gdb valgrind netcat-openbsd procps
+              git gdb valgrind netcat-openbsd procps
 
 gcc7_without_mumble_sdl2:
   stage: build
@@ -165,7 +165,7 @@ gcc7_without_mumble_sdl2:
               make autoconf automake autopoint gettext 
               libxml2-dev libcurl4-gnutls-dev libpng-dev 
               libsdl2-gfx-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-net-dev libsdl2-ttf-dev
-              gdb valgrind netcat-openbsd procps
+              git gdb valgrind netcat-openbsd procps
 
 gcc-7_cilkplus:
   stage: build
@@ -178,7 +178,7 @@ gcc-7_cilkplus:
               make autoconf automake autopoint gettext 
               libxml2-dev libcurl4-gnutls-dev libpng-dev 
               libsdl-gfx1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-net1.2-dev libsdl-ttf2.0-dev
-              gdb valgrind netcat-openbsd procps
+              git gdb valgrind netcat-openbsd procps
 
 gcc_portable:
   stage: build
@@ -191,7 +191,7 @@ gcc_portable:
               make autoconf automake autopoint gettext 
               libxml2-dev libcurl4-gnutls-dev libpng-dev 
               libsdl-gfx1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-net1.2-dev libsdl-ttf2.0-dev
-              gdb valgrind netcat-openbsd procps
+              git gdb valgrind netcat-openbsd procps
 
 gcc-7_no_asserts:
   stage: build
@@ -204,7 +204,7 @@ gcc-7_no_asserts:
               make autoconf automake autopoint gettext 
               libxml2-dev libcurl4-gnutls-dev libpng-dev 
               libsdl-gfx1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-net1.2-dev libsdl-ttf2.0-dev
-              gdb valgrind netcat-openbsd procps
+              git gdb valgrind netcat-openbsd procps
 
 gcc-7_default_i386:
   stage: build
@@ -222,7 +222,7 @@ gcc-7_default_i386:
               make autoconf automake autopoint gettext 
               libxml2-dev libcurl4-gnutls-dev libpng-dev 
               libsdl-gfx1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-net1.2-dev libsdl-ttf2.0-dev
-              gdb valgrind netcat-openbsd procps
+              git gdb valgrind netcat-openbsd procps
   tags:
     - docker
 
@@ -238,7 +238,7 @@ gcc-7_openglerrors_i386:
               make autoconf automake autopoint gettext 
               libxml2-dev libcurl4-gnutls-dev libpng-dev 
               libsdl-gfx1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-net1.2-dev libsdl-ttf2.0-dev
-              gdb valgrind netcat-openbsd procps
+              git gdb valgrind netcat-openbsd procps
 
 gcc-7_openglerrors:
   stage: build
@@ -251,4 +251,4 @@ gcc-7_openglerrors:
               make autoconf automake autopoint gettext 
               libxml2-dev libcurl4-gnutls-dev libpng-dev 
               libsdl-gfx1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-net1.2-dev libsdl-ttf2.0-dev
-              gdb valgrind netcat-openbsd procps
+              git gdb valgrind netcat-openbsd procps
