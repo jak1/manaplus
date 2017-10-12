@@ -41,7 +41,7 @@ variables:
   dependencies: []
 
 gcc-6-i386:
-  stage: prebuild
+  stage: build
   script:
   - ./tools/ci/jobs/gcc6.sh
   - ./tools/ci/scripts/runtests.sh
@@ -57,7 +57,7 @@ gcc-6-i386:
     - docker
 
 gcc-6:
-  stage: prebuild
+  stage: build
   script:
   - ./tools/ci/jobs/gcc6.sh
   - ./tools/ci/scripts/runtests.sh
@@ -70,7 +70,7 @@ gcc-6:
               git gdb valgrind netcat-openbsd procps
 
 gcc-6_default:
-  stage: prebuild
+  stage: build
   script:
   - ./tools/ci/jobs/any_compiler.sh --enable-werror
   - ./tools/ci/scripts/runtests.sh
