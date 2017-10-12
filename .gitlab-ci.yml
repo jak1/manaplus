@@ -89,8 +89,6 @@ doxygen:
               libsdl-gfx1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-net1.2-dev libsdl-ttf2.0-dev
   tags:
     - docker
-  only:
-    - master
 
 gitstats:
   stage: build
@@ -107,8 +105,6 @@ gitstats:
     PACKAGES: python zlib1g git-core gnuplot
   tags:
     - docker
-  only:
-    - master
 
 # stats
 
@@ -127,5 +123,3 @@ pages:
     paths:
     - public
     expire_in: 3 week
-  only:
-    - master
