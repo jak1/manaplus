@@ -12,8 +12,6 @@ before_script:
   - ":; ${UPDATEREPOS}"
   - ":; ${DOCKERRETRY} ${PMUPDATE} >logs/apt.log"
   - ":; ${DOCKERRETRY} ${PMINSTALL} ${PACKAGES} >>logs/apt.log"
-  - ":; ./tools/ci/scripts/clonesrc.sh"
-  - ":; cd manaplus"
 
 image: debian:unstable
 variables:
@@ -46,6 +44,8 @@ variables:
 gcc-7_tests_gcov:
   stage: build
   script:
+  - ./tools/ci/scripts/clonesrc.sh
+  - cd manaplus
   - ./tools/ci/jobs/gcc7_tests_gcov.sh --without-dyecmd --without-manaplusgame
   <<: *job-push
   variables:
@@ -61,6 +61,8 @@ gcc-7_tests_gcov:
 gcc-7_sdl2_tests_gcov:
   stage: build
   script:
+  - ./tools/ci/scripts/clonesrc.sh
+  - cd manaplus
   - ./tools/ci/jobs/gcc7_sdl2_tests_gcov.sh --without-dyecmd --without-manaplusgame
   <<: *job-push
   variables:
@@ -76,6 +78,8 @@ gcc-7_sdl2_tests_gcov:
 doxygen:
   stage: build
   script:
+  - ./tools/ci/scripts/clonesrc.sh
+  - cd manaplus
   - ./tools/ci/jobs/doxygen.sh
   artifacts:
     paths:
@@ -94,6 +98,8 @@ doxygen:
 gitstats:
   stage: build
   script:
+  - ./tools/ci/scripts/clonesrc.sh
+  - cd manaplus
   - ./tools/ci/jobs/gitstats.sh
   artifacts:
     paths:
@@ -112,6 +118,11 @@ gitstats:
 pages:
   stage: stats
   script:
+  - rm -rf artifacts || true
+  - mv manaplus artifacts
+  - ./tools/ci/scripts/clonesrc.sh
+  - mv artifacts/* manaplus/
+  - cd manaplus
   - ./tools/ci/jobs/pages.sh
   dependencies:
     - doxygen
@@ -124,3 +135,5 @@ pages:
     paths:
     - public
     expire_in: 3 week
+  tags:
+    - docker
