@@ -40,8 +40,7 @@ variables:
     expire_in: 3 week
   dependencies: []
 
-# disabled due gitlab bug
-.gcc-6_sanitize_doctest_tests:
+gcc-6_sanitize_doctest_tests:
   stage: build
   script:
   - ./tools/ci/jobs/gcc6_sanitize_tests.sh --enable-unittests=doctest --without-dyecmd --without-manaplusgame
