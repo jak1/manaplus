@@ -60,8 +60,7 @@ gcc-7_sanitize_i386:
   tags:
     - docker
 
-# disabled due gitlab bug
-.gcc-7_sanitize:
+gcc-7_sanitize:
   stage: build
   script:
   - ./tools/ci/jobs/gcc7_sanitize.sh
