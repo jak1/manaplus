@@ -42,8 +42,7 @@ variables:
     expire_in: 3 week
   dependencies: []
 
-# disabled due gitlab bug
-.gcc-7_sanitize_doctest_tests:
+gcc-7_sanitize_doctest_tests:
   stage: build
   script:
   - ./tools/ci/jobs/gcc7_sanitize_tests.sh --enable-unittests=doctest --without-dyecmd --without-manaplusgame
@@ -244,8 +243,7 @@ gcc-7_separate_doctest:
               libsdl-gfx1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-net1.2-dev libsdl-ttf2.0-dev 
               git python
 
-# disabled due kernel issue in shared runners.
-.gcc-7_separate_doctest_sanitize:
+gcc-7_separate_doctest_sanitize:
   stage: build
   script:
   - ./tools/ci/jobs/gcc7_silent.sh --enable-unittestsbin=doctest --without-manaplusgame --without-dyecmd
@@ -269,8 +267,7 @@ gcc-7_separate_doctest:
   tags:
     - docker
 
-# disabled due kernel issue in shared runners.
-.gcc-7_separate_doctest_sanitize_sdl2:
+gcc-7_separate_doctest_sanitize_sdl2:
   stage: build
   script:
   - ./tools/ci/jobs/gcc7_silent.sh --enable-unittestsbin=doctest --without-manaplusgame --without-dyecmd --with-sdl2
