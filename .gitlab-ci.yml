@@ -14,7 +14,7 @@ before_script:
   - ":; ./tools/ci/scripts/clonesrc.sh"
   - ":; cd manaplus"
 
-image: debian:unstable
+image: ubuntu:artful
 variables:
   GET_SOURCES_ATTEMPTS: "5"
   ARTIFACT_DOWNLOAD_ATTEMPTS: "5"
@@ -67,7 +67,7 @@ deheader_libxml_opengl_tmwa_cpp:
   script:
   - export FLAGS="-DENABLE_LIBXML -DUSE_OPENGL -DUSE_X11 -DTMWA_SUPPORT"
   - ./tools/ci/jobs/deheader.sh
-  - find ./src -type f \( -name "*.cpp" \) -exec tools/ci/scripts/deheaderS.sh {} \;
+  - find ./src -type f \( -name "*.cpp" \) -exec tools/ci/scripts/deheader.sh {} \;
   - ./tools/ci/jobs/deheader2.sh
   <<: *job-push
   <<: *job-deheader_shared
@@ -77,7 +77,7 @@ deheader_sdl2_libxml_opengl_tmwa_cpp:
   script:
   - export FLAGS="-DENABLE_LIBXML -DUSE_OPENGL -DUSE_X11 -DTMWA_SUPPORT -DUSE_SDL2"
   - ./tools/ci/jobs/deheader.sh
-  - find ./src -type f \( -name "*.cpp" \) -exec tools/ci/scripts/deheaderS.sh {} \;
+  - find ./src -type f \( -name "*.cpp" \) -exec tools/ci/scripts/deheader.sh {} \;
   - ./tools/ci/jobs/deheader2.sh
   <<: *job-push
   <<: *job-deheader_sdl2_shared
@@ -87,7 +87,7 @@ deheader_libxml_tmwa_cpp:
   script:
   - export FLAGS="-DENABLE_LIBXML -DUSE_X11 -DTMWA_SUPPORT"
   - ./tools/ci/jobs/deheader.sh
-  - find ./src -type f \( -name "*.cpp" \) -exec tools/ci/scripts/deheaderS.sh {} \;
+  - find ./src -type f \( -name "*.cpp" \) -exec tools/ci/scripts/deheader.sh {} \;
   - ./tools/ci/jobs/deheader2.sh
   <<: *job-push
   <<: *job-deheader_shared
@@ -97,7 +97,7 @@ deheader_sdl2_libxml_tmwa_cpp:
   script:
   - export FLAGS="-DENABLE_LIBXML -DUSE_X11 -DTMWA_SUPPORT -DUSE_SDL2"
   - ./tools/ci/jobs/deheader.sh
-  - find ./src -type f \( -name "*.cpp" \) -exec tools/ci/scripts/deheaderS.sh {} \;
+  - find ./src -type f \( -name "*.cpp" \) -exec tools/ci/scripts/deheader.sh {} \;
   - ./tools/ci/jobs/deheader2.sh
   <<: *job-push
   <<: *job-deheader_sdl2_shared
@@ -110,6 +110,7 @@ deheader_tinyxml_opengl_tmwa_cpp:
   - find ./src -type f \( -name "*.cpp" \) -exec tools/ci/scripts/deheader.sh {} \;
   - ./tools/ci/jobs/deheader2.sh
   <<: *job-push
+  image: debian:unstable
   variables:
     GIT_DEPTH: "1"
     INCLUDES: "-I/usr/include/SDL -I/usr/include/libxml2"
@@ -128,6 +129,7 @@ deheader_sdl2_tinyxml_opengl_tmwa_cpp:
   - find ./src -type f \( -name "*.cpp" \) -exec tools/ci/scripts/deheader.sh {} \;
   - ./tools/ci/jobs/deheader2.sh
   <<: *job-push
+  image: debian:unstable
   variables:
     GIT_DEPTH: "1"
     INCLUDES: "-I/usr/include/SDL2 -I/usr/include/libxml2"
@@ -144,7 +146,7 @@ deheader_libxml_opengl_cpp:
   - export FLAGS="-DENABLE_LIBXML -DUSE_OPENGL -DUSE_X11"
   - ./tools/ci/jobs/deheader.sh
   - export skipPath="src/net/tmwa/"
-  - find ./src -type f \( -name "*.cpp" \) -exec tools/ci/scripts/deheaderS.sh {} \;
+  - find ./src -type f \( -name "*.cpp" \) -exec tools/ci/scripts/deheader.sh {} \;
   - ./tools/ci/jobs/deheader2.sh
   <<: *job-push
   <<: *job-deheader_shared
@@ -155,7 +157,7 @@ deheader_sdl2_libxml_opengl_cpp:
   - export FLAGS="-DENABLE_LIBXML -DUSE_OPENGL -DUSE_X11 -DUSE_SDL2"
   - ./tools/ci/jobs/deheader.sh
   - export skipPath="src/net/tmwa/"
-  - find ./src -type f \( -name "*.cpp" \) -exec tools/ci/scripts/deheaderS.sh {} \;
+  - find ./src -type f \( -name "*.cpp" \) -exec tools/ci/scripts/deheader.sh {} \;
   - ./tools/ci/jobs/deheader2.sh
   <<: *job-push
   <<: *job-deheader_sdl2_shared
@@ -165,7 +167,7 @@ deheader_libxml_opengl_tmwa_h:
   script:
   - export FLAGS="-DENABLE_LIBXML -DUSE_OPENGL -DUSE_X11 -DTMWA_SUPPORT"
   - ./tools/ci/jobs/deheader.sh
-  - find ./src -type f \( -name "*.h" \) -exec tools/ci/scripts/deheaderS.sh {} \;
+  - find ./src -type f \( -name "*.h" \) -exec tools/ci/scripts/deheader.sh {} \;
   - ./tools/ci/jobs/deheader2.sh
   <<: *job-push
   <<: *job-deheader_shared
@@ -175,7 +177,7 @@ deheader_sdl2_libxml_opengl_tmwa_h:
   script:
   - export FLAGS="-DENABLE_LIBXML -DUSE_OPENGL -DUSE_X11 -DTMWA_SUPPORT -DUSE_SDL2"
   - ./tools/ci/jobs/deheader.sh
-  - find ./src -type f \( -name "*.h" \) -exec tools/ci/scripts/deheaderS.sh {} \;
+  - find ./src -type f \( -name "*.h" \) -exec tools/ci/scripts/deheader.sh {} \;
   - ./tools/ci/jobs/deheader2.sh
   <<: *job-push
   <<: *job-deheader_sdl2_shared
@@ -185,7 +187,7 @@ deheader_libxml_tmwa_h:
   script:
   - export FLAGS="-DENABLE_LIBXML -DUSE_X11 -DTMWA_SUPPORT"
   - ./tools/ci/jobs/deheader.sh
-  - find ./src -type f \( -name "*.h" \) -exec tools/ci/scripts/deheaderS.sh {} \;
+  - find ./src -type f \( -name "*.h" \) -exec tools/ci/scripts/deheader.sh {} \;
   - ./tools/ci/jobs/deheader2.sh
   <<: *job-push
   <<: *job-deheader_shared
@@ -195,7 +197,7 @@ deheader_sdl2_libxml_tmwa_h:
   script:
   - export FLAGS="-DENABLE_LIBXML -DUSE_X11 -DTMWA_SUPPORT -DUSE_SDL2"
   - ./tools/ci/jobs/deheader.sh
-  - find ./src -type f \( -name "*.h" \) -exec tools/ci/scripts/deheaderS.sh {} \;
+  - find ./src -type f \( -name "*.h" \) -exec tools/ci/scripts/deheader.sh {} \;
   - ./tools/ci/jobs/deheader2.sh
   <<: *job-push
   <<: *job-deheader_sdl2_shared
@@ -208,6 +210,7 @@ deheader_tinyxml_opengl_tmwa_h:
   - find ./src -type f \( -name "*.h" \) -exec tools/ci/scripts/deheader.sh {} \;
   - ./tools/ci/jobs/deheader2.sh
   <<: *job-push
+  image: debian:unstable
   variables:
     GIT_DEPTH: "1"
     INCLUDES: "-I/usr/include/SDL -I/usr/include/libxml2"
@@ -226,6 +229,7 @@ deheader_sdl2_tinyxml_opengl_tmwa_h:
   - find ./src -type f \( -name "*.h" \) -exec tools/ci/scripts/deheader.sh {} \;
   - ./tools/ci/jobs/deheader2.sh
   <<: *job-push
+  image: debian:unstable
   variables:
     GIT_DEPTH: "1"
     INCLUDES: "-I/usr/include/SDL2 -I/usr/include/libxml2"
@@ -242,7 +246,7 @@ deheader_libxml_opengl_h:
   - export FLAGS="-DENABLE_LIBXML -DUSE_OPENGL -DUSE_X11"
   - ./tools/ci/jobs/deheader.sh
   - export skipPath="src/net/tmwa/"
-  - find ./src -type f \( -name "*.h" \) -exec tools/ci/scripts/deheaderS.sh {} \;
+  - find ./src -type f \( -name "*.h" \) -exec tools/ci/scripts/deheader.sh {} \;
   - ./tools/ci/jobs/deheader2.sh
   <<: *job-push
   <<: *job-deheader_shared
@@ -253,7 +257,7 @@ deheader_sdl2_libxml_opengl_h:
   - export FLAGS="-DENABLE_LIBXML -DUSE_OPENGL -DUSE_X11 -DUSE_SDL2"
   - ./tools/ci/jobs/deheader.sh
   - export skipPath="src/net/tmwa/"
-  - find ./src -type f \( -name "*.h" \) -exec tools/ci/scripts/deheaderS.sh {} \;
+  - find ./src -type f \( -name "*.h" \) -exec tools/ci/scripts/deheader.sh {} \;
   - ./tools/ci/jobs/deheader2.sh
   <<: *job-push
   <<: *job-deheader_sdl2_shared
