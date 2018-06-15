@@ -1,2 +1,3 @@
-include: "https://gitlab.com/manaplus/manaplus/raw/master/tools/ci/branches/.gitlab-ci_header.yml"
-include: "https://gitlab.com/manaplus/manaplus/raw/master/tools/ci/branches/ci_checks/.gitlab-ci.yml"
+include:
+    - "https://gitlab.com/manaplus/manaplus/raw/master/tools/ci/branches/.gitlab-ci_header.yml"
+    - "https://gitlab.com/manaplus/manaplus/raw/master/tools/ci/branches/ci_checks/.gitlab-ci.yml"
