@@ -1406,6 +1406,7 @@ def testcompile(source, compiler, std, std2, defines, maker, msg="", verbosity=0
     start = time.time()
     command = "{0} {1} {2} {3} -o {4} {5}".format(compiler, std, defines, maker, tmpname, source)
     (status, output) = getstatusoutput(command)
+    print("outpu1: '{0}'".format(output))
     end = time.time()
     if verbosity >= COMMAND_DEBUG or (showerrs and os.WIFEXITED(status) and os.WEXITSTATUS(status) != 0):
         sys.stdout.write(output + "\n")
@@ -1419,6 +1420,7 @@ def testcompile(source, compiler, std, std2, defines, maker, msg="", verbosity=0
         else:
             command = "{0} {1} {2} {3} -o {4} {5}".format(compiler, std2, defines, maker, tmpname, source)
             (status, output) = getstatusoutput(command)
+            print("outpu2: '{0}'".format(output))
             end = time.time()
             if status:
                 explain = "failed"
