@@ -53,7 +53,8 @@ Setup_Advanced::Setup_Advanced(const Widget2 *const widget) :
         "", this,
         Separator_true);
 
-    // FIXME: if(debugCMD[/enabledebug] || gmlvl >= advancedgmsettings@groups.xml) : show
+    // FIXME: if(debugCMD[/enabledebug] ||
+    //  gmlvl >= advancedgmsettings@groups.xml) : show
     // TRANSLATORS: settings option
     new SetupItemLabel(_("Debug Section (for debugging only)"),
         "", this,

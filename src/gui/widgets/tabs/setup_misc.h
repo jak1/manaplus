@@ -27,7 +27,7 @@
 
 class NamesModel;
 
-class [[deprecated("use setup_advanced instead")]] Setup_Misc final : public SetupTabScroll
+class Setup_Misc final : public SetupTabScroll
 {
     public:
         explicit Setup_Misc(const Widget2 *const widget);
