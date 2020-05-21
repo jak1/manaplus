@@ -62,6 +62,7 @@ Setup_Advanced::Setup_Advanced(const Widget2 *const widget) :
 
     // TRANSLATORS: settings option
     new SetupItemCheckBox(_("Disable logging (Default : unchecked)"),
+            // TRANSLATORS: settings option
             _("Disables inGame logging (carefull with this!)"),
             "disableLoggingInGame", this, "disableLoggingInGameEvent",
             MainConfig_true);
