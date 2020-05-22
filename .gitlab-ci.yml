@@ -52,32 +52,47 @@ variables:
   image: i386/ubuntu:cosmic
   <<: *job-push
   variables:
-    PACKAGES: gcc-5 g++-5 
-              make autoconf automake autopoint gettext 
-              libxml2-dev libcurl4-gnutls-dev libpng-dev 
-              libsdl-gfx1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-net1.2-dev libsdl-ttf2.0-dev 
-              gdb valgrind netcat-openbsd procps
-  tags:
-    - docker
-
-gcc-8-i386:
-  stage: prebuild
-  script:
-  - ./tools/ci/scripts/patchsdl1.sh
-  - ./tools/ci/jobs/gcc8.sh
-  - ./tools/ci/scripts/runtests.sh
-  image: vicamo/debian:sid-i386
-  <<: *job-push
-  variables:
-    PACKAGES: gcc-8 g++-8 
-              make autoconf automake autopoint gettext 
-              libxml2-dev libcurl4-gnutls-dev libpng-dev 
+    PACKAGES: gcc-5 g++-5
+              make autoconf automake autopoint gettext
+              libxml2-dev libcurl4-gnutls-dev libpng-dev
               libsdl-gfx1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-net1.2-dev libsdl-ttf2.0-dev
               gdb valgrind netcat-openbsd procps
   tags:
     - docker
 
-gcc-7-i386:
+gcc-9-i386:
+  stage: prebuild
+  script:
+  - ./tools/ci/scripts/patchsdl1.sh
+  - ./tools/ci/jobs/gcc9.sh
+  - ./tools/ci/scripts/runtests.sh
+  image: vicamo/debian:sid-i386
+  <<: *job-push
+  variables:
+    PACKAGES: gcc-9 g++-9
+              make autoconf automake autopoint gettext
+              libxml2-dev libcurl4-gnutls-dev libpng-dev
+              libsdl-gfx1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-net1.2-dev libsdl-ttf2.0-dev
+              gdb valgrind netcat-openbsd procps
+  tags:
+    - docker
+    
+gcc-8:
+  stage: prebuild
+  script:
+  - ./tools/ci/scripts/patchsdl1.sh
+  - ./tools/ci/jobs/gcc9.sh
+  - ./tools/ci/scripts/runtests.sh
+  - ./tools/ci/scripts/rundyecmd.sh
+  <<: *job-push
+  variables:
+    PACKAGES: gcc-9 g++-9
+              make autoconf automake autopoint gettext
+              libxml2-dev libcurl4-gnutls-dev libpng-dev
+              libsdl-gfx1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-net1.2-dev libsdl-ttf2.0-dev
+              gdb valgrind netcat-openbsd procps
+
+.gcc-7-i386:
   stage: prebuild
   script:
   - ./tools/ci/scripts/patchsdl1.sh
@@ -87,9 +102,9 @@ gcc-7-i386:
   image: vicamo/debian:sid-i386
   <<: *job-push
   variables:
-    PACKAGES: gcc-7 g++-7 
-              make autoconf automake autopoint gettext 
-              libxml2-dev libcurl4-gnutls-dev libpng-dev 
+    PACKAGES: gcc-7 g++-7
+              make autoconf automake autopoint gettext
+              libxml2-dev libcurl4-gnutls-dev libpng-dev
               libsdl-gfx1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-net1.2-dev libsdl-ttf2.0-dev
               gdb valgrind netcat-openbsd procps
   tags:
@@ -105,9 +120,9 @@ clang-3.9:
   image: debian:stretch
   <<: *job-push
   variables:
-    PACKAGES: clang-3.9 libc++-dev libc++abi-dev 
-              make autoconf automake autopoint gettext 
-              libxml2-dev libcurl4-gnutls-dev libpng-dev 
+    PACKAGES: clang-3.9 libc++-dev libc++abi-dev
+              make autoconf automake autopoint gettext
+              libxml2-dev libcurl4-gnutls-dev libpng-dev
               libsdl-gfx1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-net1.2-dev libsdl-ttf2.0-dev
               gdb valgrind netcat-openbsd procps
 
@@ -121,9 +136,9 @@ gcc-6:
   image: debian:stretch
   <<: *job-push
   variables:
-    PACKAGES: gcc-6 g++-6 
-              make autoconf automake autopoint gettext 
-              libxml2-dev libcurl4-gnutls-dev libpng-dev 
+    PACKAGES: gcc-6 g++-6
+              make autoconf automake autopoint gettext
+              libxml2-dev libcurl4-gnutls-dev libpng-dev
               libsdl-gfx1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-net1.2-dev libsdl-ttf2.0-dev
               gdb valgrind netcat-openbsd procps
 
@@ -136,9 +151,9 @@ gcc-8:
   - ./tools/ci/scripts/rundyecmd.sh
   <<: *job-push
   variables:
-    PACKAGES: gcc-8 g++-8 
-              make autoconf automake autopoint gettext 
-              libxml2-dev libcurl4-gnutls-dev libpng-dev 
+    PACKAGES: gcc-8 g++-8
+              make autoconf automake autopoint gettext
+              libxml2-dev libcurl4-gnutls-dev libpng-dev
               libsdl-gfx1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-net1.2-dev libsdl-ttf2.0-dev
               gdb valgrind netcat-openbsd procps
 
@@ -156,13 +171,13 @@ gcc-6_default:
     CC: gcc-6
     CXX: g++-6
     CXXFLAGS: "-Wall -Wextra"
-    PACKAGES: gcc-6 g++-6 
-              make autoconf automake autopoint gettext 
-              libxml2-dev libcurl4-gnutls-dev libpng-dev 
+    PACKAGES: gcc-6 g++-6
+              make autoconf automake autopoint gettext
+              libxml2-dev libcurl4-gnutls-dev libpng-dev
               libsdl-gfx1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-net1.2-dev libsdl-ttf2.0-dev
               gdb valgrind netcat-openbsd procps
 
-gcc-7_default:
+.gcc-7_default:
   stage: prebuild
   script:
   - ./tools/ci/scripts/patchsdl1.sh
@@ -175,9 +190,9 @@ gcc-7_default:
     CC: gcc-7
     CXX: g++-7
     CXXFLAGS: "-Wall -Wextra"
-    PACKAGES: gcc-7 g++-7 
-              make autoconf automake autopoint gettext 
-              libxml2-dev libcurl4-gnutls-dev libpng-dev 
+    PACKAGES: gcc-7 g++-7
+              make autoconf automake autopoint gettext
+              libxml2-dev libcurl4-gnutls-dev libpng-dev
               libsdl-gfx1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-net1.2-dev libsdl-ttf2.0-dev
               gdb valgrind netcat-openbsd procps
 
@@ -220,13 +235,13 @@ gcc-7_default:
   <<: *job-push
   image: ubuntu:cosmic
   variables:
-    PACKAGES: gcc-5 g++-5 
-              make autoconf automake autopoint gettext 
-              libxml2-dev libcurl4-gnutls-dev libpng-dev 
+    PACKAGES: gcc-5 g++-5
+              make autoconf automake autopoint gettext
+              libxml2-dev libcurl4-gnutls-dev libpng-dev
               libsdl2-gfx-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-net-dev libsdl2-ttf-dev
               gdb valgrind netcat-openbsd procps
 
-gcc-7_game_only:
+.gcc-7_game_only:
   stage: prebuild
   script:
   - ./tools/ci/scripts/patchsdl1.sh
@@ -234,13 +249,13 @@ gcc-7_game_only:
   - ./tools/ci/scripts/runtests.sh
   <<: *job-push
   variables:
-    PACKAGES: gcc-7 g++-7 
-              make autoconf automake autopoint gettext 
-              libxml2-dev libcurl4-gnutls-dev libpng-dev 
+    PACKAGES: gcc-7 g++-7
+              make autoconf automake autopoint gettext
+              libxml2-dev libcurl4-gnutls-dev libpng-dev
               libsdl-gfx1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-net1.2-dev libsdl-ttf2.0-dev
               gdb valgrind netcat-openbsd procps
 
-gcc-7_dyecmd_only:
+.gcc-7_dyecmd_only:
   stage: prebuild
   script:
   - ./tools/ci/scripts/patchsdl1.sh
@@ -248,9 +263,9 @@ gcc-7_dyecmd_only:
   - ./tools/ci/scripts/rundyecmd.sh
   <<: *job-push
   variables:
-    PACKAGES: gcc-7 g++-7 
-              make autoconf automake autopoint gettext 
-              libxml2-dev libcurl4-gnutls-dev libpng-dev 
+    PACKAGES: gcc-7 g++-7
+              make autoconf automake autopoint gettext
+              libxml2-dev libcurl4-gnutls-dev libpng-dev
               libsdl-gfx1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-net1.2-dev libsdl-ttf2.0-dev
 
 gcc-8_unittestsbin:
@@ -260,9 +275,9 @@ gcc-8_unittestsbin:
   - ./tools/ci/jobs/gcc8_silent.sh --enable-unittestsbin --without-manaplusgame --without-dyecmd
   <<: *job-push
   variables:
-    PACKAGES: gcc-8 g++-8 
-              make autoconf automake autopoint gettext 
-              libxml2-dev libcurl4-gnutls-dev libpng-dev 
+    PACKAGES: gcc-8 g++-8
+              make autoconf automake autopoint gettext
+              libxml2-dev libcurl4-gnutls-dev libpng-dev
               libsdl-gfx1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-net1.2-dev libsdl-ttf2.0-dev
 
 mplint:
@@ -273,7 +288,7 @@ mplint:
   - ./tools/ci/jobs/mplint.sh data
   <<: *job-push
   variables:
-    PACKAGES: gcc g++ git 
+    PACKAGES: gcc g++ git
               make autoconf automake autopoint gettext
 
 linters:
@@ -299,9 +314,9 @@ linters:
   <<: *job-push
   image: ubuntu:cosmic
   variables:
-    PACKAGES: gcc-5 g++-5 
-              make autoconf automake autopoint gettext 
-              libxml2-dev libcurl4-gnutls-dev libpng-dev 
+    PACKAGES: gcc-5 g++-5
+              make autoconf automake autopoint gettext
+              libxml2-dev libcurl4-gnutls-dev libpng-dev
               libsdl-gfx1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-net1.2-dev libsdl-ttf2.0-dev
 
 .gcc-5_h_all_i386:
@@ -316,9 +331,9 @@ linters:
   image: i386/ubuntu:cosmic
   <<: *job-push
   variables:
-    PACKAGES: gcc-5 g++-5 
-              make autoconf automake autopoint gettext 
-              libxml2-dev libcurl4-gnutls-dev libpng-dev 
+    PACKAGES: gcc-5 g++-5
+              make autoconf automake autopoint gettext
+              libxml2-dev libcurl4-gnutls-dev libpng-dev
               libsdl-gfx1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-net1.2-dev libsdl-ttf2.0-dev
   tags:
     - docker
@@ -350,10 +365,10 @@ triggers:
   variables:
     LIBNAME: SDL
     LIBVERSION: SDL-1.2_asan
-    PACKAGES: gcc-7 g++-7 
-              make autoconf automake autopoint gettext pkg-config 
-              libx11-dev libxext-dev libxt-dev libxv-dev x11proto-core-dev libgl1-mesa-dev libasound2-dev libglu1-mesa-dev libicu-dev 
-              valgrind 
+    PACKAGES: gcc-7 g++-7
+              make autoconf automake autopoint gettext pkg-config
+              libx11-dev libxext-dev libxt-dev libxv-dev x11proto-core-dev libgl1-mesa-dev libasound2-dev libglu1-mesa-dev libicu-dev
+              valgrind
               wget unzip
     JOBS: 1
     ASAN_OPTIONS: "detect_leaks=0"
@@ -376,10 +391,10 @@ triggers:
   variables:
     LIBNAME: SDL
     LIBVERSION: default_asan
-    PACKAGES: gcc-7 g++-7 
-              make autoconf automake autopoint gettext pkg-config 
-              libx11-dev libxext-dev libxt-dev libxv-dev x11proto-core-dev libgl1-mesa-dev libasound2-dev libicu-dev 
-              valgrind 
+    PACKAGES: gcc-7 g++-7
+              make autoconf automake autopoint gettext pkg-config
+              libx11-dev libxext-dev libxt-dev libxv-dev x11proto-core-dev libgl1-mesa-dev libasound2-dev libicu-dev
+              valgrind
               wget unzip
     JOBS: 1
     ASAN_OPTIONS: "detect_leaks=0"
@@ -402,10 +417,10 @@ triggers:
   variables:
     LIBNAME: SDL
     LIBVERSION: SDL-1.2
-    PACKAGES: gcc-7 g++-7 
-              make autoconf automake autopoint gettext pkg-config 
-              libx11-dev libxext-dev libxt-dev libxv-dev x11proto-core-dev libgl1-mesa-dev libasound2-dev libglu1-mesa-dev libicu-dev 
-              valgrind 
+    PACKAGES: gcc-7 g++-7
+              make autoconf automake autopoint gettext pkg-config
+              libx11-dev libxext-dev libxt-dev libxv-dev x11proto-core-dev libgl1-mesa-dev libasound2-dev libglu1-mesa-dev libicu-dev
+              valgrind
               wget unzip
     runenvz: /usr/local/spm/bin/${LIBNAME}_${LIBVERSION}/runzlib_master.sh
     runenvx: /usr/local/spm/bin/${LIBNAME}_${LIBVERSION}/runlibxml2_master.sh
@@ -424,10 +439,10 @@ triggers:
   variables:
     LIBNAME: SDL
     LIBVERSION: default
-    PACKAGES: gcc-7 g++-7 
-              make autoconf automake autopoint gettext pkg-config 
-              libx11-dev libxext-dev libxt-dev libxv-dev x11proto-core-dev libgl1-mesa-dev libasound2-dev libicu-dev 
-              valgrind 
+    PACKAGES: gcc-7 g++-7
+              make autoconf automake autopoint gettext pkg-config
+              libx11-dev libxext-dev libxt-dev libxv-dev x11proto-core-dev libgl1-mesa-dev libasound2-dev libicu-dev
+              valgrind
               wget unzip
     runenvz: /usr/local/spm/bin/${LIBNAME}_${LIBVERSION}/runzlib_master.sh
     runenvx: /usr/local/spm/bin/${LIBNAME}_${LIBVERSION}/runlibxml2_master.sh
@@ -449,10 +464,10 @@ triggers:
   variables:
     LIBNAME: SDL
     LIBVERSION: SDL-1.2_old
-    PACKAGES: gcc-7 g++-7 
-              make autoconf automake autopoint gettext pkg-config 
-              libx11-dev libxext-dev libxt-dev libxv-dev x11proto-core-dev libgl1-mesa-dev libasound2-dev libglu1-mesa-dev libicu-dev 
-              valgrind 
+    PACKAGES: gcc-7 g++-7
+              make autoconf automake autopoint gettext pkg-config
+              libx11-dev libxext-dev libxt-dev libxv-dev x11proto-core-dev libgl1-mesa-dev libasound2-dev libglu1-mesa-dev libicu-dev
+              valgrind
               libjpeg-dev libtiff-dev
               wget unzip
     runenvz: /usr/local/spm/bin/${LIBNAME}_${LIBVERSION}/runzlib_v1.2.5.sh
@@ -473,10 +488,10 @@ triggers:
   variables:
     LIBNAME: SDL
     LIBVERSION: default_old
-    PACKAGES: gcc-7 g++-7 
-              make autoconf automake autopoint gettext pkg-config 
-              libx11-dev libxext-dev libxt-dev libxv-dev x11proto-core-dev libgl1-mesa-dev libasound2-dev libicu-dev 
-              valgrind 
+    PACKAGES: gcc-7 g++-7
+              make autoconf automake autopoint gettext pkg-config
+              libx11-dev libxext-dev libxt-dev libxv-dev x11proto-core-dev libgl1-mesa-dev libasound2-dev libicu-dev
+              valgrind
               libjpeg-dev libtiff-dev
               wget unzip
     runenvz: /usr/local/spm/bin/${LIBNAME}_${LIBVERSION}/runzlib_v1.2.5.sh
@@ -498,9 +513,9 @@ triggers:
   variables:
     LIBNAME: zlib_ng
     LIBVERSION: develop
-    PACKAGES: gcc-7 g++-7 
-              make autoconf automake autopoint gettext 
-              libxml2-dev libcurl4-gnutls-dev libpng-dev 
+    PACKAGES: gcc-7 g++-7
+              make autoconf automake autopoint gettext
+              libxml2-dev libcurl4-gnutls-dev libpng-dev
               libsdl-gfx1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-net1.2-dev libsdl-ttf2.0-dev
               wget unzip gdb valgrind netcat-openbsd procps
   tags:
@@ -520,9 +535,9 @@ triggers:
   variables:
     LIBNAME: SDL
     LIBVERSION: SDL-1.2
-    PACKAGES: gcc-7 g++-7 
-              make autoconf automake autopoint gettext pkg-config 
-              libx11-dev libxext-dev libxt-dev libxv-dev x11proto-core-dev libgl1-mesa-dev libasound2-dev libglu1-mesa-dev libicu-dev 
+    PACKAGES: gcc-7 g++-7
+              make autoconf automake autopoint gettext pkg-config
+              libx11-dev libxext-dev libxt-dev libxv-dev x11proto-core-dev libgl1-mesa-dev libasound2-dev libglu1-mesa-dev libicu-dev
               valgrind netcat-openbsd
               wget unzip
     runenvz: /usr/local/spm/bin/${LIBNAME}_${LIBVERSION}/runzlib_master.sh
@@ -542,9 +557,9 @@ triggers:
   variables:
     LIBNAME: SDL
     LIBVERSION: default
-    PACKAGES: gcc-7 g++-7 
-              make autoconf automake autopoint gettext pkg-config 
-              libx11-dev libxext-dev libxt-dev libxv-dev x11proto-core-dev libgl1-mesa-dev libasound2-dev libicu-dev 
+    PACKAGES: gcc-7 g++-7
+              make autoconf automake autopoint gettext pkg-config
+              libx11-dev libxext-dev libxt-dev libxv-dev x11proto-core-dev libgl1-mesa-dev libasound2-dev libicu-dev
               valgrind netcat-openbsd
               wget unzip
     runenvz: /usr/local/spm/bin/${LIBNAME}_${LIBVERSION}/runzlib_master.sh
@@ -567,9 +582,9 @@ triggers:
   variables:
     LIBNAME: SDL
     LIBVERSION: SDL-1.2_old
-    PACKAGES: gcc-7 g++-7 
-              make autoconf automake autopoint gettext pkg-config 
-              libx11-dev libxext-dev libxt-dev libxv-dev x11proto-core-dev libgl1-mesa-dev libasound2-dev libglu1-mesa-dev libicu-dev 
+    PACKAGES: gcc-7 g++-7
+              make autoconf automake autopoint gettext pkg-config
+              libx11-dev libxext-dev libxt-dev libxv-dev x11proto-core-dev libgl1-mesa-dev libasound2-dev libglu1-mesa-dev libicu-dev
               valgrind netcat-openbsd
               libjpeg-dev libtiff-dev
               wget unzip
@@ -591,9 +606,9 @@ triggers:
   variables:
     LIBNAME: SDL
     LIBVERSION: default_old
-    PACKAGES: gcc-7 g++-7 
-              make autoconf automake autopoint gettext pkg-config 
-              libx11-dev libxext-dev libxt-dev libxv-dev x11proto-core-dev libgl1-mesa-dev libasound2-dev libicu-dev 
+    PACKAGES: gcc-7 g++-7
+              make autoconf automake autopoint gettext pkg-config
+              libx11-dev libxext-dev libxt-dev libxv-dev x11proto-core-dev libgl1-mesa-dev libasound2-dev libicu-dev
               valgrind netcat-openbsd
               libjpeg-dev libtiff-dev
               wget unzip
