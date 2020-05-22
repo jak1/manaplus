@@ -76,8 +76,8 @@ gcc-9-i386:
               gdb valgrind netcat-openbsd procps
   tags:
     - docker
-    
-gcc-8:
+
+gcc-9:
   stage: prebuild
   script:
   - ./tools/ci/scripts/patchsdl1.sh
