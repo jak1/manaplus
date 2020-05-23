@@ -195,6 +195,12 @@ function run_make {
     check_error $?
 }
 
+function run_make_install {
+    echo "make install"
+    make install 2>$ERRFILE
+    check_error $?
+}
+
 function run_make_check {
     rm $ERRFILE
     if [ "$JOBS" == "" ]; then

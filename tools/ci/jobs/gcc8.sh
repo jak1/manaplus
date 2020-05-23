@@ -24,6 +24,8 @@ source ./tools/ci/flags/gcc8.sh
 
 export CXXFLAGS="$CXXFLAGS $POST_CXXFLAGS"
 
+mkdir -p run
+
 do_init
 run_configure --enable-werror \
 --enable-commandlinepassword \
