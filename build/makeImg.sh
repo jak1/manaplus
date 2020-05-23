@@ -27,7 +27,7 @@ chmod -R 755 "$dir/$appdir"
 -e run/bin/manaplus \
 --output appimage >> logs/appimg.log
 
-mv *.AppImage binarys/
+mv ManaPlus*.AppImage binarys/
 cp -r run/ binarys/
 
 exit 0
