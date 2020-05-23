@@ -25,9 +25,8 @@ chmod -R 755 "$dir/$appdir"
 -d manaplus.desktop \
 -i data/icons/manaplus.svg \
 -e run/bin/manaplus \
---output appimage >> logs/appimg.log
+--output appimage >> logs/appimg.log || exit 1
 
-mv ManaPlus*.AppImage binarys/
-cp -r run/ binarys/
+mv ManaPlus*.AppImage binarys/ || exit 1
 
 exit 0
