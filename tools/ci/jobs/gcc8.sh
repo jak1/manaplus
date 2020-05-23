@@ -1,4 +1,5 @@
 #!/bin/bash
+dir=`pwd`
 
 export CC=gcc-8
 export CXX=g++-8
@@ -23,9 +24,19 @@ source ./tools/ci/flags/gcc8.sh
 
 export CXXFLAGS="$CXXFLAGS $POST_CXXFLAGS"
 
+mkdir -p run
+
 do_init
-run_configure --enable-werror $*
+run_configure --enable-werror \
+--enable-commandlinepassword \
+--datadir=$dir/run/share/games \
+--bindir=$dir/run/bin \
+--mandir=$dir/run/share/man \
+--enable-portable=yes $*
+
 run_make
+run_make_install
+
 
 source ./tools/ci/scripts/exit.sh
 
