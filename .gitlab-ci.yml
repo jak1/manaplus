@@ -222,7 +222,6 @@ mxe_gcc6_shared_32:
   stage: prebuild
   script:
   - ./tools/ci/jobs/mxe_gcc6.sh
-  - ./tools/ci/jobs/packwin.sh
   <<: *job-push
   image: registry.gitlab.com/manaplus2/mp-build-test
   variables:

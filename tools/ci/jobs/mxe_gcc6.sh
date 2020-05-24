@@ -5,4 +5,5 @@ cd build/
 cd $dir
 cd build/
 ./packwin
-cp tmp/src/*.exe /binarys/
+cd $dir
+cp packaging/windows/*.exe binarys/
