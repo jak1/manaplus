@@ -218,13 +218,13 @@ gcc-6_default:
               gdb valgrind netcat-openbsd procps
 
 #removed would not build, to many errors (docker not configured)
-.mxe_gcc6_shared_32:
+mxe_gcc6_shared_32:
   stage: prebuild
   script:
-  - ls /mxe
   - ./tools/ci/jobs/mxe_gcc6.sh
+  - ./tools/ci/jobs/packwin.sh
   <<: *job-push
-  image: registry.gitlab.com/manaplus/mxe:gcc6_shared_32
+  image: registry.gitlab.com/manaplus2/mp-build-test
   variables:
     PACKAGES: bash
     CROSS: i686-w64-mingw32.shared
