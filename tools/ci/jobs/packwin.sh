@@ -2,7 +2,7 @@
 
 cp_dll(){
 	if [[ -f "/usr/lib/mxe/usr/${CROSS}/bin/${1}" ]]; then
-		cp "/usr/lib/mxe/usr/${CROSS}/bin/${1}" "../../libs/dll/${1}"
+		cp "/usr/lib/mxe/usr/${CROSS}/bin/${1}" "../libs/dll/${1}"
 	else
 		echo "NOT FOUND: /usr/lib/mxe/usr/${CROSS}/bin/${1}"
 		exit 1
@@ -10,7 +10,7 @@ cp_dll(){
 }
 
 cp_dlls(){
-	mkdir -p ../../libs/dll
+	mkdir -p ../libs/dll/
 	cp_dll "SDL.dll"
 	cp_dll "SDL_image.dll"
 	cp_dll "SDL_mixer.dll"
@@ -38,6 +38,8 @@ cp_dlls(){
 	#cp_dll "libreadline7.dll" # ^
 	cp_dll "libreadline8.dll"
 	cp_dll "libtermcap.dll"
+    ls -1 ../
+    ls -1 ../libs/dll/
 }
 
 cp_dlls
